@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Energy / Calories Calculator | S3 Biology</title>
+  <link rel="stylesheet" href="../osmosis/bio-typography.css" />
+  <link rel="stylesheet" href="../osmosis/embed.css" />
+  <script src="../osmosis/embed.js"></script>
+  <script src="../osmosis/tool-back.js" data-position="top-right" data-hub="../osmosis/lab.html"></script>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --ink: #1e1540;
+      --muted: #5a5470;
+      --title: #7a1a32;
+      --red: #c41e3a;
+      --line: #cfcfcf;
+      --box: #ffffff;
+      --soft: #f4f4f4;
+      --on: #fdecee;
+      --on-line: #7a1a32;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100%;
+    }
+
+    body {
+      font-family: "Segoe UI", "Microsoft JhengHei", Arial, sans-serif;
+      line-height: 1.4;
+    }
+
+    .page {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 18px 20px 40px;
+    }
+
+    html.bio-embed .page { padding: 10px 12px 24px; }
+
+    .page-title {
+      text-align: center;
+      color: var(--title);
+      font-size: 1.55rem;
+      font-weight: 800;
+      margin: 6px 0 16px;
+    }
+
+    .section-label {
+      font-weight: 800;
+      color: var(--ink);
+      font-size: 0.95rem;
+      margin: 18px 0 8px;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+    }
+
+    .pick-list {
+      max-width: 640px;
+      margin: 0 auto 8px;
+    }
+
+    .pick-row {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .pick-row .please {
+      font-weight: 800;
+      color: var(--ink);
+      font-size: 0.95rem;
+    }
+
+    .pick-row select {
+      width: 100%;
+      height: 36px;
+      border: 1px solid #bdbdbd;
+      background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23666' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 10px center;
+      appearance: none;
+      padding: 0 32px 0 10px;
+      font: inherit;
+      font-size: 0.92rem;
+      color: var(--ink);
+    }
+
+    .pick-row select:disabled {
+      color: var(--muted);
+      background-color: var(--soft);
+    }
+
+    .label-wrap {
+      display: grid;
+      grid-template-columns: minmax(240px, 340px) 1fr;
+      gap: 16px;
+      align-items: start;
+      margin-top: 8px;
+    }
+
+    .nutri-table {
+      width: 100%;
+      border: 1px solid #111;
+      border-collapse: collapse;
+      background: #fff;
+      font-size: 0.9rem;
+    }
+
+    .nutri-table caption {
+      background: #111;
+      color: #fff;
+      font-weight: 700;
+      text-align: left;
+      padding: 6px 10px;
+      caption-side: top;
+    }
+
+    .nutri-table .cap-right {
+      float: right;
+      font-weight: 600;
+    }
+
+    .nutri-table td {
+      border-bottom: 1px solid #ddd;
+      padding: 5px 10px;
+    }
+
+    .nutri-table tr:last-child td { border-bottom: 0; }
+    .nutri-table .sub td:first-child { padding-left: 22px; color: #333; }
+    .nutri-table .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .nutri-empty {
+      border: 1px solid var(--line);
+      background: var(--soft);
+      min-height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .food-note {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    .work {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 16px;
+      margin-top: 22px;
+      align-items: start;
+    }
+
+    .calc-head {
+      text-align: center;
+      color: var(--title);
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    .col {
+      border: 1px solid var(--line);
+      background: #fff;
+      padding: 10px 10px 12px;
+      cursor: pointer;
+      min-height: 168px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .col.is-on {
+      border-color: var(--on-line);
+      background: #fff8f9;
+    }
+
+    .col h3 {
+      font-size: 0.82rem;
+      font-weight: 800;
+      line-height: 1.25;
+      color: var(--ink);
+    }
+
+    .col select {
+      width: 100%;
+      height: 34px;
+      border: 1px solid #bdbdbd;
+      background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23666' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 8px center;
+      appearance: none;
+      padding: 0 28px 0 8px;
+      font: inherit;
+      font-size: 0.82rem;
+      color: var(--ink);
+    }
+
+    .weight {
+      color: var(--red);
+      font-size: 0.78rem;
+      font-weight: 700;
+      min-height: 1.1em;
+    }
+
+    .score {
+      margin-top: auto;
+      height: 36px;
+      border: 1px solid #bdbdbd;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 10px;
+      font-variant-numeric: tabular-nums;
+      font-size: 0.92rem;
+    }
+
+    .req-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      align-items: center;
+      margin-top: 14px;
+      font-size: 0.88rem;
+    }
+
+    .req-row label { font-weight: 700; }
+
+    .req-row input {
+      width: 96px;
+      height: 32px;
+      border: 1px solid #bdbdbd;
+      background: #fff;
+      padding: 0 8px;
+      font: inherit;
+      text-align: right;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 14px;
+    }
+
+    .btn-calc {
+      appearance: none;
+      border: 0;
+      background: var(--title);
+      color: #fff;
+      font: inherit;
+      font-weight: 800;
+      padding: 10px 22px;
+      cursor: pointer;
+    }
+
+    .btn-calc:hover { filter: brightness(1.08); }
+
+    .results {
+      border: 1px solid var(--line);
+      background: #fff;
+      min-height: 280px;
+      padding: 12px 14px 16px;
+    }
+
+    .results h2 {
+      color: var(--title);
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .placeholder {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .block {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid #eee;
+    }
+
+    .block:first-of-type { margin-top: 0; padding-top: 0; border-top: 0; }
+
+    .block h3 {
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+
+    .step {
+      font-size: 0.86rem;
+      margin: 6px 0;
+    }
+
+    .eq {
+      font-family: "Cambria Math", "Times New Roman", serif;
+      background: var(--soft);
+      border: 1px solid #e6e6e6;
+      padding: 8px 10px;
+      margin: 6px 0;
+      font-size: 0.9rem;
+    }
+
+    .ans {
+      font-weight: 800;
+      color: var(--title);
+      margin-top: 6px;
+    }
+
+    .warn {
+      font-size: 0.82rem;
+      color: var(--red);
+      margin-top: 6px;
+    }
+
+    .rank-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+    }
+
+    .rank-table th, .rank-table td {
+      border-bottom: 1px solid #e5e5e5;
+      padding: 4px 6px;
+      text-align: left;
+    }
+
+    .rank-table td:last-child, .rank-table th:last-child { text-align: right; }
+
+    .err {
+      color: var(--red);
+      font-size: 0.86rem;
+      margin-top: 8px;
+      min-height: 1.2em;
+    }
+
+    @media (max-width: 900px) {
+      .label-wrap, .work, .cols { grid-template-columns: 1fr; }
+      .pick-row { grid-template-columns: 1fr; gap: 4px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1 class="page-title">Please Select Your Food</h1>
+    <p class="hint">First choose a food product category, then choose the food name. Nutrition information appears below. Scroll down to calculate.</p>
+
+    <div class="pick-list">
+      <div class="pick-row">
+        <span class="please">Please Select</span>
+        <select id="sel-category" aria-label="Food product category">
+          <option value="">Select a food product category</option>
+        </select>
+      </div>
+      <div class="pick-row">
+        <span class="please">Please Select</span>
+        <select id="sel-food" aria-label="Food product name" disabled>
+          <option value="">Select a food product</option>
+        </select>
+      </div>
+    </div>
+
+    <h2 class="section-label">Nutrition information</h2>
+    <div class="label-wrap">
+      <div id="label-panel">
+        <div class="nutri-empty">Select a category, then a food name, to see its nutrition information table.</div>
+      </div>
+      <div>
+        <p class="hint" id="selected-name">No food selected yet.</p>
+        <p class="food-note">Energy-giving substances: carbohydrate / protein ≈ 17 kJ/g (4 kcal/g); lipid ≈ 37 kJ/g (9 kcal/g). Dietary fibre, minerals and vitamins have no energy value in this course.</p>
+      </div>
+    </div>
+
+    <div class="work">
+      <section>
+        <h2 class="calc-head">Please Select What to Calculate</h2>
+        <div class="cols">
+          <article class="col" id="col-energy" data-col="energy" tabindex="0" role="button" aria-pressed="false">
+            <h3>Energy / calories amount<br>(click if you want to see)</h3>
+            <select id="sel-energy" aria-label="Show energy amount">
+              <option value="off">Skip</option>
+              <option value="on">Show energy amount</option>
+            </select>
+            <div class="weight">4.2 kJ = 1 kcal</div>
+            <div class="score" id="score-energy">—</div>
+          </article>
+          <article class="col" id="col-nutrient" data-col="nutrient" tabindex="0">
+            <h3>Amount of nutrition that could be obtained<br>(select a nutrient)</h3>
+            <select id="sel-nutrient" aria-label="Select nutrient">
+              <option value="">Skip</option>
+            </select>
+            <div class="weight">(ii) 1 · from energy need</div>
+            <div class="score" id="score-nutrient">—</div>
+          </article>
+          <article class="col" id="col-rank" data-col="rank" tabindex="0" role="button" aria-pressed="false">
+            <h3>Ranking of top 5 substances by abundance<br>(click if you want to see)</h3>
+            <select id="sel-rank" aria-label="Show ranking">
+              <option value="off">Skip</option>
+              <option value="on">Show top 5 ranking</option>
+            </select>
+            <div class="weight">Q5 · energy source</div>
+            <div class="score" id="score-rank">—</div>
+          </article>
+        </div>
+
+        <div class="req-row">
+          <label for="daily-kj">Daily energy requirement</label>
+          <input id="daily-kj" type="number" min="1" step="100" value="11100" />
+          <span>kJ</span>
+          <label for="daily-protein">Daily protein requirement</label>
+          <input id="daily-protein" type="number" min="1" step="1" value="52" />
+          <span>g &nbsp;(16-year-old boy, exam Table II)</span>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn-calc" id="btn-calc">Calculate</button>
+        </div>
+        <p class="err" id="err"></p>
+      </section>
+
+      <aside class="results" id="results">
+        <h2>Result and working</h2>
+        <p class="placeholder">After you press Calculate, the answer and step-by-step working appear here.</p>
+      </aside>
+    </div>
+  </div>
+
+  <script src="./js/energy-calories-data.js"></script>
+  <script>
+    (function () {
+      const KJ_PER_KCAL = 4.2;
+      const KJ = { protein: 17, carb: 17, fat: 37 };
+      const KCAL = { protein: 4, carb: 4, fat: 9 };
+
+      const foods = window.ENERGY_FOODS;
+      const categories = window.ENERGY_CATEGORIES;
+      const nutrients = window.ENERGY_NUTRIENTS;
+
+      const els = {
+        selCategory: document.getElementById("sel-category"),
+        selFood: document.getElementById("sel-food"),
+        label: document.getElementById("label-panel"),
+        selected: document.getElementById("selected-name"),
+        selEnergy: document.getElementById("sel-energy"),
+        selNutrient: document.getElementById("sel-nutrient"),
+        selRank: document.getElementById("sel-rank"),
+        colEnergy: document.getElementById("col-energy"),
+        colNutrient: document.getElementById("col-nutrient"),
+        colRank: document.getElementById("col-rank"),
+        scoreEnergy: document.getElementById("score-energy"),
+        scoreNutrient: document.getElementById("score-nutrient"),
+        scoreRank: document.getElementById("score-rank"),
+        dailyKj: document.getElementById("daily-kj"),
+        dailyProtein: document.getElementById("daily-protein"),
+        btn: document.getElementById("btn-calc"),
+        results: document.getElementById("results"),
+        err: document.getElementById("err")
+      };
+
+      let selectedId = null;
+
+      nutrients.forEach((n) => {
+        const opt = document.createElement("option");
+        opt.value = n.id;
+        opt.textContent = n.label;
+        els.selNutrient.appendChild(opt);
+      });
+
+      function foodById(id) {
+        return foods.find((f) => f.id === id);
+      }
+
+      function kjOf(food) {
+        return food.kj != null ? food.kj : Math.round(food.kcal * KJ_PER_KCAL);
+      }
+
+      function fmt(n, d) {
+        const f = Number(n);
+        if (!Number.isFinite(f)) return "—";
+        return f.toLocaleString("en-HK", {
+          minimumFractionDigits: d,
+          maximumFractionDigits: d
+        });
+      }
+
+      function round0(n) {
+        return Math.round(n);
+      }
+
+      function round1(n) {
+        return Math.round(n * 10) / 10;
+      }
+
+      function wantEnergy() {
+        return els.selEnergy.value === "on";
+      }
+
+      function wantRank() {
+        return els.selRank.value === "on";
+      }
+
+      function chosenNutrient() {
+        return nutrients.find((n) => n.id === els.selNutrient.value) || null;
+      }
+
+      function syncCols() {
+        els.colEnergy.classList.toggle("is-on", wantEnergy());
+        els.colEnergy.setAttribute("aria-pressed", String(wantEnergy()));
+        els.colNutrient.classList.toggle("is-on", Boolean(chosenNutrient()));
+        els.colRank.classList.toggle("is-on", wantRank());
+        els.colRank.setAttribute("aria-pressed", String(wantRank()));
+      }
+
+      function fillCategories() {
+        categories.forEach((cat) => {
+          const opt = document.createElement("option");
+          opt.value = cat;
+          opt.textContent = cat;
+          els.selCategory.appendChild(opt);
+        });
+      }
+
+      function fillFoods(category) {
+        els.selFood.innerHTML = "";
+        const placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = category ? "Select a food product" : "Select a category first";
+        els.selFood.appendChild(placeholder);
+        const items = category ? foods.filter((f) => f.category === category) : [];
+        items.forEach((f) => {
+          const opt = document.createElement("option");
+          opt.value = f.id;
+          opt.textContent = f.name;
+          els.selFood.appendChild(opt);
+        });
+        els.selFood.disabled = items.length === 0;
+      }
+
+      function row(name, value, sub) {
+        return `<tr class="${sub ? "sub" : ""}"><td>${name}</td><td class="num">${value}</td></tr>`;
+      }
+
+      function renderLabel(food) {
+        if (!food) {
+          els.label.innerHTML = `<div class="nutri-empty">Select a category, then a food name, to see its nutrition information table.</div>`;
+          els.selected.textContent = "No food selected yet.";
+          return;
+        }
+        const kj = kjOf(food);
+        els.selected.textContent = `Selected: ${food.name} · ${food.serving}${food.freshPer100Dry ? ` · ${food.freshPer100Dry} g fresh yields 100 g dry` : ""}`;
+        els.label.innerHTML = `
+          <table class="nutri-table">
+            <caption>Nutrition Information <span class="cap-right">${food.serving}</span></caption>
+            <tbody>
+              ${row("Energy", `${fmt(food.kcal, 0)} kcal`)}
+              ${row("", `${fmt(kj, 0)} kJ`)}
+              ${row("Protein", `${fmt(food.protein, 1)} g`)}
+              ${row("Total fat", `${fmt(food.fat, 1)} g`)}
+              ${row("- Saturated fat", `${fmt(food.sat, 1)} g`, true)}
+              ${row("- Trans fat", `${fmt(food.trans, 1)} g`, true)}
+              ${row("Total carbohydrate", `${fmt(food.carb, 1)} g`)}
+              ${row("- Dietary fibre", `${fmt(food.fibre, 1)} g`, true)}
+              ${row("- Sugars", `${fmt(food.sugars, 1)} g`, true)}
+              ${row("Sodium", `${fmt(food.sodium, 0)} mg`)}
+              ${row("Calcium", `${fmt(food.calcium, 0)} mg`)}
+            </tbody>
+          </table>
+          ${food.note ? `<p class="food-note">${food.note}</p>` : ""}
+          ${food.freshPer100Dry ? `<p class="food-note">Fresh weight from which 100 g dry weight is yielded: <strong>${food.freshPer100Dry} g</strong></p>` : ""}
+        `;
+      }
+
+      function selectFood(id) {
+        selectedId = id || null;
+        renderLabel(id ? foodById(id) : null);
+        els.scoreEnergy.textContent = "—";
+        els.scoreNutrient.textContent = "—";
+        els.scoreRank.textContent = "—";
+        els.err.textContent = "";
+      }
+
+      function onCategoryChange() {
+        const cat = els.selCategory.value;
+        fillFoods(cat);
+        selectFood(null);
+      }
+
+      function onFoodChange() {
+        selectFood(els.selFood.value);
+      }
+
+      function substances(food) {
+        return [
+          { name: "Protein", g: food.protein, show: `${fmt(food.protein, 1)} g`, energy: true, kind: "protein" },
+          { name: "Total fat", g: food.fat, show: `${fmt(food.fat, 1)} g`, energy: true, kind: "fat" },
+          { name: "Saturated fat", g: food.sat, show: `${fmt(food.sat, 1)} g`, energy: false },
+          { name: "Trans fat", g: food.trans, show: `${fmt(food.trans, 1)} g`, energy: false },
+          { name: "Total carbohydrate", g: food.carb, show: `${fmt(food.carb, 1)} g`, energy: true, kind: "carb" },
+          { name: "Dietary fibre", g: food.fibre, show: `${fmt(food.fibre, 1)} g`, energy: false },
+          { name: "Sugars", g: food.sugars, show: `${fmt(food.sugars, 1)} g`, energy: false },
+          { name: "Sodium", g: food.sodium / 1000, show: `${fmt(food.sodium, 0)} mg`, energy: false },
+          { name: "Calcium", g: food.calcium / 1000, show: `${fmt(food.calcium, 0)} mg`, energy: false }
+        ];
+      }
+
+      function top5(food) {
+        return substances(food).slice().sort((a, b) => b.g - a.g).slice(0, 5);
+      }
+
+      function energySources(food) {
+        return [
+          { name: "fat", mass: food.fat, kcal: food.fat * KCAL.fat, kj: food.fat * KJ.fat },
+          { name: "carbohydrate", mass: food.carb, kcal: food.carb * KCAL.carb, kj: food.carb * KJ.carb },
+          { name: "protein", mass: food.protein, kcal: food.protein * KCAL.protein, kj: food.protein * KJ.protein }
+        ].sort((a, b) => b.kcal - a.kcal);
+      }
+
+      function nutrientAmount(food, nutrient, dailyKj) {
+        const unitMass = food.freshPer100Dry || 100;
+        const e = kjOf(food);
+        const rawMass = (dailyKj / e) * unitMass;
+        const mass = round0(rawMass);
+        const perUnit = food[nutrient.field];
+        const obtained = round1((mass / unitMass) * perUnit);
+        return { unitMass, e, mass, perUnit, obtained };
+      }
+
+      function htmlEnergy(food) {
+        const kj = kjOf(food);
+        const fromMac = food.protein * KJ.protein + food.carb * KJ.carb + food.fat * KJ.fat;
+        return `
+          <div class="block">
+            <h3>1. Energy / calories amount</h3>
+            <p class="step">Read the energy value from the nutrition information of <strong>${food.name}</strong> (${food.serving}).</p>
+            <div class="eq">Energy = ${fmt(food.kcal, 0)} kcal = ${fmt(kj, 0)} kJ</div>
+            <p class="step">Conversion used in this course:</p>
+            <div class="eq">kJ = kcal × 4.2<br>${fmt(food.kcal, 0)} × 4.2 = ${fmt(food.kcal * KJ_PER_KCAL, 1)} kJ</div>
+            <p class="step">Check with energy values of food substances (fibre and minerals give no energy):</p>
+            <div class="eq">
+              Protein: ${fmt(food.protein, 1)} × 17 = ${fmt(food.protein * KJ.protein, 1)} kJ<br>
+              Carbohydrate: ${fmt(food.carb, 1)} × 17 = ${fmt(food.carb * KJ.carb, 1)} kJ<br>
+              Fat: ${fmt(food.fat, 1)} × 37 = ${fmt(food.fat * KJ.fat, 1)} kJ<br>
+              Total ≈ ${fmt(fromMac, 0)} kJ
+            </div>
+            <p class="ans">Energy amount: ${fmt(kj, 0)} kJ (${fmt(food.kcal, 0)} kcal)</p>
+          </div>`;
+      }
+
+      function htmlNutrient(food, nutrient, dailyKj, dailyProtein) {
+        const { unitMass, e, mass, perUnit, obtained } = nutrientAmount(food, nutrient, dailyKj);
+        const unitName = food.freshPer100Dry ? "g fresh cassava" : "g of food";
+        const basis = food.freshPer100Dry
+          ? `${unitMass} g fresh weight yields 100 g dry weight`
+          : `${food.serving}`;
+        const proteinNote = nutrient.id === "protein" && obtained < dailyProtein
+          ? `<p class="warn">This is only ${fmt(obtained, 1)} g protein, below the daily need of ${fmt(dailyProtein, 0)} g. Relying on this food alone for energy can cause protein deficiency (e.g. swollen feet from tissue fluid).</p>`
+          : nutrient.id === "protein"
+            ? `<p class="step">Compare with daily protein requirement (${fmt(dailyProtein, 0)} g): ${fmt(obtained, 1)} g is enough for protein if this amount is eaten.</p>`
+            : "";
+        return `
+          <div class="block">
+            <h3>2. Amount of ${nutrient.label.toLowerCase()} that could be obtained</h3>
+            <p class="step">If this food supplies the daily energy requirement (${fmt(dailyKj, 0)} kJ), first find how much food is eaten. ${basis}.</p>
+            <div class="eq">
+              Mass of food = (daily energy / energy per unit) × unit mass<br>
+              = (${fmt(dailyKj, 0)} / ${fmt(e, 0)}) × ${fmt(unitMass, 0)}<br>
+              = ${fmt(mass, 0)} ${unitName}
+            </div>
+            <p class="step">Then find how much ${nutrient.label.toLowerCase()} is in that mass (${fmt(perUnit, nutrient.unit === "mg" ? 0 : 1)} ${nutrient.unit} per unit):</p>
+            <div class="eq">
+              ${nutrient.label} obtained = (mass of food / unit mass) × amount per unit<br>
+              = (${fmt(mass, 0)} / ${fmt(unitMass, 0)}) × ${fmt(perUnit, nutrient.unit === "mg" ? 0 : 1)}<br>
+              = ${fmt(obtained, 1)} ${nutrient.unit}
+            </div>
+            <p class="ans">${nutrient.label} obtained: ${fmt(obtained, 1)} ${nutrient.unit}</p>
+            ${proteinNote}
+          </div>`;
+      }
+
+      function htmlRank(food) {
+        const ranked = top5(food);
+        const sources = energySources(food);
+        const winner = sources[0];
+        const rows = ranked.map((s, i) => `<tr><td>${i + 1}</td><td>${s.name}</td><td>${s.show}</td></tr>`).join("");
+        const srcLines = sources.map((s) =>
+          `${s.name}: ${fmt(s.mass, 1)} g × ${s.name === "fat" ? 9 : 4} = ${fmt(s.kcal, 1)} kcal &nbsp;(${fmt(s.mass, 1)} × ${s.name === "fat" ? 37 : 17} = ${fmt(s.kj, 1)} kJ)`
+        ).join("<br>");
+        return `
+          <div class="block">
+            <h3>3. Ranking of substances in the food product</h3>
+            <p class="step">Abundance is compared from the nutrition information table. Convert mg to g so units match. Energy is not a substance, so it is not ranked.</p>
+            <table class="rank-table">
+              <thead><tr><th>#</th><th>Substance</th><th>Amount</th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+            <p class="ans">Most abundant: ${ranked[0].name} (${ranked[0].show})</p>
+            <p class="step">Which food substance provides most of the energy content? Use kcal/g (same method as the exam question): fat 9, protein 4, carbohydrate 4. Fibre and minerals give no energy.</p>
+            <div class="eq">${srcLines}</div>
+            <p class="ans">${winner.name.charAt(0).toUpperCase() + winner.name.slice(1)} provides most of the energy content (${fmt(winner.kcal, 1)} kcal).</p>
+          </div>`;
+      }
+
+      function calculate() {
+        els.err.textContent = "";
+        const food = foodById(selectedId);
+        if (!food) {
+          els.err.textContent = "Select a food first.";
+          return;
+        }
+        const energyOn = wantEnergy();
+        const nutrient = chosenNutrient();
+        const rankOn = wantRank();
+        if (!energyOn && !nutrient && !rankOn) {
+          els.err.textContent = "Click energy, select a nutrient, and/or click ranking before calculating.";
+          return;
+        }
+        const dailyKj = Number(els.dailyKj.value);
+        const dailyProtein = Number(els.dailyProtein.value);
+        if (!Number.isFinite(dailyKj) || dailyKj <= 0) {
+          els.err.textContent = "Enter a valid daily energy requirement in kJ.";
+          return;
+        }
+
+        let html = `<h2>Result and working</h2><p class="step"><strong>${food.name}</strong> — ${[energyOn ? "energy amount" : null, nutrient ? nutrient.label.toLowerCase() + " obtained" : null, rankOn ? "top 5 ranking" : null].filter(Boolean).join("; ")}.</p>`;
+
+        if (energyOn) {
+          const kj = kjOf(food);
+          els.scoreEnergy.textContent = `${fmt(kj, 0)} kJ`;
+          html += htmlEnergy(food);
+        } else {
+          els.scoreEnergy.textContent = "—";
+        }
+
+        if (nutrient) {
+          const got = nutrientAmount(food, nutrient, dailyKj);
+          els.scoreNutrient.textContent = `${fmt(got.obtained, 1)} ${nutrient.unit}`;
+          html += htmlNutrient(food, nutrient, dailyKj, dailyProtein);
+        } else {
+          els.scoreNutrient.textContent = "—";
+        }
+
+        if (rankOn) {
+          const first = top5(food)[0];
+          els.scoreRank.textContent = first.name;
+          html += htmlRank(food);
+        } else {
+          els.scoreRank.textContent = "—";
+        }
+
+        els.results.innerHTML = html;
+        els.results.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+
+      function toggleSelect(sel) {
+        sel.value = sel.value === "on" ? "off" : "on";
+        syncCols();
+      }
+
+      els.colEnergy.addEventListener("click", (e) => {
+        if (e.target.tagName === "SELECT") return;
+        toggleSelect(els.selEnergy);
+      });
+      els.colRank.addEventListener("click", (e) => {
+        if (e.target.tagName === "SELECT") return;
+        toggleSelect(els.selRank);
+      });
+      els.colEnergy.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleSelect(els.selEnergy); }
+      });
+      els.colRank.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleSelect(els.selRank); }
+      });
+      [els.selEnergy, els.selRank, els.selNutrient].forEach((sel) => {
+        sel.addEventListener("click", (e) => e.stopPropagation());
+        sel.addEventListener("change", syncCols);
+      });
+      els.selCategory.addEventListener("change", onCategoryChange);
+      els.selFood.addEventListener("change", onFoodChange);
+      els.btn.addEventListener("click", calculate);
+
+      fillCategories();
+      fillFoods("");
+      syncCols();
+    })();
+  </script>
+</body>
+</html>
