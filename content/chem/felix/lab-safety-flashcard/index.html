@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flashcards — Laboratory safety</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <link rel="stylesheet" href="./css/flashcards-embed.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#004e9f",
+            secondary: "#006d37",
+            tertiary: "#a50018",
+            background: "#f7f9fb",
+            surface: "#f7f9fb",
+            "on-surface": "#191c1e",
+            "on-surface-variant": "#414753",
+            "outline-variant": "#c1c6d5",
+            "primary-container": "#0066cc",
+            "error-container": "#ffdad6",
+            "secondary-container": "#6bfe9c",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-high": "#e6e8ea",
+          },
+          maxWidth: { "container-max": "1200px" },
+          fontFamily: { sans: ["Inter", "system-ui", "sans-serif"] },
+        },
+      },
+    };
+  </script>
+</head>
+<body class="bg-background font-body-md text-on-surface min-h-screen overflow-x-hidden">
+  <canvas id="particle-canvas" class="fixed inset-0 opacity-[0.35] pointer-events-none z-0" aria-hidden="true"></canvas>
+
+  <main class="max-w-container-max mx-auto px-4 sm:px-6 py-6 md:py-10 pb-16 relative z-10">
+    <header class="mb-8 space-y-4">
+      <div id="tag-row" class="flex flex-wrap gap-2"></div>
+      <h1 id="chapter-title" class="text-primary font-headline-xl text-headline-xl"></h1>
+      <p id="chapter-subtitle" class="text-on-surface-variant max-w-2xl font-body-md"></p>
+
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2">
+        <div id="filter-row" class="flex flex-wrap gap-2"></div>
+        <div class="flex flex-wrap items-center gap-3 sm:gap-4">
+          <div class="flex items-center gap-2">
+            <span class="text-on-surface-variant font-body-sm">Study mode</span>
+            <div id="mode-toggle" class="fc-mode-toggle">
+              <button type="button" data-mode="sequence" class="active">Sequence</button>
+              <button type="button" data-mode="random">Random</button>
+            </div>
+          </div>
+          <span id="round-badge" class="px-3 py-1.5 rounded-2xl bg-primary/10 text-primary font-label-bold text-body-sm">Round 1</span>
+          <div class="flex items-baseline gap-2">
+            <span class="text-on-surface-variant font-body-sm">Progress</span>
+            <span id="progress-text" class="text-primary font-headline-lg text-2xl font-bold">1 / 1</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div id="study-panel">
+      <div class="relative min-h-[420px] h-[min(520px,70vh)] flex items-center justify-center perspective-1000 mb-6">
+        <div class="card-layer absolute inset-x-8 top-8 bottom-4 scale-90 opacity-30 translate-y-4"></div>
+        <div class="card-layer absolute inset-x-6 top-6 bottom-3 scale-95 opacity-45 translate-y-2"></div>
+
+        <div id="card-container" class="relative w-full max-w-2xl h-[min(400px,65vh)] cursor-pointer">
+          <div id="card-inner" class="card-inner relative w-full h-full">
+            <div class="card-face absolute inset-0 rounded-2xl bg-surface-container-lowest border border-outline-variant/30 p-8 sm:p-10 flex flex-col shadow-lg">
+              <div class="flex justify-between items-start gap-2">
+                <span id="subtopic-pill" class="px-3 py-1 rounded-full border border-primary/20 text-primary font-label-bold text-body-sm"></span>
+                <span id="card-code" class="px-2 py-1 rounded-md bg-surface-container-high font-label-code text-on-surface-variant"></span>
+              </div>
+              <div class="mt-6 flex-1 flex flex-col items-center justify-center min-h-0 w-full">
+                <img id="card-front-img" class="card-front-image mx-auto hidden" alt="" />
+                <div id="card-front-text" class="text-center w-full px-1"></div>
+              </div>
+              <p class="text-center text-on-surface-variant font-body-sm mt-4">Tap, space, or FLIP to reveal answer</p>
+            </div>
+
+            <div class="card-face card-face-back absolute inset-0 rounded-2xl bg-white border border-primary/20 p-8 sm:p-10 flex flex-col shadow-lg overflow-y-auto">
+              <div class="flex justify-between items-start gap-2">
+                <span class="subtopic-pill-back px-3 py-1 rounded-full border border-primary/20 text-primary font-label-bold text-body-sm"></span>
+                <span class="card-code-back px-2 py-1 rounded-md bg-surface-container-high font-label-code text-on-surface-variant"></span>
+              </div>
+              <div class="mt-6 flex-1 flex flex-col items-center justify-center min-h-0 w-full">
+                <div id="card-back-text" class="card-back-text text-center w-full px-1"></div>
+                <img id="card-back-img" class="card-back-image mx-auto hidden" alt="" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p id="rating-hint" class="text-center font-body-sm text-on-surface-variant mb-4"></p>
+
+      <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+        <button id="btn-prev" type="button" class="inline-flex items-center gap-1 px-4 py-2.5 rounded-xl border border-outline-variant/60 font-label-bold text-on-surface-variant disabled:opacity-45">
+          <span class="material-symbols-outlined text-xl">chevron_left</span> Prev
+        </button>
+        <button id="btn-again" type="button" class="w-14 h-14 rounded-full bg-error-container text-tertiary flex items-center justify-center disabled:opacity-45" title="Again">
+          <span class="material-symbols-outlined text-2xl">history</span>
+        </button>
+        <button id="btn-flip" type="button" class="w-20 h-20 rounded-full bg-primary text-white flex items-center justify-center shadow-md" title="Flip">
+          <span class="material-symbols-outlined text-[40px]">sync</span>
+        </button>
+        <button id="btn-got-it" type="button" class="w-14 h-14 rounded-full bg-secondary-container text-secondary flex items-center justify-center disabled:opacity-45" title="Got it">
+          <span class="material-symbols-outlined text-2xl">check</span>
+        </button>
+        <button id="btn-next" type="button" class="inline-flex items-center gap-1 px-4 py-2.5 rounded-xl border border-outline-variant/60 font-label-bold text-on-surface-variant disabled:opacity-45">
+          Next <span class="material-symbols-outlined text-xl">chevron_right</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="summary-panel" class="hidden max-w-[42rem] mx-auto space-y-6">
+      <div class="text-center space-y-2">
+        <span class="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary font-label-bold">Round summary</span>
+        <h2 id="summary-title" class="text-primary font-headline-lg text-2xl font-bold"></h2>
+        <p id="summary-stats" class="text-on-surface-variant font-body-md"></p>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div class="rounded-2xl border border-tertiary/30 bg-tertiary/5 p-4">
+          <h3 class="text-tertiary font-label-bold mb-2">Keep practising</h3>
+          <ul id="summary-keep" class="space-y-1 list-disc list-inside"></ul>
+        </div>
+        <div class="rounded-2xl border border-secondary/30 bg-secondary/5 p-4">
+          <h3 class="text-secondary font-label-bold mb-2">Getting confident</h3>
+          <ul id="summary-confident" class="space-y-1 list-disc list-inside"></ul>
+        </div>
+      </div>
+      <p class="text-center text-on-surface-variant font-body-sm bg-surface-container-high/80 rounded-xl px-4 py-3">
+        Tip: cards marked Again appear more often next round. Three Got its in a session lowers a card’s weight.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <button id="btn-next-round" type="button" class="px-6 py-3 rounded-xl bg-primary text-white font-label-bold">Next round →</button>
+        <button id="btn-restart" type="button" class="px-6 py-3 rounded-xl border border-outline-variant/60 font-label-bold text-on-surface-variant">Restart deck</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+/** Laboratory safety — terms to memorise */
+var FLASHCARD_TAGS = ["Chemistry", "LaboratorySafety", "DSE"];
+
+var FLASHCARD_DECK = [
+  // —— Apparatus identification ——
+  {
+    id: 1,
+    subtopic: "Apparatus identification",
+    front: "Name this apparatus.",
+    back: "<strong>Test tube</strong>",
+    frontImage: "./assets/apparatus-test-tube.png",
+    frontImageAlt: "Vertical section of a test tube",
+  },
+  {
+    id: 2,
+    subtopic: "Apparatus identification",
+    front: "Name this apparatus.",
+    back: "<strong>Beaker</strong>",
+    frontImage: "./assets/apparatus-beaker.png",
+    frontImageAlt: "Vertical section of a beaker",
+  },
+  {
+    id: 3,
+    subtopic: "Apparatus identification",
+    front: "Name this apparatus.",
+    back: "<strong>Measuring cylinder</strong>",
+    frontImage: "./assets/apparatus-measuring-cylinder.png",
+    frontImageAlt: "Vertical section of a measuring cylinder",
+  },
+  {
+    id: 4,
+    subtopic: "Apparatus identification",
+    front: "Name this apparatus.",
+    back: "<strong>Filter funnel</strong>",
+    frontImage: "./assets/apparatus-filter-funnel.png",
+    frontImageAlt: "Vertical section of a filter funnel",
+  },
+  {
+    id: 5,
+    subtopic: "Apparatus identification",
+    front: "Name this apparatus.",
+    back: "<strong>Conical flask</strong>",
+    frontImage: "./assets/apparatus-conical-flask.png",
+    frontImageAlt: "Vertical section of a conical flask",
+  },
+  {
+    id: 6,
+    subtopic: "Apparatus identification",
+    front: "Name this apparatus.",
+    back: "<strong>Round-bottomed flask</strong>",
+    frontImage: "./assets/apparatus-round-bottomed-flask.png",
+    frontImageAlt: "Vertical section of a round-bottomed flask",
+  },
+  {
+    id: 7,
+    subtopic: "Apparatus identification",
+    front: "Name this apparatus.",
+    back: "<strong>Evaporating dish</strong>",
+    frontImage: "./assets/apparatus-evaporating-dish.png",
+    frontImageAlt: "Vertical section of an evaporating dish",
+  },
+  {
+    id: 8,
+    subtopic: "Apparatus identification",
+    front: "Name this apparatus.",
+    back: "<strong>Watch glass</strong>",
+    frontImage: "./assets/apparatus-watch-glass.png",
+    frontImageAlt: "Vertical section of a watch glass",
+  },
+  {
+    id: 9,
+    subtopic: "Apparatus identification",
+    front: "Name this apparatus.",
+    back: "<strong>Wire gauze</strong>",
+    frontImage: "./assets/apparatus-wire-gauze.png",
+    frontImageAlt: "Vertical section of wire gauze",
+  },
+  {
+    id: 10,
+    subtopic: "Apparatus identification",
+    front: "Name this apparatus.",
+    back: "<strong>Bunsen burner</strong>",
+    frontImage: "./assets/apparatus-bunsen-burner.png",
+    frontImageAlt: "Vertical section of a Bunsen burner",
+  },
+  {
+    id: 11,
+    subtopic: "Apparatus identification",
+    front: "Name this apparatus.",
+    back: "<strong>Tripod</strong>",
+    frontImage: "./assets/apparatus-tripod.png",
+    frontImageAlt: "Vertical section of a tripod",
+  },
+  {
+    id: 12,
+    subtopic: "Apparatus identification",
+    front: "Name this apparatus.",
+    back: "<strong>Dropper</strong>",
+    frontImage: "./assets/apparatus-dropper.png",
+    frontImageAlt: "Vertical section of a dropper",
+  },
+  {
+    id: 13,
+    subtopic: "Apparatus identification",
+    front: "Name this apparatus.",
+    back: "<strong>Glass rod</strong>",
+    frontImage: "./assets/apparatus-glass-rod.png",
+    frontImageAlt: "Vertical section of a glass rod",
+  },
+  {
+    id: 14,
+    subtopic: "Apparatus identification",
+    front: "Name this apparatus.",
+    back: "<strong>Thermometer</strong>",
+    frontImage: "./assets/apparatus-thermometer.png",
+    frontImageAlt: "Vertical section of a thermometer",
+  },
+  {
+    id: 15,
+    subtopic: "Apparatus identification",
+    front: "Name this apparatus.",
+    back: "<strong>Crucible</strong>",
+    frontImage: "./assets/apparatus-crucible.png",
+    frontImageAlt: "Vertical section of a crucible",
+  },
+
+  // —— Usage of apparatus ——
+  {
+    id: 16,
+    subtopic: "Usage of apparatus",
+    front: "What is the usage of <strong>Beaker</strong>?",
+    back: "Hold and heat large volume of liquid",
+  },
+  {
+    id: 17,
+    subtopic: "Usage of apparatus",
+    front: "What is the usage of <strong>Watch glass and Petri dish</strong>?",
+    back: "Temporary storage of solids and sometimes liquids",
+  },
+  {
+    id: 18,
+    subtopic: "Usage of apparatus",
+    front: "What is the usage of <strong>Evaporating basins</strong>?",
+    back: "Evaporating basins (or evaporating dishes) are used to evaporate solutions",
+  },
+  {
+    id: 19,
+    subtopic: "Usage of apparatus",
+    front: "What is the usage of <strong>Crucibles</strong>?",
+    back: "Hold substances for very strong heating",
+  },
+  {
+    id: 20,
+    subtopic: "Usage of apparatus",
+    front: "What is the usage of <strong>Mortar and pestle</strong>?",
+    back: "Grind a solid into a fine powder",
+  },
+  {
+    id: 21,
+    subtopic: "Usage of apparatus",
+    front: "What is the usage of <strong>Spatulas</strong>?",
+    back: "Pick up small amounts of solids",
+  },
+  {
+    id: 22,
+    subtopic: "Usage of apparatus",
+    front: "What is the usage of <strong>Droppers and teat pipettes</strong>?",
+    back: "Add drop quantities of a liquid",
+  },
+  {
+    id: 23,
+    subtopic: "Usage of apparatus",
+    front: "What is the usage of <strong>Desiccator</strong>?",
+    back: "Keep solids or liquids out of contact with the moisture from the air",
+  },
+  {
+    id: 24,
+    subtopic: "Usage of apparatus",
+    front: "What is the usage of <strong>Pipette, burette and volumetric flask</strong>?",
+    back: "Make accurate measurements of liquid volumes",
+  },
+  {
+    id: 25,
+    subtopic: "Usage of apparatus",
+    front: "What is the usage of <strong>Measuring cylinder</strong>?",
+    back: "Make rough measurements of liquid volumes",
+  },
+  {
+    id: 26,
+    subtopic: "Usage of apparatus",
+    front: "What is the usage of <strong>pipeclay triangle</strong>?",
+    back: "to support crucible on tripod for heating",
+  },
+  {
+    id: 27,
+    subtopic: "Usage of apparatus",
+    front: "What is the drying agent used in a desiccator?",
+    back: "anhydrous calcium chloride or silica gel",
+  },
+
+  // —— Bunsen flame ——
+  {
+    id: 28,
+    subtopic: "Bunsen flame",
+    front: "What does the <strong>gas tap</strong> in bunsen burner control?",
+    back: "<strong>Fuel supply</strong> → <strong>size</strong> of the flame",
+  },
+  {
+    id: 29,
+    subtopic: "Bunsen flame",
+    front: "What does the <strong>air hole</strong> in bunsen burner control?",
+    back: "<strong>Air supply</strong> → <strong>luminosity and temperature</strong> of the flame",
+  },
+  {
+    id: 30,
+    subtopic: "Bunsen flame",
+    front: "What is the characteristic of the flame when the air hole of the bunsen burner is <strong>open</strong>?",
+    back: "<strong>Non-luminous</strong>, <strong>blue</strong>, <strong>high temperature</strong> (more complete burning)",
+  },
+  {
+    id: 31,
+    subtopic: "Bunsen flame",
+    front: "What is the characteristic of the flame when the air hole of the bunsen burner is <strong>closed</strong>?",
+    back: "<strong>Luminous</strong>, <strong>yellow</strong>, <strong>lower temperature</strong> (incomplete burning)",
+  },
+  {
+    id: 32,
+    subtopic: "Bunsen flame",
+    front: "What are the steps to ignite a bunsen burner?",
+    back: "1. Close air hole<br>2. Put lighted match near top of the barrel<br>3. Turn on gas tap<br>4. Open air hole slowly, until flame change from luminous to non-luminous",
+  },
+
+  // —— Laboratory techniques ——
+  {
+    id: 33,
+    subtopic: "Laboratory techniques",
+    front: "How do you transfer solids?",
+    back: "using a clean dry spatula",
+  },
+  {
+    id: 34,
+    subtopic: "Laboratory techniques",
+    front: "Why should a test tube slope downwards slightly when heating a solid which gives off water?",
+    back: "prevents the condensed water (at the mouth of the tube) from running back and cracking the hot glass.",
+  },
+  {
+    id: 35,
+    subtopic: "Laboratory techniques",
+    front: "How do you heat a solid very strongly?",
+    back: "Heat in crucible",
+  },
+  {
+    id: 36,
+    subtopic: "Laboratory techniques",
+    front: "How do you heat a volatile or flammable liquid?",
+    back: "Water-bath (or oil-bath if higher temperature is required)",
+  },
+  {
+    id: 37,
+    subtopic: "Laboratory techniques",
+    front: "How do you collect gases less dense than air?",
+    back: "Upward delivery",
+  },
+  {
+    id: 38,
+    subtopic: "Laboratory techniques",
+    front: "How do you collect gases that are denser than air?",
+    back: "Downward delivery",
+  },
+  {
+    id: 39,
+    subtopic: "Laboratory techniques",
+    front: "How do you collect water-insoluble gases?",
+    back: "Displacement of water",
+  },
+  {
+    id: 40,
+    subtopic: "Laboratory techniques",
+    front: "How do you dry crystals?",
+    back: "Filter paper",
+  },
+  {
+    id: 41,
+    subtopic: "Laboratory techniques",
+    front: "How do you dry solids?",
+    back: "Oven or filter paper . (Note: To dry hydrated salts, the temperature of the oven should be set below 105°C. Otherwise, the water of crystallization would be removed.)",
+  },
+  {
+    id: 42,
+    subtopic: "Laboratory techniques",
+    front: "What is the procedure for smelling gases?",
+    back: "Hold tube with gas 15cm away from nose<br>Fan a little of the gas towards your nose",
+  },
+  {
+    id: 43,
+    subtopic: "Laboratory techniques",
+    front: "What are the procedures to heat a non-flammable liquid in a test tube?",
+    back: "1. Wear safety spectacles.<br>2. Do not fill a tube with a liquid to more than one-third of its capacity.<br>3. Hold the test tube near the top with a test tube holder<br>4. Use a small non-luminous flame for heating.<br>5. Never point the test tube to anyone during heating.<br>6. Swirl the tube continuously during heating, so that the heating is uniform.",
+  },
+  {
+    id: 44,
+    subtopic: "Laboratory techniques",
+    front: "How do you evaporate a solution quickly?",
+    back: "Use a steam bath",
+  },
+  {
+    id: 45,
+    subtopic: "Laboratory techniques",
+    front: "How do you dry ammonia?",
+    back: "using Anhydrous calcium oxide",
+  },
+  {
+    id: 46,
+    subtopic: "Laboratory techniques",
+    front: "How do you dry acidic gases?",
+    back: "using Concentrated sulphuric acid",
+  },
+  {
+    id: 47,
+    subtopic: "Laboratory techniques",
+    front: "Why must the delivery tube be removed from water before heating is stopped for collection of gas using displacement of water from a heated vessel?",
+    back: "To prevent sucking back of water, which may crack the hot glass vessel",
+  },
+
+  // —— Storage ——
+  {
+    id: 48,
+    subtopic: "Storage",
+    front: "How are <strong>potassium</strong> and <strong>sodium</strong> stored, and why?",
+    back: "Under paraffin oil — to prevent contact and reaction with air",
+  },
+  {
+    id: 49,
+    subtopic: "Storage",
+    front: "How is <strong>yellow phosphorus</strong> stored, and why?",
+    back: "Under water — to prevent contact and reaction with air",
+  },
+  {
+    id: 50,
+    subtopic: "Storage",
+    front: "Storage rules for <strong>flammable / volatile liquids</strong>?",
+    back: "<strong>Cool</strong> place, away from sunlight and heat; <strong>never fill the container completely</strong>",
+  },
+  {
+    id: 51,
+    subtopic: "Storage",
+    front: "How are chemicals that absorb water kept? Also give examples",
+    back: "in well-sealed containers ; aluminium chloride, sodium hydroxide, potassium hydroxide, concentrated sulphuric acid",
+  },
+  {
+    id: 52,
+    subtopic: "Storage",
+    front: "How are chemicals that will decompose quickly in the presence of light kept? Also give examples",
+    back: "in brown bottles ; concentrated nitric acid, silver nitrate solution, hydrogen peroxide solution, chlorine water and bromine water",
+  },
+
+  // —— Microscale ——
+  {
+    id: 53,
+    subtopic: "Microscale",
+    front: "Five advantages of <strong>microscale experiments</strong>?",
+    back: "Reduce chemicals used; reduce wastes; save cost; shorter time; minimize hazards",
+  },
+
+  // —— Hazard classes (definitions + examples) ——
+  {
+    id: 54,
+    subtopic: "Hazard classes",
+    front: "Define <strong>explosive</strong> substance.",
+    back: "May explode if ignited, heated, shocked, or rubbed",
+  },
+  {
+    id: 55,
+    subtopic: "Hazard classes",
+    front: "Examples of <strong>explosive</strong> substances?",
+    back: "Old <strong>K / Na</strong>; <strong>ammonium dichromate</strong>; <strong>2,4-dinitrophenylhydrazine</strong>",
+  },
+  {
+    id: 56,
+    subtopic: "Hazard classes",
+    front: "Define <strong>oxidizing</strong> substance.",
+    back: "May start a highly <strong>exothermic</strong> reaction with easily oxidizable materials; fire risk",
+  },
+  {
+    id: 57,
+    subtopic: "Hazard classes",
+    front: "Examples of <strong>oxidizing</strong> substances?",
+    back: "<strong>Conc. H₂SO₄, conc. HNO₃, KMnO₄, K₂Cr₂O₇, KIO₃</strong>",
+  },
+  {
+    id: 58,
+    subtopic: "Hazard classes",
+    front: "Define <strong>flammable</strong> substance.",
+    back: "Can catch fire easily under ordinary conditions",
+  },
+  {
+    id: 59,
+    subtopic: "Hazard classes",
+    front: "Examples of <strong>flammable</strong> substances?",
+    back: "<strong>H₂, CO, LPG, town gas, methanol, ethanol, yellow P, S, K, Na</strong>",
+  },
+  {
+    id: 60,
+    subtopic: "Hazard classes",
+    front: "Define <strong>carcinogenic</strong> substance.",
+    back: "Causes or is suspected to cause <strong>cancer</strong>",
+  },
+  {
+    id: 61,
+    subtopic: "Hazard classes",
+    front: "Known and suspected <strong>carcinogens</strong>?",
+    back: "Known: <strong>benzene, asbestos</strong>. Suspected: <strong>CCl₄, CHCl₃, nitrobenzene</strong>",
+  },
+  {
+    id: 62,
+    subtopic: "Hazard classes",
+    front: "Define <strong>toxic</strong> substance.",
+    back: "If breathed in / swallowed / absorbed through skin → <strong>serious health risk or death</strong>",
+  },
+  {
+    id: 63,
+    subtopic: "Hazard classes",
+    front: "Examples of <strong>toxic</strong> substances?",
+    back: "<strong>Cl₂, H₂S, CO, NO₂, SO₂, Br₂, CS₂, methanol, cyanides, lead compounds, mercury and its compounds</strong>",
+  },
+  {
+    id: 64,
+    subtopic: "Hazard classes",
+    front: "Define <strong>harmful</strong> substance.",
+    back: "Same exposure routes as toxic, but <strong>limited</strong> health risk",
+  },
+  {
+    id: 65,
+    subtopic: "Hazard classes",
+    front: "Examples of <strong>harmful</strong> substances?",
+    back: "<strong>CHCl₃, 1,1,1-trichloroethane, I₂, oxalic acids, oxalates</strong>",
+  },
+  {
+    id: 66,
+    subtopic: "Hazard classes",
+    front: "Define <strong>corrosive</strong> substance.",
+    back: "<strong>Destroys living tissues</strong> upon contact",
+  },
+  {
+    id: 67,
+    subtopic: "Hazard classes",
+    front: "Examples of <strong>corrosive</strong> substances?",
+    back: "<strong>HCl, Br₂, conc. mineral acids, conc. ethanoic acid, conc. ammonia, conc. H₂O₂, K, Na, NaOH, KOH, AgNO₃</strong>",
+  },
+  {
+    id: 68,
+    subtopic: "Hazard classes",
+    front: "Define <strong>irritant</strong> substance.",
+    back: "<strong>Non-corrosive</strong>, but causes <strong>inflammation or reddening</strong> of the skin",
+  },
+  {
+    id: 69,
+    subtopic: "Hazard classes",
+    front: "Examples of <strong>irritant</strong> substances?",
+    back: "<strong>Dilute mineral acids, aqueous ammonia, ammonium dichromate, K₂Cr₂O₇</strong>",
+  },
+
+  // —— Hazard labels (adjective → logo) ——
+  {
+    id: 70,
+    subtopic: "Hazard labels",
+    front: "What is the Hazard Label of a chemical that is <strong>explosive</strong>?",
+    back: "<strong>Explosive</strong>",
+    image: "./assets/hazard-explosive.png",
+    imageAlt: "Explosive hazard pictogram",
+  },
+  {
+    id: 71,
+    subtopic: "Hazard labels",
+    front: "What is the Hazard Label of a chemical that is <strong>oxidizing</strong>?",
+    back: "<strong>Oxidizing</strong>",
+    image: "./assets/hazard-oxidizing.png",
+    imageAlt: "Oxidizing hazard pictogram",
+  },
+  {
+    id: 72,
+    subtopic: "Hazard labels",
+    front: "What is the Hazard Label of a chemical that is <strong>flammable</strong>?",
+    back: "<strong>Flammable</strong>",
+    image: "./assets/hazard-flammable.png",
+    imageAlt: "Flammable hazard pictogram",
+  },
+  {
+    id: 73,
+    subtopic: "Hazard labels",
+    front: "What is the Hazard Label of a chemical that is <strong>carcinogenic</strong>?",
+    back: "<strong>Carcinogenic</strong>",
+    image: "./assets/hazard-carcinogenic.png",
+    imageAlt: "Carcinogenic hazard pictogram",
+  },
+  {
+    id: 74,
+    subtopic: "Hazard labels",
+    front: "What is the Hazard Label of a chemical that is <strong>toxic</strong>?",
+    back: "<strong>Toxic</strong>",
+    image: "./assets/hazard-toxic.png",
+    imageAlt: "Toxic hazard pictogram",
+  },
+  {
+    id: 75,
+    subtopic: "Hazard labels",
+    front: "What is the Hazard Label of a chemical that is <strong>harmful</strong>?",
+    back: "<strong>Harmful</strong>",
+    image: "./assets/hazard-harmful.png",
+    imageAlt: "Harmful hazard pictogram",
+  },
+  {
+    id: 76,
+    subtopic: "Hazard labels",
+    front: "What is the Hazard Label of a chemical that is <strong>corrosive</strong>?",
+    back: "<strong>Corrosive</strong>",
+    image: "./assets/hazard-corrosive.png",
+    imageAlt: "Corrosive hazard pictogram",
+  },
+  {
+    id: 77,
+    subtopic: "Hazard labels",
+    front: "What is the Hazard Label of a chemical that is <strong>irritant</strong>?",
+    back: "<strong>Irritant</strong>",
+    image: "./assets/hazard-irritant.png",
+    imageAlt: "Irritant hazard pictogram",
+  },
+
+  // —— Hazard precautions (logo + name → precautions) ——
+  {
+    id: 78,
+    subtopic: "Hazard precautions",
+    front: "Safety precautions for <strong>explosive</strong> substances?",
+    back: "Keep away from heat and naked flames; avoid shock or friction; container properly stoppered",
+    frontImage: "./assets/hazard-explosive.png",
+    frontImageAlt: "Explosive hazard pictogram",
+  },
+  {
+    id: 79,
+    subtopic: "Hazard precautions",
+    front: "Safety precautions for <strong>oxidizing</strong> substances?",
+    back: "Container properly stoppered; keep away from heat/naked flames; keep away from metals, combustible and flammable chemicals; avoid eyes/skin — wash ≥ 3 min if conc. acid spill, then medical check-up",
+    frontImage: "./assets/hazard-oxidizing.png",
+    frontImageAlt: "Oxidizing hazard pictogram",
+  },
+  {
+    id: 80,
+    subtopic: "Hazard precautions",
+    front: "Safety precautions for <strong>flammable</strong> substances?",
+    back: "Solids/liquids: properly stoppered; gases: no leakage into the lab; keep away from heat and naked flames",
+    frontImage: "./assets/hazard-flammable.png",
+    frontImageAlt: "Flammable hazard pictogram",
+  },
+  {
+    id: 81,
+    subtopic: "Hazard precautions",
+    front: "Safety precautions for <strong>carcinogenic</strong> substances?",
+    back: "Lab coat, safety spectacles, gloves; fume cupboard; properly stoppered; avoid breathing vapours/particles; avoid using carcinogens at school",
+    frontImage: "./assets/hazard-carcinogenic.png",
+    frontImageAlt: "Carcinogenic hazard pictogram",
+  },
+  {
+    id: 82,
+    subtopic: "Hazard precautions",
+    front: "Safety precautions for <strong>toxic</strong> substances?",
+    back: "Fume cupboard; solids/liquids properly stoppered; avoid breathing gases/vapours/particles; wear gloves (or wash hands thoroughly after)",
+    frontImage: "./assets/hazard-toxic.png",
+    frontImageAlt: "Toxic hazard pictogram",
+  },
+  {
+    id: 83,
+    subtopic: "Hazard precautions",
+    front: "Safety precautions for <strong>harmful</strong> substances?",
+    back: "Avoid breathing vapours/particles; avoid eyes/skin — wash with lots of water if spilt; lab well ventilated",
+    frontImage: "./assets/hazard-harmful.png",
+    frontImageAlt: "Harmful hazard pictogram",
+  },
+  {
+    id: 84,
+    subtopic: "Hazard precautions",
+    front: "Safety precautions for <strong>corrosive</strong> substances?",
+    back: "Lab coat, spectacles, gloves; fume cupboard; handle with care especially when hot; wash ≥ 3 min if conc. acid spill, then medical check-up",
+    frontImage: "./assets/hazard-corrosive.png",
+    frontImageAlt: "Corrosive hazard pictogram",
+  },
+  {
+    id: 85,
+    subtopic: "Hazard precautions",
+    front: "Safety precautions for <strong>irritant</strong> substances?",
+    back: "Avoid eyes/skin; wash with lots of water if accidentally spilt",
+    frontImage: "./assets/hazard-irritant.png",
+    frontImageAlt: "Irritant hazard pictogram",
+  },
+];
+
+window.FLASHCARD_TAGS = FLASHCARD_TAGS;
+window.FLASHCARD_DECK = FLASHCARD_DECK;
+
+
+/** Study algorithm — notes-to-flashcards / study-runtime.md */
+
+var RATE_AGAIN = 1.7;
+var RATE_GOT_IT = 0.7;
+var RATE_NEUTRAL = 1.0;
+var RATE_MASTERED = 0.1;
+var GOT_IT_MASTER_COUNT = 3;
+
+function rateToCopyCount(rate) {
+  const whole = Math.floor(rate);
+  const frac = rate - whole;
+  return whole + (Math.random() < frac ? 1 : 0);
+}
+
+function createCardStates(deck) {
+  const states = {};
+  for (const card of deck) {
+    states[card.id] = {
+      nextRate: RATE_NEUTRAL,
+      totalGotIt: 0,
+      roundAgain: 0,
+      roundGotIt: 0,
+      roundNeutral: 0,
+    };
+  }
+  return states;
+}
+
+function buildRoundCopyPlan(deck, cardStates, roundNumber) {
+  if (roundNumber === 1) {
+    return deck.map((c) => ({ id: c.id, count: 1 }));
+  }
+  const plan = [];
+  for (const card of deck) {
+    const count = rateToCopyCount(cardStates[card.id].nextRate);
+    if (count > 0) plan.push({ id: card.id, count });
+  }
+  return plan;
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildSequenceQueueNoAdjacent(plan) {
+  const remaining = new Map(plan.map((p) => [p.id, p.count]));
+  const ids = [...remaining.keys()].sort((a, b) => a - b);
+  const queue = [];
+  let last = null;
+
+  while ([...remaining.values()].some((n) => n > 0)) {
+    let placed = false;
+    for (const id of ids) {
+      if ((remaining.get(id) || 0) <= 0) continue;
+      if (id === last) continue;
+      queue.push(id);
+      remaining.set(id, remaining.get(id) - 1);
+      last = id;
+      placed = true;
+      break;
+    }
+    if (!placed) {
+      const id = ids.find((i) => (remaining.get(i) || 0) > 0);
+      queue.push(id);
+      remaining.set(id, remaining.get(id) - 1);
+      last = id;
+    }
+  }
+  return queue;
+}
+
+function buildRoundQueue(plan, roundNumber, mode) {
+  if (!plan.length) return [];
+
+  if (mode === "random") {
+    if (roundNumber === 1) {
+      return shuffle(plan.map((p) => p.id));
+    }
+    const expanded = [];
+    for (const p of plan) {
+      for (let i = 0; i < p.count; i += 1) expanded.push(p.id);
+    }
+    return shuffle(expanded);
+  }
+
+  if (roundNumber === 1) {
+    return plan.map((p) => p.id).sort((a, b) => a - b);
+  }
+  return buildSequenceQueueNoAdjacent(plan);
+}
+
+class FlashcardSession {
+  constructor(deck) {
+    this.fullDeck = deck;
+    this.activeDeck = deck;
+    this.filterSubtopic = null;
+    this.cardStates = createCardStates(deck);
+    this.roundNumber = 1;
+    this.mode = "sequence";
+    this.roundCopyPlan = [];
+    this.roundQueue = [];
+    this.queueIndex = 0;
+    this.flipped = false;
+    this.phase = "study";
+    this.sessionComplete = false;
+    this.startRound();
+  }
+
+  setFilter(subtopic) {
+    this.filterSubtopic = subtopic || null;
+    this.activeDeck = subtopic
+      ? this.fullDeck.filter((c) => c.subtopic === subtopic)
+      : [...this.fullDeck];
+    this.resetSession();
+  }
+
+  resetSession() {
+    this.cardStates = createCardStates(this.activeDeck);
+    this.roundNumber = 1;
+    this.phase = "study";
+    this.sessionComplete = false;
+    this.startRound();
+  }
+
+  startRound() {
+    for (const card of this.activeDeck) {
+      const s = this.cardStates[card.id];
+      s.roundAgain = 0;
+      s.roundGotIt = 0;
+      s.roundNeutral = 0;
+    }
+
+    this.roundCopyPlan = buildRoundCopyPlan(
+      this.activeDeck,
+      this.cardStates,
+      this.roundNumber,
+    );
+
+    if (!this.roundCopyPlan.length) {
+      this.phase = "summary";
+      this.sessionComplete = true;
+      this.roundQueue = [];
+      this.queueIndex = 0;
+      this.flipped = false;
+      return;
+    }
+
+    this.roundQueue = buildRoundQueue(
+      this.roundCopyPlan,
+      this.roundNumber,
+      this.mode,
+    );
+    this.queueIndex = 0;
+    this.flipped = false;
+    this.phase = "study";
+    this.sessionComplete = false;
+  }
+
+  getCurrentCard() {
+    const id = this.roundQueue[this.queueIndex];
+    return this.activeDeck.find((c) => c.id === id) ?? null;
+  }
+
+  setMode(mode) {
+    if (this.mode === mode || this.phase !== "study") return;
+    this.mode = mode;
+    this.roundQueue = buildRoundQueue(
+      this.roundCopyPlan,
+      this.roundNumber,
+      this.mode,
+    );
+    this.queueIndex = 0;
+    this.flipped = false;
+  }
+
+  flip() {
+    if (this.phase !== "study") return;
+    this.flipped = !this.flipped;
+  }
+
+  prev() {
+    if (this.phase !== "study" || this.queueIndex <= 0) return;
+    this.queueIndex -= 1;
+    this.flipped = false;
+  }
+
+  nextNavigate() {
+    if (this.phase !== "study") return;
+    if (this.queueIndex < this.roundQueue.length - 1) {
+      this.queueIndex += 1;
+      this.flipped = false;
+    }
+  }
+
+  advanceAfterRating() {
+    this.flipped = false;
+    if (this.queueIndex >= this.roundQueue.length - 1) {
+      this.phase = "summary";
+    } else {
+      this.queueIndex += 1;
+    }
+  }
+
+  rateAgain() {
+    if (!this.flipped || this.phase !== "study") return false;
+    const card = this.getCurrentCard();
+    if (!card) return false;
+    const s = this.cardStates[card.id];
+    s.nextRate = RATE_AGAIN;
+    s.totalGotIt = 0;
+    s.roundAgain += 1;
+    this.advanceAfterRating();
+    return true;
+  }
+
+  rateGotIt() {
+    if (!this.flipped || this.phase !== "study") return false;
+    const card = this.getCurrentCard();
+    if (!card) return false;
+    const s = this.cardStates[card.id];
+    s.totalGotIt += 1;
+    s.roundGotIt += 1;
+    s.nextRate =
+      s.totalGotIt >= GOT_IT_MASTER_COUNT ? RATE_MASTERED : RATE_GOT_IT;
+    this.advanceAfterRating();
+    return true;
+  }
+
+  rateNext() {
+    if (this.phase !== "study") return;
+    const card = this.getCurrentCard();
+    if (card && this.flipped) {
+      this.cardStates[card.id].nextRate = RATE_NEUTRAL;
+      this.cardStates[card.id].roundNeutral += 1;
+      this.advanceAfterRating();
+      return;
+    }
+    this.nextNavigate();
+  }
+
+  nextRound() {
+    this.roundNumber += 1;
+    this.startRound();
+  }
+
+  getSubtopics() {
+    return [...new Set(this.fullDeck.map((c) => c.subtopic))];
+  }
+
+  getSummaryLists() {
+    const keep = [];
+    const confident = [];
+    for (const card of this.activeDeck) {
+      const s = this.cardStates[card.id];
+      if (s.roundAgain > 0) keep.push(card);
+      else if (s.roundGotIt > 0) confident.push(card);
+    }
+    return { keep, confident };
+  }
+
+  getRoundCardCount() {
+    return this.roundCopyPlan.reduce((sum, p) => sum + p.count, 0);
+  }
+}
+
+
+
+
+var FC_TAGS = FLASHCARD_TAGS;
+var FC_DECK = FLASHCARD_DECK;
+var FC_Session = FlashcardSession;
+
+const CHAPTER_TITLE = "Laboratory safety";
+const CHAPTER_SUBTITLE = "Chemistry · apparatus, techniques, storage & hazard terms to memorise";
+
+const session = new FC_Session(FC_DECK);
+
+const els = {
+  tagRow: document.getElementById("tag-row"),
+  filterRow: document.getElementById("filter-row"),
+  modeToggle: document.getElementById("mode-toggle"),
+  roundBadge: document.getElementById("round-badge"),
+  progressText: document.getElementById("progress-text"),
+  studyPanel: document.getElementById("study-panel"),
+  summaryPanel: document.getElementById("summary-panel"),
+  cardContainer: document.getElementById("card-container"),
+  cardInner: document.getElementById("card-inner"),
+  subtopicPill: document.getElementById("subtopic-pill"),
+  cardCode: document.getElementById("card-code"),
+  cardFront: document.getElementById("card-front-text"),
+  cardFrontImage: document.getElementById("card-front-img"),
+  cardBack: document.getElementById("card-back-text"),
+  cardImage: document.getElementById("card-back-img"),
+  ratingHint: document.getElementById("rating-hint"),
+  btnPrev: document.getElementById("btn-prev"),
+  btnNext: document.getElementById("btn-next"),
+  btnAgain: document.getElementById("btn-again"),
+  btnFlip: document.getElementById("btn-flip"),
+  btnGotIt: document.getElementById("btn-got-it"),
+  summaryTitle: document.getElementById("summary-title"),
+  summaryStats: document.getElementById("summary-stats"),
+  summaryKeep: document.getElementById("summary-keep"),
+  summaryConfident: document.getElementById("summary-confident"),
+  btnNextRound: document.getElementById("btn-next-round"),
+  btnRestart: document.getElementById("btn-restart"),
+};
+
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function renderTags() {
+  els.tagRow.innerHTML = FC_TAGS.map(
+    (tag) =>
+      `<span class="px-3 py-1 rounded-full bg-primary/10 text-primary font-label-bold text-body-sm">#${escapeHtml(tag)}</span>`,
+  ).join("");
+}
+
+function renderFilters() {
+  const subtopics = session.getSubtopics();
+  const chips = [
+    `<button type="button" class="filter-chip active px-3 py-1.5 rounded-full border border-outline-variant/60 text-on-surface-variant font-label-bold" data-filter="">全部</button>`,
+    ...subtopics.map(
+      (st) =>
+        `<button type="button" class="filter-chip px-3 py-1.5 rounded-full border border-outline-variant/60 text-on-surface-variant font-label-bold" data-filter="${escapeHtml(st)}">${escapeHtml(st)}</button>`,
+    ),
+  ];
+  els.filterRow.innerHTML = chips.join("");
+  els.filterRow.querySelectorAll(".filter-chip").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      els.filterRow
+        .querySelectorAll(".filter-chip")
+        .forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      session.setFilter(btn.dataset.filter || null);
+      render();
+    });
+  });
+}
+
+function renderModeToggle() {
+  els.modeToggle.querySelectorAll("button").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.mode === session.mode);
+  });
+}
+
+function renderCard() {
+  const card = session.getCurrentCard();
+  if (!card) {
+    els.cardFront.textContent = session.sessionComplete
+      ? "本輪所有卡片已掌握！"
+      : "沒有可顯示的卡片";
+    els.cardBack.innerHTML = "";
+    els.cardImage.classList.add("hidden");
+    if (els.cardFrontImage) {
+      els.cardFrontImage.classList.add("hidden");
+      els.cardFrontImage.removeAttribute("src");
+    }
+    return;
+  }
+
+  els.subtopicPill.textContent = card.subtopic;
+  els.cardCode.textContent = `Card ${card.id}`;
+  document.querySelector(".subtopic-pill-back").textContent = card.subtopic;
+  document.querySelector(".card-code-back").textContent = `Card ${card.id}`;
+  // Wrap in one child so flex/grid on #card-front-text does not collapse
+  // spaces around <strong> (e.g. "Define explosive substance").
+  els.cardFront.innerHTML = `<span class="fc-card-copy">${card.front}</span>`;
+  els.cardBack.innerHTML = `<span class="fc-card-copy">${card.back}</span>`;
+
+  if (els.cardFrontImage) {
+    if (card.frontImage) {
+      els.cardFrontImage.src = card.frontImage.replace(/^\.\//, "");
+      els.cardFrontImage.alt = card.frontImageAlt || "";
+      els.cardFrontImage.classList.remove("hidden");
+    } else {
+      els.cardFrontImage.classList.add("hidden");
+      els.cardFrontImage.removeAttribute("src");
+    }
+  }
+
+  if (card.image) {
+    els.cardImage.src = card.image.replace(/^\.\//, "");
+    els.cardImage.alt = card.imageAlt || "";
+    els.cardImage.classList.remove("hidden");
+  } else {
+    els.cardImage.classList.add("hidden");
+    els.cardImage.removeAttribute("src");
+  }
+
+  els.cardInner.classList.toggle("card-flipped", session.flipped);
+  els.ratingHint.textContent = session.flipped
+    ? "← Again · Got it → 或按 1 / 2"
+    : "點擊卡片、空白鍵或 FLIP 顯示答案";
+  els.ratingHint.classList.toggle("text-tertiary", !session.flipped);
+
+  const atStart = session.queueIndex <= 0;
+  const atEnd = session.queueIndex >= session.roundQueue.length - 1;
+  els.btnPrev.disabled = atStart;
+  els.btnNext.disabled = session.phase !== "study" || (atEnd && !session.flipped);
+  els.btnAgain.disabled = !session.flipped;
+  els.btnGotIt.disabled = !session.flipped;
+}
+
+function renderStudyChrome() {
+  const total = session.roundQueue.length || 0;
+  const pos = total ? session.queueIndex + 1 : 0;
+  els.progressText.textContent = `${pos} / ${total}`;
+  els.roundBadge.textContent = `Round ${session.roundNumber} · ${session.getRoundCardCount()} cards`;
+  renderModeToggle();
+  renderCard();
+}
+
+function renderSummary() {
+  const { keep, confident } = session.getSummaryLists();
+  if (session.sessionComplete) {
+    els.summaryTitle.textContent = "Deck complete";
+    els.summaryStats.textContent =
+      "所有卡片已達掌握權重 — 可重新開始或切換篩選。";
+  } else {
+    els.summaryTitle.textContent = `Round ${session.roundNumber} complete`;
+    els.summaryStats.textContent = `${session.getRoundCardCount()} cards this round`;
+  }
+
+  const li = (c) =>
+    `<li class="text-body-sm"><span class="font-label-code text-on-surface-variant">#${c.id}</span> ${escapeHtml(c.subtopic)} — ${stripHtml(c.front).slice(0, 48)}…</li>`;
+
+  els.summaryKeep.innerHTML = keep.length
+    ? keep.map(li).join("")
+    : "<li class=\"text-on-surface-variant text-body-sm\">—</li>";
+  els.summaryConfident.innerHTML = confident.length
+    ? confident.map(li).join("")
+    : "<li class=\"text-on-surface-variant text-body-sm\">—</li>";
+
+  els.btnNextRound.textContent = session.sessionComplete
+    ? "Restart deck"
+    : "Next round →";
+}
+
+function stripHtml(html) {
+  const d = document.createElement("div");
+  d.innerHTML = html;
+  return d.textContent || "";
+}
+
+function render() {
+  const studying = session.phase === "study" && !session.sessionComplete;
+  els.studyPanel.classList.toggle("hidden", !studying);
+  els.summaryPanel.classList.toggle("hidden", studying);
+
+  if (studying) {
+    renderStudyChrome();
+  } else {
+    renderSummary();
+  }
+}
+
+function initModeToggle() {
+  els.modeToggle.querySelectorAll("button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      session.setMode(btn.dataset.mode);
+      render();
+    });
+  });
+}
+
+function initControls() {
+  els.btnFlip.addEventListener("click", () => {
+    session.flip();
+    renderCard();
+  });
+  els.cardContainer.addEventListener("click", (e) => {
+    if (e.target.closest("button")) return;
+    session.flip();
+    renderCard();
+  });
+  els.btnPrev.addEventListener("click", () => {
+    session.prev();
+    renderCard();
+  });
+  els.btnNext.addEventListener("click", () => {
+    session.rateNext();
+    render();
+  });
+  els.btnAgain.addEventListener("click", () => {
+    if (session.rateAgain()) render();
+  });
+  els.btnGotIt.addEventListener("click", () => {
+    if (session.rateGotIt()) render();
+  });
+  els.btnNextRound.addEventListener("click", () => {
+    if (session.sessionComplete) session.resetSession();
+    else session.nextRound();
+    render();
+  });
+  els.btnRestart.addEventListener("click", () => {
+    session.resetSession();
+    render();
+  });
+}
+
+function initKeyboard() {
+  document.addEventListener("keydown", (e) => {
+    if (e.target.matches("input, textarea, select")) return;
+    if (session.phase !== "study") return;
+
+    if (e.code === "Space") {
+      e.preventDefault();
+      session.flip();
+      renderCard();
+      return;
+    }
+
+    if (!session.flipped) {
+      if (e.key === "ArrowLeft") {
+        session.prev();
+        renderCard();
+      } else if (e.key === "ArrowRight") {
+        session.nextNavigate();
+        renderCard();
+      }
+      return;
+    }
+
+    if (e.key === "ArrowLeft" || e.key === "1") {
+      if (session.rateAgain()) render();
+    } else if (e.key === "ArrowRight" || e.key === "2") {
+      if (session.rateGotIt()) render();
+    }
+  });
+}
+
+function initTabReset() {
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+      window.parent.postMessage({ type: "s3bio-flashcards-reset" }, "*");
+      session.resetSession();
+      render();
+    }
+  });
+  window.addEventListener("message", (e) => {
+    if (e.data?.type === "s3bio-flashcards-reset") {
+      session.resetSession();
+      render();
+    }
+  });
+}
+
+function initParticles() {
+  const canvas = document.getElementById("particle-canvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  let w = 0;
+  let h = 0;
+  const dots = Array.from({ length: 40 }, () => ({
+    x: Math.random(),
+    y: Math.random(),
+    r: 1 + Math.random() * 2,
+    vx: (Math.random() - 0.5) * 0.0004,
+    vy: (Math.random() - 0.5) * 0.0004,
+  }));
+
+  function resize() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+
+  function frame() {
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = "rgba(0, 78, 159, 0.12)";
+    for (const d of dots) {
+      d.x += d.vx;
+      d.y += d.vy;
+      if (d.x < 0 || d.x > 1) d.vx *= -1;
+      if (d.y < 0 || d.y > 1) d.vy *= -1;
+      ctx.beginPath();
+      ctx.arc(d.x * w, d.y * h, d.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    requestAnimationFrame(frame);
+  }
+
+  resize();
+  window.addEventListener("resize", resize);
+  frame();
+}
+
+document.getElementById("chapter-title").textContent = CHAPTER_TITLE;
+document.getElementById("chapter-subtitle").textContent = CHAPTER_SUBTITLE;
+
+renderTags();
+renderFilters();
+initModeToggle();
+initControls();
+initKeyboard();
+initTabReset();
+render();
+try {
+  initParticles();
+} catch (err) {
+  /* decorative particles only */
+}
+
+  </script>
+  <script>
+    document.getElementById("card-inner").addEventListener("transitionend", function () {
+      var sub = document.getElementById("subtopic-pill").textContent;
+      var code = document.getElementById("card-code").textContent;
+      document.querySelector(".subtopic-pill-back").textContent = sub;
+      document.querySelector(".card-code-back").textContent = code;
+    });
+  </script>
+</body>
+</html>
