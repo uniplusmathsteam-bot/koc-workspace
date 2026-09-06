@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ore Extraction Lab — Interactive Lab</title>
+  <link rel="stylesheet" href="lab.css" />
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div>
+        <h1>Ore Extraction Lab</h1>
+        <p>Drag each ore onto the correct extraction process</p>
+      </div>
+      <div class="header-actions">
+        <span class="mode-pill" id="progress-pill">0 / 12 extracted</span>
+        <button type="button" class="btn-header" id="toggle-kb">Knowledge base</button>
+        <button type="button" class="btn-header" id="reset-lab">Reset</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="lab-main">
+    <section class="panel lab-panel" aria-label="Lab bench">
+      <div class="panel-header">
+        <span>Lab bench</span>
+        <span class="hint">Drag an ore onto a process symbol</span>
+      </div>
+      <div class="lab-scene" id="lab-stage">
+        <div class="bench-surface" aria-hidden="true"></div>
+
+        <div class="ore-band">
+          <div id="ore-tray" class="ore-tray" role="list"></div>
+        </div>
+
+        <div class="process-band">
+          <div id="stations" class="station-row"></div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="side-stack">
+      <section class="panel" aria-label="Extracted metals">
+        <div class="panel-header">
+          <span>Extracted metals</span>
+        </div>
+        <div class="controls results-panel">
+          <div class="progress-bar"><div id="progress-fill"></div></div>
+          <div id="results" class="results-grid"></div>
+          <p class="hint" id="results-empty">Drop ores on the correct process to extract metals.</p>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <div id="overlay-kb" class="overlay" hidden>
+    <div class="overlay-card panel concepts-card">
+      <div class="panel-header">
+        <span>Knowledge base — Ores</span>
+        <button type="button" class="btn-close" id="kb-close" aria-label="Close">×</button>
+      </div>
+      <div class="overlay-body concepts-scroll">
+        <div class="concept-block">
+          <h3>Ores</h3>
+          <p><strong>Ore:</strong> An ore is the type of rock that contains useful minerals, from which a metal can be extracted.</p>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Ore</th>
+                <th>Major element / compound</th>
+                <th>Metal extracted</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Bauxite</td><td>Aluminium oxide (Al<sub>2</sub>O<sub>3</sub>)</td><td>Aluminium (Al)</td></tr>
+              <tr><td>Copper pyrite</td><td>Copper iron sulphide (CuFeS<sub>2</sub>)</td><td>Copper (Cu)</td></tr>
+              <tr><td>Haematite</td><td>Iron(III) oxide (Fe<sub>2</sub>O<sub>3</sub>)</td><td>Iron (Fe)</td></tr>
+              <tr><td>Galena</td><td>Lead(II) sulphide (PbS)</td><td>Lead (Pb)</td></tr>
+              <tr><td>Rock salt</td><td>Sodium chloride (NaCl)</td><td>Sodium (Na)</td></tr>
+              <tr><td>Gold ore</td><td>Gold (Au)</td><td>Gold (Au)</td></tr>
+              <tr><td>Silver ore</td><td>Silver oxide (Ag<sub>2</sub>O)</td><td>Silver (Ag)</td></tr>
+              <tr><td>Mercury ore</td><td>Mercury(II) oxide (HgO)</td><td>Mercury (Hg)</td></tr>
+              <tr><td>Zinc ore</td><td>Zinc oxide (ZnO)</td><td>Zinc (Zn)</td></tr>
+              <tr><td>Potassium ore</td><td>Potassium chloride (KCl)</td><td>Potassium (K)</td></tr>
+              <tr><td>Magnesium ore</td><td>Magnesium chloride (MgCl<sub>2</sub>)</td><td>Magnesium (Mg)</td></tr>
+              <tr><td>Calcium ore</td><td>Calcium chloride (CaCl<sub>2</sub>)</td><td>Calcium (Ca)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="concept-block">
+          <h3>Extraction of metals from their ores</h3>
+          <ol class="kb-methods">
+            <li>
+              <h4>Mechanical separation (e.g. panning)</h4>
+              <ul>
+                <li>Gold can be extracted by panning</li>
+                <li>This method involves physical change as no new substances are produced.</li>
+              </ul>
+            </li>
+            <li>
+              <h4>Heating the metal ore alone</h4>
+              <ul>
+                <li>Silver and mercury (unreactive metals) can be extracted by heating their ores</li>
+                <li>Word equation: Silver oxide → Silver + oxygen</li>
+                <li>This method involves chemical change as new substances (silver and oxygen) are produced</li>
+              </ul>
+            </li>
+            <li>
+              <h4>Heating the metal ore with carbon</h4>
+              <ul>
+                <li>Zinc, iron, lead and copper (more reactive metals) can be extracted by heating their ores with carbon</li>
+                <li>Word equation: Lead(II) oxide + Carbon → Lead + Carbon dioxide</li>
+                <li>This method involves chemical change as new substances (lead and carbon dioxide) are produced</li>
+              </ul>
+            </li>
+            <li>
+              <h4>Electrolysis of molten metal ore</h4>
+              <ul>
+                <li>Potassium, sodium, calcium, magnesium and aluminium (most reactive metals) can be extracted by electrolysis of their molten ores.</li>
+                <li>Word equation: Aluminium oxide → Aluminium + Oxygen</li>
+                <li>This method involves chemical change as new substances (aluminium and oxygen) are produced</li>
+              </ul>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="feedback" class="overlay" hidden>
+    <div class="overlay-card panel" id="feedback-card">
+      <div class="panel-header" id="feedback-header">
+        <span id="feedback-title"></span>
+      </div>
+      <div class="overlay-body">
+        <div id="feedback-body"></div>
+        <div class="overlay-actions">
+          <button type="button" class="btn btn-primary" id="feedback-close">Continue</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="overlay-congrats" class="overlay congrats-overlay" hidden>
+    <div class="overlay-card panel congrats-card">
+      <div class="congrats-burst" aria-hidden="true" id="congrats-burst"></div>
+      <div class="panel-header ok-header">
+        <span>Lab complete</span>
+      </div>
+      <div class="overlay-body congrats-body">
+        <div class="congrats-badge" aria-hidden="true">★</div>
+        <h2 class="congrats-title">Congratulations!</h2>
+        <p class="congrats-text">You extracted every metal using the correct process.</p>
+        <div class="overlay-actions">
+          <button type="button" class="btn btn-primary" id="congrats-kb">Open knowledge base</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="lab.js"></script>
+</body>
+</html>
