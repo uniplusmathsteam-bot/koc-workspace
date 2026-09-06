@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Who Needs More · Nutrition Race</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../osmosis/bio-typography.css" />
+  <link rel="stylesheet" href="../osmosis/embed.css" />
+  <link rel="stylesheet" href="./who-needs-race.css" />
+  <script src="../osmosis/embed.js"></script>
+  <script src="../osmosis/tool-back.js" data-position="top-right" data-hub="../osmosis/lab.html"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">Ch 5 · Food</div>
+      <h1 class="title">Who needs more?</h1>
+      <div class="hud">
+        <span class="hud-chip hud-chip--timer" id="timer-chip">10s</span>
+        <span class="hud-chip" id="progress-chip">0 / 15</span>
+        <span class="hud-chip hud-chip--retry" id="retry-chip">1 retry left</span>
+      </div>
+    </header>
+
+    <div class="groups-bar" id="groups-bar" aria-label="People groups"></div>
+
+    <div class="stage" id="stage">
+      <div class="world is-live" id="world">
+        <div class="horizon"></div>
+        <div class="speed-lines" aria-hidden="true"></div>
+        <div class="track-scene">
+          <div class="track" id="track"></div>
+        </div>
+        <div class="car" id="car" aria-hidden="true">
+          <div class="car-motion" id="car-motion">
+            <div class="car-cabin"></div>
+            <div class="car-body"></div>
+            <div class="car-stripe"></div>
+            <div class="car-wheel car-wheel--l"></div>
+            <div class="car-wheel car-wheel--r"></div>
+          </div>
+        </div>
+      </div>
+
+      <section class="panel" id="play-panel" hidden>
+        <div class="q-row">
+          <div class="kahoot" id="kahoot">
+            <div class="timer-track" aria-hidden="true">
+              <div class="timer-bar" id="timer-bar"></div>
+            </div>
+            <span class="kahoot-num" id="q-num">Q1</span>
+            <p class="stem" id="stem"></p>
+          </div>
+          <div class="q-side">
+            <button type="button" class="btn-pause" id="btn-pause">Pause</button>
+            <button type="button" class="btn-skip" id="btn-skip">Skip</button>
+          </div>
+        </div>
+        <p class="why" id="why" hidden></p>
+        <form class="answer-row" id="answer-form">
+          <label class="sr-only" for="answer-input">Type the group name</label>
+          <input
+            id="answer-input"
+            type="text"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="Type who needs more…"
+          />
+          <button type="submit" class="btn btn-go" id="btn-go">Enter</button>
+        </form>
+      </section>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="overlay-card" role="dialog" aria-labelledby="overlay-title">
+      <p class="overlay-kicker" id="overlay-kicker">Ch 5 · Nutrition race</p>
+      <h2 id="overlay-title">Who needs more?</h2>
+      <p class="overlay-body" id="overlay-body">
+        Type who needs more — no choices shown. You have 10 seconds each question.
+        Capital or small letters both count. One free Skip (right of the question).
+        One wrong answer gets a retry; a second miss or timeout is game over.
+      </p>
+      <p class="overlay-score" id="overlay-score" hidden></p>
+      <p class="overlay-answer" id="overlay-answer" hidden></p>
+      <button type="button" class="btn btn-primary" id="overlay-btn">Start</button>
+    </div>
+  </div>
+
+  <script type="module" src="./js/whoNeedsRace.js"></script>
+</body>
+</html>

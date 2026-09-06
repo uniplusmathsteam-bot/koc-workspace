@@ -1,6 +1,17 @@
 /* Issac · Bio + IS KOC — submissions. */
 KOC.works('bio-is', 'issac', [
   {
+    id: 'who-needs-more-race',
+    title: 'Who Needs More Race',
+    type: 'interactive',
+    subject: 'Bio',
+    chapter: 'Bio Ch. 5',
+    submitted: '2026-09-06',
+    tags: ['Interactive', 'Quiz', 'Nutrition'],
+    src: 'content/bio-is/issac/food-nutrition/who-needs-race.html',
+    notes: 'Kanji-de-Go style typed race: 15 “who needs more” questions, 10s timer, one skip, pause.'
+  },
+  {
     id: 'food-test-lab',
     title: 'Food Test Lab',
     type: 'interactive',
