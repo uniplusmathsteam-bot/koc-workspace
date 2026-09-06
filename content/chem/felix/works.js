@@ -1,5 +1,17 @@
-﻿/* Felix · Chem KOC — submissions. */
+/* Felix — Chem KOC — submissions. */
 KOC.works('chem', 'felix', [
+  {
+    id: 'flame-test-sim',
+    title: 'Flame Test Simulator',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'Chem — Flame test',
+    submitted: '2026-09-06',
+    tags: ['Interactive', 'Flame test', 'Qualitative analysis'],
+    src: 'content/chem/felix/flame-test-sim/index.html',
+    notes: 'Demonstration and Test modes for cleaning a platinum wire and identifying K⁺, Na⁺, Ca²⁺, Cu²⁺ (or none) by flame colour, with red-hot wire safety checks.'
+  },
+
   {
     id: 'lab-safety-flashcard',
     title: 'Uni+ Chem S3 U1 Lab Safety Flashcard',
