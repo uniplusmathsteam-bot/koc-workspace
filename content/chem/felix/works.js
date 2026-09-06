@@ -1,6 +1,18 @@
 ﻿/* Felix · Chem KOC — submissions. */
 KOC.works('chem', 'felix', [
   {
+    id: 'lab-safety-flashcard',
+    title: 'Uni+ Chem S3 U1 Lab Safety Flashcard',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'Chem S3 U1',
+    submitted: '2026-09-06',
+    tags: ['Flashcards', 'Lab safety', 'Interactive'],
+    src: 'content/chem/felix/lab-safety-flashcard/index.html',
+    notes: 'Interactive flashcards for laboratory apparatus, techniques, storage, and hazard labels/precautions.'
+  },
+
+  {
     id: 'atom-interactive-lab',
     title: 'Atom Interactive Lab',
     type: 'interactive',
