@@ -1,6 +1,18 @@
 /* Felix - Chem KOC - submissions. */
 KOC.works('chem', 'felix', [
   {
+    id: 'planet-earth-ore-extraction',
+    title: 'Planet earth: Ore extraction',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'Chem - Planet Earth',
+    submitted: '2026-09-06',
+    tags: ['Interactive', 'Ore extraction', 'Metals'],
+    src: 'content/chem/felix/planet-earth-ore-extraction/index.html',
+    notes: 'Drag ores onto the correct extraction process: mechanical separation, heating alone, heating with carbon, or electrolysis of molten metal ore.'
+  },
+
+  {
     id: 'flame-test-sim',
     title: 'Flame Test Simulator',
     type: 'interactive',
