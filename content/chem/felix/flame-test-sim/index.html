@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flame Test Simulator — Interactive Lab</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div>
+        <h1>Flame Test Simulator</h1>
+        <p>Identify metal cations by flame colour in a non-luminous Bunsen flame</p>
+      </div>
+      <div class="header-actions" id="header-actions" hidden>
+        <span class="mode-pill" id="mode-badge">Demonstration Mode</span>
+        <span class="phase-pill" id="phase-badge">Cleaning the wire</span>
+        <button type="button" class="btn btn-header" id="btn-restart" hidden>Restart</button>
+        <button type="button" class="btn btn-header" id="btn-home">Menu</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Start / Mode select -->
+  <section id="screen-start" class="screen active">
+    <div class="start-wrap">
+      <div class="panel start-panel">
+        <div class="panel-header">
+          <span>Choose a lab mode</span>
+        </div>
+        <div class="start-body">
+          <p class="start-lead">
+            Clean a platinum wire, introduce a salt sample, and observe the characteristic flame colour.
+            A nichrome wire can also be used in place of platinum.
+          </p>
+          <div class="mode-cards">
+            <button type="button" class="mode-card" id="btn-guided">
+              <span class="mode-card-title">Demonstration Mode</span>
+              <span class="mode-card-desc">Watch the full cleaning and flame test procedure step by step with narration.</span>
+            </button>
+            <button type="button" class="mode-card" id="btn-test">
+              <span class="mode-card-title">Test Mode</span>
+              <span class="mode-card-desc">Pick up the platinum wire with your mouse and perform every step yourself. Mistakes pause the lab with feedback.</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sample picker (after Demonstration Mode) -->
+  <div id="overlay-sample" class="overlay" hidden>
+    <div class="overlay-card panel">
+      <div class="panel-header">
+        <span>Select sample for Demonstration Mode</span>
+      </div>
+      <div class="overlay-body">
+        <p class="hint">Choose which salt the demonstration will use.</p>
+        <div class="sample-grid" id="sample-grid" role="listbox" aria-label="Salt samples">
+          <button type="button" class="sample-option" data-cation="K">
+            <span class="sample-swatch lilac"></span>
+            <strong>Potassium salt</strong>
+            <span>Expected: lilac</span>
+          </button>
+          <button type="button" class="sample-option" data-cation="Na">
+            <span class="sample-swatch golden"></span>
+            <strong>Sodium salt</strong>
+            <span>Expected: golden yellow</span>
+          </button>
+          <button type="button" class="sample-option" data-cation="Ca">
+            <span class="sample-swatch brick"></span>
+            <strong>Calcium salt</strong>
+            <span>Expected: brick red</span>
+          </button>
+          <button type="button" class="sample-option" data-cation="Cu">
+            <span class="sample-swatch bluish"></span>
+            <strong>Copper salt</strong>
+            <span>Expected: bluish green</span>
+          </button>
+        </div>
+        <div class="overlay-actions">
+          <button type="button" class="btn btn-secondary" id="btn-sample-cancel">Back</button>
+          <button type="button" class="btn btn-primary" id="btn-sample-start" disabled>Start demonstration</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lab -->
+  <section id="screen-lab" class="screen">
+    <main class="lab-main">
+      <section class="panel lab-panel" aria-label="Lab bench">
+        <div class="panel-header">
+          <span>Lab bench</span>
+          <span class="hint" id="stage-hint">Follow the procedure panel</span>
+        </div>
+        <div class="lab-scene" id="lab-stage">
+          <div class="bench-surface" aria-hidden="true"></div>
+
+          <div class="apparatus-row" id="apparatus-row">
+            <!-- Shared test-tube rack: Conc. HCl + wire holder -->
+            <div class="station rack-station" id="rack-station">
+              <svg class="equip-svg rack-svg" viewBox="0 0 200 200" aria-hidden="true">
+                <defs>
+                  <linearGradient id="acidGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#bbf7d0"/>
+                    <stop offset="100%" stop-color="#16a34a"/>
+                  </linearGradient>
+                  <linearGradient id="woodG" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#d6b27a"/>
+                    <stop offset="100%" stop-color="#8b5e34"/>
+                  </linearGradient>
+                  <linearGradient id="rackMetal" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="#94a3b8"/>
+                    <stop offset="50%" stop-color="#e2e8f0"/>
+                    <stop offset="100%" stop-color="#64748b"/>
+                  </linearGradient>
+                </defs>
+                <!-- rack base -->
+                <rect x="18" y="168" width="164" height="18" rx="3" fill="url(#woodG)" stroke="#6b4423" stroke-width="1.5"/>
+                <rect x="28" y="158" width="144" height="12" rx="2" fill="#a16207" stroke="#78350f" stroke-width="1"/>
+                <!-- uprights -->
+                <rect x="36" y="70" width="8" height="90" rx="1" fill="url(#rackMetal)" stroke="#475569" stroke-width="1"/>
+                <rect x="156" y="70" width="8" height="90" rx="1" fill="url(#rackMetal)" stroke="#475569" stroke-width="1"/>
+                <!-- top bar with two holes -->
+                <rect x="30" y="68" width="140" height="14" rx="3" fill="url(#rackMetal)" stroke="#475569" stroke-width="1.2"/>
+                <ellipse cx="70" cy="75" rx="14" ry="5" fill="#1e293b" opacity="0.35"/>
+                <ellipse cx="130" cy="75" rx="14" ry="5" fill="#1e293b" opacity="0.35"/>
+
+                <!-- Left test tube: Conc. HCl -->
+                <g id="hcl-tube-graphic">
+                  <path d="M58 28 H82 V145 Q82 158 70 158 Q58 158 58 145 Z" fill="#f8fafc" fill-opacity="0.55" stroke="#64748b" stroke-width="2.2"/>
+                  <g id="hcl-liquid-group">
+                    <path id="hcl-liquid" d="M62 95 H78 V145 Q78 152 70 152 Q62 152 62 145 Z" fill="url(#acidGrad)" opacity="0.9"/>
+                    <ellipse id="hcl-liquid-surface" cx="70" cy="95" rx="8" ry="2.5" fill="#86efac"/>
+                  </g>
+                  <g id="hcl-bubbles" class="hcl-bubbles" opacity="0" aria-hidden="true">
+                    <circle class="bubble b1" cx="66" cy="130" r="2.2" fill="#bbf7d0"/>
+                    <circle class="bubble b2" cx="74" cy="122" r="1.8" fill="#86efac"/>
+                    <circle class="bubble b3" cx="70" cy="112" r="2.5" fill="#dcfce7"/>
+                    <circle class="bubble b4" cx="68" cy="138" r="1.5" fill="#86efac"/>
+                  </g>
+                  <line x1="56" y1="28" x2="84" y2="28" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
+                  <text x="70" y="128" text-anchor="middle" font-size="9" font-weight="700" fill="#14532d" opacity="0.75">HCl</text>
+                </g>
+
+                <!-- Right test tube: empty wire holder -->
+                <g id="wire-tube-graphic">
+                  <path d="M118 28 H142 V145 Q142 158 130 158 Q118 158 118 145 Z" fill="#f8fafc" fill-opacity="0.45" stroke="#64748b" stroke-width="2.2"/>
+                  <line x1="116" y1="28" x2="144" y2="28" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
+                </g>
+              </svg>
+
+              <!-- Hit zones over each tube -->
+              <div class="tube-hit hcl-hit" id="zone-hcl" data-zone="hcl" title="Conc. HCl"></div>
+              <div class="tube-hit wire-hit" id="zone-wire" data-zone="wire" title="Platinum wire">
+                <svg class="wire-svg rest-wire" id="wire-visual" viewBox="0 0 48 160" aria-label="Platinum wire">
+                  <rect class="wire-grip-rect" x="14" y="4" width="20" height="28" rx="3" fill="#b45309" stroke="#78350f" stroke-width="1"/>
+                  <rect x="17" y="8" width="14" height="4" rx="1" fill="#fbbf24" opacity="0.4"/>
+                  <line class="wire-shaft-line" x1="24" y1="32" x2="24" y2="138" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
+                  <line x1="22.5" y1="32" x2="22.5" y2="138" stroke="#f8fafc" stroke-width="1" opacity="0.75"/>
+                  <circle class="wire-loop-circle" id="wire-loop" cx="24" cy="148" r="9" fill="none" stroke="#334155" stroke-width="2.6"/>
+                  <circle cx="24" cy="148" r="5" fill="none" stroke="#e2e8f0" stroke-width="1.1"/>
+                </svg>
+              </div>
+
+              <div class="rack-labels">
+                <span class="station-label">Conc. HCl</span>
+                <span class="station-label">Platinum wire</span>
+              </div>
+            </div>
+
+            <!-- Bunsen + flame (next to HCl rack so cleaning path does not cross the sample) -->
+            <div class="station burner-station">
+              <div class="flame-hit" id="zone-flame" data-zone="flame"></div>
+              <div class="flame-area">
+                <svg class="flame-svg base" id="base-flame" viewBox="0 0 80 110" aria-hidden="true">
+                  <defs>
+                    <linearGradient id="outerFlame" x1="0.5" y1="0" x2="0.5" y2="1">
+                      <stop offset="0%" stop-color="#93c5fd" stop-opacity="0.2"/>
+                      <stop offset="45%" stop-color="#3b82f6" stop-opacity="0.55"/>
+                      <stop offset="100%" stop-color="#1d4ed8" stop-opacity="0.85"/>
+                    </linearGradient>
+                    <linearGradient id="innerFlame" x1="0.5" y1="0" x2="0.5" y2="1">
+                      <stop offset="0%" stop-color="#eff6ff"/>
+                      <stop offset="100%" stop-color="#60a5fa"/>
+                    </linearGradient>
+                  </defs>
+                  <path id="flame-outer" class="flicker-outer" d="M40 8 C28 40 18 78 22 102 L40 98 L58 102 C62 78 52 40 40 8 Z" fill="url(#outerFlame)"/>
+                  <path id="flame-inner" class="flicker-inner" d="M40 48 C34 68 30 88 32 100 L40 96 L48 100 C50 88 46 68 40 48 Z" fill="url(#innerFlame)"/>
+                </svg>
+                <svg class="flame-svg color" id="color-flame" viewBox="0 0 90 120" aria-hidden="true" hidden>
+                  <defs>
+                    <filter id="flameGlow" x="-40%" y="-40%" width="180%" height="180%">
+                      <feGaussianBlur stdDeviation="3.5" result="b"/>
+                      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                  </defs>
+                  <path id="color-flame-path" filter="url(#flameGlow)" class="flicker-color" d="M45 6 C28 42 16 86 22 112 L45 104 L68 112 C74 86 62 42 45 6 Z" fill="#c084fc"/>
+                </svg>
+              </div>
+              <svg class="equip-svg bunsen-svg" viewBox="0 0 100 120" aria-hidden="true">
+                <defs>
+                  <linearGradient id="metalG" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="#64748b"/>
+                    <stop offset="40%" stop-color="#cbd5e1"/>
+                    <stop offset="100%" stop-color="#475569"/>
+                  </linearGradient>
+                  <linearGradient id="brassG" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="#a16207"/>
+                    <stop offset="45%" stop-color="#fbbf24"/>
+                    <stop offset="100%" stop-color="#854d0e"/>
+                  </linearGradient>
+                </defs>
+                <path d="M28 118 L18 88 H82 L72 118 Z" fill="url(#metalG)" stroke="#334155" stroke-width="1.5"/>
+                <rect x="42" y="28" width="16" height="62" rx="2" fill="url(#metalG)" stroke="#334155" stroke-width="1.2"/>
+                <rect x="36" y="22" width="28" height="10" rx="2" fill="url(#brassG)" stroke="#854d0e" stroke-width="1"/>
+                <circle cx="50" cy="27" r="3" fill="#1e293b"/>
+                <path d="M58 100 H88 V106 H58 Z" fill="#1e293b"/>
+                <ellipse cx="50" cy="28" rx="5" ry="2" fill="#0f172a"/>
+              </svg>
+              <span class="station-label">Non-luminous flame</span>
+            </div>
+
+            <!-- Sample (after burner so HCl → flame does not cross it) -->
+            <div class="station sample-station">
+              <div class="sample-hit" id="zone-sample" data-zone="sample"></div>
+              <svg class="equip-svg sample-svg" viewBox="0 0 120 90" aria-hidden="true">
+                <defs>
+                  <radialGradient id="saltGrad" cx="45%" cy="40%" r="55%">
+                    <stop offset="0%" stop-color="#f8fafc"/>
+                    <stop offset="100%" stop-color="#cbd5e1"/>
+                  </radialGradient>
+                </defs>
+                <ellipse cx="60" cy="62" rx="48" ry="16" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
+                <ellipse id="sample-dish" cx="60" cy="58" rx="46" ry="14" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+                <ellipse id="salt-pile" class="salt-pile" cx="60" cy="54" rx="16" ry="8" fill="url(#saltGrad)" stroke="#94a3b8" stroke-width="1"/>
+              </svg>
+              <span class="station-label" id="sample-label">Unknown sample</span>
+            </div>
+          </div>
+
+          <!-- Held wire: tip (loop) at bottom — shorter so tip can reach the flame -->
+          <div class="held-wire" id="held-wire" hidden aria-hidden="true">
+            <svg class="wire-svg" viewBox="0 0 48 120">
+              <rect class="wire-grip-rect" x="14" y="2" width="20" height="24" rx="3" fill="#b45309" stroke="#78350f" stroke-width="1"/>
+              <rect x="17" y="6" width="14" height="4" rx="1" fill="#fbbf24" opacity="0.4"/>
+              <line class="wire-shaft-line" x1="24" y1="26" x2="24" y2="100" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
+              <line x1="22.5" y1="26" x2="22.5" y2="100" stroke="#f8fafc" stroke-width="1" opacity="0.75"/>
+              <circle class="wire-loop-circle" cx="24" cy="110" r="9" fill="none" stroke="#334155" stroke-width="2.6"/>
+              <circle cx="24" cy="110" r="5" fill="none" stroke="#e2e8f0" stroke-width="1.1"/>
+            </svg>
+          </div>
+
+          <div class="status-toast" id="status-toast" hidden></div>
+        </div>
+        <div class="legend">
+          <div class="legend-item"><span class="swatch flame-blue"></span><span>Non-luminous Bunsen flame</span></div>
+          <div class="legend-item"><span class="swatch wire-hot"></span><span>Red-hot wire (cool before HCl)</span></div>
+          <div class="legend-item"><span class="swatch acid"></span><span>Concentrated HCl</span></div>
+          <div class="legend-item"><span class="swatch wire"></span><span>Platinum / nichrome wire</span></div>
+        </div>
+      </section>
+
+      <div class="side-stack">
+        <aside class="panel" aria-label="Procedure">
+          <div class="panel-header">
+            <span id="procedure-heading">Cleaning the platinum / nichrome wire</span>
+          </div>
+          <div class="controls">
+            <ol class="step-list" id="step-list"></ol>
+            <p class="hint-line" id="hint-line">Follow the highlighted step.</p>
+          </div>
+        </aside>
+
+        <aside class="panel" aria-label="Status">
+          <div class="panel-header">
+            <span>Status</span>
+          </div>
+          <div class="controls">
+            <div class="process-log" id="narration">Ready.</div>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </section>
+
+  <!-- Error -->
+  <div id="overlay-error" class="overlay" hidden>
+    <div class="overlay-card panel error-card">
+      <div class="panel-header warn-header">
+        <span>Mistake</span>
+      </div>
+      <div class="overlay-body">
+        <p id="error-what" class="error-what"></p>
+        <p id="error-correct" class="error-correct"></p>
+        <div class="overlay-actions">
+          <button type="button" class="btn btn-primary" id="btn-error-ok">Restart experiment</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MCQ -->
+  <div id="overlay-mcq" class="overlay" hidden>
+    <div class="overlay-card panel mcq-card">
+      <div class="panel-header">
+        <span>Identify the cation</span>
+      </div>
+      <div class="overlay-body">
+        <p class="mcq-prompt">Which cation is present in the experiment sample?</p>
+        <div class="mcq-options" id="mcq-options">
+          <button type="button" class="btn btn-secondary mcq-btn" data-answer="K">Potassium ion</button>
+          <button type="button" class="btn btn-secondary mcq-btn" data-answer="Na">Sodium ion</button>
+          <button type="button" class="btn btn-secondary mcq-btn" data-answer="Ca">Calcium ion</button>
+          <button type="button" class="btn btn-secondary mcq-btn" data-answer="Cu">Copper ion</button>
+          <button type="button" class="btn btn-secondary mcq-btn" data-answer="none">None of the above</button>
+        </div>
+        <div class="answer-flash" id="answer-flash" hidden>
+          <span id="answer-flash-text"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Concepts -->
+  <div id="overlay-concepts" class="overlay" hidden>
+    <div class="overlay-card panel concepts-card">
+      <div class="panel-header">
+        <span>Concepts — Flame Test</span>
+        <button type="button" class="btn-close" id="btn-concepts-close" aria-label="Close">×</button>
+      </div>
+      <div class="overlay-body concepts-scroll">
+        <div class="concept-block highlight-block">
+          <h3>How this cation was identified</h3>
+          <p id="concept-id-text"></p>
+        </div>
+
+        <div class="concept-block">
+          <h3>Nature of the test</h3>
+          <p>
+            The flame test is a <strong>physical test</strong>. Heating does not change the chemical identity of the metal cation;
+            electrons are excited and then emit characteristic light as they return to lower energy levels. The observed flame colour
+            is therefore a physical property used for qualitative identification.
+          </p>
+        </div>
+
+        <div class="concept-block">
+          <h3>All four flame colours in this lab</h3>
+          <div class="colour-grid" id="colour-grid">
+            <div class="colour-swatch" data-ion="K">
+              <div class="swatch-flame lilac"></div>
+              <strong>Potassium ion</strong>
+              <span>Lilac</span>
+            </div>
+            <div class="colour-swatch" data-ion="Na">
+              <div class="swatch-flame golden"></div>
+              <strong>Sodium ion</strong>
+              <span>Golden yellow</span>
+            </div>
+            <div class="colour-swatch" data-ion="Ca">
+              <div class="swatch-flame brick"></div>
+              <strong>Calcium ion</strong>
+              <span>Brick red</span>
+            </div>
+            <div class="colour-swatch" data-ion="Cu">
+              <div class="swatch-flame bluish"></div>
+              <strong>Copper ion</strong>
+              <span>Bluish green</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="concept-block">
+          <h3>Correct procedures</h3>
+          <h4>Procedures of cleaning the platinum / nichrome wire:</h4>
+          <ol>
+            <li>Dip the platinum wire / nichrome wire into concentrated hydrochloric acid.</li>
+            <li>Heat the end of the wire strongly in a non-luminous flame.</li>
+            <li>Repeat the above steps until no characteristic flame color can be observed</li>
+          </ol>
+          <h4>Procedures of flame test:</h4>
+          <ol>
+            <li>Dip a clean platinum wire / nichrome wire into concentrated hydrochloric acid.</li>
+            <li>Dip the wire into the sample.</li>
+            <li>Heat the end of the wire strongly in a non-luminous flame. Observe the flame color.</li>
+          </ol>
+          <p class="note-box">
+            <strong>Note:</strong> A nichrome wire also works as a replacement of a platinum wire for the flame test.
+            After heating, always allow the wire to cool before dipping it back into concentrated hydrochloric acid —
+            a red-hot wire will cause the acid to boil away violently.
+          </p>
+        </div>
+
+        <div class="overlay-actions">
+          <button type="button" class="btn btn-primary" id="btn-concepts-home">Back to menu</button>
+          <button type="button" class="btn btn-secondary" id="btn-concepts-retry">Run again</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
