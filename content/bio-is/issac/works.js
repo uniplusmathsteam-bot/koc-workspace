@@ -1,6 +1,17 @@
 /* Issac · Bio + IS KOC — submissions. */
 KOC.works('bio-is', 'issac', [
   {
+    id: 'food-deficit',
+    title: 'Food Deficit',
+    type: 'interactive',
+    subject: 'Bio',
+    chapter: 'Bio Ch. 5',
+    submitted: '2026-09-06',
+    tags: ['Interactive', 'Nutrition', 'Deficiency'],
+    src: 'content/bio-is/issac/food-nutrition/food-deficit.html',
+    notes: '2D body: pick a nutrient, slide too little / too much, then open the matching deficiency or excess disease.'
+  },
+  {
     id: 'who-needs-more-race',
     title: 'Who Needs More Race',
     type: 'interactive',

@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Food Deficit | S3 Biology</title>
+  <link rel="stylesheet" href="../osmosis/bio-typography.css" />
+  <link rel="stylesheet" href="../osmosis/embed.css" />
+  <script src="../osmosis/embed.js"></script>
+  <script src="../osmosis/tool-back.js" data-position="top-right" data-hub="../osmosis/lab.html"></script>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --ink: #1a1a1a;
+      --muted: #5c5c5c;
+      --line: #2b2b2b;
+      --body: #dcdcdc;
+      --body-stroke: #2b2b2b;
+      --flag: #d12626;
+      --ok: #2b8a3e;
+      --panel: #ffffff;
+      --track: #efefef;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100%;
+    }
+
+    body {
+      font-family: "Inter", "Segoe UI", "Microsoft JhengHei", sans-serif;
+      line-height: 1.4;
+    }
+
+    .page {
+      min-height: 100vh;
+      padding: 18px 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    html.bio-embed .page { min-height: 0; padding: 10px 14px 16px; }
+
+    .head h1 {
+      font-size: 1.55rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .head p {
+      color: var(--muted);
+      font-size: 0.92rem;
+      max-width: 52rem;
+    }
+
+    .layout {
+      flex: 1;
+      display: grid;
+      grid-template-columns: minmax(280px, 1fr) auto;
+      gap: 18px;
+      align-items: stretch;
+      min-height: 560px;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      gap: 14px;
+      overflow: visible;
+      position: relative;
+      z-index: 6;
+    }
+
+    .stage {
+      position: relative;
+      border: 1px solid #e6e6e6;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: visible;
+      min-height: 540px;
+    }
+
+    .figure {
+      position: relative;
+      width: 360px;
+      height: 500px;
+      transform-origin: center top;
+    }
+
+    .blocks {
+      position: absolute;
+      left: 40px;
+      top: 0;
+      width: 280px;
+      height: 500px;
+    }
+
+    .part {
+      position: absolute;
+      background: var(--body);
+      border: 2px solid var(--body-stroke);
+      cursor: pointer;
+    }
+
+    .figure[data-state="low"] { --body: #cfcfcf; }
+    .figure[data-state="high"] { --body: #c8c8c8; }
+
+    .head-block {
+      left: 98px; top: 8px; width: 84px; height: 84px;
+    }
+    .figure[data-state="low"] .head-block { left: 104px; width: 72px; height: 78px; }
+    .figure[data-state="high"] .head-block { left: 90px; width: 100px; height: 88px; }
+
+    .eye {
+      position: absolute;
+      top: 28px;
+      width: 14px; height: 10px;
+      background: #fff;
+      border: 2px solid var(--body-stroke);
+    }
+    .eye.l { left: 16px; }
+    .eye.r { right: 16px; }
+    .figure[data-state="low"] .eye { background: #9aa0a6; }
+
+    .mouth {
+      position: absolute;
+      left: 26px; bottom: 14px;
+      width: 32px; height: 10px;
+      background: #fff;
+      border: 2px solid var(--body-stroke);
+      cursor: pointer;
+    }
+    .figure.is-scurvy .mouth {
+      background: #d12626;
+      border-color: #8f1212;
+    }
+    .drip, .drip2 {
+      position: absolute;
+      z-index: 2;
+      width: 7px; height: 10px;
+      background: #d12626;
+      border-radius: 0 0 6px 6px;
+      left: 36px;
+      bottom: 2px;
+      opacity: 0;
+    }
+    .figure.is-scurvy .drip,
+    .figure.is-scurvy .drip2 { animation: drip 1.4s ease-in infinite; }
+    .figure.is-scurvy .drip2 { left: 48px; animation-delay: 0.55s; }
+
+    @keyframes drip {
+      0% { opacity: 1; transform: translateY(0); }
+      85% { opacity: 1; }
+      100% { opacity: 0; transform: translateY(16px); }
+    }
+
+    .neck {
+      left: 122px; top: 90px; width: 36px; height: 22px;
+    }
+    .figure.is-goitre .neck {
+      left: 108px; width: 64px; height: 28px;
+      background: #bfbfbf;
+    }
+
+    .torso {
+      left: 86px; top: 110px; width: 108px; height: 168px;
+    }
+    .figure[data-state="low"] .torso { left: 102px; width: 76px; height: 160px; }
+    .figure[data-state="high"] .torso { left: 62px; width: 156px; height: 176px; }
+
+    .belly {
+      display: none;
+      position: absolute;
+      background: var(--body);
+      border: 2px solid var(--body-stroke);
+      cursor: pointer;
+      z-index: 2;
+      border-radius: 50%;
+    }
+    .figure.is-kwashiorkor .belly {
+      display: block;
+      left: 102px;
+      top: 194px;
+      width: 76px;
+      height: 76px;
+    }
+    .figure.is-obesity .belly {
+      display: block;
+      left: 62px;
+      top: 130px;
+      width: 156px;
+      height: 156px;
+    }
+
+    .heart {
+      position: absolute;
+      left: 118px; top: 132px;
+      width: 28px; height: 24px;
+      background: #b0b0b0;
+      border: 2px solid var(--body-stroke);
+      cursor: pointer;
+    }
+    .figure[data-state="low"] .heart { left: 124px; }
+    .figure[data-state="high"] .heart { left: 110px; }
+    .figure.is-chd .heart { background: #d12626; border-color: #8f1212; }
+
+    .arm {
+      top: 118px; width: 36px; height: 168px;
+    }
+    .arm.l { left: 46px; }
+    .arm.r { left: 198px; }
+    .figure[data-state="low"] .arm { width: 28px; }
+    .figure[data-state="low"] .arm.l { left: 70px; }
+    .figure[data-state="low"] .arm.r { left: 182px; }
+    .figure[data-state="high"] .arm { width: 52px; }
+    .figure[data-state="high"] .arm.l { left: 10px; }
+    .figure[data-state="high"] .arm.r { left: 218px; }
+
+    .wound {
+      position: absolute;
+      left: 10px; top: 70px;
+      width: 16px; height: 22px;
+      background: #fff;
+      border: 2px solid #8f1212;
+      display: none;
+    }
+    .wound::after {
+      content: "";
+      position: absolute;
+      left: 6px; top: 2px;
+      width: 2px; height: 16px;
+      background: #d12626;
+    }
+    .figure.is-wound .wound { display: block; }
+
+    .leg {
+      top: 276px; width: 44px; height: 200px;
+    }
+    .leg.l { left: 90px; }
+    .leg.r { left: 146px; }
+    .figure[data-state="low"] .leg { width: 34px; height: 190px; }
+    .figure[data-state="low"] .leg.l { left: 106px; }
+    .figure[data-state="low"] .leg.r { left: 144px; }
+    .figure[data-state="high"] .leg { width: 62px; }
+    .figure[data-state="high"] .leg.l { left: 72px; }
+    .figure[data-state="high"] .leg.r { left: 146px; }
+    #flags {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .flag {
+      position: absolute;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      font: inherit;
+      color: var(--flag);
+      padding: 0;
+      white-space: nowrap;
+      pointer-events: auto;
+    }
+    .flag .mark {
+      width: 12px; height: 16px;
+      background: var(--flag);
+      clip-path: polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%);
+      flex: 0 0 auto;
+    }
+    .flag .name {
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: #fff;
+      border: 1.5px solid var(--flag);
+      padding: 2px 6px;
+    }
+    .flag:hover .name,
+    .flag[aria-pressed="true"] .name {
+      background: var(--flag);
+      color: #fff;
+    }
+    .flag.ok {
+      color: var(--ok);
+    }
+    .flag.ok .mark { background: var(--ok); clip-path: none; width: 12px; height: 12px; }
+    .flag.ok .name { border-color: var(--ok); color: var(--ok); }
+    .flag.ok[aria-pressed="true"] .name,
+    .flag.ok:hover .name { background: var(--ok); color: #fff; }
+
+    .detail {
+      display: none;
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      bottom: 12px;
+      width: min(340px, 46%);
+      border: 1.5px solid var(--line);
+      background: var(--panel);
+      padding: 14px 14px 16px;
+      flex-direction: column;
+      min-height: 0;
+      z-index: 8;
+      overflow: auto;
+    }
+    .detail.open { display: flex; }
+    .detail-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 28px;
+      height: 28px;
+      border: 1.5px solid var(--line);
+      background: #fff;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 700;
+    }
+    .detail-kicker {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+      padding-right: 28px;
+    }
+    .detail h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .nutrient {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .illust {
+      border: 1px solid #e6e6e6;
+      background: #fff;
+      min-height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+      padding: 8px;
+    }
+    .illust svg { width: 100%; height: 210px; }
+    .illust img,
+    .illust video {
+      display: block;
+      width: 100%;
+      max-height: 280px;
+      object-fit: contain;
+    }
+    .figcap {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin: -6px 0 10px;
+    }
+    .detail p.body-copy {
+      font-size: 0.92rem;
+      color: #2a2a2a;
+    }
+    .empty-copy { display: none; }
+    .detail .subtitle {
+      font-size: 0.88rem;
+      font-style: italic;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .detail .points,
+    .detail .mech {
+      margin: 8px 0 0;
+      padding-left: 1.15rem;
+      font-size: 0.88rem;
+      color: #2a2a2a;
+    }
+    .detail .points li,
+    .detail .mech li { margin: 3px 0; }
+
+    .rail {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+      width: 92px;
+      flex: 0 0 auto;
+    }
+    .rail-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      text-align: center;
+      color: var(--muted);
+      writing-mode: horizontal-tb;
+    }
+    .rail-label.hot { color: var(--flag); }
+    .rail-label.ok { color: var(--ok); }
+
+    .slider {
+      position: relative;
+      width: 36px;
+      flex: 1;
+      min-height: 320px;
+      background: var(--track);
+      border: 2px solid var(--line);
+      cursor: ns-resize;
+      touch-action: none;
+    }
+    .slider .zones {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .slider .z-high { position: absolute; left: 0; right: 0; top: 0; height: 33.3%; background: #f8d7d7; }
+    .slider .z-ok { position: absolute; left: 0; right: 0; top: 33.3%; height: 33.4%; background: #d8f0dc; }
+    .slider .z-low { position: absolute; left: 0; right: 0; bottom: 0; height: 33.3%; background: #f3e0c8; }
+    .thumb {
+      position: absolute;
+      left: -6px; right: -6px;
+      height: 18px;
+      background: var(--ink);
+      border: 2px solid var(--ink);
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+    .status {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-align: center;
+      min-height: 2.4em;
+    }
+    .status.low, .status.high { color: var(--flag); }
+    .status.ok { color: var(--ok); }
+
+    .nutrient-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      width: 210px;
+      padding: 8px 0;
+      gap: 8px;
+    }
+    .nutrient-panel label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .nutrient-combo { position: relative; }
+    .nutrient-combo > button {
+      width: 100%;
+      font: inherit;
+      font-size: 0.88rem;
+      padding: 8px 10px;
+      border: 2px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+    }
+    .nutrient-menu {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(100% + 2px);
+      z-index: 20;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      background: #fff;
+      border: 2px solid var(--line);
+      max-height: 260px;
+      overflow: auto;
+    }
+    .nutrient-menu[hidden] { display: none; }
+    .nutrient-menu li {
+      padding: 7px 10px;
+      cursor: pointer;
+      font-size: 0.88rem;
+    }
+    .nutrient-menu li:hover,
+    .nutrient-menu li[aria-selected="true"] { background: #efefef; }
+    .nutrient-hint {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .flag-note {
+      position: absolute;
+      left: 50%;
+      top: 46%;
+      transform: translate(-50%, -50%);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--muted);
+      background: #fff;
+      border: 1.5px solid #cfcfcf;
+      padding: 6px 10px;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .figure.is-dry-skin .arm {
+      background:
+        repeating-linear-gradient(135deg, #dcdcdc 0 8px, #bdbdbd 8px 10px);
+    }
+    .figure.is-osteoporosis .leg {
+      border-style: dashed;
+    }
+    .figure.is-liver .torso {
+      background: #c9c4b0;
+    }
+    .figure.is-kidney .torso {
+      background: #d4d4d4;
+    }
+    .figure.is-thyroid-high .neck {
+      background: #d12626;
+      border-color: #8f1212;
+    }
+    .figure.is-low-glucose .eye {
+      background: #9aa0a6;
+    }
+    .figure.is-constipation .torso {
+      left: 78px;
+      width: 124px;
+    }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .controls { justify-content: center; }
+      .detail {
+        right: 8px; left: 8px; width: auto; top: auto; bottom: 8px;
+        max-height: 48%;
+      }
+      .stage { min-height: 460px; }
+      .figure { transform: scale(0.86); }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="head">
+      <h1>Food deficit</h1>
+      <p>A 2D block body. Choose a nutrient, then use the bar to change how much is absorbed. Too little or too much labels only that nutrient’s diseases — click a label to see the problem.</p>
+    </header>
+
+    <div class="layout">
+      <section class="stage" aria-label="2D body">
+        <div class="figure" id="figure" data-state="ok">
+          <div class="blocks">
+            <div class="part head-block" data-hits="anaemia,night,low-glucose">
+              <div class="eye l"></div>
+              <div class="eye r"></div>
+              <div class="mouth" data-hits="scurvy"></div>
+              <div class="drip"></div>
+              <div class="drip2"></div>
+            </div>
+            <div class="part neck" data-hits="goitre,thyroid-high"></div>
+            <div class="part torso" data-hits="kwashiorkor,colon,obesity,diabetes,constipation,hormones,liver,kidney,iron-liver"></div>
+            <div class="part belly" data-hits="kwashiorkor,obesity"></div>
+            <div class="heart" data-hits="chd,atherosclerosis"></div>
+            <div class="part arm l" data-hits="wound,dry-skin"><div class="wound"></div></div>
+            <div class="part arm r" data-hits="wound,dry-skin"></div>
+            <div class="part leg l" data-hits="rickets,osteoporosis"></div>
+            <div class="part leg r" data-hits="rickets,osteoporosis"></div>
+          </div>
+          <div id="flags"></div>
+        </div>
+        <aside class="detail" id="detail" aria-live="polite" hidden></aside>
+      </section>
+
+      <div class="controls">
+        <aside class="rail" aria-label="Nutrition absorbed">
+          <div class="rail-label hot">Too much</div>
+          <div class="slider" id="slider" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" aria-valuetext="Balanced" aria-label="Amount of nutrition absorbed">
+            <div class="zones">
+              <div class="z-high"></div>
+              <div class="z-ok"></div>
+              <div class="z-low"></div>
+            </div>
+            <div class="thumb" id="thumb"></div>
+          </div>
+          <div class="rail-label">Too little</div>
+          <div class="status ok" id="status">Balanced</div>
+        </aside>
+        <aside class="nutrient-panel" aria-label="Choose a nutrient">
+          <label id="nutrient-label">Please select</label>
+          <div class="nutrient-combo">
+            <button type="button" id="nutrient-select" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="nutrient-label">Please select</button>
+            <ul id="nutrient-menu" class="nutrient-menu" role="listbox" hidden>
+              <li role="option" data-value="" aria-selected="true">Please select</li>
+              <li role="option" data-value="carbohydrates">Carbohydrates</li>
+              <li role="option" data-value="lipids">Lipids (Fats)</li>
+              <li role="option" data-value="proteins">Proteins</li>
+              <li role="option" data-value="fibre">Dietary Fibre</li>
+              <li role="option" data-value="calcium">Calcium</li>
+              <li role="option" data-value="iron">Iron</li>
+              <li role="option" data-value="iodine">Iodine</li>
+              <li role="option" data-value="vitamin-a">Vitamin A</li>
+              <li role="option" data-value="vitamin-c">Vitamin C</li>
+              <li role="option" data-value="vitamin-d">Vitamin D</li>
+            </ul>
+          </div>
+          <p class="nutrient-hint" id="nutrient-hint">Choose a nutrient. Only its related diseases will appear.</p>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const LOW = 33;
+    const HIGH = 67;
+
+    const NUTRIENT_LABELS = {
+      carbohydrates: "Carbohydrates",
+      lipids: "Lipids (Fats)",
+      proteins: "Proteins",
+      fibre: "Dietary Fibre",
+      calcium: "Calcium",
+      iron: "Iron",
+      iodine: "Iodine",
+      "vitamin-a": "Vitamin A",
+      "vitamin-c": "Vitamin C",
+      "vitamin-d": "Vitamin D"
+    };
+
+    const CONDITIONS = [
+      {
+        id: "low-glucose",
+        mode: "low",
+        nutrients: ["carbohydrates"],
+        label: "Low blood sugar",
+        zh: "低血糖",
+        part: "head",
+        x: 228, y: 22,
+        nutrient: "Too little carbohydrate",
+        title: "Low blood sugar",
+        desc: "Carbohydrates are the body’s quick energy source. Too little glucose in the blood leaves the brain short of fuel, so the person feels dizzy, tired, and shaky.",
+        fig: "Fig. Blood glucose — hypoglycemia, normal, and hyperglycemia."
+      },
+      {
+        id: "dry-skin",
+        mode: "low",
+        nutrients: ["lipids"],
+        label: "Dry skin",
+        zh: "皮膚乾燥",
+        part: "arm",
+        x: 4, y: 188,
+        nutrient: "Too little lipid",
+        title: "Dry skin",
+        desc: "Lipids waterproof the skin and are a component of cell membranes. Too little fat in the diet leaves skin dry. Notes also link lipid shortage to sex-hormone imbalance (steroids are made from cholesterol).",
+        fig: "Fig. Normal skin compared with dry, flaking skin.",
+
+      },
+      {
+        id: "hormones",
+        mode: "low",
+        nutrients: ["lipids"],
+        label: "Hormone imbalance",
+        zh: "性激素失衡",
+        part: "abdomen",
+        x: 238, y: 210,
+        nutrient: "Too little lipid",
+        title: "Sex hormone imbalance",
+        desc: "Cholesterol (a steroid lipid) is the precursor for sex hormones. Too little dietary lipid can disturb hormone production. Lipids also waterproof the skin, so dry skin often appears with the same deficiency.",
+        fig: "Fig. Hormonal imbalance pathway.",
+        points: [
+          "Steroids 類固醇: four carbon rings; cholesterol is a precursor for sex hormones.",
+          "Functions of lipids also include energy storage (about twice carbohydrates/proteins per gram), organ protection, insulating nerves, and reducing heat loss via subcutaneous fat."
+        ],
+
+      },
+      {
+        id: "scurvy",
+        mode: "low",
+        nutrients: ["vitamin-c"],
+        label: "Scurvy",
+        zh: "壞血病",
+        part: "mouth",
+        x: 228, y: 62,
+        nutrient: "Too little vitamin C",
+        title: "Scurvy — bleeding gums",
+        desc: "Vitamin C is needed for growth and repair of connective tissues 結締組織 (mnemonic: C for Connective tissue). It keeps gums 牙齦 and skin healthy and is needed to heal wounds. Heat destroys vitamin C.",
+        fig: "Fig. Bleeding gums in scurvy.",
+        points: [
+          "Scurvy 壞血病: weak connective tissues.",
+          "Weak and bleeding gums.",
+          "Poor healing of wounds.",
+          "Easy bruising.",
+          "Joint pain.",
+          "Water-soluble; limited storage; surplus is removed in urine."
+        ],
+
+      },
+      {
+        id: "wound",
+        mode: "low",
+        nutrients: ["vitamin-c"],
+        label: "Poor wound healing",
+        zh: "傷口癒合不良",
+        part: "arm",
+        x: 4, y: 188,
+        nutrient: "Too little vitamin C",
+        title: "Poor wound healing",
+        desc: "Vitamin C is needed for growth and repair of connective tissues. Weak connective tissue means wounds heal poorly — a key sign of scurvy 壞血病, together with bleeding gums, easy bruising and joint pain.",
+        fig: "Fig. Poorly healing wound.",
+        points: [
+          "C for Connective tissue 結締組織.",
+          "Needed for healing wounds and keeping skin and gums healthy.",
+          "Heat destroys vitamin C."
+        ],
+
+      },
+      {
+        id: "night",
+        mode: "low",
+        nutrients: ["vitamin-a"],
+        label: "Night blindness",
+        zh: "夜盲症",
+        part: "eyes",
+        x: 228, y: 22,
+        nutrient: "Too little vitamin A",
+        title: "Night blindness",
+        desc: "Vitamin A is needed to form visual purple 視紫素 for vision in dim light (rod cells). It also keeps skin and the linings of the alimentary canal and breathing system healthy. Fat-soluble; absorbed with fats in the small intestine; stored in liver and fat tissues.",
+        fig: "Fig. Night blindness compared with normal night vision.",
+        points: [
+          "Night blindness 夜盲症.",
+          "Drying up of eye and skin.",
+          "Thickened cornea 角膜厚化."
+        ],
+
+      },
+      {
+        id: "goitre",
+        mode: "low",
+        nutrients: ["iodine"],
+        label: "Goitre",
+        zh: "甲狀腺腫",
+        part: "neck",
+        x: 228, y: 96,
+        nutrient: "Too little iodine",
+        title: "Goitre — swollen thyroid",
+        desc: "Iodine is needed for thyroid 甲狀腺 hormone synthesis, which regulates metabolism. Too little iodine causes goitre (enlarged thyroid) 甲狀腺腫大, and can lead to hypothyroidism.",
+        fig: "Fig. Enlarged thyroid — goitre.",
+        points: [
+          "Goitre: enlarged thyroid as it tries to trap more iodine.",
+          "Hypothyroidism: metabolism is no longer regulated properly."
+        ],
+
+      },
+      {
+        id: "rickets",
+        mode: "low",
+        nutrients: ["calcium", "vitamin-d"],
+        label: "Rickets",
+        zh: "佝僂病",
+        part: "legs",
+        x: 238, y: 360,
+        nutrient: "Too little vitamin D / calcium",
+        title: "Rickets — bowed legs",
+        desc: "Rickets 佝僂病 occurs in children: bent / bowed legs due to soft bones. Calcium is a component of bones and teeth (99% of body calcium is stored there). Vitamin D is not a component of bones — it promotes calcium and phosphate absorption. It can also be synthesised in skin under sunlight.",
+        fig: "Fig. Normal bones compared with bowed rickets bones.",
+        points: [
+          "Calcium absorption is enhanced by vitamin D.",
+          "Calcium also needed for muscle contraction, nerve impulses, blood clotting and enzyme activation.",
+          "Vitamin D deficiency → calcium & phosphate deficiency → rickets in children."
+        ],
+
+      },
+      {
+        id: "osteoporosis",
+        mode: "low",
+        nutrients: ["calcium", "vitamin-d"],
+        label: "Osteoporosis",
+        zh: "骨質疏鬆",
+        part: "legs",
+        x: 4, y: 360,
+        nutrient: "Too little calcium / vitamin D",
+        title: "Osteoporosis — brittle bones",
+        desc: "Osteoporosis 骨質疏鬆 occurs in adults / elderly: bones become porous and brittle 脆. Calcium is the mineral component of bone. Vitamin D is not itself a bone component — it promotes calcium and phosphate absorption, so lack of vitamin D also leads to osteoporosis.",
+        fig: "Fig. Healthy bone compared with osteoporotic bone.",
+        points: [
+          "Children → rickets (soft, bent bones).",
+          "Adults / elderly → osteoporosis (porous, brittle bones).",
+          "Elderly need more calcium / vitamin D to prevent osteoporosis."
+        ],
+
+      },
+      {
+        id: "anaemia",
+        mode: "low",
+        nutrients: ["iron"],
+        label: "Anaemia",
+        zh: "貧血",
+        part: "head",
+        x: 4, y: 28,
+        nutrient: "Too little iron",
+        title: "Iron-deficiency anaemia",
+        desc: "Iron is absorbed directly and stored in the liver. Its main function is oxygen transport as part of haemoglobin 血紅蛋白, the oxygen-carrying protein in red blood cells. It also activates enzymes.",
+        fig: "Fig. Normal haemoglobin compared with anaemia.",
+        points: [
+          "Anaemia 貧血: fatigue, pale skin, weakness.",
+          "Too little haemoglobin → less oxygen carried to tissues."
+        ],
+
+      },
+      {
+        id: "kwashiorkor",
+        mode: "low",
+        nutrients: ["proteins"],
+        label: "Kwashiorkor",
+        zh: "蛋白質缺乏",
+        part: "abdomen",
+        x: 238, y: 210,
+        nutrient: "Too little protein",
+        title: "Kwashiorkor — swollen abdomen",
+        subtitle: "“The disease of the deposed child”",
+        desc: "A lack of proteins in the diet leads to kwashiorkor. It is common in developing countries where access to meat, fish, eggs and milk is limited. Proteins are also needed for growth and repair of tissues (muscles, skin, nails), enzymes, hormones and antibodies.",
+        fig: "Fig. Kwashiorkor — swollen abdomen.",
+        points: [
+          "Poor growth.",
+          "Weak muscles.",
+          "Swollen abdomen (tissue fluid accumulation / oedema)."
+        ],
+        steps: [
+          "Protein deficiency",
+          "Low albumin",
+          "Reduced oncotic pressure",
+          "Osmosis: fluid leaks out of vessels",
+          "Fluid accumulation (oedema), particularly in the abdomen",
+          "Swollen belly"
+        ],
+
+      },
+      {
+        id: "constipation",
+        mode: "low",
+        nutrients: ["fibre"],
+        label: "Constipation",
+        zh: "便秘",
+        part: "colon",
+        x: 4, y: 220,
+        nutrient: "Too little dietary fibre",
+        title: "Constipation",
+        desc: "Dietary fibre is the indigestible portion of plant food (no energy value: humans have no enzyme to digest cellulose). It absorbs water and adds bulk to faeces, helping gut peristalsis 蠕動.",
+        fig: "Fig. Constipation.",
+        points: [
+          "Constipation 便秘.",
+          "Also gives a sense of fullness, which can help weight control."
+        ],
+
+      },
+      {
+        id: "colon",
+        mode: "low",
+        nutrients: ["fibre"],
+        label: "Colon cancer risk",
+        zh: "大腸癌風險",
+        part: "colon",
+        x: 4, y: 268,
+        nutrient: "Too little dietary fibre",
+        title: "Increased risk of colon cancer",
+        desc: "Low fibre slows gut movement, so toxins stay in the large intestine longer. This increases the risk of colorectal cancer 結腸直腸癌. A tumour cannot be drawn on the outer body, so the panel uses a colon diagram.",
+        fig: "Fig. Colon with a tumour growth.",
+        points: [
+          "Deficiency: constipation 便秘.",
+          "Increased risk of colon cancer due to longer toxin retention in the gut.",
+          "Fibre has no energy value to humans."
+        ],
+
+      },
+      {
+        id: "obesity",
+        mode: "high",
+        nutrients: ["carbohydrates", "lipids"],
+        label: "Obesity",
+        zh: "肥胖",
+        part: "torso",
+        x: 4, y: 150,
+        nutrient: "Too much energy (carbohydrate / lipid)",
+        title: "Obesity",
+        desc: "Obesity 肥胖症 is excess calorie intake over time. When energy input is greater than energy output, the body stores excess energy as fat (adipose tissue), so biomass — and body mass — increase.",
+        fig: "Fig. Essential fat compared with storage fat.",
+        points: [
+          "Malnutrition includes both undernutrition and overnutrition.",
+          "To explain weight gain or loss, always compare energy input with energy output.",
+          "Weight loss: energy output > input → body breaks down stored glycogen and fat."
+        ],
+
+      },
+      {
+        id: "chd",
+        mode: "high",
+        nutrients: ["carbohydrates"],
+        label: "Cardiovascular disease",
+        zh: "心血管疾病",
+        part: "heart",
+        x: 238, y: 132,
+        nutrient: "Too much carbohydrate / energy",
+        title: "Cardiovascular diseases",
+        desc: "Saturated fatty acids are solid at room temperature and less healthy: they clot more easily and can block blood vessels, leading to cardiovascular diseases 心血管疾病.",
+        fig: "Fig. Plaque buildup in an artery.",
+        points: [
+          "Unsaturated fatty acids: liquid at room temperature, more healthy.",
+          "Trans fatty acids: forced from unsaturated towards saturated — worst; in-born enzymes unfit to hydrolyse them."
+        ]
+      },
+      {
+        id: "atherosclerosis",
+        mode: "high",
+        nutrients: ["lipids"],
+        label: "Atherosclerosis",
+        zh: "動脈粥狀硬化",
+        part: "heart",
+        x: 238, y: 132,
+        nutrient: "Too much lipid",
+        title: "Atherosclerosis — plaque in arteries",
+        desc: "Saturated fatty acids clot more easily and can block blood vessels. Extra lipid builds fatty plaques on artery walls (atherosclerosis 動脈粥狀硬化), so the vessel narrows.",
+        fig: "Fig. Plaque buildup in an artery.",
+        points: [
+          "Saturated fats: solid at room temp, less healthy → cardiovascular disease.",
+          "Plaque buildup in arteries reduces blood flow to organs including the heart."
+        ],
+
+      },
+      {
+        id: "diabetes",
+        mode: "high",
+        nutrients: ["carbohydrates"],
+        label: "Diabetes",
+        zh: "糖尿病",
+        part: "abdomen",
+        x: 238, y: 220,
+        nutrient: "Too much sugar / energy over time",
+        title: "Diabetes",
+        desc: "Long-term excess energy makes body cells less sensitive to insulin. Blood glucose stays high. This cannot be seen on the skin, so the panel shows a simple glucose / insulin diagram.",
+        fig: "Fig. Blood glucose — hypoglycemia, normal, and hyperglycemia."
+      },
+      {
+        id: "liver",
+        mode: "high",
+        nutrients: ["proteins"],
+        label: "Liver damage",
+        zh: "肝損傷",
+        part: "abdomen",
+        x: 238, y: 170,
+        nutrient: "Too much protein",
+        title: "Liver damage — deamination load",
+        desc: "Extra amino acids cannot be stored. The liver must deaminate them (remove the nitrogen, which becomes urea). A long-term deamination load can damage the liver.",
+        fig: "Fig. Liver damage.",
+
+      },
+      {
+        id: "iron-liver",
+        mode: "high",
+        nutrients: ["iron"],
+        label: "Liver damage",
+        zh: "肝損傷",
+        part: "abdomen",
+        x: 238, y: 170,
+        nutrient: "Too much iron",
+        title: "Liver damage — iron overload",
+        desc: "Iron is stored in the liver. The mineral notes list liver damage as the excess symptom of iron (just as kidney stones are the excess symptom of calcium).",
+        fig: "Fig. Liver damage.",
+
+      },
+      {
+        id: "kidney",
+        mode: "high",
+        nutrients: ["calcium"],
+        label: "Kidney stones",
+        zh: "腎結石",
+        part: "abdomen",
+        x: 4, y: 250,
+        nutrient: "Too much calcium",
+        title: "Kidney stones",
+        desc: "Extra calcium can crystallise in the urinary system and form kidney stones, which are painful as they pass through the ureter.",
+        fig: "Fig. Kidney stones in the renal pelvis."
+      },
+      {
+        id: "thyroid-high",
+        mode: "high",
+        nutrients: ["iodine"],
+        label: "Thyroid problem",
+        zh: "甲狀腺問題",
+        part: "neck",
+        x: 228, y: 96,
+        nutrient: "Too much iodine",
+        title: "Thyroid problem",
+        desc: "The thyroid needs iodine, but too much can also disturb hormone production. The gland may become overactive or underactive, so metabolism is no longer controlled properly.",
+        fig: "Fig. Thyroid — function disturbed."
+      }
+    ];
+
+    const figure = document.getElementById("figure");
+    const flagsEl = document.getElementById("flags");
+    const detail = document.getElementById("detail");
+    const slider = document.getElementById("slider");
+    const thumb = document.getElementById("thumb");
+    const statusEl = document.getElementById("status");
+    const nutrientSelect = document.getElementById("nutrient-select");
+    const nutrientMenu = document.getElementById("nutrient-menu");
+    const nutrientHint = document.getElementById("nutrient-hint");
+
+    let value = 50;
+    let selected = null;
+    let dragging = false;
+    let dragPointer = null;
+    let nutrientId = "";
+
+    function modeOf(v) {
+      if (v < LOW) return "low";
+      if (v > HIGH) return "high";
+      return "ok";
+    }
+
+    function illustrations(id) {
+      const photos = {
+        "low-glucose": { src: "./assets/deficit/blood-glucose.png", alt: "Blood glucose levels: hypoglycemia, normal, and hyperglycemia" },
+        diabetes: { src: "./assets/deficit/blood-glucose.png", alt: "Blood glucose levels: hypoglycemia, normal, and hyperglycemia" },
+        obesity: { src: "./assets/deficit/obesity.png", alt: "Essential fat compared with storage fat" },
+        "dry-skin": { src: "./assets/deficit/dry-skin.png", alt: "Normal skin compared with dry, cracked skin" },
+        hormones: { src: "./assets/deficit/hormones.png", alt: "Hormonal imbalance pathway" },
+        kwashiorkor: { src: "./assets/deficit/kwashiorkor.png", alt: "Kwashiorkor — swollen abdomen" },
+        constipation: { src: "./assets/deficit/constipation.gif", alt: "Constipation" },
+        colon: { src: "./assets/deficit/colon.png", alt: "Colon with a tumour growth" },
+        kidney: { src: "./assets/deficit/kidney.png", alt: "Kidney cross-section with kidney stones" },
+        rickets: { src: "./assets/deficit/rickets.png", alt: "Normal bones compared with bowed rickets bones" },
+        osteoporosis: { src: "./assets/deficit/osteoporosis.png", alt: "Healthy bone compared with osteoporotic bone" },
+        anaemia: { src: "./assets/deficit/anaemia.jpg", alt: "Normal haemoglobin compared with anaemia" },
+        goitre: { src: "./assets/deficit/goitre.png", alt: "Enlarged thyroid — goitre" },
+        night: { src: "./assets/deficit/night.png", alt: "Night blindness compared with normal night vision" },
+        scurvy: { src: "./assets/deficit/scurvy.jpg", alt: "Bleeding gums in scurvy" },
+        wound: { src: "./assets/deficit/wound.png", alt: "Poorly healing wound" },
+        liver: { src: "./assets/deficit/liver.mp4", alt: "Liver damage", type: "video" },
+        "iron-liver": { src: "./assets/deficit/liver.mp4", alt: "Liver damage", type: "video" },
+        atherosclerosis: { src: "./assets/deficit/plaque.gif", alt: "Plaque buildup in an artery" },
+        chd: { src: "./assets/deficit/plaque.gif", alt: "Plaque buildup in an artery" }
+      };
+      const photo = photos[id];
+      if (photo) {
+        if (photo.type === "video") {
+          return `<video src="${photo.src}" autoplay loop muted playsinline></video>`;
+        }
+        return `<img src="${photo.src}" alt="${photo.alt}"/>`;
+      }
+      if (id === "thyroid-high") return `
+        <svg viewBox="0 0 260 180" aria-hidden="true">
+          <rect x="95" y="16" width="70" height="54" fill="#dcdcdc" stroke="#2b2b2b" stroke-width="2"/>
+          <rect x="88" y="70" width="84" height="40" fill="#d12626" stroke="#8f1212" stroke-width="2"/>
+          <rect x="108" y="116" width="44" height="44" fill="#dcdcdc" stroke="#2b2b2b" stroke-width="2"/>
+          <text x="130" y="96" text-anchor="middle" font-size="12" fill="#fff">thyroid</text>
+        </svg>`;
+      return "";
+    }
+
+    function setThumb() {
+      const pct = 1 - value / 100;
+      thumb.style.top = (pct * 100) + "%";
+      slider.setAttribute("aria-valuenow", String(Math.round(value)));
+    }
+
+    function matchesNutrient(c) {
+      return nutrientId && c.nutrients.includes(nutrientId);
+    }
+
+    function visibleConditions(mode) {
+      if (!nutrientId || mode === "ok") return [];
+      return CONDITIONS.filter((c) => c.mode === mode && matchesNutrient(c));
+    }
+
+    function updateHint(mode) {
+      if (!nutrientId) {
+        nutrientHint.textContent = "Choose a nutrient. Only its related diseases will appear.";
+        return;
+      }
+      const name = NUTRIENT_LABELS[nutrientId] || nutrientId;
+      if (mode === "ok") {
+        nutrientHint.textContent = name + " selected. Move the bar to too little or too much.";
+        return;
+      }
+      const n = visibleConditions(mode).length;
+      if (n === 0) {
+        nutrientHint.textContent = mode === "high"
+          ? "No excess disorder listed for " + name + "."
+          : "No deficiency listed for " + name + ".";
+        return;
+      }
+      nutrientHint.textContent = (mode === "low" ? "Too little " : "Too much ") + name + " — click a label.";
+    }
+
+    function renderFlags(mode) {
+      flagsEl.innerHTML = "";
+      updateHint(mode);
+      if (!nutrientId) {
+        const note = document.createElement("div");
+        note.className = "flag-note";
+        note.textContent = "Please select a nutrient";
+        flagsEl.appendChild(note);
+        return;
+      }
+      if (mode === "ok") {
+        const b = document.createElement("button");
+        b.className = "flag ok";
+        b.style.left = "228px";
+        b.style.top = "150px";
+        b.type = "button";
+        b.innerHTML = `<span class="mark"></span><span class="name">Healthy</span>`;
+        b.addEventListener("click", showEmpty);
+        flagsEl.appendChild(b);
+        return;
+      }
+      const list = visibleConditions(mode);
+      if (list.length === 0) {
+        const note = document.createElement("div");
+        note.className = "flag-note";
+        note.textContent = mode === "high" ? "No excess disorder listed" : "No deficiency listed";
+        flagsEl.appendChild(note);
+        return;
+      }
+      list.forEach((c) => {
+        const b = document.createElement("button");
+        b.className = "flag";
+        b.type = "button";
+        b.style.left = c.x + "px";
+        b.style.top = c.y + "px";
+        b.setAttribute("aria-pressed", selected === c.id ? "true" : "false");
+        b.innerHTML = `<span class="mark"></span><span class="name">${c.label}</span>`;
+        b.addEventListener("click", () => openCondition(c.id));
+        flagsEl.appendChild(b);
+      });
+    }
+
+    function figureClasses(mode) {
+      figure.dataset.state = mode;
+      const ids = new Set(visibleConditions(mode).map((c) => c.id));
+      figure.classList.toggle("is-scurvy", ids.has("scurvy"));
+      figure.classList.toggle("is-wound", ids.has("wound"));
+      figure.classList.toggle("is-goitre", ids.has("goitre"));
+      figure.classList.toggle("is-rickets", ids.has("rickets"));
+      figure.classList.toggle("is-kwashiorkor", ids.has("kwashiorkor"));
+      figure.classList.toggle("is-obesity", ids.has("obesity"));
+      figure.classList.toggle("is-chd", ids.has("chd") || ids.has("atherosclerosis"));
+      figure.classList.toggle("is-dry-skin", ids.has("dry-skin"));
+      figure.classList.toggle("is-osteoporosis", ids.has("osteoporosis"));
+      figure.classList.toggle("is-liver", ids.has("liver") || ids.has("iron-liver"));
+      figure.classList.toggle("is-kidney", ids.has("kidney"));
+      figure.classList.toggle("is-thyroid-high", ids.has("thyroid-high"));
+      figure.classList.toggle("is-low-glucose", ids.has("low-glucose"));
+      figure.classList.toggle("is-constipation", ids.has("constipation"));
+    }
+
+    function showEmpty() {
+      selected = null;
+      detail.hidden = true;
+      detail.classList.remove("open");
+      detail.innerHTML = "";
+      renderFlags(modeOf(value));
+    }
+
+    function openCondition(id) {
+      const c = CONDITIONS.find((x) => x.id === id);
+      if (!c) return;
+      selected = id;
+      const mode = modeOf(value);
+      renderFlags(mode);
+      detail.hidden = false;
+      detail.classList.add("open");
+      const points = (c.points || []).map((p) => `<li>${p}</li>`).join("");
+      const steps = (c.steps || []).map((s) => `<li>${s}</li>`).join("");
+      detail.innerHTML = `
+        <button type="button" class="detail-close" aria-label="Close">×</button>
+        <div class="detail-kicker">${c.mode === "low" ? "Too little" : "Too much"} · ${c.zh}</div>
+        <h2>${c.title}</h2>
+        ${c.subtitle ? `<p class="subtitle">${c.subtitle}</p>` : ""}
+        <div class="nutrient">${c.nutrient}</div>
+        <div class="illust">${illustrations(c.id)}</div>
+        <p class="figcap">${c.fig}</p>
+        <p class="body-copy">${c.desc}</p>
+        ${steps ? `<ol class="mech">${steps}</ol>` : ""}
+        ${points ? `<ul class="points">${points}</ul>` : ""}
+      `;
+      detail.querySelector(".detail-close").addEventListener("click", showEmpty);
+    }
+
+    function apply() {
+      const mode = modeOf(value);
+      setThumb();
+      statusEl.textContent = mode === "ok" ? "Balanced" : mode === "low" ? "Too little" : "Too much";
+      statusEl.className = "status " + mode;
+      slider.setAttribute("aria-valuetext", statusEl.textContent);
+      figureClasses(mode);
+      if (selected) {
+        const c = CONDITIONS.find((x) => x.id === selected);
+        if (!c || c.mode !== mode || !matchesNutrient(c)) showEmpty();
+        else openCondition(selected);
+      } else {
+        renderFlags(mode);
+      }
+    }
+
+    function valueFromPointer(clientY) {
+      const r = slider.getBoundingClientRect();
+      const t = Math.min(1, Math.max(0, (clientY - r.top) / r.height));
+      return Math.round((1 - t) * 100);
+    }
+
+    figure.addEventListener("click", (e) => {
+      const hit = e.target.closest("[data-hits]");
+      if (!hit || !nutrientId) return;
+      const mode = modeOf(value);
+      const ids = hit.dataset.hits.split(",");
+      const match = CONDITIONS.find((c) => ids.includes(c.id) && c.mode === mode && matchesNutrient(c));
+      if (match) openCondition(match.id);
+    });
+
+    function closeNutrientMenu() {
+      nutrientMenu.hidden = true;
+      nutrientSelect.setAttribute("aria-expanded", "false");
+    }
+
+    function openNutrientMenu() {
+      nutrientMenu.hidden = false;
+      nutrientSelect.setAttribute("aria-expanded", "true");
+    }
+
+    function setNutrient(id, label) {
+      nutrientId = id;
+      nutrientSelect.textContent = label || "Please select";
+      nutrientMenu.querySelectorAll("[role='option']").forEach((opt) => {
+        opt.setAttribute("aria-selected", opt.dataset.value === id ? "true" : "false");
+      });
+      selected = null;
+      detail.hidden = true;
+      detail.classList.remove("open");
+      detail.innerHTML = "";
+      closeNutrientMenu();
+      apply();
+    }
+
+    nutrientSelect.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (nutrientMenu.hidden) openNutrientMenu();
+      else closeNutrientMenu();
+    });
+    nutrientMenu.addEventListener("click", (e) => {
+      const opt = e.target.closest("[role='option']");
+      if (!opt) return;
+      e.stopPropagation();
+      setNutrient(opt.dataset.value, opt.textContent);
+    });
+    document.addEventListener("pointerdown", (e) => {
+      if (!nutrientMenu.hidden && !e.target.closest(".nutrient-combo")) closeNutrientMenu();
+    });
+
+    function endDrag(e) {
+      if (dragPointer != null && e && e.pointerId !== dragPointer) return;
+      dragging = false;
+      if (dragPointer != null) {
+        try { slider.releasePointerCapture(dragPointer); } catch (_) {}
+      }
+      dragPointer = null;
+    }
+
+    slider.addEventListener("pointerdown", (e) => {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      e.preventDefault();
+      closeNutrientMenu();
+      dragging = true;
+      dragPointer = e.pointerId;
+      try { slider.setPointerCapture(e.pointerId); } catch (_) {}
+      value = valueFromPointer(e.clientY);
+      apply();
+    });
+    slider.addEventListener("pointermove", (e) => {
+      if (!dragging || (dragPointer != null && e.pointerId !== dragPointer)) return;
+      value = valueFromPointer(e.clientY);
+      apply();
+    });
+    slider.addEventListener("pointerup", endDrag);
+    slider.addEventListener("pointercancel", endDrag);
+    slider.addEventListener("lostpointercapture", endDrag);
+    slider.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowUp" || e.key === "ArrowRight") { value = Math.min(100, value + 5); apply(); e.preventDefault(); }
+      if (e.key === "ArrowDown" || e.key === "ArrowLeft") { value = Math.max(0, value - 5); apply(); e.preventDefault(); }
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        if (!nutrientMenu.hidden) { closeNutrientMenu(); return; }
+        if (selected) showEmpty();
+      }
+    });
+
+    apply();
+  </script>
+</body>
+</html>
