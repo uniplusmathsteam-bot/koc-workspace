@@ -1,6 +1,17 @@
 /* Issac · Bio + IS KOC — submissions. */
 KOC.works('bio-is', 'issac', [
   {
+    id: 'food-substance-functions',
+    title: 'Food Substance Functions',
+    type: 'interactive',
+    subject: 'Bio',
+    chapter: 'Bio Ch. 5',
+    submitted: '2026-09-07',
+    tags: ['Interactive', 'Nutrition', 'Functions'],
+    src: 'content/bio-is/issac/food-nutrition/food-substance-function.html',
+    notes: 'Click a nutrient tag, then a function. 2D models plus extracted lab animations for water, enzymes, calcium, and membrane proteins.'
+  },
+  {
     id: 'food-deficit',
     title: 'Food Deficit',
     type: 'interactive',

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maltose Hydrolysis — Interactive Animation</title>
+  <link rel="stylesheet" href="../osmosis/bio-typography.css">
+  <link rel="stylesheet" href="./ch5-reaction-animation.css">
+  <link rel="stylesheet" href="../osmosis/embed.css">
+  <script src="../osmosis/embed.js"></script>
+  <script src="../osmosis/tool-back.js" data-position="top-right"
+          data-hub="./ch5-reactions-hub.html"
+          data-back-en="← Ch5 — Condensation &amp; Hydrolysis"
+          data-back-zh="← Ch5 — 縮合與水解"
+          data-back-zh-hant="← Ch5 — 縮合與水解"></script>
+</head>
+<body>
+  <header class="page-header">
+    <h1 id="page-title">Maltose Hydrolysis</h1>
+    <p id="page-subtitle">Maltose breaks down into two glucose molecules when water is added.</p>
+    <p class="ch5-equation" id="page-equation">maltose + H₂O → 2 × α-D-glucose</p>
+  </header>
+  <main class="stage-shell">
+    <div class="canvas-wrap ch5-deck-wrap">
+      <iframe id="deck-frame" class="ch5-deck-frame" src="./ch5/maltose-hydrolysis/index.html" title="Maltose Hydrolysis deck" allow="autoplay"></iframe>
+    </div>
+    <div class="caption-bar" aria-live="polite">
+      <div class="caption-row"><span class="caption-step" id="caption-step">1</span><p class="caption-text" id="caption-en"></p></div>
+      <p class="caption-text zh" id="caption-zh"></p>
+    </div>
+    <div class="controls">
+      <button type="button" class="primary" id="btn-play">▶ Play slide</button>
+      <button type="button" id="btn-prev">◀ Prev</button>
+      <button type="button" id="btn-next">Next ▶</button>
+      <button type="button" id="btn-restart">↺ Restart</button>
+      <div class="progress-wrap">
+        <input type="range" id="progress" min="0" max="4" step="1" value="0">
+        <span class="progress-label" id="progress-label">Step 1 / 5</span>
+      </div>
+    </div>
+  </main>
+  <script type="module">
+    const STEPS = [{ en: 'Maltose — locate the α-1,4 glycosidic bond (C1—O—C4) between the two glucose units.', zh: '麥芽糖——找出兩個葡萄糖單位之間嘅 α-1,4 醣苷鍵（C1—O—C4）。' },
+      { en: 'Water will break the glycosidic bond — −OH adds to C1, H adds to C4-O.', zh: '水會斷開醣苷鍵——−OH 加於 C1，H 加於 C4-O。' },
+      { en: 'Circle the bond that water will break.', zh: '圈起水分子會斷開嘅鍵。' },
+      { en: 'Add one water molecule — hydrolysis uses water to split the bond.', zh: '加入一個水分子——水解用水去解鍵。' },
+      { en: 'Bond broken — two separate α-D-glucose molecules are released.', zh: '鍵斷開——釋放出兩個 α-D-葡萄糖。' }];
+    const frame = document.getElementById("deck-frame");
+    const captionEn = document.getElementById("caption-en");
+    const captionZh = document.getElementById("caption-zh");
+    const captionStep = document.getElementById("caption-step");
+    const btnPlay = document.getElementById("btn-play");
+    const btnPrev = document.getElementById("btn-prev");
+    const btnNext = document.getElementById("btn-next");
+    const btnRestart = document.getElementById("btn-restart");
+    const progress = document.getElementById("progress");
+    const progressLabel = document.getElementById("progress-label");
+    function revealApi() { return frame.contentWindow?.Reveal; }
+    function currentVideo() {
+      const R = revealApi(); if (!R) return null;
+      const slide = R.getCurrentSlide();
+      return slide?.slideBackgroundContentElement?.querySelector("video");
+    }
+    function setCaption(i) {
+      const s = STEPS[i] || STEPS[0];
+      captionEn.textContent = s.en; captionZh.textContent = s.zh;
+      captionStep.textContent = String(i + 1);
+      progress.value = String(i);
+      progressLabel.textContent = `Step ${i + 1} / ${STEPS.length}`;
+    }
+    function waitForReveal() {
+      return new Promise((resolve) => {
+        const poll = () => { const R = revealApi(); if (R?.isReady?.()) resolve(R); else setTimeout(poll, 80); };
+        poll();
+      });
+    }
+    frame.addEventListener("load", async () => {
+      const R = await waitForReveal();
+      R.on("slidechanged", (e) => setCaption(e.indexh));
+      setCaption(R.getIndices().h);
+    });
+    btnPrev.addEventListener("click", () => revealApi()?.prev());
+    btnNext.addEventListener("click", () => revealApi()?.next());
+    btnRestart.addEventListener("click", () => { revealApi()?.slide(0); setCaption(0); });
+    progress.addEventListener("input", () => { revealApi()?.slide(Number(progress.value)); setCaption(Number(progress.value)); });
+    btnPlay.addEventListener("click", () => {
+      const v = currentVideo();
+      if (v) { v.paused ? v.play() : v.pause(); return; }
+      revealApi()?.next();
+    });
+    setCaption(0);
+  </script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fig 4.3 ù Action of an Enzyme</title>
+  <link rel="stylesheet" href="../osmosis/bio-typography.css">
+  <link rel="stylesheet" href="./enzyme-action-animation.css">
+  <link rel="stylesheet" href="../osmosis/embed.css">
+  <script src="../osmosis/embed.js"></script>
+  <script src="../osmosis/tool-back.js" data-position="top-right"></script>
+</head>
+<body>
+  <header class="page-header">
+    <h1>Fig 4.3 ù Action of an Enzyme</h1>
+    <p>Lock and key model ù catabolic reaction (substrate ? products).</p>
+  </header>
+
+  <main class="stage-shell">
+    <div class="canvas-wrap" id="stage-root">
+      <div id="enzyme-stage" aria-label="Enzyme action animation"></div>
+    </div>
+
+    <div class="caption-bar" aria-live="polite">
+      <div class="caption-row">
+        <span class="caption-step" id="caption-step">1</span>
+        <p class="caption-text" id="caption-en">Loadingù</p>
+      </div>
+      <p class="caption-text zh" id="caption-zh" hidden></p>
+    </div>
+
+    <div class="controls">
+      <button type="button" class="primary" id="btn-play">? Play</button>
+      <button type="button" id="btn-prev">? Prev</button>
+      <button type="button" id="btn-next">Next ?</button>
+      <button type="button" id="btn-restart">? Restart</button>
+      <div class="progress-wrap">
+        <input type="range" id="progress" min="0" max="3" step="1" value="0" aria-label="Animation step">
+        <span class="progress-label" id="progress-label">Step 1 / 4</span>
+      </div>
+    </div>
+  </main>
+
+<script src="./js-enzyme/enzymeShapes.js?v=20260703j"></script>
+<script src="./js-enzyme/enzymeActionAnimation.js?v=20260703j"></script>
+  <script>
+  (function initEnzymeAnimation() {
+    var STEPS = window.ENZYME_ANIM_STEPS;
+    var stage = document.getElementById("enzyme-stage");
+    if (!stage || !window.EnzymeActionAnimation) return;
+
+    var captionEn = document.getElementById("caption-en");
+    var captionZh = document.getElementById("caption-zh");
+    var captionStep = document.getElementById("caption-step");
+    var btnPlay = document.getElementById("btn-play");
+    var btnPrev = document.getElementById("btn-prev");
+    var btnNext = document.getElementById("btn-next");
+    var btnRestart = document.getElementById("btn-restart");
+    var progress = document.getElementById("progress");
+    var progressLabel = document.getElementById("progress-label");
+
+    progress.max = String(STEPS.length - 1);
+
+    function setCaption(step, index) {
+      captionEn.textContent = step.en;
+      if (step.zh) {
+        captionZh.textContent = step.zh;
+        captionZh.hidden = false;
+      } else {
+        captionZh.hidden = true;
+      }
+      captionStep.hidden = step.badge == null;
+      if (step.badge != null) captionStep.textContent = String(step.badge);
+      progress.value = String(index);
+      progressLabel.textContent = "Step " + (index + 1) + " / " + STEPS.length;
+    }
+
+    function setPlayLabel(playing) {
+      btnPlay.textContent = playing ? "\u23F8 Pause" : "\u25B6 Play";
+    }
+
+    var anim = new EnzymeActionAnimation(stage, {
+      onStep: function (step, index) { setCaption(step, index); },
+      onComplete: function () { setPlayLabel(false); },
+    });
+
+    setPlayLabel(true);
+    setCaption(STEPS[0], 0);
+
+    btnPlay.addEventListener("click", function () {
+      anim.toggle();
+      setPlayLabel(anim.playing);
+    });
+    btnPrev.addEventListener("click", function () {
+      anim.prev();
+      anim.pause();
+      setPlayLabel(false);
+      setCaption(STEPS[anim.stepIndex], anim.stepIndex);
+    });
+    btnNext.addEventListener("click", function () {
+      anim.next();
+      anim.pause();
+      setPlayLabel(false);
+      setCaption(STEPS[anim.stepIndex], anim.stepIndex);
+      progress.value = String(anim.stepIndex);
+    });
+    btnRestart.addEventListener("click", function () {
+      anim.restart();
+      setPlayLabel(true);
+      setCaption(STEPS[0], 0);
+    });
+    progress.addEventListener("input", function () {
+      anim.goToStep(Number(progress.value), true);
+      anim.pause();
+      setPlayLabel(false);
+      setCaption(STEPS[anim.stepIndex], anim.stepIndex);
+    });
+  })();
+  </script>
+</body>
+</html>

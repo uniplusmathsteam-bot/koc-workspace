@@ -1,0 +1,13 @@
+@import url("./condensation-animation.css");
+.ch5-equation { margin: 0.35rem 0 0; font-size: 0.88rem; color: var(--on-surface-variant); font-weight: 500; }
+.ch5-deck-frame { width: 100%; aspect-ratio: 16/9; min-height: 320px; border: 0; display: block; background: #000; }
+.ch5-deck-wrap { position: relative; background: #000; border-radius: 12px; overflow: hidden; }
+
+html.bio-embed .page-header,
+html.bio-embed .bio-tool-back-wrap {
+  display: none !important;
+}
+html.bio-embed .stage-shell {
+  padding: 0.35rem 0.5rem 0.5rem;
+  max-width: 100%;
+}
