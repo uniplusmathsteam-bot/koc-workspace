@@ -9,9 +9,13 @@ const state = {
   tab: "all",
   seen: {},
   cleared: false,
+  cover: false,
   lbId: "",
   lbZoom: ZOOM_DEFAULT,
-  mode: "check",
+  lbPiece: "",
+  lbRevealed: true,
+  fromCheck: false,
+  gate: "",
   deck: [],
   i: 0,
   pick: "",
@@ -24,9 +28,41 @@ const state = {
   fb: null,
 };
 
+function t(key, vars) {
+  const pack = COPY[state.lang] || COPY.en;
+  let text = pack[key] || COPY.en[key] || key;
+  const n = vars && vars.n;
+  text = text.replace("{es}", n === 1 ? "" : "es");
+  text = text.replace("{s}", n === 1 ? "" : "s");
+  if (vars) {
+    Object.keys(vars).forEach((name) => {
+      text = text.replace(new RegExp("\\{" + name + "\\}", "g"), String(vars[name]));
+    });
+  }
+  return text;
+}
+
+function langText(value) {
+  if (value == null) return "";
+  if (typeof value === "string") return value;
+  return value[state.lang] || value.en || "";
+}
+
+function langList(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) return value.map(langText);
+  if (value.en || value.zh) return value[state.lang] || value.en || [];
+  return [];
+}
+
 function displayTitle(item) {
   if (!item) return "";
   return state.lang === "zh" ? `${item.zh} · ${item.title}` : item.title;
+}
+
+function displayPiece(piece) {
+  if (!piece) return "";
+  return state.lang === "zh" ? `${piece.zh} · ${piece.title}` : piece.title;
 }
 
 function itemsForTab(tab) {
@@ -39,11 +75,15 @@ function seenCount() {
   return WALL_ITEMS.filter((row) => state.seen[row.id]).length;
 }
 
+function checkInProgress() {
+  return Boolean(state.deck.length && state.phase !== "done" && (state.i > 0 || Object.keys(state.firstTry).length > 0));
+}
+
 function wallStamp() {
   const need = WALL_ITEMS.length;
   const got = seenCount();
-  if (state.cleared) return `<span class="stamp cleared">Cleared</span>`;
-  if (got > 0) return `<span class="stamp progress">${got}/${need} opened</span>`;
+  if (state.cleared) return `<span class="stamp cleared">${t("allOpened")}</span>`;
+  if (got > 0) return `<span class="stamp progress">${got}/${need} ${t("opened")}</span>`;
   return `<span class="stamp todo">0/${need}</span>`;
 }
 
@@ -53,10 +93,10 @@ function firstTryCorrect() {
 
 function checkStamp() {
   if (!state.deck.length) return "";
-  if (state.phase === "done" && firstTryCorrect() >= state.deck.length) return `<span class="stamp cleared">Cleared</span>`;
-  if (state.phase === "done") return `<span class="stamp revised">Revised</span>`;
+  if (state.phase === "done" && firstTryCorrect() >= state.deck.length) return `<span class="stamp cleared">${t("cleanRun")}</span>`;
+  if (state.phase === "done") return `<span class="stamp revised">${t("revised")}</span>`;
   if (firstTryCorrect() || Object.keys(state.firstTry).length) {
-    return `<span class="stamp progress">${firstTryCorrect()}/${state.deck.length} first try</span>`;
+    return `<span class="stamp progress">${firstTryCorrect()}/${state.deck.length} ${t("firstTry")}</span>`;
   }
   return "";
 }
@@ -69,6 +109,7 @@ function saveProgress() {
       tab: state.tab,
       seen: state.seen,
       cleared: state.cleared,
+      cover: state.cover,
       deck: state.deck,
       i: state.i,
       firstTry: state.firstTry,
@@ -89,6 +130,7 @@ function loadProgress() {
     state.tab = data.tab || "all";
     state.seen = data.seen || {};
     state.cleared = Boolean(data.cleared);
+    state.cover = Boolean(data.cover);
     state.deck = Array.isArray(data.deck) ? data.deck : [];
     state.i = data.i || 0;
     state.firstTry = data.firstTry || {};
@@ -105,7 +147,7 @@ function applyTheme(dark, skipSave) {
   const btn = document.getElementById("theme-toggle");
   if (btn) {
     btn.setAttribute("aria-pressed", dark ? "true" : "false");
-    btn.textContent = dark ? "Light mode" : "Dark mode";
+    btn.textContent = dark ? t("lightMode") : t("darkMode");
   }
   if (!skipSave) saveProgress();
 }
@@ -115,14 +157,22 @@ function loadThemeFallback() {
   applyTheme(Boolean(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches), true);
 }
 
-function applyLang() {
+function paintChrome() {
+  document.getElementById("header-kicker").textContent = t("headerKicker");
+  document.getElementById("header-title").textContent = t("headerTitle");
+  document.getElementById("header-lead").textContent = t("headerLead");
+  document.getElementById("lb-close").textContent = t("close");
+  document.getElementById("lb-close").setAttribute("aria-label", t("close"));
   const zh = state.lang === "zh";
   document.documentElement.lang = zh ? "zh-Hant" : "en";
-  const btn = document.getElementById("lang-toggle");
-  if (btn) {
-    btn.setAttribute("aria-pressed", zh ? "true" : "false");
-    btn.textContent = zh ? "EN" : "中";
+  const langBtn = document.getElementById("lang-toggle");
+  if (langBtn) {
+    langBtn.setAttribute("aria-pressed", zh ? "true" : "false");
+    langBtn.textContent = zh ? "EN" : "中";
   }
+  applyTheme(document.documentElement.classList.contains("dark"), true);
+  buildNav();
+  fillPrintCrib();
 }
 
 function prefersReducedMotion() {
@@ -151,9 +201,9 @@ function burstConfetti() {
     vr: -8 + Math.random() * 16,
     color: colors[Math.floor(Math.random() * colors.length)],
   }));
-  let t = 0;
+  let ticked = 0;
   const tick = () => {
-    t += 1;
+    ticked += 1;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     pieces.forEach((p) => {
       p.x += p.vx;
@@ -167,7 +217,7 @@ function burstConfetti() {
       ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
       ctx.restore();
     });
-    if (t < 50) confettiFrame = requestAnimationFrame(tick);
+    if (ticked < 50) confettiFrame = requestAnimationFrame(tick);
     else {
       confettiFrame = 0;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -192,6 +242,9 @@ function show(id, opts) {
   state.view = id;
   if (id === "check") {
     if (options.fresh || !state.deck.length) remixCheck();
+    if (options.force) state.gate = "";
+    else if (seenCount() === 0 && !checkInProgress()) state.gate = "empty";
+    else state.gate = "";
   }
   document.querySelectorAll(".view").forEach((node) => node.classList.toggle("active", node.id === id));
   document.querySelectorAll(".nav button").forEach((btn) => {
@@ -206,8 +259,8 @@ function buildNav() {
   const nav = document.getElementById("nav");
   nav.innerHTML = "";
   [
-    { id: "wall", label: "Wall" },
-    { id: "check", label: "Check yourself" },
+    { id: "wall", label: t("wall") },
+    { id: "check", label: t("check") },
   ].forEach((view) => {
     const btn = document.createElement("button");
     btn.textContent = view.label;
@@ -217,37 +270,62 @@ function buildNav() {
   });
 }
 
+function fillPrintCrib() {
+  const root = document.getElementById("print-crib");
+  if (!root) return;
+  const setups = WALL_ITEMS.filter((row) => row.tag === "setup");
+  root.innerHTML = `
+    <h1>${t("printTitle")}</h1>
+    <h2>${t("printPieces")}</h2>
+    <table>
+      ${PIECES.map((piece) => `<tr><th>${displayPiece(piece)}</th><td>${langText(piece.job)}</td></tr>`).join("")}
+    </table>
+    <h2>${t("printSetups")}</h2>
+    <table>
+      ${setups.map((item) => `<tr><th>${displayTitle(item)}</th><td>${langText(item.exam)}</td></tr>`).join("")}
+    </table>
+  `;
+}
+
 function renderWall() {
   const root = document.getElementById("wall");
   const list = itemsForTab(state.tab);
   const tabs = WALL_TABS.map((row) => {
     const n = itemsForTab(row.id).filter((item) => state.seen[item.id]).length;
     const need = itemsForTab(row.id).length;
-    return `<button type="button" class="wall-tab${row.id === state.tab ? " on" : ""}" data-tab="${row.id}">${row.label}<span class="tab-count">${n}/${need}</span></button>`;
+    return `<button type="button" class="wall-tab${row.id === state.tab ? " on" : ""}" data-tab="${row.id}">${langText(row.label)}<span class="tab-count">${n}/${need}</span></button>`;
   }).join("");
+  const resume = checkInProgress()
+    ? `<button class="btn btn-ghost" data-resume="1">${t("resume")}</button>`
+    : "";
   root.innerHTML = `
     <div class="toolbar">
       <div>
-        <h2>Notes Wall</h2>
-        <p class="lead">Tap a chart to open it full size. Cleared means every page has been opened — not just the tab.</p>
+        <h2>${t("notesWall")}</h2>
+        <p class="path-line">${t("path")}</p>
+        <p class="lead">${t("wallLead")}</p>
       </div>
       <div class="score-wrap">
         ${wallStamp()}
-        <button class="btn btn-primary" data-go="check">Check yourself</button>
+        ${resume}
+        <button class="btn btn-ghost${state.cover ? " is-on" : ""}" data-cover="1" aria-pressed="${state.cover ? "true" : "false"}">${t("coverNames")}</button>
+        <button class="btn btn-ghost" data-print="1">${t("printCrib")}</button>
+        <button class="btn btn-primary" data-go="check">${t("check")}</button>
       </div>
     </div>
+    ${checkInProgress() ? `<p class="tiny resume-hint">${t("resumeHint")}</p>` : ""}
     <div class="wall-tabs">${tabs}</div>
     <div class="wall-grid">
       ${list.map((item) => `
-        <button type="button" class="wall-card${state.seen[item.id] ? " is-seen" : ""}" data-id="${item.id}">
-          ${state.seen[item.id] ? `<span class="stamp progress">Opened</span>` : `<span class="stamp todo">Open</span>`}
-          <img src="${item.src}" alt="${item.title}" />
-          <h3>${displayTitle(item)}</h3>
-          <p>${item.exam}</p>
+        <button type="button" class="wall-card${state.seen[item.id] ? " is-seen" : ""}${state.cover ? " is-cover" : ""}" data-id="${item.id}">
+          ${state.seen[item.id] ? `<span class="stamp progress">${t("opened")}</span>` : `<span class="stamp todo">${t("open")}</span>`}
+          <img src="${item.src}" alt="${state.cover ? t("tapToName") : item.title}" />
+          <h3>${state.cover ? t("tapToName") : displayTitle(item)}</h3>
+          <p>${state.cover ? "" : langText(item.exam)}</p>
         </button>
       `).join("")}
     </div>
-    <p class="export-note">This is an offline website. Double-click <strong>index.html</strong>. Keep this folder together when you share it.</p>
+    <p class="export-note">${t("exportNote")}</p>
   `;
   root.querySelectorAll("[data-tab]").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -260,19 +338,36 @@ function renderWall() {
     btn.addEventListener("click", () => openLightbox(btn.dataset.id));
   });
   root.querySelector("[data-go=check]").addEventListener("click", () => show("check"));
+  const resumeBtn = root.querySelector("[data-resume]");
+  if (resumeBtn) resumeBtn.addEventListener("click", () => show("check"));
+  root.querySelector("[data-cover]").addEventListener("click", () => {
+    state.cover = !state.cover;
+    if (state.lbId) state.lbRevealed = !state.cover;
+    saveProgress();
+    renderWall();
+    if (state.lbId) paintLightbox();
+  });
+  root.querySelector("[data-print]").addEventListener("click", () => {
+    fillPrintCrib();
+    window.print();
+  });
 }
 
-function openLightbox(id) {
+function openLightbox(id, opts) {
+  const options = opts || {};
   const item = byId(id);
   if (!item) return;
   state.lbId = id;
   state.lbZoom = ZOOM_DEFAULT;
+  state.lbPiece = options.piece || "";
+  state.lbRevealed = !state.cover || Boolean(options.fromCheck);
+  if (options.fromCheck) state.fromCheck = true;
   markSeen(id);
   paintLightbox();
   const box = document.getElementById("lightbox");
   box.hidden = false;
   box.classList.add("show");
-  renderWall();
+  if (state.view === "wall") renderWall();
 }
 
 function closeLightbox() {
@@ -280,6 +375,10 @@ function closeLightbox() {
   box.hidden = true;
   box.classList.remove("show");
   state.lbId = "";
+  state.lbPiece = "";
+  const back = state.fromCheck;
+  state.fromCheck = false;
+  if (back) renderCheck();
 }
 
 function stepLightbox(dir) {
@@ -287,26 +386,105 @@ function stepLightbox(dir) {
   const i = list.findIndex((row) => row.id === state.lbId);
   if (i < 0) return;
   const next = list[(i + dir + list.length) % list.length];
-  openLightbox(next.id);
+  openLightbox(next.id, { fromCheck: state.fromCheck });
 }
 
 function paintLightbox() {
   const item = byId(state.lbId);
   if (!item) return;
   const img = document.getElementById("lb-img");
+  const crop = document.getElementById("lb-crop");
+  const zoomInner = document.getElementById("lb-zoom-inner");
+  const piece = state.lbPiece ? byPiece(state.lbPiece) : null;
+  const usePiece = piece && piece.parent === item.id;
   img.src = item.src;
-  img.alt = item.title;
-  img.style.transform = `scale(${state.lbZoom})`;
+  img.alt = state.lbRevealed ? item.title : t("notesPage");
+  if (usePiece) {
+    crop.classList.add("is-piece");
+    crop.style.setProperty("--cols", String(piece.cols));
+    crop.style.setProperty("--col", String(piece.col));
+  } else {
+    crop.classList.remove("is-piece");
+    crop.style.removeProperty("--cols");
+    crop.style.removeProperty("--col");
+  }
+  zoomInner.style.transform = `scale(${state.lbZoom})`;
   document.getElementById("lb-zoom-label").textContent = Math.round(state.lbZoom * 100) + "%";
   document.getElementById("lb-smaller").disabled = state.lbZoom <= ZOOM_MIN;
   document.getElementById("lb-bigger").disabled = state.lbZoom >= ZOOM_MAX;
-  const steps = (item.steps || []).map((line) => `<li>${line}</li>`).join("");
-  document.getElementById("lb-copy").innerHTML = `
-    <p class="exam-kicker">${WALL_TABS.find((t) => t.id === item.tag).label}</p>
-    <p class="exam-line"><strong>${displayTitle(item)}</strong></p>
-    <p>${item.exam}</p>
-    ${steps ? `<p class="exam-kicker">Steps</p><ol class="steps">${steps}</ol>` : ""}
-  `;
+
+  const pieces = piecesFor(item.id);
+  const revealed = state.lbRevealed;
+  const tab = WALL_TABS.find((row) => row.id === item.tag);
+  const steps = langList(item.steps);
+  const terms = item.terms || [];
+  const same = item.sameAs ? byId(item.sameAs) : null;
+  const pieceChips = pieces.length ? `
+    <p class="exam-kicker">${t("pieces")}</p>
+    <div class="piece-chips">
+      <button type="button" class="piece-chip${!usePiece ? " on" : ""}" data-piece="">${t("showFullPage")}</button>
+      ${pieces.map((row, idx) => `
+        <button type="button" class="piece-chip${usePiece && row.id === piece.id ? " on" : ""}" data-piece="${row.id}">
+          ${revealed ? displayPiece(row) : idx + 1}
+        </button>
+      `).join("")}
+    </div>
+  ` : "";
+
+  let body = "";
+  if (!revealed) {
+    body = `
+      <p class="exam-kicker">${tab ? langText(tab.label) : ""}</p>
+      <p class="exam-line"><strong>${t("tapToName")}</strong></p>
+      <button type="button" class="btn btn-primary" id="lb-reveal">${t("reveal")}</button>
+      ${pieceChips}
+    `;
+  } else {
+    const jobBlock = usePiece ? `
+      <p class="exam-kicker">${t("job")}</p>
+      <p>${langText(piece.job)}</p>
+      ${piece.trap ? `<p class="exam-kicker">${t("trap")}</p><p class="trap-line">${langText(piece.trap)}</p>` : ""}
+    ` : `
+      <p>${langText(item.exam)}</p>
+      ${item.trap ? `<p class="exam-kicker">${t("trap")}</p><p class="trap-line">${langText(item.trap)}</p>` : ""}
+    `;
+    body = `
+      <p class="exam-kicker">${tab ? langText(tab.label) : ""}</p>
+      <p class="exam-line"><strong>${usePiece ? displayPiece(piece) : displayTitle(item)}</strong></p>
+      ${jobBlock}
+      ${item.scanNote ? `<p class="exam-kicker">${t("scanNote")}</p><p class="scan-note">${langText(item.scanNote)}</p>` : ""}
+      ${item.safety ? `<div class="safety-banner"><strong>${t("safety")}</strong><p>${langText(item.safety)}</p></div>` : ""}
+      ${steps.length ? `<p class="exam-kicker">${t("steps")}</p><ol class="steps">${steps.map((line) => `<li>${line}</li>`).join("")}</ol>` : ""}
+      ${terms.length ? `<p class="exam-kicker">${t("glossary")}</p><dl class="glossary">${terms.map((row) => `<dt>${langText(row.word)}</dt><dd>${langText(row.def)}</dd>`).join("")}</dl>` : ""}
+      ${same ? `<p class="exam-kicker">${t("sameAs")}</p><button type="button" class="btn btn-ghost" id="lb-same">${displayTitle(same)} — ${t("sameAs")}</button>` : ""}
+      ${pieceChips}
+    `;
+  }
+
+  const copy = document.getElementById("lb-copy");
+  copy.innerHTML = body;
+  copy.querySelectorAll("[data-piece]").forEach((btn) => {
+    btn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      state.lbPiece = btn.dataset.piece || "";
+      paintLightbox();
+    });
+  });
+  const reveal = document.getElementById("lb-reveal");
+  if (reveal) {
+    reveal.addEventListener("click", (event) => {
+      event.stopPropagation();
+      state.lbRevealed = true;
+      paintLightbox();
+    });
+  }
+  const sameBtn = document.getElementById("lb-same");
+  if (sameBtn) {
+    sameBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      openLightbox(item.sameAs, { fromCheck: state.fromCheck });
+    });
+  }
 }
 
 function bumpZoom(delta) {
@@ -330,12 +508,11 @@ function remixCheck() {
   state.phase = "main";
   state.recapQueue = [];
   state.fb = null;
+  state.gate = "";
 }
 
 function pickIsCorrect(q, pick) {
-  const item = byId(q.id);
-  if (q.type === "spot") return pick === item.id;
-  return pick === item.title;
+  return String(pick) === String(q.answer);
 }
 
 function recordAnswer(q, ok) {
@@ -350,27 +527,36 @@ function recordAnswer(q, ok) {
 }
 
 function setFb(ok, q, pick) {
-  const item = byId(q.id);
-  const chosen = q.type === "spot" ? (byId(pick) ? displayTitle(byId(pick)) : pick) : pick;
-  state.fb = {
-    ok,
-    title: ok ? "Correct — that matches the notes" : "Not this time — look at the page again",
-    item,
-    chosen,
-  };
+  state.fb = { ok, pick };
+}
+
+function chosenLabel(q, pick) {
+  if (q.type === "order") {
+    return String(pick).split(",").filter(Boolean).map((opt) => optionLabel(q, opt)).join(" → ");
+  }
+  return optionLabel(q, pick);
+}
+
+function optionLabel(q, opt) {
+  if (q.labels && q.labels[opt]) return langText(q.labels[opt]);
+  const item = byId(opt);
+  if (item) return displayTitle(item);
+  const piece = byPiece(opt);
+  if (piece) return displayPiece(piece);
+  return String(opt);
 }
 
 function nextLabel(q) {
   const locked = state.checked && pickIsCorrect(q, state.pick);
-  if (!locked) return "Next";
+  if (!locked) return t("next");
   if (state.phase === "recap") {
     const more = state.recapQueue.length > 1 || state.missQueue.length > 0;
-    return more ? "Next recap" : "Finish";
+    return more ? t("nextRecap") : t("finish");
   }
   const last = state.i === state.deck.length - 1;
-  if (!last) return "Next";
+  if (!last) return t("next");
   const n = state.missQueue.length;
-  return n ? `Recap ${n} miss${n === 1 ? "" : "es"}` : "Finish";
+  return n ? t("recapMisses", { n }) : t("finish");
 }
 
 function startRecap() {
@@ -414,13 +600,26 @@ function goNext() {
   renderCheck();
 }
 
-function optionLabel(q, opt) {
-  if (q.type === "spot") return displayTitle(byId(opt));
-  if (state.lang === "zh") {
-    const item = WALL_ITEMS.find((row) => row.title === opt);
-    return item ? displayTitle(item) : opt;
-  }
-  return opt;
+function bindOpenPage(root) {
+  root.querySelectorAll("[data-open-page]").forEach((btn) => {
+    btn.addEventListener("click", () => openLightbox(btn.dataset.openPage, { fromCheck: true }));
+  });
+}
+
+function renderEmptyWarn() {
+  const root = document.getElementById("check");
+  root.innerHTML = `
+    <div class="done-card">
+      <h2>${t("emptyWarnTitle")}</h2>
+      <p class="exam-line">${t("emptyWarnBody")}</p>
+      <div class="toolbar">
+        <button class="btn btn-primary" data-force="1">${t("startAnyway")}</button>
+        <button class="btn btn-ghost" data-go="wall">${t("backWall")}</button>
+      </div>
+    </div>
+  `;
+  root.querySelector("[data-force]").addEventListener("click", () => show("check", { force: true }));
+  root.querySelector("[data-go=wall]").addEventListener("click", () => show("wall"));
 }
 
 function renderCheckDone() {
@@ -431,26 +630,60 @@ function renderCheckDone() {
   const weak = Object.keys(state.missCounts).map((key) => {
     const q = state.deck.find((row) => row.key === key);
     const item = q ? byId(q.id) : null;
-    return item ? { name: displayTitle(item), n: state.missCounts[key] } : null;
+    return item ? { id: item.id, name: displayTitle(item), n: state.missCounts[key] } : null;
   }).filter(Boolean).sort((a, b) => b.n - a.n);
   root.innerHTML = `
     <div class="done-card">
-      ${clean ? `<span class="stamp cleared">Cleared</span>` : `<span class="stamp revised">Revised</span>`}
-      <h2>${clean ? "Clean first-try run" : "Recap finished"}</h2>
-      <p class="exam-line">First try ${got} / ${need}${clean ? " — Cleared." : ". Recap is done; this is not a clean run."}</p>
-      <p class="exam-kicker">Weak pages</p>
-      ${weak.length ? `<ul class="weak-list">${weak.map((row) => `<li><strong>${row.name}</strong> — missed ${row.n} time${row.n === 1 ? "" : "s"}</li>`).join("")}</ul>` : "<p>Clean run — no misses to recap.</p>"}
+      ${clean ? `<span class="stamp cleared">${t("cleanRun")}</span>` : `<span class="stamp revised">${t("revised")}</span>`}
+      <h2>${clean ? t("cleanRunTitle") : t("recapFinished")}</h2>
+      <p class="exam-line">${t("firstTry")} ${got} / ${need}${clean ? " — " + t("cleanRun") + "." : ". " + t("recapFinished") + "."}</p>
+      <p class="exam-kicker">${t("weakPages")}</p>
+      ${weak.length ? `<ul class="weak-list">${weak.map((row) => `<li><button type="button" class="weak-link" data-open-page="${row.id}"><strong>${row.name}</strong> — ${t("missedTimes", { n: row.n })}</button></li>`).join("")}</ul>` : `<p>${t("noMisses")}</p>`}
       <div class="toolbar">
-        <button class="btn btn-primary" data-go="wall">Back to the wall</button>
-        <button class="btn btn-ghost" data-fresh="1">New mix</button>
+        <button class="btn btn-primary" data-go="wall">${t("backWall")}</button>
+        <button class="btn btn-ghost" data-fresh="1">${t("newMix")}</button>
       </div>
     </div>
   `;
   root.querySelector("[data-go=wall]").addEventListener("click", () => show("wall"));
   root.querySelector("[data-fresh]").addEventListener("click", () => show("check", { fresh: true }));
+  bindOpenPage(root);
+}
+
+function orderSeq() {
+  return String(state.pick || "").split(",").filter(Boolean);
+}
+
+function handleChoice(q, opt) {
+  const locked = state.checked && pickIsCorrect(q, state.pick);
+  if (locked) return;
+  if (q.type === "order") {
+    if (state.checked) return;
+    const seq = orderSeq();
+    if (seq.includes(String(opt))) return;
+    seq.push(String(opt));
+    state.pick = seq.join(",");
+    if (seq.length < q.options.length) {
+      saveProgress();
+      renderCheck();
+      return;
+    }
+  } else {
+    state.pick = String(opt);
+  }
+  const ok = pickIsCorrect(q, state.pick);
+  recordAnswer(q, ok);
+  setFb(ok, q, state.pick);
+  state.checked = true;
+  saveProgress();
+  renderCheck();
 }
 
 function renderCheck() {
+  if (state.gate === "empty") {
+    renderEmptyWarn();
+    return;
+  }
   if (!state.deck.length) remixCheck();
   if (state.phase === "done") {
     renderCheckDone();
@@ -465,66 +698,64 @@ function renderCheck() {
   const item = byId(q.id);
   const locked = state.checked && pickIsCorrect(q, state.pick);
   const root = document.getElementById("check");
+  const seq = orderSeq();
   const progress = state.phase === "recap"
-    ? `<p class="recap-banner">Recap · ${state.recapQueue.length} still to get right</p>`
-    : `<p class="tiny">${state.i + 1} / ${state.deck.length} · first try ${firstTryCorrect()} / ${Object.keys(state.firstTry).length}</p>`;
+    ? `<p class="recap-banner">${t("recapBanner", { n: state.recapQueue.length })}</p>`
+    : `<p class="tiny">${state.i + 1} / ${state.deck.length} · ${t("firstTry")} ${firstTryCorrect()} / ${Object.keys(state.firstTry).length}</p>`;
+  const showPhoto = q.showSrc && q.type !== "spot";
   const choices = q.options.map((opt, i) => {
-    const selected = String(state.pick) === String(opt) ? " selected" : "";
-    const right = state.checked && ((q.type === "spot" && opt === q.id) || (q.type === "name" && opt === item.title));
-    const wrong = state.checked && String(state.pick) === String(opt) && !right;
-    const mark = right ? " is-right" : (wrong ? " is-wrong" : "");
+    const selected = q.type === "order" ? seq.includes(String(opt)) : String(state.pick) === String(opt);
+    const right = state.checked && String(opt) === String(q.answer) && q.type !== "order";
+    const orderRight = state.checked && q.type === "order" && pickIsCorrect(q, state.pick);
+    const wrong = state.checked && selected && !pickIsCorrect(q, state.pick) && (q.type === "order" || String(opt) !== String(q.answer));
+    const mark = (right || orderRight) ? " is-right" : (wrong ? " is-wrong" : "");
+    const sel = selected ? " selected" : "";
+    const orderNum = q.type === "order" && selected ? `<span class="order-num">${seq.indexOf(String(opt)) + 1}</span>` : "";
     if (q.type === "spot") {
       const choice = byId(opt);
-      return `<button class="choice spot${selected}${mark}" data-opt="${opt}">
+      return `<button class="choice spot${sel}${mark}" data-opt="${opt}">
         <span class="keycap">${i + 1}</span>
-        <img src="${choice.src}" alt="${state.checked ? choice.title : "Notes page option " + (i + 1)}" />
+        <img src="${choice.src}" alt="${state.checked ? choice.title : t("optionPage", { n: i + 1 })}" />
         ${state.checked ? `<span>${displayTitle(choice)}</span>` : ""}
       </button>`;
     }
-    return `<button class="choice${selected}${mark}" data-opt="${opt}"><span class="keycap">${i + 1}</span><span>${optionLabel(q, opt)}</span></button>`;
+    return `<button class="choice${sel}${mark}" data-opt="${opt}"><span class="keycap">${i + 1}</span>${orderNum}<span>${optionLabel(q, opt)}</span></button>`;
   }).join("");
+  const keysHint = `<p class="tiny keys">${q.type === "order" ? t("orderHint") : t("pressKeys", { keys: [1, 2, 3, 4].slice(0, q.options.length).map((k) => `<span class="keycap">${k}</span>`).join(" ") })}</p>`;
+  const explain = q.explain ? langText(q.explain) : langText(item && item.exam);
   const fb = state.fb ? `<div class="feedback ${state.fb.ok ? "ok" : "bad"}">
-    <strong>${state.fb.title}</strong>
-    <p class="exam-kicker">Model answer</p>
-    <p><strong>${displayTitle(item)}</strong> — ${item.exam}</p>
-    ${state.fb.ok ? "" : `<p>You chose <strong>${state.fb.chosen}</strong>.</p>`}
-  </div>` : `<p class="tiny keys">Press ${[1, 2, 3, 4].map((k) => `<span class="keycap">${k}</span>`).join(" ")} to choose</p>`;
+    <strong>${state.fb.ok ? t("correct") : t("incorrect")}</strong>
+    <p class="exam-kicker">${t("modelAnswer")}</p>
+    <p><strong>${displayTitle(item)}</strong> — ${explain}</p>
+    ${state.fb.ok ? "" : `<p>${t("youChose")} <strong>${chosenLabel(q, state.pick)}</strong>.</p>`}
+    ${state.fb.ok ? "" : `<button type="button" class="btn btn-ghost" data-open-page="${item.id}">${t("openThisPage")}</button>`}
+  </div>` : keysHint;
   root.innerHTML = `
     <div class="toolbar">
       <div>
-        <h2>Check yourself</h2>
-        <p class="lead">${q.prompt}</p>
+        <h2>${t("check")}</h2>
+        <p class="lead">${langText(q.prompt)}</p>
       </div>
       <div class="score-wrap">${checkStamp()}<div class="score">${firstTryCorrect()} / ${state.deck.length}</div></div>
     </div>
     ${progress}
-    <div class="drill-stage${q.type === "spot" ? " is-spot" : ""}">
-      ${q.type === "name" ? `<div class="photo-frame specimen"><img src="${item.src}" alt="${state.checked ? item.title : "Notes page"}" /></div>` : ""}
+    <div class="drill-stage${showPhoto ? "" : " is-spot"}">
+      ${showPhoto ? `<div class="photo-frame specimen"><img src="${item.src}" alt="${state.checked ? item.title : t("notesPage")}" /></div>` : ""}
       <div class="fb-col">
-        ${state.checked ? fb : fb}
+        ${fb}
         <div class="choices${q.type === "spot" ? " spots" : ""}">${choices}</div>
         <div class="toolbar drill-actions">
           <div>
-            ${state.checked && !locked ? `<button class="btn btn-primary" id="check-again">Try again</button>` : ""}
+            ${state.checked && !locked ? `<button class="btn btn-primary" id="check-again">${t("tryAgain")}</button>` : ""}
             <button class="btn btn-primary" id="check-next" ${!locked ? "disabled" : ""}>${nextLabel(q)}</button>
           </div>
-          <button class="btn btn-ghost" id="check-reset">New mix</button>
+          <button class="btn btn-ghost" id="check-reset">${t("newMix")}</button>
         </div>
       </div>
     </div>
   `;
   root.querySelectorAll(".choice").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      if (locked) return;
-      const pick = btn.dataset.opt;
-      const ok = pickIsCorrect(q, pick);
-      state.pick = pick;
-      recordAnswer(q, ok);
-      setFb(ok, q, pick);
-      state.checked = true;
-      saveProgress();
-      renderCheck();
-    });
+    btn.addEventListener("click", () => handleChoice(q, btn.dataset.opt));
   });
   const again = document.getElementById("check-again");
   if (again) {
@@ -537,6 +768,7 @@ function renderCheck() {
   }
   document.getElementById("check-next").addEventListener("click", () => goNext());
   document.getElementById("check-reset").addEventListener("click", () => show("check", { fresh: true }));
+  bindOpenPage(root);
 }
 
 function bindLightbox() {
@@ -564,8 +796,7 @@ function bindLightbox() {
 
 loadProgress();
 loadThemeFallback();
-applyLang();
-buildNav();
+paintChrome();
 bindLightbox();
 show("wall");
 
@@ -574,7 +805,7 @@ document.getElementById("theme-toggle").addEventListener("click", () => {
 });
 document.getElementById("lang-toggle").addEventListener("click", () => {
   state.lang = state.lang === "zh" ? "en" : "zh";
-  applyLang();
+  paintChrome();
   saveProgress();
   if (state.view === "wall") renderWall();
   if (state.view === "check") renderCheck();
@@ -587,6 +818,16 @@ document.addEventListener("keydown", (event) => {
     event.preventDefault();
     if (state.lbId) closeLightbox();
     else show("wall");
+    return;
+  }
+  if (state.lbId && (event.key === "+" || event.key === "=")) {
+    event.preventDefault();
+    bumpZoom(ZOOM_STEP);
+    return;
+  }
+  if (state.lbId && (event.key === "-" || event.key === "_")) {
+    event.preventDefault();
+    bumpZoom(-ZOOM_STEP);
     return;
   }
   if (state.lbId && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
