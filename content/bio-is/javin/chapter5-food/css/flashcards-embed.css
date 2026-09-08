@@ -45,6 +45,13 @@ html.bio-embed body {
   line-height: 1.55;
 }
 
+#card-front-text br,
+.card-back-text br {
+  content: "";
+  display: block;
+  margin-top: 0.55em;
+}
+
 .card-back-text strong {
   font-weight: 700;
   color: #004e9f;
