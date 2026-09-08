@@ -10,9 +10,9 @@
   <header class="top">
     <div class="top-inner">
       <div>
-        <p class="kicker">HKDSE Chemistry · Topic 01 · S3 lab</p>
-        <h1>Notes Wall</h1>
-        <p>Open a chart to read it. Press Esc to close. Check yourself when you have looked at the set-ups.</p>
+        <p class="kicker" id="header-kicker">HKDSE Chemistry · Topic 01 · S3 lab</p>
+        <h1 id="header-title">Notes Wall</h1>
+        <p id="header-lead">Glassware → Heating → Set-ups → Check yourself. Cover names to recall. Press Esc to close a chart.</p>
       </div>
       <div class="top-side">
         <div class="top-actions">
@@ -29,6 +29,8 @@
     <section class="view" id="check"></section>
   </main>
 
+  <section id="print-crib" class="print-only"></section>
+
   <div id="lightbox" class="lightbox" hidden>
     <button type="button" class="lb-close" id="lb-close" aria-label="Close">Close</button>
     <button type="button" class="lb-nav prev" id="lb-prev" aria-label="Previous">‹</button>
@@ -39,7 +41,13 @@
         <span id="lb-zoom-label">100%</span>
         <button type="button" class="btn btn-ghost" id="lb-bigger" aria-label="Bigger">+</button>
       </div>
-      <div class="lb-frame"><img id="lb-img" alt="" /></div>
+      <div class="lb-frame">
+        <div class="lb-zoom-inner" id="lb-zoom-inner">
+          <div class="lb-crop" id="lb-crop">
+            <img id="lb-img" alt="" />
+          </div>
+        </div>
+      </div>
       <div class="lb-copy" id="lb-copy"></div>
     </div>
   </div>

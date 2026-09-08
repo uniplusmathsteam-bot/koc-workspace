@@ -28,10 +28,10 @@ KOC.works('chem', 'james', [
     type: 'interactive',
     subject: 'Chem',
     chapter: 'Chem Topic 01',
-    submitted: '2026-09-05',
+    submitted: '2026-09-07',
     tags: ['Interactive', 'S3', 'Lab notes'],
     src: 'content/chem/james/notes-wall/index.html',
-    notes: 'S3 Topic 01 notes wall: open charts and set-up diagrams, then check yourself on the exam lines.'
+    notes: 'S3 Topic 01 notes wall: Glassware → Heating → Set-ups → Check yourself. Cover names, open charts, then recap misses until a clean run. Bilingual EN/中, stamps, print crib.'
   },
   {
     id: 'name-that-piece',
