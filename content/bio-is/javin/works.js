@@ -9,7 +9,7 @@ KOC.works('bio-is', 'javin', [
     submitted: '2026-09-08',
     tags: ['Flashcards', 'Interactive', 'Revision tool', 'Cells'],
     src: 'content/bio-is/javin/chapter2-cells/flashcards-study.html',
-    notes: '48 bilingual EN/中文 cards from notes pages 1–15 (cell theory, microscopes, organelles). Photo cards 24 and 43–48 show photomicrographs on the front.'
+    notes: '45 fully bilingual EN/中文 cards from notes pages 1–15 (cell theory, microscopes, organelles). Photo cards show photomicrographs on the front. Every front and back has English and Chinese.'
   },
   {
     id: 'chapter-5-flashcards',
@@ -20,7 +20,7 @@ KOC.works('bio-is', 'javin', [
     submitted: '2026-09-08',
     tags: ['Flashcards', 'Interactive', 'Revision tool', 'Nutrition'],
     src: 'content/bio-is/javin/chapter5-food/flashcards-study.html',
-    notes: '47 bilingual EN/中文 cards from notes pages 1–16 (condensation/hydrolysis, carbohydrates, lipids, proteins). Sequence or random study with Again / Got it rounds.'
+    notes: '47 fully bilingual EN/中文 cards from notes pages 1–16 (condensation/hydrolysis, carbohydrates, lipids, proteins). Every front and back has English and Chinese.'
   },
   {
     id: 'immune-response-flow',

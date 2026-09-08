@@ -1,8 +1,8 @@
 import { FLASHCARD_TAGS, FLASHCARD_DECK } from "./flashcardData.js";
 import { FlashcardSession } from "./flashcardSession.js";
 
-const CHAPTER_TITLE = "Ch2 Cellular Organizations";
-const CHAPTER_SUBTITLE = "Biology · pages 1–15 · cell theory, microscopes, organelles & photomicrographs";
+const CHAPTER_TITLE = "Ch2 Cellular Organizations 細胞組織";
+const CHAPTER_SUBTITLE = "Biology 生物 · pages 1–15 · cell theory 細胞理論, microscopes 顯微鏡, organelles 細胞器 & photomicrographs 顯微照片";
 
 const session = new FlashcardSession(FLASHCARD_DECK);
 

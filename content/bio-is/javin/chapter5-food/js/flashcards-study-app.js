@@ -1,8 +1,8 @@
 import { FLASHCARD_TAGS, FLASHCARD_DECK } from "./flashcardData.js";
 import { FlashcardSession } from "./flashcardSession.js";
 
-const CHAPTER_TITLE = "Ch5 Food and humans";
-const CHAPTER_SUBTITLE = "Biology · pages 1–16 · organics → carbs, lipids, proteins, minerals & ions";
+const CHAPTER_TITLE = "Ch5 Food and humans 食物與人類";
+const CHAPTER_SUBTITLE = "Biology 生物 · pages 1–16 · organics 有機物 → carbs 碳水化合物, lipids 脂質, proteins 蛋白質, minerals 礦物質 & ions 離子";
 
 const session = new FlashcardSession(FLASHCARD_DECK);
 

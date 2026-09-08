@@ -5,8 +5,8 @@ export const FLASHCARD_DECK = [
   {
     id: 1,
     subtopic: "有機與縮合水解",
-    front: "Condensation 縮合 = which type of metabolism 代謝？",
-    back: "<strong>Anabolism 合成代謝</strong> (build-up 合成)",
+    front: "Condensation 縮合 = which type of metabolism 代謝？縮合屬於哪一類代謝？",
+    back: "<strong>Anabolism 合成代謝</strong>（build-up 合成）",
   },
   {
     id: 2,
@@ -19,8 +19,8 @@ export const FLASHCARD_DECK = [
   {
     id: 3,
     subtopic: "有機與縮合水解",
-    front: "Hydrolysis 水解 = which type of metabolism 代謝？",
-    back: "<strong>Catabolism 分解代謝</strong> (breakdown 分解)",
+    front: "Hydrolysis 水解 = which type of metabolism 代謝？水解屬於哪一類代謝？",
+    back: "<strong>Catabolism 分解代謝</strong>（breakdown 分解）",
   },
   {
     id: 4,
@@ -32,15 +32,15 @@ export const FLASHCARD_DECK = [
     id: 5,
     subtopic: "有機與縮合水解",
     front: "Prolonged starvation 長期饑餓: fuel use order？能量使用次序？",
-    back: "<strong>Carbohydrates 碳水化合物 → Lipids 脂質 → Proteins 蛋白質</strong> (last resort 最後手段)",
+    back: "<strong>Carbohydrates 碳水化合物 → Lipids 脂質 → Proteins 蛋白質</strong>（last resort 最後手段）",
     image: "./assets/page02_starvation.png",
     imageAlt: "Starvation graph: glycogen then lipids then proteins 饑餓時先用肝醣再脂質最後蛋白質",
   },
   {
     id: 6,
     subtopic: "有機與縮合水解",
-    front: "Two monosaccharides 單醣 join by ____ to form a disaccharide 雙醣。",
-    back: "<strong>Condensation 縮合</strong> (lose H₂O 失去水)",
+    front: "Two monosaccharides 單醣 join by ____ to form a disaccharide 雙醣。兩分子單醣以____結合形成雙醣。",
+    back: "<strong>Condensation 縮合</strong>（lose H₂O 失去水）",
   },
   {
     id: 7,
@@ -57,8 +57,8 @@ export const FLASHCARD_DECK = [
   {
     id: 9,
     subtopic: "碳水化合物",
-    front: "What do reducing sugars 還原糖 do? Exception 例外？",
-    back: "<strong>Donate electrons 捐出電子</strong>；★except <strong>sucrose 蔗糖</strong>",
+    front: "What do reducing sugars 還原糖 do? Exception 例外？還原糖有何作用？例外是什麼？",
+    back: "<strong>Donate electrons 捐出電子</strong>；★except <strong>sucrose 蔗糖</strong>除外",
   },
   {
     id: 10,
@@ -69,20 +69,20 @@ export const FLASHCARD_DECK = [
   {
     id: 11,
     subtopic: "碳水化合物",
-    front: "Name 5 monosaccharides 單醣 in the notes.",
-    back: "Glucose 葡萄糖, fructose 果糖, galactose 半乳糖, <strong>ribose 核糖</strong>, <strong>deoxyribose 脱氧核糖</strong> (DNA)",
+    front: "Name 5 monosaccharides 單醣 in the notes. 寫出筆記中的五種單醣。",
+    back: "Glucose 葡萄糖, fructose 果糖, galactose 半乳糖, <strong>ribose 核糖</strong>, <strong>deoxyribose 脱氧核糖</strong>（DNA）",
   },
   {
     id: 12,
     subtopic: "碳水化合物",
-    front: "Maltose 麥芽糖 can form from?",
+    front: "Maltose 麥芽糖 can form from? 麥芽糖可由什麼形成？",
     back: "<strong>Starch hydrolysis 澱粉水解</strong>",
   },
   {
     id: 13,
     subtopic: "碳水化合物",
     front: "Sucrose 蔗糖: reducing 還原性？Role in plants 植物中角色？",
-    back: "<strong>Non-reducing 非還原糖</strong>；<strong>transport form 運輸形式</strong> in plants",
+    back: "<strong>Non-reducing 非還原糖</strong>；<strong>transport form 運輸形式</strong> in plants 在植物中",
   },
   {
     id: 14,
@@ -93,8 +93,8 @@ export const FLASHCARD_DECK = [
   {
     id: 15,
     subtopic: "碳水化合物",
-    front: "Cellulose 纖維素 role in <strong>plants 植物</strong>？",
-    back: "Support <strong>plant cell wall 植物細胞壁</strong>",
+    front: "Cellulose 纖維素 role in <strong>plants 植物</strong>？纖維素在植物中的功能？",
+    back: "Support <strong>plant cell wall 植物細胞壁</strong>　支撐植物細胞壁",
   },
   {
     id: 16,
@@ -132,19 +132,19 @@ export const FLASHCARD_DECK = [
     front: "Phospholipid 磷脂: hydrophilic vs hydrophobic parts？親水／疏水部分？",
     back: "★<strong>Hydrophilic (polar) head 親水（極性）頭</strong>；★<strong>hydrophobic (non-polar) tails 疏水（非極性）尾</strong> → bilayer 雙層",
     image: "./assets/page07_phospholipid.jpeg",
-    imageAlt: "Phospholipid 磷脂 structure diagram",
+    imageAlt: "Phospholipid 磷脂 structure diagram 結構圖",
   },
   {
     id: 21,
     subtopic: "脂質",
-    front: "Energy per gram of lipids 脂質 vs carbohydrates 碳水化合物 / proteins 蛋白質？",
-    back: "<strong>About twice 約兩倍</strong> (×2)",
+    front: "Energy per gram of lipids 脂質 vs carbohydrates 碳水化合物 / proteins 蛋白質？每克脂質相對碳水化合物／蛋白質的能量？",
+    back: "<strong>About twice 約兩倍</strong>（×2）",
   },
   {
     id: 22,
     subtopic: "脂質",
     front: "Name 4 triglyceride 三酸甘油酯 functions besides energy. 除能量外四項功能？",
-    back: "Organ protection 保護器官；insulating nerve 絕緣神經；waterproofing 防水；reduce heat loss 減少熱量散失 (subcutaneous fat 皮下脂肪)",
+    back: "Organ protection 保護器官；insulating nerve 絕緣神經；waterproofing 防水；reduce heat loss 減少熱量散失（subcutaneous fat 皮下脂肪）",
   },
   {
     id: 23,
@@ -168,7 +168,7 @@ export const FLASHCARD_DECK = [
     id: 26,
     subtopic: "脂質",
     front: "Before summing food energy, lipids need what multiplier？計算總能量前脂質要乘？",
-    back: "<strong>×2</strong>",
+    back: "<strong>×2</strong>　乘以 2",
   },
   {
     id: 27,
@@ -179,29 +179,29 @@ export const FLASHCARD_DECK = [
   {
     id: 28,
     subtopic: "蛋白質",
-    front: "Elements in proteins 蛋白質元素？",
-    back: "<strong>C + H + O + N</strong> (+ <strong>S</strong> in some 部分含硫)",
+    front: "Elements in proteins 蛋白質含哪些元素？",
+    back: "<strong>C + H + O + N</strong>（+ <strong>S</strong> in some 部分含硫）",
     image: "./assets/page02_condensation_eq.png",
     imageAlt: "Organic molecules element table including proteins C H O N S 有機物元素表",
   },
   {
     id: 29,
     subtopic: "蛋白質",
-    front: "How many types of amino acids 胺基酸？Why 為何？",
-    back: "<strong>20</strong> (20 types of side chain 側鏈)",
+    front: "How many types of amino acids 胺基酸？Why 為何？胺基酸有多少種？原因？",
+    back: "<strong>20</strong>（20 types of side chain 20 種側鏈）",
   },
   {
     id: 30,
     subtopic: "蛋白質",
     front: "Three groups on an amino acid 胺基酸的三個基團？",
-    back: "<strong>Amino group 氨基</strong> (N)；<strong>carboxyl group 羧基</strong> (C)；<strong>side chain 側鏈</strong> (R)",
+    back: "<strong>Amino group 氨基</strong>（N）；<strong>carboxyl group 羧基</strong>（C）；<strong>side chain 側鏈</strong>（R）",
     image: "./assets/page09_amino_acid.png",
     imageAlt: "Amino acid: amino group, carboxyl group, side chain 胺基酸三基團",
   },
   {
     id: 31,
     subtopic: "蛋白質",
-    front: "Condensation of 2 amino acids joins which groups？Product 產物？",
+    front: "Condensation of 2 amino acids joins which groups？Product 產物？兩分子胺基酸縮合連接哪些基團？",
     back: "★Between <strong>amino group 氨基 + carboxyl group 羧基</strong> → <strong>dipeptide 二肽</strong>",
     image: "./assets/page11_dipeptide.png",
     imageAlt: "Dipeptide with peptide bond and water lost 二肽肽鍵失水",
@@ -210,7 +210,7 @@ export const FLASHCARD_DECK = [
     id: 32,
     subtopic: "蛋白質",
     front: "Polypeptide 多肽 vs protein 蛋白質: key difference 關鍵分別？",
-    back: "Polypeptide 多肽 = <strong>linear chain 線性鏈</strong>；Protein 蛋白質 = <strong>3D conformation 三維構象</strong> (folding 摺疊)",
+    back: "Polypeptide 多肽 = <strong>linear chain 線性鏈</strong>；Protein 蛋白質 = <strong>3D conformation 三維構象</strong>（folding 摺疊）",
     image: "./assets/page12_folding.png",
     imageAlt: "Polypeptide folding into protein 多肽摺疊成蛋白質",
   },
@@ -224,7 +224,7 @@ export const FLASHCARD_DECK = [
     id: 34,
     subtopic: "蛋白質",
     front: "What determines a protein’s 3D fold / function？決定蛋白質摺疊／功能的是？",
-    back: "<strong>Amino acid sequence 胺基酸序列</strong> (by DNA)",
+    back: "<strong>Amino acid sequence 胺基酸序列</strong>（by DNA 由 DNA 決定）",
   },
   {
     id: 35,
@@ -235,7 +235,7 @@ export const FLASHCARD_DECK = [
   {
     id: 36,
     subtopic: "蛋白質",
-    front: "Name 5 protein functions 蛋白質五項功能 from notes.",
+    front: "Name 5 protein functions 蛋白質五項功能 from notes. 寫出筆記中蛋白質的五項功能。",
     back: "Cell membrane proteins 細胞膜蛋白；growth and repair 生長與修復；<strong>enzymes 酶</strong>；hormones 激素；<strong>antibodies 抗體</strong>",
   },
   {
@@ -248,21 +248,21 @@ export const FLASHCARD_DECK = [
     id: 38,
     subtopic: "蛋白質",
     front: "Denature 變性: reversible 可逆？Caused by 成因？",
-    back: "<strong>Irreversible 不可逆</strong>；high temperature 高溫 / sub-optimal <strong>pH</strong>",
+    back: "<strong>Irreversible 不可逆</strong>；high temperature 高溫 / sub-optimal <strong>pH</strong> 非最適 pH",
     image: "./assets/page12_denature.png",
     imageAlt: "Native protein unfolds when denatured 變性失去構象",
   },
   {
     id: 39,
     subtopic: "蛋白質",
-    front: "Denature 變性 → loss of ____ → loss of ____",
+    front: "Denature 變性 → loss of ____ → loss of ____　變性失去____再失去____",
     back: "Loss of <strong>conformation 構象</strong> → loss of <strong>function 功能</strong>",
   },
   {
     id: 40,
     subtopic: "食物分類與礦物質",
     front: "Energy values 能量值: carbohydrates 碳水化合物 / proteins 蛋白質 / lipids 脂質 (kJ/g)？",
-    back: "~<strong>17</strong> / ~<strong>17</strong> / ~<strong>37</strong> (~2 times 約兩倍)",
+    back: "~<strong>17</strong> / ~<strong>17</strong> / ~<strong>37</strong>（~2 times 約兩倍）",
   },
   {
     id: 41,
@@ -292,7 +292,7 @@ export const FLASHCARD_DECK = [
     id: 45,
     subtopic: "食物分類與礦物質",
     front: "Iron 鐵: key function 主要功能？Deficiency disease 缺乏症？",
-    back: "Oxygen transport 氧氣運輸 (<strong>hemoglobin 血紅蛋白</strong>)；<strong>anemia 貧血</strong>",
+    back: "Oxygen transport 氧氣運輸（<strong>hemoglobin 血紅蛋白</strong>）；<strong>anemia 貧血</strong>",
   },
   {
     id: 46,
