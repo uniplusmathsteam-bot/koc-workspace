@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>打太鼓</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="top-inner">
+      <div>
+        <p class="kicker" id="header-kicker">學習重點</p>
+        <h1 id="header-title">打太鼓</h1>
+        <p id="header-lead">左邊金色鼓是手法，右邊三面鼓選作用。可選小學或中學學段。按 1 2 3。Esc 回主頁。</p>
+      </div>
+      <div class="top-side">
+        <div id="hud" class="hud" hidden></div>
+        <nav class="nav">
+          <button type="button" class="btn btn-ghost" id="btn-home">主頁</button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="view active" id="hub"></section>
+    <section class="view" id="play"></section>
+    <section class="view" id="recap"></section>
+  </main>
+
+  <div id="leave-overlay" class="overlay" hidden>
+    <div class="overlay-card" role="dialog" aria-modal="true" aria-labelledby="leave-title">
+      <p id="leave-title">本局尚未完成，確定回主頁？</p>
+      <div class="overlay-actions">
+        <button type="button" class="btn" id="leave-stay">留下</button>
+        <button type="button" class="btn btn-ghost" id="leave-home">回主頁</button>
+      </div>
+    </div>
+  </div>
+
+  <canvas id="confetti" aria-hidden="true"></canvas>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
