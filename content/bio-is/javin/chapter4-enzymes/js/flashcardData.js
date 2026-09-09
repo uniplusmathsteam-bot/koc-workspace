@@ -129,36 +129,10 @@ export const FLASHCARD_DECK = [
     back: "<strong>High temperature (boiling)</strong> and <strong>sub-optimal pH</strong>.<br><strong>高溫（煮沸）</strong>和<strong>非最適 pH</strong>。",
   },
   {
-    id: 21,
-    subtopic: "實驗與曲線",
-    front: "Why is there a clear zone around a well in an agar plate?<br>為何瓊脂平板的小井周圍會有透明圈？",
-    back: "Enzyme <strong>diffuses out</strong> and <strong>catalyses breakdown</strong> of the substrate into simpler molecules.<br>酶<strong>擴散出來</strong>並<strong>催化</strong>底物分解成較簡單分子。",
-  },
-  {
-    id: 22,
-    subtopic: "實驗與曲線",
-    front: "Why is a clear zone larger?<br>為何透明圈會較大？",
-    back: "<strong>Higher enzyme concentration</strong>, so more enzyme diffuses out in the same time.<br><strong>酶濃度較高</strong>，相同時間擴散出來的酶較多。",
-  },
-  {
     id: 23,
     subtopic: "實驗與曲線",
     front: "Why is there no clear zone?<br>為何沒有透明圈？",
     back: "The enzyme is <strong>denatured</strong> or <strong>inactive</strong>, so it cannot catalyse breakdown.<br>酶已<strong>變性</strong>或<strong>不活躍</strong>，不能催化分解。",
-  },
-  {
-    id: 24,
-    subtopic: "實驗與曲線",
-    front: "On a time graph, which curve is the substrate?<br>時間曲線中，哪一條是底物？",
-    back: "The curve that <strong>starts high and falls</strong> as product forms.<br><strong>開始高然後下降</strong>的那條，因為產物在形成。",
-    image: "./assets/img008.jpg",
-    imageAlt: "Time graph of substrate falling and product rising during an enzyme reaction.",
-  },
-  {
-    id: 25,
-    subtopic: "實驗與曲線",
-    front: "How should you state the optimum if the graph peak is not sharp?<br>若曲線高峰不尖，應如何說最適溫度？",
-    back: "Say the optimum is <strong>around</strong> that temperature, not exactly that value.<br>應說最適溫度<strong>大約</strong>是該值，不要說剛好是該值。",
   },
   {
     id: 26,
@@ -201,12 +175,6 @@ export const FLASHCARD_DECK = [
     subtopic: "抑制劑",
     front: "Why can inhibitors kill bacteria?<br>為何抑制劑能殺死細菌？",
     back: "They can <strong>inhibit respiration</strong>, so active transport and other processes stop.<br>它們能<strong>抑制呼吸</strong>，使主動運輸等過程停止。",
-  },
-  {
-    id: 33,
-    subtopic: "應用",
-    front: "Which enzyme makes fruit juice clearer, and how?<br>哪種酶使果汁更清澈？如何做到？",
-    back: "<strong>Pectinase</strong> breaks down cell walls.<br><strong>果膠酶</strong>分解細胞壁。",
   },
   {
     id: 34,

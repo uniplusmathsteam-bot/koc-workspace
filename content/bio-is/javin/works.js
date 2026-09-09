@@ -31,7 +31,7 @@ KOC.works('bio-is', 'javin', [
     submitted: '2026-09-08',
     tags: ['Flashcards', 'Interactive', 'Revision tool', 'Enzymes'],
     src: 'content/bio-is/javin/chapter4-enzymes/flashcards-study.html',
-    notes: '38 fully bilingual EN/中文 cards (metabolism, enzyme properties, temperature/pH, inhibitors, applications). Short note-questions on boiled-enzyme control and agar clear zones. Diagrams on energy graphs, lock-and-key, and substrate–product curves.'
+    notes: '33 fully bilingual EN/中文 cards (metabolism, enzyme properties, temperature/pH, inhibitors, applications). Short note-questions on boiled-enzyme control and agar clear zone. Diagrams on energy graphs and lock-and-key.'
   },
   {
     id: 'chapter-5-flashcards',
