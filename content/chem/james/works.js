@@ -1,6 +1,16 @@
 /* James · Chem KOC lead — submissions. */
 KOC.works('chem', 'james', [
   {
+    id: 'taiko',
+    title: '打太鼓',
+    type: 'interactive',
+    chapter: '寫作手法',
+    submitted: '2026-09-09',
+    tags: ['Interactive', '寫作', '修辭'],
+    src: 'content/chem/james/taiko/index.html',
+    notes: '寫作手法配對：左邊金色鼓是手法，右邊三面鼓選作用。可選小學或中學。按 1 2 3。打錯會說明該作用屬於哪種手法，再練錯題。'
+  },
+  {
     id: 'whats-it-for',
     title: "What's It For?",
     type: 'interactive',
