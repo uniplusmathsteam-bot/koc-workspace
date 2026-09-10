@@ -68,7 +68,7 @@ const FOODS = [
 ];
 
 const TESTS = [
-  { id: "clinistix", cat: "Carbohydrates", name: "Glucose", sub: "Clinistix paper · pink → purple", reagents: [], extra: ["clinistix", "dropper"] },
+  { id: "clinistix", cat: "Carbohydrates", name: "Glucose", sub: "Glucose paper · dip 1–2 s · read 60 s · yellow / light green → darker green, brown or blue-grey", reagents: [], extra: ["clinistix", "dropper"] },
   { id: "benedict", cat: "Carbohydrates", name: "Reducing sugar", sub: "Benedict's · 1 cm³ + equal vol. + boil 5 min", reagents: ["benedict"], extra: ["tube", "dropper", "bath"], heatMin: 5 },
   { id: "iodine", cat: "Carbohydrates", name: "Starch", sub: "Iodine · food or leaf · boil 5 min", reagents: ["iodine", "alcohol", "water"], extra: ["tube", "dropper", "bath"], heatMin: 5 },
   { id: "albustix", cat: "Proteins", name: "Protein paper", sub: "Albustix · dip 1 s · read 60 s · yellow → green", reagents: [], extra: ["albustix", "dropper"] },
@@ -125,7 +125,17 @@ const BLACK = "#1b1d33";
 const PURPLE = "#7a3d9b";
 const MILK = "#f0eee8";
 const ALBUSTIX_YELLOW = "#f5e000";
+const GLUCOSE_UNUSED = "#efe9a4";
 const STRIP_READ_MS = 1000;
+
+const GLUCOSE_SCALE = [
+  { key: "0", label: "0%", reading: "0%", min: 0, max: 0, color: "#efe9a4", word: "light yellow" },
+  { key: "0.1", label: "0.1%", reading: "0.1%", min: 1, max: 2, color: "#c8dc7a", word: "light green" },
+  { key: "0.25", label: "0.25%", reading: "0.25%", min: 3, max: 3, color: "#7eb24a", word: "green" },
+  { key: "0.5", label: "0.5%", reading: "0.5%", min: 4, max: 5, color: "#3f7a32", word: "darker green" },
+  { key: "1", label: "1%", reading: "1%", min: 6, max: 8, color: "#8a5a28", word: "brown" },
+  { key: "2", label: "2%", reading: "2%", min: 9, max: 10, color: "#4a5a68", word: "blue-grey" },
+];
 
 const ALBUSTIX_SCALE = [
   { key: "neg", label: "NEG.", reading: "NEG.", gl: "0 g/l", min: 0, max: 0, color: "#f5e000", word: "yellow" },
@@ -140,10 +150,15 @@ function albustixBand(protein) {
   return ALBUSTIX_SCALE.find((b) => n >= b.min && n <= b.max) || ALBUSTIX_SCALE[0];
 }
 
-function dipAlbustix(piece, foodId) {
+function glucoseBand(level) {
+  const n = Number(level) || 0;
+  return GLUCOSE_SCALE.find((b) => n >= b.min && n <= b.max) || GLUCOSE_SCALE[0];
+}
+
+function dipStrip(piece, foodId) {
   if (!piece) return;
   piece.foodId = foodId;
-  if (piece.strip !== "albustix") return;
+  if (piece.strip !== "albustix" && piece.strip !== "clinistix") return;
   piece.dippedAt = Date.now();
   setTimeout(() => {
     if (state.pieces.includes(piece) && piece.foodId === foodId) renderLab();
@@ -164,6 +179,7 @@ const state = {
   bankQ: "",
   openCard: null,
   testCat: "",
+  embedLocked: null,
 };
 
 let drag = null;
@@ -364,7 +380,7 @@ function evaluateTube(piece) {
       ? "Use the burning set-up — drag it onto the bench, then drop a food on it."
       : test === "albustix"
         ? "Dip the yellow test end into the sample for 1 s. Wait 60 s, then compare the pad with the PROTEIN g/l colour chart."
-        : "Dip the test paper into the sample (drag paper onto the food or a tube).";
+        : "Dip the light-yellow glucose paper into the sample for 1–2 s. Wait 60 s — it darkens to green, brown, or blue-grey if glucose is present.";
   }
 
   return { color, vol, ppt, pptAmt: evPptAmt, cloudy, fizz, text, drops };
@@ -409,9 +425,39 @@ function evaluateBlock(piece) {
 function evaluateStrip(piece) {
   const food = foodById(piece.foodId);
   if (piece.strip === "clinistix") {
-    if (!food) return { color: "#f4b6c2", text: "Dip Clinistix into the sample (pink paper)." };
-    if (glucoseOf(food) > 0) return { color: "#7a3d9b", text: `Pink → purple. Glucose present in ${food.name}.` };
-    return { color: "#f4b6c2", text: `Remains pink. Glucose not detected in ${food.name} (Clinistix is glucose-specific).` };
+    if (!food) {
+      return {
+        color: GLUCOSE_UNUSED,
+        text: "The unused glucose paper is light yellow. Dip it into the sample for 1–2 s. Wait 60 s — it darkens to green, brown, or blue-grey if glucose is present.",
+        reading: "",
+        band: "",
+      };
+    }
+    const developing = piece.dippedAt && Date.now() - piece.dippedAt < STRIP_READ_MS;
+    if (developing) {
+      return {
+        color: GLUCOSE_UNUSED,
+        text: `Dipped 1–2 s in ${food.name}. Wait 60 s (1 lab min) — watch for darker green, brown, or blue-grey.`,
+        reading: "",
+        band: "",
+        developing: true,
+      };
+    }
+    const band = glucoseBand(glucoseOf(food));
+    if (band.key === "0") {
+      return {
+        color: band.color,
+        text: `Paper stays light yellow (0%). No darkening — glucose not detected in ${food.name}.`,
+        reading: band.reading,
+        band: band.key,
+      };
+    }
+    return {
+      color: band.color,
+      text: `Light yellow → ${band.word}. Glucose present in ${food.name} (about ${band.reading}).`,
+      reading: band.reading,
+      band: band.key,
+    };
   }
   if (!food) {
     return {
@@ -510,13 +556,16 @@ function renderTests() {
   const block = document.getElementById("test-block");
   const sel = document.getElementById("test-cat");
   if (sel && sel.value !== state.testCat) sel.value = state.testCat;
-  if (!state.testCat) {
+  if (sel) sel.disabled = !!state.embedLocked;
+  if (!state.testCat && !state.embedLocked) {
     block.hidden = true;
     box.innerHTML = "";
     return;
   }
   block.hidden = false;
-  const rows = TESTS.filter((t) => t.cat === state.testCat);
+  const rows = state.embedLocked
+    ? TESTS.filter((t) => t.id === state.embedLocked)
+    : TESTS.filter((t) => t.cat === state.testCat);
   box.innerHTML = rows.map((t) => `
     <button type="button" class="test-item ${state.test === t.id ? "active" : ""}" data-test="${t.id}">
       <span class="t-name">${t.name}</span>
@@ -525,11 +574,11 @@ function renderTests() {
   `).join("");
 }
 
-function renderProteinScale(matchKey) {
+function renderColorScale(title, bands, matchKey) {
   const scale = document.getElementById("protein-scale");
   if (!scale) return;
   scale.hidden = false;
-  scale.innerHTML = `<div class="protein-scale-title">PROTEIN g/l</div>` + ALBUSTIX_SCALE.map((b) => `
+  scale.innerHTML = `<div class="protein-scale-title">${title}</div>` + bands.map((b) => `
     <div class="protein-scale-row ${b.key === matchKey ? "match" : ""}">
       <span class="protein-swatch" style="background:${b.color}"></span>
       <span class="protein-scale-label">${b.label}</span>
@@ -541,14 +590,20 @@ function renderConc() {
   const panel = document.getElementById("conc-panel");
   const sliderWrap = document.getElementById("conc-slider-wrap");
   const scale = document.getElementById("protein-scale");
-  if (t?.id === "albustix") {
+  if (t?.id === "albustix" || t?.id === "clinistix") {
     panel.classList.add("on");
     if (sliderWrap) sliderWrap.hidden = true;
-    const sel = state.pieces.find((p) => p.id === state.selectedPiece && p.kind === "strip" && p.strip === "albustix")
-      || [...state.pieces].reverse().find((p) => p.kind === "strip" && p.strip === "albustix");
+    const stripId = t.id;
+    const sel = state.pieces.find((p) => p.id === state.selectedPiece && p.kind === "strip" && p.strip === stripId)
+      || [...state.pieces].reverse().find((p) => p.kind === "strip" && p.strip === stripId);
     const ev = sel ? evaluateStrip(sel) : null;
-    renderProteinScale(ev?.band || "");
-    document.getElementById("conc-hint").textContent = "Dip the yellow test end into the food sample for 1 s. Wait 60 s, then compare the pad colour with this chart. Shade may be greener than blue, depending on the strip chart.";
+    if (t.id === "clinistix") {
+      renderColorScale("GLUCOSE %", GLUCOSE_SCALE, ev?.band || "");
+      document.getElementById("conc-hint").textContent = "Unused paper is light yellow. After 60 s, glucose darkens it through green, then brown, then blue-grey. Darker shade means higher concentration.";
+    } else {
+      renderColorScale("PROTEIN g/l", ALBUSTIX_SCALE, ev?.band || "");
+      document.getElementById("conc-hint").textContent = "Dip the yellow test end into the food sample for 1 s. Wait 60 s, then compare the pad colour with this chart. Shade may be greener than blue, depending on the strip chart.";
+    }
     return;
   }
   if (scale) {
@@ -591,7 +646,7 @@ function apparatusList() {
   items.push({ id: "dropper", label: dropperLabel() });
   if (t.extra.includes("bath")) items.push({ id: "bath", label: t.id === "benedict" ? "Hot water bath" : "Water bath" });
   if (t.extra.includes("paper")) items.push({ id: "paper", label: "Filter paper" });
-  if (t.extra.includes("clinistix")) items.push({ id: "clinistix", label: "Clinistix" });
+  if (t.extra.includes("clinistix")) items.push({ id: "clinistix", label: "Glucose paper" });
   if (t.extra.includes("albustix")) items.push({ id: "albustix", label: "Albustix" });
   if (t.extra.includes("burner")) items.push({ id: "burner", label: "Burning set-up" });
   (t.reagents || []).forEach((r) => items.push({ id: r, label: REAGENTS[r].name + " · 1 cm³", reagent: true }));
@@ -610,7 +665,7 @@ function renderApparatus() {
       : a.id === "bath" ? `<span style="width:28px;height:14px;background:#f3c56b;border:1px solid #c5a04a;display:inline-block"></span>`
       : a.id === "paper" ? `<span style="width:22px;height:16px;background:#f3f1ea;border:1px solid #ccc;display:inline-block"></span>`
       : a.id === "dropper" ? `<svg width="18" height="28" viewBox="0 0 18 28"><rect x="7" y="2" width="4" height="10" fill="#c5d0d8"/><path d="M5 12 h8 l-2 14 h-4z" fill="#9eb0bc"/></svg>`
-      : a.id === "clinistix" ? `<span style="width:18px;height:28px;background:#f4b6c2;display:inline-block;border:1px solid #d48"></span>`
+      : a.id === "clinistix" ? `<span class="mini-glucose"><i></i></span>`
       : a.id === "albustix" ? `<span class="mini-albustix"><i></i></span>`
       : a.id === "burner" ? `<span style="width:22px;height:22px;background:#f4a024;border-radius:50%;display:inline-block"></span>`
       : miniTubeSVG(col);
@@ -762,8 +817,8 @@ function pieceEl(p) {
       el.classList.add("clinistix-strip");
       el.innerHTML = `
         <button class="x" type="button" data-del="${p.id}">×</button>
-        <div class="strip-pad" style="background:${ev.color}"></div>
-        <div class="tube-tag">Clinistix</div>`;
+        <div class="strip-body${ev.developing ? " developing" : ""}" style="background:${ev.color}"></div>
+        <div class="tube-tag">${ev.reading ? `Glucose · ${ev.reading}` : "Glucose paper"}</div>`;
     } else {
       el.classList.add("albustix-strip");
       el.innerHTML = `
@@ -891,7 +946,7 @@ function renderBank() {
     const pills = NUT.filter((k) => f.n[k] > 0).map((k) => `<span class="pill yes">${NUT_LABEL[k]} ${LEVEL(f.n[k])}</span>`).join("");
     const rowsN = NUT.map((k) => `<span>${NUT_LABEL[k]}</span><b>${LEVEL(f.n[k])}</b>`).join("");
     const tests = [
-      `Clinistix: ${glucoseOf(f) ? "pink → purple" : "remains pink"}`,
+      `Glucose paper: ${(() => { const b = glucoseBand(glucoseOf(f)); return b.key === "0" ? "stays light yellow (0%)" : `light yellow → ${b.word} (${b.reading})`; })()}`,
       `Benedict's: ${f.n.rs ? "brick-red ppt (more ppt = more reducing sugar)" : (f.n.nrs ? "blue until hydrolysed" : "remains blue")}`,
       `Iodine: ${f.n.starch ? "brown → blue-black" : "remains brown"}`,
       `Albustix: ${(() => { const b = albustixBand(f.n.protein); return b.key === "neg" ? "remains yellow (NEG.)" : `yellow → ${b.word} (${b.reading})`; })()}`,
@@ -1121,10 +1176,7 @@ function usePalette(appId, reagent, clientX, clientY) {
     state.selectedPiece = hit.id;
   } else if ((appId === "clinistix" || appId === "albustix") && hit?.kind === "tube") {
     const strip = addPiece("strip", { strip: appId });
-    if (hit.contents.foodId) {
-      if (appId === "albustix") dipAlbustix(strip, hit.contents.foodId);
-      else strip.foodId = hit.contents.foodId;
-    }
+    if (hit.contents.foodId) dipStrip(strip, hit.contents.foodId);
     state.selectedPiece = strip.id;
   }
 }
@@ -1138,8 +1190,7 @@ function useFoodOn(food, target, pour) {
     return;
   }
   if (target.kind === "strip") {
-    if (target.strip === "albustix") dipAlbustix(target, food.id);
-    else target.foodId = food.id;
+    dipStrip(target, food.id);
     state.selectedPiece = target.id;
   } else if (target.kind === "burner") {
     target.foodId = food.id;
@@ -1324,8 +1375,7 @@ function onPointerDown(ev) {
         if (state.dropper.fill === "ethanol" || state.dropper.fill === "alcohol") p.solvent = true;
         else if (state.dropper.fill && foodById(state.dropper.fill)) p.foodId = state.dropper.fill;
       } else if (p.kind === "strip" && state.dropper.fill && foodById(state.dropper.fill)) {
-        if (p.strip === "albustix") dipAlbustix(p, state.dropper.fill);
-        else p.foodId = state.dropper.fill;
+        dipStrip(p, state.dropper.fill);
       } else if (p.kind === "burner" && state.dropper.fill && foodById(state.dropper.fill)) {
         p.foodId = state.dropper.fill;
       }
@@ -1341,6 +1391,7 @@ function onClick(ev) {
   if (tab) { setTab(tab.dataset.tab); return; }
   const testBtn = ev.target.closest("[data-test]");
   if (testBtn) {
+    if (state.embedLocked && testBtn.dataset.test !== state.embedLocked) return;
     state.test = testBtn.dataset.test;
     const t = testById(state.test);
     if (t.conc && state.conc[t.conc.key] == null) state.conc[t.conc.key] = t.conc.def;
@@ -1367,6 +1418,10 @@ function bind() {
   document.addEventListener("pointermove", onPointerMove);
   document.addEventListener("pointerup", endDrag);
   document.getElementById("test-cat").addEventListener("change", (e) => {
+    if (state.embedLocked) {
+      e.target.value = state.testCat;
+      return;
+    }
     state.testCat = e.target.value;
     const rows = TESTS.filter((t) => !state.testCat || t.cat === state.testCat);
     if (rows.length && !rows.some((t) => t.id === state.test)) {
@@ -1401,8 +1456,7 @@ function bind() {
     const strip = state.pieces.find((p) => p.id === state.selectedPiece && p.kind === "strip")
       || [...state.pieces].reverse().find((p) => p.kind === "strip");
     if (strip && foodById(state.dropper.fill)) {
-      if (strip.strip === "albustix") dipAlbustix(strip, state.dropper.fill);
-      else strip.foodId = state.dropper.fill;
+      dipStrip(strip, state.dropper.fill);
       state.selectedPiece = strip.id;
     } else if (paper && foodById(state.dropper.fill)) {
       paper.foodId = state.dropper.fill;
@@ -1428,8 +1482,38 @@ function bind() {
   });
 }
 
+function applyQuery() {
+  const q = new URLSearchParams(location.search);
+  const testId = q.get("test");
+  const embed = q.get("embed") === "1" || q.get("ppt") === "1";
+  if (testId && testById(testId)) {
+    const t = testById(testId);
+    state.test = testId;
+    state.testCat = t.cat;
+    if (t.conc && state.conc[t.conc.key] == null) state.conc[t.conc.key] = t.conc.def;
+    if (embed) {
+      state.embedLocked = testId;
+      document.documentElement.classList.add("ppt-embed");
+    }
+  }
+}
+
+function seedApparatus() {
+  if (!state.embedLocked) return;
+  const t = testById(state.test);
+  if (!t) return;
+  if (t.extra.includes("bath")) addPiece("bath", { x: 70, y: 36, hot: t.id === "benedict" || t.id === "nrs" });
+  if (t.extra.includes("tube")) addPiece("tube", { x: 410, y: 48 });
+  if (t.extra.includes("paper")) addPiece("paper", { x: 210, y: 56 });
+  if (t.extra.includes("clinistix")) addPiece("strip", { strip: "clinistix", x: 210, y: 36 });
+  if (t.extra.includes("albustix")) addPiece("strip", { strip: "albustix", x: 210, y: 36 });
+  if (t.extra.includes("burner")) addPiece("burner", { x: 190, y: 40 });
+}
+
 function init() {
+  applyQuery();
   bind();
+  seedApparatus();
   renderLab();
   renderBank();
 }

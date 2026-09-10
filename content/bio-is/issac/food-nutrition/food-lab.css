@@ -30,6 +30,9 @@ body {
   background: var(--white);
 }
 
+html.ppt-embed .tab[data-tab="bank"] { display: none; }
+html.ppt-embed .cat-select { pointer-events: none; opacity: 0.85; }
+
 .topbar {
   flex: 0 0 auto;
   display: flex;
@@ -221,6 +224,22 @@ html.bio-embed .topbar { padding-left: 88px; }
   left: 1px; right: 1px; bottom: 1px;
   height: 7px;
   background: #f5e000;
+  border: 1px solid rgba(0,0,0,0.12);
+}
+.mini-glucose {
+  width: 10px;
+  height: 28px;
+  background: linear-gradient(180deg, #f4f0b8, #efe9a4);
+  border: 1px solid #c8c070;
+  display: inline-block;
+  position: relative;
+  border-radius: 1px;
+}
+.mini-glucose i {
+  position: absolute;
+  left: 1px; right: 1px; bottom: 1px;
+  height: 7px;
+  background: #efe9a4;
   border: 1px solid rgba(0,0,0,0.12);
 }
 
@@ -629,6 +648,19 @@ body.dragging .test-scroll {
 }
 .albustix-strip .strip-pad.developing {
   box-shadow: inset 0 0 0 1px rgba(200, 180, 0, 0.35);
+}
+.clinistix-strip { width: 22px; height: 112px; }
+.clinistix-strip .strip-body {
+  position: absolute;
+  left: 3px; right: 3px; top: 6px; bottom: 20px;
+  background: #efe9a4;
+  border: 1px solid #c8c070;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.45);
+  transition: background-color 0.7s ease;
+}
+.clinistix-strip .strip-body.developing {
+  box-shadow: inset 0 0 0 1px rgba(180, 170, 80, 0.35);
 }
 
 .burner { width: 150px; height: 110px; }
