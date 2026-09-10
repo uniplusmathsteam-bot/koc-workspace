@@ -5,10 +5,10 @@ KOC.works('chem', 'james', [
     title: '打太鼓',
     type: 'interactive',
     chapter: '寫作手法',
-    submitted: '2026-09-09',
+    submitted: '2026-09-10',
     tags: ['Interactive', '寫作', '修辭'],
     src: 'content/chem/james/taiko/index.html',
-    notes: '寫作手法配對：左邊金色鼓是手法，右邊三面鼓選作用。可選小學或中學。按 1 2 3。打錯會說明該作用屬於哪種手法，再練錯題。'
+    notes: '寫作手法太鼓：作用寫在咚／咔／大上。先選學段、類別和速度（練習會顯示例句），可先複習。答錯或錯過會暫停顯示正解，按繼續才再演奏。時機差不算錯題。'
   },
   {
     id: 'whats-it-for',
