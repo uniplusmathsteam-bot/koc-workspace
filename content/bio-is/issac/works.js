@@ -1,6 +1,17 @@
 /* Issac · Bio + IS KOC — submissions. */
 KOC.works('bio-is', 'issac', [
   {
+    id: 'cell-code-comic',
+    title: 'Cell Code Comic',
+    type: 'pdf',
+    subject: 'Bio',
+    chapter: 'Bio Ch. 2',
+    submitted: '2026-09-10',
+    tags: ['Comics', 'Cells'],
+    src: 'content/bio-is/issac/cell-code-comic.pdf',
+    notes: 'Cell code comic (new version 1).'
+  },
+  {
     id: 'food-substance-functions',
     title: 'Food Substance Functions',
     type: 'interactive',
