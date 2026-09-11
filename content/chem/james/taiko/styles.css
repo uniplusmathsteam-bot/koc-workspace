@@ -178,6 +178,14 @@ main {
   border-color: var(--navy);
 }
 
+.chip:disabled,
+.chip[disabled] {
+  opacity: 0.38;
+  cursor: default;
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
 .cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -465,11 +473,25 @@ main {
 }
 
 .gogo-flag {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   font-weight: 800;
   color: #ffb070;
   letter-spacing: 0.08em;
   animation: gogo-pulse 0.6s ease-in-out infinite alternate;
+  line-height: 1.15;
 }
+
+.gogo-flag small {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  color: #ffd7a8;
+  opacity: 0.95;
+}
+
+.gogo-flag[hidden] { display: none; }
 
 @keyframes gogo-pulse {
   from { opacity: 0.7; transform: scale(1); }
@@ -480,23 +502,30 @@ main {
   display: flex;
   align-items: baseline;
   gap: 10px;
-  margin: 4px 0 10px;
-  min-height: 1.6em;
+  margin: 4px 0 8px;
+  min-height: 1.4em;
+  flex-wrap: wrap;
 }
 
-.now-playing strong {
-  font-size: 1.35rem;
+.now-playing strong,
+.now-playing .name-hint {
+  font-size: 0.95rem;
+  font-weight: 800;
   letter-spacing: 0.02em;
+  color: #ffd7a8;
 }
+
+.now-playing .name-hint[hidden],
+#now-name[hidden] { display: none; }
 
 .now-example {
-  margin: 0 0 10px;
+  margin: 0 0 12px;
   background: var(--cream);
   color: var(--ink);
   border-radius: 14px;
-  padding: 8px 12px;
-  font-size: 15px;
-  font-weight: 700;
+  padding: 12px 14px;
+  font-size: 1.12rem;
+  font-weight: 800;
 }
 
 .now-example[hidden] { display: none; }
@@ -644,8 +673,9 @@ main {
 .hit-pad .pad-ans {
   font-size: 15px;
   font-weight: 800;
-  max-width: 6.8em;
+  max-width: 7.4em;
   text-align: center;
+  line-height: 1.25;
 }
 
 .hit-pad.don {
@@ -786,11 +816,30 @@ main {
   margin: 0 0 6px;
 }
 
+.teach-banner .teach-hit {
+  font-weight: 800;
+  margin: 0 0 6px;
+}
+
 .teach-banner .teach-ex {
   margin: 0 0 10px;
   color: var(--muted);
   font-size: 14px;
   font-weight: 700;
+}
+
+.teach-continue-hint {
+  margin: 8px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.concept-fail {
+  text-align: center;
+  font-weight: 800;
+  color: var(--bad);
+  margin: 4px 0 8px;
 }
 
 .study-card {
@@ -842,8 +891,10 @@ main {
   .top-side { align-items: flex-start; }
   .hit-pad { width: 108px; height: 108px; padding: 20px 8px 10px; }
   .hit-pad .pad-kind { font-size: 10px; }
-  .hit-pad .pad-ans { font-size: 13px; max-width: 6em; }
-  .now-playing strong { font-size: 1.15rem; }
+  .hit-pad .pad-ans { font-size: 13px; max-width: 6.4em; }
+  .now-playing strong,
+  .now-playing .name-hint { font-size: 0.88rem; }
+  .now-example { font-size: 1rem; }
   .hud { flex-wrap: wrap; justify-content: flex-start; }
   .nav { flex-wrap: wrap; }
 }

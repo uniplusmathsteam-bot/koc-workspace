@@ -1,5 +1,5 @@
 (function () {
-  const HOWTO_KEY = "dadataogu-howto-v1";
+  const HOWTO_KEY = "dadataogu-howto-v2";
   const FLASH_MS = 180;
   const hubEl = document.getElementById("hub");
   const studyEl = document.getElementById("study");
@@ -180,11 +180,12 @@
     pauseBtn.disabled = state.freeze;
   }
 
-  function chipButtons(values, attr, current) {
+  function chipButtons(values, attr, current, disabledSet) {
     return values
       .map(function (value) {
         const on = value === current ? " active" : "";
-        return `<button type="button" class="chip${on}" ${attr}="${value}">${value}</button>`;
+        const disabled = disabledSet && disabledSet[value] ? " disabled" : "";
+        return `<button type="button" class="chip${on}" ${attr}="${value}"${disabled}>${value}</button>`;
       })
       .join("");
   }
@@ -193,11 +194,15 @@
     const n = poolForRound(false).length;
     const empty = n === 0;
     const stageChips = chipButtons(
-      [COPY.stageAll, COPY.stagePrimary, COPY.stageSecondary],
+      [COPY.stageAll, COPY.stagePrimary, COPY.stageJunior, COPY.stageSenior],
       "data-stage",
       state.stage
     );
-    const catChips = chipButtons([COPY.catAll].concat(CATS), "data-cat", state.cat);
+    const catDisabled = {};
+    CATS.forEach(function (cat) {
+      if (!countPool(state.stage, cat)) catDisabled[cat] = true;
+    });
+    const catChips = chipButtons([COPY.catAll].concat(CATS), "data-cat", state.cat, catDisabled);
     const speedChips = chipButtons(
       [COPY.speedPractice, COPY.speedStandard, COPY.speedExpert],
       "data-speed",
@@ -229,35 +234,62 @@
     `;
   }
 
-  function collectDecoys(tech, correct) {
+  function techById(id) {
+    for (let i = 0; i < TECHNIQUES.length; i++) {
+      if (TECHNIQUES[i].id === id) return TECHNIQUES[i];
+    }
+    return null;
+  }
+
+  function collectDecoyTechs(tech, pool) {
     const out = [];
-    tech.decoys.forEach(function (text) {
-      if (text !== correct && tech.hits.indexOf(text) === -1 && out.indexOf(text) === -1) {
-        out.push(text);
-      }
+    const seen = {};
+    seen[tech.id] = true;
+    function add(other) {
+      if (!other || seen[other.id] || out.length >= 2) return;
+      seen[other.id] = true;
+      out.push(other);
+    }
+    function fromList(list) {
+      list.forEach(add);
+    }
+    const poolIds = {};
+    (pool || []).forEach(function (item) {
+      poolIds[item.id] = item;
     });
-    TECHNIQUES.forEach(function (other) {
-      if (out.length >= 2) return;
-      if (other.id === tech.id) return;
-      other.hits.forEach(function (text) {
-        if (out.length >= 2) return;
-        if (text !== correct && tech.hits.indexOf(text) === -1 && out.indexOf(text) === -1) {
-          out.push(text);
-        }
-      });
+    (tech.confusable || []).forEach(function (id) {
+      if (poolIds[id]) add(poolIds[id]);
     });
+    fromList(
+      shuffle(
+        (pool || []).filter(function (other) {
+          return other.cat === tech.cat;
+        })
+      )
+    );
+    fromList(shuffle(pool || []));
+    (tech.confusable || []).forEach(function (id) {
+      add(techById(id));
+    });
+    fromList(
+      shuffle(
+        TECHNIQUES.filter(function (other) {
+          return other.cat === tech.cat;
+        })
+      )
+    );
+    fromList(shuffle(TECHNIQUES));
     return out.slice(0, 2);
   }
 
   function makeTaikoDeck(pool) {
     const size = Math.min(12, pool.length);
     return shuffle(pool).slice(0, size).map(function (tech) {
-      const correct = tech.hits[Math.floor(Math.random() * tech.hits.length)];
-      const decoys = collectDecoys(tech, correct);
+      const decoys = collectDecoyTechs(tech, pool);
       const options = shuffle(
-        [{ text: correct, ok: true }].concat(
-          decoys.map(function (text) {
-            return { text: text, ok: tech.hits.indexOf(text) !== -1 };
+        [{ text: tech.name, ok: true, id: tech.id }].concat(
+          decoys.map(function (other) {
+            return { text: other.name, ok: false, id: other.id };
           })
         )
       );
@@ -267,19 +299,37 @@
         name: tech.name,
         example: tech.example,
         hits: tech.hits.slice(),
-        correct: correct,
+        correct: tech.name,
         options: options,
         missed: [],
       };
     });
   }
 
-  function matchesStage(tech) {
-    if (state.stage === COPY.stageAll) return true;
-    if (state.stage === COPY.stagePrimary) {
+  function matchesStageValue(tech, stage) {
+    if (stage === COPY.stageAll) return true;
+    if (stage === COPY.stagePrimary) {
       return tech.stage === "primary" || tech.stage === "both";
     }
-    return tech.stage === "secondary" || tech.stage === "both";
+    if (stage === COPY.stageJunior) {
+      return tech.stage === "junior" || tech.stage === "both";
+    }
+    if (stage === COPY.stageSenior) {
+      return tech.stage === "junior" || tech.stage === "senior" || tech.stage === "both";
+    }
+    return true;
+  }
+
+  function matchesStage(tech) {
+    return matchesStageValue(tech, state.stage);
+  }
+
+  function countPool(stage, cat) {
+    return TECHNIQUES.filter(function (tech) {
+      if (!matchesStageValue(tech, stage)) return false;
+      if (cat !== COPY.catAll && tech.cat !== cat) return false;
+      return true;
+    }).length;
   }
 
   function poolForRound(weakOnly) {
@@ -308,7 +358,7 @@
     return { bpm: 42, scrollMs: 4000, good: 120, ok: 250, miss: 380, drain: 1 };
   }
 
-  function showPracticeExample() {
+  function showNameHint() {
     return state.speed === COPY.speedPractice;
   }
 
@@ -479,6 +529,7 @@
       teachBanner: document.getElementById("teach-banner"),
       teachKind: document.getElementById("teach-kind"),
       teachCorrect: document.getElementById("teach-correct"),
+      teachHit: document.getElementById("teach-hit"),
       teachEx: document.getElementById("teach-ex"),
       teachContinue: document.getElementById("teach-continue"),
       pads: {
@@ -505,13 +556,16 @@
             </div>
             <span class="soul-label" id="soul-label">${COPY.soul}</span>
           </div>
-          <span class="gogo-flag" id="gogo-flag" hidden>GOGO!!</span>
+          <span class="gogo-flag" id="gogo-flag" hidden>
+            GOGO!!
+            <small>${COPY.gogoHint}</small>
+          </span>
         </div>
         <div class="now-playing">
           <span class="cat-pill" id="now-cat"></span>
-          <strong id="now-name"></strong>
+          <strong id="now-name" class="name-hint" hidden></strong>
         </div>
-        <p class="now-example" id="now-example" hidden></p>
+        <p class="now-example" id="now-example"></p>
         <div class="lane-wrap">
           <div class="combo-stack idle" id="combo-stack">
             <span id="combo-count">0</span>
@@ -522,12 +576,12 @@
           <canvas id="taiko-lane"></canvas>
         </div>
         <div class="taiko-pad-wrap">
-          <button type="button" class="hit-pad don" data-hit="don" tabindex="-1" aria-label="1 ${COPY.don}">
+          <button type="button" class="hit-pad don" data-hit="don" tabindex="-1" aria-label="1 ${COPY.don} F">
             <span class="pad-num">1</span>
             <span class="pad-kind">${COPY.don}</span>
             <span class="pad-ans" id="pad-don"></span>
           </button>
-          <button type="button" class="hit-pad ka" data-hit="ka" tabindex="-1" aria-label="2 ${COPY.ka}">
+          <button type="button" class="hit-pad ka" data-hit="ka" tabindex="-1" aria-label="2 ${COPY.ka} J">
             <span class="pad-num">2</span>
             <span class="pad-kind">${COPY.ka}</span>
             <span class="pad-ans" id="pad-ka"></span>
@@ -542,8 +596,10 @@
         <div class="teach-banner" id="teach-banner" hidden>
           <p class="teach-kind" id="teach-kind"></p>
           <p class="teach-correct" id="teach-correct"></p>
+          <p class="teach-hit" id="teach-hit"></p>
           <p class="teach-ex" id="teach-ex"></p>
           <button type="button" class="btn" id="teach-continue">${COPY.continue}</button>
+          <p class="teach-continue-hint">${COPY.continueHint}</p>
         </div>
       </div>
     `;
@@ -637,7 +693,7 @@
     const opt = note.labels[type];
     if (!opt) return false;
     if (opt.ok) return true;
-    if (note.item.hits && note.item.hits.indexOf(opt.text) !== -1) return true;
+    if (opt.text === note.item.name) return true;
     return false;
   }
 
@@ -687,27 +743,30 @@
     note.judge = result;
     note.hitType = hitType;
     const n = state.chart.length || 1;
+    const mul = state.gogo ? 2 : 1;
     const goodPts = Math.floor(1000000 / n);
     const goodFill = 100 / n;
     if (result === "good") {
       state.good += 1;
       state.combo += 1;
-      state.score += goodPts;
+      state.score += goodPts * mul;
       state.gauge = Math.min(100, state.gauge + goodFill);
       showJudgeFx(COPY.good, "good");
       holdLegend(500);
     } else if (result === "ok") {
       state.ok += 1;
       state.combo += 1;
-      state.score += Math.floor(goodPts / 2);
+      state.score += Math.floor(goodPts / 2) * mul;
       state.gauge = Math.min(100, state.gauge + goodFill / 2);
       showJudgeFx(COPY.ok, "ok");
       holdLegend(500);
     } else if (result === "late") {
       state.late += 1;
       state.combo = 0;
-      state.score += Math.floor(goodPts / 4);
-      state.gauge = Math.max(0, state.gauge - goodFill * state.diff.drain * 0.35);
+      state.score += Math.floor(goodPts / 4) * mul;
+      if (state.speed !== COPY.speedPractice) {
+        state.gauge = Math.max(0, state.gauge - goodFill * state.diff.drain * 0.35);
+      }
       showJudgeFx(COPY.late, "late");
       holdLegend(500);
     } else if (result === "wrong") {
@@ -755,9 +814,14 @@
     if (banner) banner.hidden = false;
     if (playUi && playUi.teachKind) playUi.teachKind.textContent = kindLabel;
     const drum = DRUM_NAME[note.correctType] || "";
-    const ans = note.labels[note.correctType] ? note.labels[note.correctType].text : note.item.correct;
+    const ans = note.item.name;
     if (playUi && playUi.teachCorrect) {
       playUi.teachCorrect.textContent = COPY.correct + "：" + drum + "＝" + ans;
+    }
+    if (playUi && playUi.teachHit) {
+      playUi.teachHit.textContent = note.item.hits && note.item.hits.length
+        ? COPY.hitsLabel + "：" + note.item.hits.join("、")
+        : "";
     }
     if (playUi && playUi.teachEx) {
       playUi.teachEx.textContent = note.item.example ? COPY.example + "：" + note.item.example : "";
@@ -807,24 +871,20 @@
     if (state.legendHold || state.freeze) return;
     const note = nextNote();
     if (!note || !playUi || !playUi.nowName) return;
-    playUi.nowName.textContent = note.item.name;
+    playUi.nowName.textContent = COPY.nameHint + "：" + note.item.name;
+    playUi.nowName.hidden = !showNameHint();
     playUi.nowCat.textContent = note.item.cat;
     setPadLabel("don", note.labels.don);
     setPadLabel("ka", note.labels.ka);
     setPadLabel("big", note.labels.big);
     const ex = playUi.nowExample;
     if (ex) {
-      if (showPracticeExample() && note.item.example) {
-        ex.hidden = false;
-        ex.textContent = "";
-        const lab = document.createElement("span");
-        lab.textContent = COPY.example;
-        ex.appendChild(lab);
-        ex.appendChild(document.createTextNode(note.item.example));
-      } else {
-        ex.hidden = true;
-        ex.textContent = "";
-      }
+      ex.hidden = false;
+      ex.textContent = "";
+      const lab = document.createElement("span");
+      lab.textContent = COPY.example;
+      ex.appendChild(lab);
+      ex.appendChild(document.createTextNode(note.item.example || ""));
     }
   }
 
@@ -1114,6 +1174,11 @@
     requestAnimationFrame(tick);
   }
 
+  function conceptCleared() {
+    const total = state.chart.length || 1;
+    return conceptCount() / total >= 0.8;
+  }
+
   function resultCrown() {
     if (
       state.wrong === 0 &&
@@ -1127,7 +1192,7 @@
     if (state.wrong === 0 && state.miss === 0 && state.late === 0 && state.good + state.ok > 0) {
       return { id: "fc", label: COPY.fullCombo, cls: "crown-fc" };
     }
-    if (state.gauge >= 80) {
+    if (conceptCleared()) {
       return { id: "clear", label: COPY.cleared, cls: "crown-clear" };
     }
     return { id: "fail", label: COPY.failed, cls: "crown-fail" };
@@ -1148,7 +1213,7 @@
             const ex = w.example
               ? `<div class="picked">${COPY.example}：${w.example}</div>`
               : "";
-            return `<li class="recap-pair"><div class="pair">${w.name} → ${w.correct}</div>${picked}${ex}</li>`;
+            return `<li class="recap-pair"><div class="pair">${w.name}</div><div class="picked">${COPY.hitsLabel}：${(w.hits || []).join("、")}</div>${picked}${ex}</li>`;
           })
           .join("")}</ul>`
       : `<p>${COPY.clean}。</p>`;
@@ -1163,7 +1228,8 @@
           <span>${COPY.score}</span>
           <b>${state.score}</b>
         </div>
-        <p class="concept-line">${COPY.concept} ${conceptCount()}${COPY.of}${total}</p>
+        <p class="concept-line">${COPY.concept} ${conceptCount()}${COPY.of}${total}　${COPY.conceptNeed}</p>
+        ${crown.id === "fail" ? `<p class="concept-fail">${COPY.conceptShort}</p>` : ""}
         <div class="score-row">
           <div><span>${COPY.good}</span><b>${state.good}</b></div>
           <div><span>${COPY.ok}</span><b>${state.ok}</b></div>
@@ -1320,18 +1386,22 @@
   hubEl.addEventListener("click", function (e) {
     const stageChip = e.target.closest("[data-stage]");
     if (stageChip) {
+      if (stageChip.disabled) return;
       state.stage = stageChip.getAttribute("data-stage");
+      if (!countPool(state.stage, state.cat)) state.cat = COPY.catAll;
       renderHub();
       return;
     }
     const speedChip = e.target.closest("[data-speed]");
     if (speedChip) {
+      if (speedChip.disabled) return;
       state.speed = speedChip.getAttribute("data-speed");
       renderHub();
       return;
     }
     const chip = e.target.closest("[data-cat]");
     if (chip) {
+      if (chip.disabled) return;
       state.cat = chip.getAttribute("data-cat");
       renderHub();
       return;
@@ -1413,7 +1483,10 @@
     }
     if (!howtoOverlay.hidden) return;
     if (state.freeze) {
-      if (e.code === "Space") e.preventDefault();
+      if (e.code === "Space" || e.key === "Enter") {
+        e.preventDefault();
+        endFreeze();
+      }
       return;
     }
     if (state.userPaused && (e.code === "Space" || e.key === "Enter")) {
@@ -1425,12 +1498,12 @@
     if (state.view !== "play" || state.mode !== "taiko" || state.finished) return;
     if (e.repeat) return;
     const key = e.key.toLowerCase();
-    if (key === "1") {
+    if (key === "1" || key === "f") {
       e.preventDefault();
       hit("don");
       return;
     }
-    if (key === "2") {
+    if (key === "2" || key === "j") {
       e.preventDefault();
       hit("ka");
       return;
