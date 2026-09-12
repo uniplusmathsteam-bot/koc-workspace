@@ -38,13 +38,18 @@ window.OreHuntGame = (() => {
       streak: state.streak,
       combo: state.combo,
       progress: `${state.produced}/${state.target}`,
-      timeLeft: state.timeLeft,
+      timeElapsed: state.elapsedSec,
       label: "Produced",
     });
   }
 
+  /** Full points at t=0; falls to 25% by 160s, then stays at the floor. */
+  function timeMultiplier() {
+    return Math.max(0.25, 1 - state.elapsedSec / 160);
+  }
+
   function addScore(base) {
-    const gained = base * state.combo;
+    const gained = Math.max(1, Math.round(base * state.combo * timeMultiplier()));
     state.score += gained;
     state.xpGained += Math.round(gained / 10);
     state.streak += 1;
@@ -58,7 +63,6 @@ window.OreHuntGame = (() => {
     state.streak = 0;
     state.combo = 1;
     state.mistakes += 1;
-    state.timeLeft = Math.max(0, state.timeLeft - 3);
   }
 
   function toast(msg, bad) {
@@ -310,10 +314,9 @@ window.OreHuntGame = (() => {
   }
 
   function tick() {
-    if (!state || state.paused) return;
-    state.timeLeft -= 1;
+    if (!state || state.paused || state.finished) return;
+    state.elapsedSec += 1;
     emitHud();
-    if (state.timeLeft <= 0) end();
   }
 
   function end() {
@@ -333,9 +336,9 @@ window.OreHuntGame = (() => {
     });
   }
 
-  function start(root, { durationSec = 90, target = 6, onHud, onComplete } = {}) {
+  function start(root, { target = 8, onHud, onComplete } = {}) {
     stop();
-    const count = Math.min(Math.max(1, Number(target) || 6), ORES.length);
+    const count = Math.min(Math.max(1, Number(target) || 8), ORES.length);
     const selected = shuffle(ORES).slice(0, count);
     const metalsInPlay = [...new Set(selected.map((o) => o.metal))];
 
@@ -352,7 +355,7 @@ window.OreHuntGame = (() => {
       produced: 0,
       matched: 0,
       target: count,
-      timeLeft: durationSec,
+      elapsedSec: 0,
       paused: false,
       finished: false,
       onHud,

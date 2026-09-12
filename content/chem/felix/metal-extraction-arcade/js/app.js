@@ -5,7 +5,7 @@
     {
       id: "ores",
       title: "Ore Hunt",
-      blurb: "Drag floating ores to their metal, then through the correct extraction process — against the clock.",
+      blurb: "Drag ores to their metal, then through the correct extraction process. Faster answers score more.",
       accentA: "#2563eb",
       accentB: "#0ea5e9",
       mode: "ore-hunt",
@@ -34,12 +34,6 @@
     results: document.getElementById("screen-results"),
     pathGrid: document.getElementById("path-grid"),
     totalXp: document.getElementById("total-xp-chip"),
-    teacherPanel: document.getElementById("teacher-panel"),
-    btnTeacher: document.getElementById("btn-teacher"),
-    btnCloseTeacher: document.getElementById("btn-close-teacher"),
-    btnReset: document.getElementById("btn-reset-progress"),
-    oreDuration: document.getElementById("ore-duration"),
-    oreTarget: document.getElementById("ore-target"),
     btnQuit: document.getElementById("btn-quit"),
     hudScore: document.getElementById("hud-score"),
     hudStreak: document.getElementById("hud-streak"),
@@ -136,7 +130,10 @@
     el.hudCombo.textContent = `×${data.combo ?? 1}`;
     el.hudProgress.textContent = data.progress ?? "—";
     el.hudProgressLabel.textContent = data.label || "Step";
-    if (typeof data.timeLeft === "number") {
+    if (typeof data.timeElapsed === "number") {
+      el.hudTimeWrap.classList.remove("hidden");
+      el.hudTime.textContent = String(data.timeElapsed);
+    } else if (typeof data.timeLeft === "number") {
       el.hudTimeWrap.classList.remove("hidden");
       el.hudTime.textContent = String(data.timeLeft);
     } else {
@@ -149,7 +146,6 @@
     if (!path) return;
     activePath = path;
     activeMode = path.mode;
-    el.teacherPanel.classList.add("hidden");
     stopActiveGame();
     showScreen("game");
     el.game.dataset.theme = path.id;
@@ -162,8 +158,7 @@
     if (path.mode === "ore-hunt") {
       window.OreHuntGame.start(el.stage, {
         ...shared,
-        durationSec: Number(el.oreDuration.value) || 90,
-        target: Number(el.oreTarget.value) || 6,
+        target: 8,
       });
     } else if (path.mode === "blast-furnace") {
       window.BlastFurnaceGame.start(el.stage, shared);
@@ -203,15 +198,6 @@
     renderHub();
   }
 
-  el.btnTeacher.addEventListener("click", () => el.teacherPanel.classList.toggle("hidden"));
-  el.btnCloseTeacher.addEventListener("click", () => el.teacherPanel.classList.add("hidden"));
-  el.btnReset.addEventListener("click", () => {
-    if (confirm("Reset all saved XP, stars, and best scores?")) {
-      progress = { totalXp: 0, paths: {} };
-      saveProgress();
-      renderHub();
-    }
-  });
   el.btnQuit.addEventListener("click", () => {
     if (confirm("Quit this run and return to paths?")) {
       stopActiveGame();

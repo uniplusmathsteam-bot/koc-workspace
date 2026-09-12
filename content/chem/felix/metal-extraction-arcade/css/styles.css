@@ -137,44 +137,6 @@ body {
   padding: 6px 10px;
 }
 
-.teacher-panel {
-  margin-top: 20px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: var(--radius);
-  padding: 18px;
-  color: #e8eefc;
-  display: grid;
-  gap: 12px;
-  max-width: 420px;
-}
-
-.teacher-panel h2 {
-  margin: 0;
-  font-size: 1.1rem;
-}
-
-.teacher-note {
-  margin: 0;
-  font-size: 0.85rem;
-  color: #94a3b8;
-}
-
-.field {
-  display: grid;
-  gap: 6px;
-  font-size: 0.9rem;
-}
-
-.field select {
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: #0b1220;
-  color: #fff;
-  padding: 10px 12px;
-  font: inherit;
-}
-
 .run-hud {
   display: flex;
   justify-content: space-between;
