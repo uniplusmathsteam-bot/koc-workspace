@@ -1,6 +1,17 @@
 /* Felix - Chem KOC - submissions. */
 KOC.works('chem', 'felix', [
   {
+    id: 'planet-earth-ore-extraction',
+    title: 'Planet earth: Ore extraction',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'Chem - Planet Earth',
+    submitted: '2026-09-12',
+    tags: ['Interactive', 'Ore extraction', 'Metals'],
+    src: 'content/chem/felix/planet-earth-ore-extraction/index.html',
+    notes: 'Drag ores onto cartoon lab setups for mechanical separation, heating alone, heating with carbon, or electrolysis of molten metal ore. Higher-energy methods are marked as inefficient.'
+  },
+  {
     id: 'word-equation-worksheet',
     title: 'Word Equation Worksheet',
     type: 'interactive',
@@ -11,19 +22,6 @@ KOC.works('chem', 'felix', [
     src: 'content/chem/felix/word-equation-worksheet/index.html',
     notes: 'Practice word equations for lime cycle, acid rain, metal extraction, and silver nitrate tests across three levels (drag blanks, build equations, or type). Metal questions include extraction method MC; silver nitrate is a two-step sequence with observations.'
   },
-
-  {
-    id: 'planet-earth-ore-extraction',
-    title: 'Planet earth: Ore extraction',
-    type: 'interactive',
-    subject: 'Chem',
-    chapter: 'Chem - Planet Earth',
-    submitted: '2026-09-06',
-    tags: ['Interactive', 'Ore extraction', 'Metals'],
-    src: 'content/chem/felix/planet-earth-ore-extraction/index.html',
-    notes: 'Drag ores onto the correct extraction process: mechanical separation, heating alone, heating with carbon, or electrolysis of molten metal ore.'
-  },
-
   {
     id: 'flame-test-sim',
     title: 'Flame Test Simulator',
