@@ -1,7 +1,9 @@
 (function () {
   const HOWTO_KEY = "dadataogu-howto-v2";
   const FLASH_MS = 180;
+  const THINK_MS = 2000;
   const hubEl = document.getElementById("hub");
+  const setupViewport = document.getElementById("setup-viewport");
   const studyEl = document.getElementById("study");
   const playEl = document.getElementById("play");
   const recapEl = document.getElementById("recap");
@@ -31,10 +33,17 @@
     if (CATS.indexOf(tech.cat) === -1) CATS.push(tech.cat);
   });
 
-  const DRUM_NAME = { don: COPY.don, ka: COPY.ka, big: COPY.big };
+  const DRUM_NAME = { a: COPY.letterA, b: COPY.letterB, c: COPY.letterC };
+  const LETTERS = ["a", "b", "c"];
   const NOTE_SPRITES = {};
   let playUi = null;
+  let hudNodes = null;
   let resizeRaf = 0;
+  let setupBusy = false;
+  let setupTimer = 0;
+  const reduceMotionMq = window.matchMedia
+    ? window.matchMedia("(prefers-reduced-motion: reduce)")
+    : { matches: false };
 
   const state = {
     view: "hub",
@@ -78,6 +87,9 @@
     studyList: [],
     studyIndex: 0,
     pausedDrawn: false,
+    setupStep: 0,
+    liveIndex: 0,
+    drawIndex: 0,
   };
 
   function shuffle(list) {
@@ -127,6 +139,7 @@
     homeBtn.hidden = view === "hub";
     pauseBtn.hidden = view !== "play";
     muteBtn.hidden = view !== "play";
+    if (headerLead) headerLead.hidden = view === "hub";
     updateMuteBtn();
     updatePauseBtn();
   }
@@ -149,24 +162,53 @@
     return state.good + state.ok + state.late + state.wrong + state.miss;
   }
 
+  function scoredNotes() {
+    return state.chart.filter(function (note) {
+      return note.judge !== "skip";
+    });
+  }
+
   function conceptCount() {
     return state.good + state.ok + state.late;
+  }
+
+  function preferReducedMotion() {
+    return !!reduceMotionMq.matches;
+  }
+
+  function ensureHud() {
+    if (hudNodes) return;
+    hudEl.innerHTML =
+      `<span data-hud="score"></span>` +
+      `<span data-hud="combo"></span>` +
+      `<span data-hud="good"></span>` +
+      `<span data-hud="ok"></span>` +
+      `<span data-hud="round"></span>`;
+    hudNodes = {
+      score: hudEl.querySelector('[data-hud="score"]'),
+      combo: hudEl.querySelector('[data-hud="combo"]'),
+      good: hudEl.querySelector('[data-hud="good"]'),
+      ok: hudEl.querySelector('[data-hud="ok"]'),
+      round: hudEl.querySelector('[data-hud="round"]'),
+    };
   }
 
   function updateHud() {
     if (state.view !== "play" || !state.chart.length) {
       hudEl.hidden = true;
-      hudEl.innerHTML = "";
       return;
     }
+    ensureHud();
     hudEl.hidden = false;
     const done = judgedCount();
-    hudEl.innerHTML =
-      `<span>${COPY.score} ${state.score}</span>` +
-      `<span>${COPY.combo} ${state.combo}</span>` +
-      `<span>${COPY.good} ${state.good}</span>` +
-      `<span>${COPY.ok} ${state.ok}</span>` +
-      `<span>${COPY.round}${Math.min(done + 1, state.chart.length)}${COPY.of}${state.chart.length}</span>`;
+    const total = scoredNotes().length || state.chart.length;
+    hudNodes.score.textContent = COPY.score + " " + state.score;
+    hudNodes.combo.textContent = COPY.combo + " " + state.combo;
+    hudNodes.good.textContent = COPY.good + " " + state.good;
+    hudNodes.ok.textContent = COPY.ok + " " + state.ok;
+    hudNodes.round.textContent =
+      COPY.round + Math.min(done + 1, total) + COPY.of + total;
+    if (playUi && playUi.scoreBoard) playUi.scoreBoard.textContent = String(state.score);
   }
 
   function updateMuteBtn() {
@@ -190,48 +232,160 @@
       .join("");
   }
 
-  function renderHub() {
+  function setupBackHtml() {
+    return `<div class="hub-actions"><button type="button" class="btn btn-ghost" data-setup-back="1">${COPY.setupBack}</button></div>`;
+  }
+
+  function poolCountHtml() {
     const n = poolForRound(false).length;
-    const empty = n === 0;
-    const stageChips = chipButtons(
-      [COPY.stageAll, COPY.stagePrimary, COPY.stageJunior, COPY.stageSenior],
-      "data-stage",
-      state.stage
-    );
-    const catDisabled = {};
-    CATS.forEach(function (cat) {
-      if (!countPool(state.stage, cat)) catDisabled[cat] = true;
-    });
-    const catChips = chipButtons([COPY.catAll].concat(CATS), "data-cat", state.cat, catDisabled);
-    const speedChips = chipButtons(
-      [COPY.speedPractice, COPY.speedStandard, COPY.speedExpert],
-      "data-speed",
-      state.speed
-    );
-    const emptyMsg = empty ? `<p class="empty-pool">${COPY.emptyPool}</p>` : "";
-    hubEl.innerHTML = `
-      <p class="track">${COPY.trackLearn}</p>
-      <p class="pick-cat">${COPY.pickHint}</p>
-      <p class="chip-label">${COPY.pickStage}</p>
-      <div class="chip-row">${stageChips}</div>
-      <p class="chip-label">${COPY.pickCat}</p>
-      <div class="chip-row">${catChips}</div>
-      <p class="chip-label">${COPY.pickSpeed}</p>
-      <div class="chip-row">${speedChips}</div>
-      <p class="pool-count">${COPY.poolCount} ${n} ${COPY.poolUnit}</p>
-      ${emptyMsg}
-      <div class="cards cards-one">
-        <button type="button" class="mode-card" data-start="taiko"${empty ? " disabled" : ""}>
-          <div class="icon">🥁</div>
-          <h2>${COPY.taikoName}</h2>
-          <p>${COPY.taikoLead}</p>
-        </button>
-      </div>
-      <div class="hub-actions">
-        <button type="button" class="btn" data-study="1"${empty ? " disabled" : ""}>${COPY.study}</button>
-        <button type="button" class="btn btn-ghost" data-howto="1">${COPY.howto}</button>
-      </div>
+    const emptyMsg = n === 0 ? `<p class="empty-pool">${COPY.emptyPool}</p>` : "";
+    return `<p class="pool-count">${COPY.poolCount} ${n} ${COPY.poolUnit}</p>${emptyMsg}`;
+  }
+
+  function hubPageHtml() {
+    if (state.setupStep === 0) {
+      return `
+          <p class="track">${COPY.howtoTitle}</p>
+          <p class="pick-cat">${COPY.pickHint}</p>
+          <ol class="howto-list">
+            <li>${COPY.howto1}</li>
+            <li>${COPY.howto2}</li>
+            <li>${COPY.howto3}</li>
+            <li>${COPY.howto4}</li>
+            <li>${COPY.howto5}</li>
+          </ol>
+          <div class="hub-actions">
+            <button type="button" class="btn btn-ghost" data-study="1">${COPY.study}</button>
+            <button type="button" class="btn" data-setup-next="1">${COPY.setupNext}</button>
+          </div>
+      `;
+    }
+    if (state.setupStep === 1) {
+      return `
+          <p class="track">${COPY.trackLearn}</p>
+          <p class="chip-label">${COPY.pickStage}</p>
+          <div class="chip-row">${chipButtons(
+            [COPY.stageAll, COPY.stagePrimary, COPY.stageJunior, COPY.stageSenior],
+            "data-stage",
+            state.stage
+          )}</div>
+          ${setupBackHtml()}
+      `;
+    }
+    if (state.setupStep === 2) {
+      const catDisabled = {};
+      CATS.forEach(function (cat) {
+        if (!countPool(state.stage, cat)) catDisabled[cat] = true;
+      });
+      return `
+          <p class="track">${COPY.trackLearn}</p>
+          <p class="chip-label">${COPY.pickCat}</p>
+          <div class="chip-row">${chipButtons([COPY.catAll].concat(CATS), "data-cat", state.cat, catDisabled)}</div>
+          ${poolCountHtml()}
+          ${setupBackHtml()}
+      `;
+    }
+    return `
+        <p class="track">${COPY.trackLearn}</p>
+        <p class="chip-label">${COPY.pickSpeed}</p>
+        <div class="chip-row">${chipButtons(
+          [COPY.speedPractice, COPY.speedStandard, COPY.speedExpert],
+          "data-speed",
+          state.speed
+        )}</div>
+        ${poolCountHtml()}
+        ${setupBackHtml()}
     `;
+  }
+
+  function markChipActive(chip) {
+    const row = chip.parentElement;
+    if (!row) return;
+    const chips = row.querySelectorAll(".chip");
+    for (let i = 0; i < chips.length; i++) {
+      chips[i].classList.toggle("active", chips[i] === chip);
+    }
+  }
+
+  function finishSetupSlide(incoming, outgoing) {
+    if (outgoing && outgoing.parentNode) outgoing.parentNode.removeChild(outgoing);
+    incoming.style.position = "";
+    incoming.style.top = "";
+    incoming.style.left = "";
+    incoming.style.width = "";
+    incoming.classList.remove("from-right", "from-left", "to-left", "to-right");
+    setupViewport.style.height = "";
+    setupBusy = false;
+  }
+
+  function slideSetupPage(html, dir) {
+    const incoming = document.createElement("div");
+    incoming.className = "setup-page";
+    incoming.innerHTML = html;
+    const outgoing = setupViewport.querySelector(".setup-page");
+    const animate = !!(outgoing && dir && !preferReducedMotion());
+    if (!animate) {
+      setupViewport.innerHTML = "";
+      setupViewport.appendChild(incoming);
+      setupBusy = false;
+      return;
+    }
+    setupBusy = true;
+    const fromClass = dir > 0 ? "from-right" : "from-left";
+    const toClass = dir > 0 ? "to-left" : "to-right";
+    incoming.classList.add(fromClass);
+    outgoing.style.position = "absolute";
+    outgoing.style.top = "0";
+    outgoing.style.left = "0";
+    outgoing.style.width = "100%";
+    incoming.style.position = "absolute";
+    incoming.style.top = "0";
+    incoming.style.left = "0";
+    incoming.style.width = "100%";
+    setupViewport.style.height = outgoing.offsetHeight + "px";
+    setupViewport.appendChild(incoming);
+    const endH = incoming.offsetHeight;
+    let done = false;
+    function settle() {
+      if (done) return;
+      done = true;
+      incoming.removeEventListener("transitionend", onEnd);
+      finishSetupSlide(incoming, outgoing);
+    }
+    function onEnd(e) {
+      if (e.target !== incoming || e.propertyName !== "transform") return;
+      settle();
+    }
+    incoming.addEventListener("transitionend", onEnd);
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        outgoing.classList.add(toClass);
+        incoming.classList.remove(fromClass);
+        setupViewport.style.height = endH + "px";
+      });
+    });
+    setTimeout(settle, 420);
+  }
+
+  function renderHub(dir) {
+    slideSetupPage(hubPageHtml(), dir || 0);
+  }
+
+  function goSetupStep(step, dir, highlightEl) {
+    if (setupBusy) return;
+    if (highlightEl) markChipActive(highlightEl);
+    const delay = highlightEl && !preferReducedMotion() ? 80 : 0;
+    function apply() {
+      setupTimer = 0;
+      state.setupStep = step;
+      renderHub(dir);
+    }
+    if (delay) {
+      setupBusy = true;
+      setupTimer = setTimeout(apply, delay);
+    } else {
+      apply();
+    }
   }
 
   function techById(id) {
@@ -308,6 +462,7 @@
         correct: tech.name,
         options: options,
         missed: [],
+        revealed: false,
       };
     });
   }
@@ -356,38 +511,58 @@
 
   function difficultyFor() {
     if (state.speed === COPY.speedPractice) {
-      return { bpm: 28, scrollMs: 5500, good: 200, ok: 400, miss: 600, drain: 0.25 };
+      return { bpm: 36, scrollMs: 4200, good: 200, ok: 400, miss: 600, drain: 0.25, notes: 10 };
     }
     if (state.speed === COPY.speedExpert) {
-      return { bpm: 52, scrollMs: 3200, good: 80, ok: 160, miss: 240, drain: 1.25 };
+      return { bpm: 80, scrollMs: 2000, good: 80, ok: 160, miss: 240, drain: 1.25, notes: 30 };
     }
-    return { bpm: 42, scrollMs: 4000, good: 120, ok: 250, miss: 380, drain: 1 };
+    return { bpm: 54, scrollMs: 3000, good: 120, ok: 250, miss: 380, drain: 1, notes: 20 };
+  }
+
+  function randomNotes(count, correctLetter) {
+    const pattern = [];
+    for (let i = 0; i < count; i++) {
+      pattern.push(LETTERS[Math.floor(Math.random() * LETTERS.length)]);
+    }
+    if (pattern.indexOf(correctLetter) === -1) {
+      pattern[Math.floor(Math.random() * count)] = correctLetter;
+    }
+    return pattern;
   }
 
   function makeChart(deck) {
-    const diff = state.diff;
-    const beat = 60000 / diff.bpm;
-    const startAt = beat * 4;
-    return deck.map(function (item, i) {
-      const types = shuffle(["don", "ka", "big"]);
+    const beat = 60000 / state.diff.bpm;
+    const appear = state.diff.scrollMs;
+    const notes = state.diff.notes || 20;
+    const block = THINK_MS + appear + notes * beat;
+    const chart = [];
+    deck.forEach(function (item, q) {
+      const types = shuffle(LETTERS.slice());
       const labels = {};
       item.options.forEach(function (opt, idx) {
         labels[types[idx]] = opt;
       });
-      let correctType = types[0];
+      let correctLetter = types[0];
       item.options.forEach(function (opt, idx) {
-        if (opt.ok) correctType = types[idx];
+        if (opt.ok) correctLetter = types[idx];
       });
-      return {
-        item: item,
-        time: startAt + i * beat * 4,
-        correctType: correctType,
-        labels: labels,
-        judged: false,
-        judge: null,
-        hitType: null,
-      };
+      const pattern = randomNotes(notes, correctLetter);
+      const appearAt = q * block + THINK_MS;
+      for (let i = 0; i < notes; i++) {
+        chart.push({
+          item: item,
+          time: appearAt + appear + i * beat,
+          appearAt: appearAt,
+          letter: pattern[i],
+          correctLetter: correctLetter,
+          labels: labels,
+          judged: false,
+          judge: null,
+          hitType: null,
+        });
+      }
     });
+    return chart;
   }
 
   function stopLoop() {
@@ -404,7 +579,7 @@
   function startTaiko(weakOnly) {
     const pool = poolForRound(weakOnly);
     if (!pool.length) {
-      renderHub();
+      renderHub(0);
       show("hub");
       return;
     }
@@ -438,6 +613,8 @@
     state.freeze = false;
     state.legendHold = false;
     state.pausedDrawn = false;
+    state.liveIndex = 0;
+    state.drawIndex = 0;
     hideLeaveOverlay();
     pauseOverlay.hidden = true;
     show("play");
@@ -472,18 +649,13 @@
   }
 
   function playHit(type) {
-    if (type === "ka") {
+    if (type === "a" || type === "c") {
       playTone(720, 0.07, "triangle", 0.12);
       playTone(980, 0.04, "square", 0.04);
     } else {
       playTone(160, 0.12, "sine", 0.16);
       playTone(90, 0.1, "sine", 0.08);
     }
-  }
-
-  function playCount(finalBeat) {
-    if (finalBeat) playHit("don");
-    else playTone(880, 0.05, "square", 0.06);
   }
 
   function gameNow() {
@@ -504,10 +676,14 @@
   }
 
   function nextNote() {
-    for (let i = 0; i < state.chart.length; i++) {
-      if (!state.chart[i].judged) return state.chart[i];
-    }
+    if (state.liveIndex < state.chart.length) return state.chart[state.liveIndex];
     return state.chart[state.chart.length - 1] || null;
+  }
+
+  function advanceLiveIndex() {
+    while (state.liveIndex < state.chart.length && state.chart[state.liveIndex].judged) {
+      state.liveIndex += 1;
+    }
   }
 
   function gogoIndex() {
@@ -530,19 +706,23 @@
       nowExample: document.getElementById("now-example"),
       teachBanner: document.getElementById("teach-banner"),
       teachKind: document.getElementById("teach-kind"),
+      teachStats: document.getElementById("teach-stats"),
       teachCorrect: document.getElementById("teach-correct"),
       teachHit: document.getElementById("teach-hit"),
       teachEx: document.getElementById("teach-ex"),
       teachContinue: document.getElementById("teach-continue"),
+      drum: document.getElementById("taiko-drum"),
+      scoreBoard: document.getElementById("score-board"),
       pads: {
-        don: playEl.querySelector('[data-hit="don"]'),
-        ka: playEl.querySelector('[data-hit="ka"]'),
-        big: playEl.querySelector('[data-hit="big"]'),
+        a: playEl.querySelector('[data-hit="a"]'),
+        b: playEl.querySelector('[data-hit="b"]'),
+        c: playEl.querySelector('[data-hit="c"]'),
+        skip: playEl.querySelector("[data-skip]"),
       },
       padAns: {
-        don: document.getElementById("pad-don"),
-        ka: document.getElementById("pad-ka"),
-        big: document.getElementById("pad-big"),
+        a: document.getElementById("pad-a"),
+        b: document.getElementById("pad-b"),
+        c: document.getElementById("pad-c"),
       },
     };
   }
@@ -568,35 +748,51 @@
           <strong id="now-name" class="name-hint" hidden></strong>
         </div>
         <p class="now-example" id="now-example"></p>
-        <div class="lane-wrap">
-          <div class="combo-stack idle" id="combo-stack">
-            <span id="combo-count">0</span>
-            <small>${COPY.combo}</small>
+        <div class="playfield-row">
+          <div class="drum-col">
+            <div class="drum-score" id="score-board">0</div>
+            <div class="taiko-drum" id="taiko-drum" aria-hidden="true">
+              <div class="drum-face"></div>
+              <div class="drum-flash blue-left"></div>
+              <div class="drum-flash red"></div>
+              <div class="drum-flash blue-right"></div>
+            </div>
           </div>
-          <div class="judge-fx" id="judge-fx"></div>
-          <div class="count-fx" id="count-fx"></div>
-          <canvas id="taiko-lane"></canvas>
+          <div class="lane-wrap">
+            <div class="combo-stack idle" id="combo-stack">
+              <span id="combo-count">0</span>
+              <small>${COPY.combo}</small>
+            </div>
+            <div class="judge-fx" id="judge-fx"></div>
+            <div class="count-fx" id="count-fx"></div>
+            <canvas id="taiko-lane"></canvas>
+          </div>
         </div>
         <div class="taiko-pad-wrap">
-          <button type="button" class="hit-pad don" data-hit="don" tabindex="-1" aria-label="1 ${COPY.don} F">
+          <button type="button" class="hit-pad a" data-hit="a" tabindex="-1" aria-label="1 ${COPY.letterA}">
             <span class="pad-num">1</span>
-            <span class="pad-kind">${COPY.don}</span>
-            <span class="pad-ans" id="pad-don"></span>
+            <span class="pad-kind">${COPY.letterA}</span>
+            <span class="pad-ans" id="pad-a"></span>
           </button>
-          <button type="button" class="hit-pad ka" data-hit="ka" tabindex="-1" aria-label="2 ${COPY.ka} J">
+          <button type="button" class="hit-pad b" data-hit="b" tabindex="-1" aria-label="2 ${COPY.letterB}">
             <span class="pad-num">2</span>
-            <span class="pad-kind">${COPY.ka}</span>
-            <span class="pad-ans" id="pad-ka"></span>
+            <span class="pad-kind">${COPY.letterB}</span>
+            <span class="pad-ans" id="pad-b"></span>
           </button>
-          <button type="button" class="hit-pad big" data-hit="big" tabindex="-1" aria-label="3 ${COPY.big}">
+          <button type="button" class="hit-pad c" data-hit="c" tabindex="-1" aria-label="3 ${COPY.letterC}">
             <span class="pad-num">3</span>
-            <span class="pad-kind">${COPY.big}</span>
-            <span class="pad-ans" id="pad-big"></span>
+            <span class="pad-kind">${COPY.letterC}</span>
+            <span class="pad-ans" id="pad-c"></span>
+          </button>
+          <button type="button" class="hit-pad skip" data-skip tabindex="-1" aria-label="${COPY.skip}">
+            <span class="pad-kind">${COPY.skip}</span>
+            <span class="pad-ans">${COPY.skipKey}</span>
           </button>
         </div>
         <p class="key-hint">${COPY.keys}</p>
         <div class="teach-banner" id="teach-banner" hidden>
           <p class="teach-kind" id="teach-kind"></p>
+          <p class="teach-stats" id="teach-stats"></p>
           <p class="teach-correct" id="teach-correct"></p>
           <p class="teach-hit" id="teach-hit"></p>
           <p class="teach-ex" id="teach-ex"></p>
@@ -641,6 +837,23 @@
         hit(el.getAttribute("data-hit"));
       });
     });
+    const skipEl = playEl.querySelector("[data-skip]");
+    if (skipEl) {
+      let fromPointer = false;
+      skipEl.addEventListener("pointerdown", function (e) {
+        e.preventDefault();
+        fromPointer = true;
+        skip();
+      });
+      skipEl.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (fromPointer) {
+          fromPointer = false;
+          return;
+        }
+        skip();
+      });
+    }
   }
 
   function resizeLane() {
@@ -682,6 +895,19 @@
     el._flashTimer = setTimeout(done, 140);
   }
 
+  function flashDrum(type) {
+    const el = playUi && playUi.drum;
+    if (!el) return;
+    el.classList.remove("flash-a", "flash-b", "flash-c");
+    void el.offsetWidth;
+    el.classList.add("flash-" + type);
+    clearTimeout(el._flashTimer);
+    el._flashTimer = setTimeout(function () {
+      el.classList.remove("flash-a", "flash-b", "flash-c");
+      el._flashTimer = null;
+    }, 120);
+  }
+
   function showJudgeFx(text, kind) {
     const el = playUi && playUi.judgeFx;
     if (!el) return;
@@ -692,11 +918,38 @@
   }
 
   function optionIsCorrect(note, type) {
-    const opt = note.labels[type];
-    if (!opt) return false;
-    if (opt.ok) return true;
-    if (opt.text === note.item.name) return true;
-    return false;
+    return type === note.letter && note.letter === note.correctLetter;
+  }
+
+  function nearestNote(now) {
+    let best = null;
+    let bestAbs = Infinity;
+    for (let i = state.liveIndex; i < state.chart.length; i++) {
+      const note = state.chart[i];
+      if (note.judged) continue;
+      const abs = Math.abs(note.time - now);
+      if (abs > state.diff.miss) {
+        if (note.time - now > state.diff.miss) break;
+        continue;
+      }
+      if (abs < bestAbs) {
+        best = note;
+        bestAbs = abs;
+      }
+    }
+    return best;
+  }
+
+  function timingResult(dt) {
+    if (dt <= state.diff.good) return "good";
+    if (dt <= state.diff.ok) return "ok";
+    return "late";
+  }
+
+  function showReveal(item) {
+    if (!playUi || !playUi.nowName || !item) return;
+    playUi.nowName.hidden = false;
+    playUi.nowName.textContent = item.name;
   }
 
   function hit(type) {
@@ -705,27 +958,30 @@
     const now = gameNow();
     playHit(type);
     flashPad(type);
-    let best = null;
-    let bestAbs = Infinity;
-    state.chart.forEach(function (note) {
-      if (note.judged) return;
-      const abs = Math.abs(note.time - now);
-      if (abs <= state.diff.miss && abs < bestAbs) {
-        best = note;
-        bestAbs = abs;
-      }
-    });
+    flashDrum(type);
+    const best = nearestNote(now);
     if (!best) {
       showJudgeFx(COPY.ghost, "ghost");
       return;
     }
     const dt = Math.abs(best.time - now);
-    let result = "wrong";
-    if (!optionIsCorrect(best, type)) result = "wrong";
-    else if (dt <= state.diff.good) result = "good";
-    else if (dt <= state.diff.ok) result = "ok";
-    else result = "late";
+    const result = optionIsCorrect(best, type) ? timingResult(dt) : "wrong";
     applyJudge(best, result, type);
+  }
+
+  function skip() {
+    if (state.view !== "play" || state.mode !== "taiko" || state.finished) return;
+    if (playBlocked()) return;
+    const now = gameNow();
+    flashPad("skip");
+    const best = nearestNote(now);
+    if (!best) {
+      showJudgeFx(COPY.ghost, "ghost");
+      return;
+    }
+    const dt = Math.abs(best.time - now);
+    const result = best.letter !== best.correctLetter ? timingResult(dt) : "wrong";
+    applyJudge(best, result, null);
   }
 
   function markWeak(note, picked) {
@@ -739,33 +995,59 @@
     }
   }
 
+  function questionDone(item) {
+    return state.chart.every(function (n) {
+      return n.item.id !== item.id || n.judged;
+    });
+  }
+
+  function questionStats(item) {
+    let hit = 0;
+    let miss = 0;
+    state.chart.forEach(function (n) {
+      if (n.item.id !== item.id || !n.judged || n.judge === "skip") return;
+      if (n.judge === "good" || n.judge === "ok" || n.judge === "late") hit += 1;
+      else miss += 1;
+    });
+    const total = hit + miss || 1;
+    return {
+      hit: hit,
+      miss: miss,
+      rate: Math.round((hit / total) * 100),
+    };
+  }
+
   function applyJudge(note, result, hitType) {
     if (note.judged) return;
     note.judged = true;
     note.judge = result;
     note.hitType = hitType;
     const n = state.chart.length || 1;
-    const mul = state.gogo ? 2 : 1;
-    const goodPts = Math.floor(1000000 / n);
     const goodFill = 100 / n;
+    if (result === "good" || result === "ok" || result === "late") {
+      if (note.letter === note.correctLetter) {
+        note.item.revealed = true;
+        showReveal(note.item);
+      }
+    }
     if (result === "good") {
       state.good += 1;
       state.combo += 1;
-      state.score += goodPts * mul;
+      state.score += 100;
       state.gauge = Math.min(100, state.gauge + goodFill);
       showJudgeFx(COPY.good, "good");
       holdLegend(500);
     } else if (result === "ok") {
       state.ok += 1;
       state.combo += 1;
-      state.score += Math.floor(goodPts / 2) * mul;
+      state.score += 50;
       state.gauge = Math.min(100, state.gauge + goodFill / 2);
       showJudgeFx(COPY.ok, "ok");
       holdLegend(500);
     } else if (result === "late") {
       state.late += 1;
       state.combo = 0;
-      state.score += Math.floor(goodPts / 4) * mul;
+      state.score += 50;
       if (state.speed !== COPY.speedPractice) {
         state.gauge = Math.max(0, state.gauge - goodFill * state.diff.drain * 0.35);
       }
@@ -779,21 +1061,25 @@
       let picked = COPY.wrong;
       if (hitType && note.labels[hitType]) picked = note.labels[hitType].text;
       markWeak(note, picked);
-      startFreeze(note, COPY.wrong);
     } else {
       state.miss += 1;
       state.combo = 0;
       state.gauge = Math.max(0, state.gauge - goodFill * state.diff.drain);
       showJudgeFx(COPY.missedNote, "miss");
       markWeak(note, COPY.missedNote);
-      startFreeze(note, COPY.missedNote);
     }
     if (state.combo > state.maxCombo) state.maxCombo = state.combo;
     state.flash = { at: performance.now(), kind: result };
     state.pausedDrawn = false;
+    advanceLiveIndex();
     updateSoul();
     updateHud();
     updateComboDom();
+    if (questionDone(note.item) && !state.freeze) {
+      note.item.revealed = true;
+      showReveal(note.item);
+      startFreeze(note, COPY.explainTitle);
+    }
   }
 
   function holdLegend(ms) {
@@ -815,7 +1101,12 @@
     const banner = playUi && playUi.teachBanner;
     if (banner) banner.hidden = false;
     if (playUi && playUi.teachKind) playUi.teachKind.textContent = kindLabel;
-    const drum = DRUM_NAME[note.correctType] || "";
+    if (playUi && playUi.teachStats) {
+      const stats = questionStats(note.item);
+      playUi.teachStats.textContent =
+        COPY.qHit + " " + stats.hit + "　" + COPY.qMiss + " " + stats.miss + "　" + COPY.qRate + " " + stats.rate + "%";
+    }
+    const drum = DRUM_NAME[note.correctLetter] || "";
     const ans = note.item.name;
     if (playUi && playUi.teachCorrect) {
       playUi.teachCorrect.textContent = COPY.correct + "：" + drum + "＝" + ans;
@@ -828,9 +1119,9 @@
     if (playUi && playUi.teachEx) {
       playUi.teachEx.textContent = note.item.example ? COPY.example + "：" + note.item.example : "";
     }
-    ["don", "ka", "big"].forEach(function (type) {
+    LETTERS.forEach(function (type) {
       const el = playUi && playUi.pads ? playUi.pads[type] : null;
-      if (el) el.classList.toggle("correct-glow", type === note.correctType);
+      if (el) el.classList.toggle("correct-glow", type === note.correctLetter);
     });
     if (playUi && playUi.teachContinue) playUi.teachContinue.focus();
   }
@@ -839,7 +1130,7 @@
     const was = state.freeze;
     state.freeze = false;
     if (playUi && playUi.teachBanner) playUi.teachBanner.hidden = true;
-    ["don", "ka", "big"].forEach(function (type) {
+    LETTERS.forEach(function (type) {
       const el = playUi && playUi.pads ? playUi.pads[type] : null;
       if (el) el.classList.remove("correct-glow");
     });
@@ -863,22 +1154,28 @@
 
   function missPassed(now) {
     if (playBlocked()) return;
-    state.chart.forEach(function (note) {
-      if (note.judged) return;
-      if (now - note.time > state.diff.miss) applyJudge(note, "miss", null);
-    });
+    for (let i = state.liveIndex; i < state.chart.length; i++) {
+      const note = state.chart[i];
+      if (note.judged) continue;
+      if (now - note.time <= state.diff.miss) break;
+      applyJudge(note, "miss", null);
+    }
   }
 
   function updateLegend() {
     if (state.legendHold || state.freeze) return;
     const note = nextNote();
     if (!note || !playUi || !playUi.nowName) return;
-    playUi.nowName.hidden = true;
-    playUi.nowName.textContent = "";
+    if (note.item.revealed) {
+      showReveal(note.item);
+    } else {
+      playUi.nowName.hidden = true;
+      playUi.nowName.textContent = "";
+    }
     playUi.nowCat.textContent = note.item.cat;
-    setPadLabel("don", note.labels.don);
-    setPadLabel("ka", note.labels.ka);
-    setPadLabel("big", note.labels.big);
+    setPadLabel("a", note.labels.a);
+    setPadLabel("b", note.labels.b);
+    setPadLabel("c", note.labels.c);
     const ex = playUi.nowExample;
     if (ex) {
       ex.hidden = false;
@@ -924,27 +1221,37 @@
     if (playUi && playUi.gogoFlag) playUi.gogoFlag.hidden = !on;
   }
 
+  function clearCountFx() {
+    const el = playUi && playUi.countFx;
+    if (el && el.textContent) {
+      el.textContent = "";
+      el.className = "count-fx";
+    }
+    if (state.lastCount !== -1) state.lastCount = -1;
+  }
+
   function updateCountFx(now) {
     const el = playUi && playUi.countFx;
     if (!el) return;
-    const beat = 60000 / state.diff.bpm;
-    if (now >= beat * 4) {
-      if (state.lastCount !== -2) {
-        el.textContent = "";
-        el.className = "count-fx";
-        state.lastCount = -2;
-      }
+    const note = nextNote();
+    if (!note || note.judged) {
+      clearCountFx();
       return;
     }
-    const i = Math.max(0, Math.min(3, Math.floor(now / beat)));
-    if (i === state.lastCount) return;
-    state.lastCount = i;
-    const labels = ["3", "2", "1", COPY.go];
-    el.textContent = labels[i];
+    const start = note.appearAt - THINK_MS;
+    const end = note.appearAt;
+    if (now < start || now >= end) {
+      clearCountFx();
+      return;
+    }
+    const step = Math.min(3, Math.floor((now - start) / (THINK_MS / 4)));
+    if (step === state.lastCount) return;
+    state.lastCount = step;
+    const labels = ["3", "2", "1", COPY.countStart];
+    el.textContent = labels[step];
     el.className = "count-fx";
     void el.offsetWidth;
-    el.className = "count-fx show";
-    playCount(i === 3);
+    el.className = "count-fx show" + (step === 3 ? " go" : "");
   }
 
   function roundRect(c, x, y, w, h, r) {
@@ -967,18 +1274,6 @@
     c.lineWidth = Math.max(4, r * 0.14);
     c.strokeStyle = rim;
     c.stroke();
-    c.fillStyle = "#3a2010";
-    c.beginPath();
-    c.arc(x - r * 0.28, y - r * 0.12, r * 0.1, 0, Math.PI * 2);
-    c.fill();
-    c.beginPath();
-    c.arc(x + r * 0.28, y - r * 0.12, r * 0.1, 0, Math.PI * 2);
-    c.fill();
-    c.beginPath();
-    c.strokeStyle = "#3a2010";
-    c.lineWidth = 2;
-    c.arc(x, y + r * 0.12, r * 0.28, 0.15 * Math.PI, 0.85 * Math.PI);
-    c.stroke();
     c.restore();
   }
 
@@ -995,45 +1290,86 @@
     return { canvas: cv, size: size };
   }
 
+  function makeNoteSprite(letter) {
+    const base = makeFaceSprite(28, "#fff4d6", "#c4a15a");
+    const c = base.canvas.getContext("2d");
+    const dpr = 2;
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const cx = base.size / 2;
+    const cy = base.size / 2;
+    c.fillStyle = "#3a2010";
+    c.font = "800 22px Segoe UI, PingFang TC, sans-serif";
+    c.textAlign = "center";
+    c.textBaseline = "middle";
+    c.fillText(DRUM_NAME[letter] || "", cx, cy);
+    return base;
+  }
+
+  function makeMissSprite() {
+    const r = 28;
+    const pad = Math.ceil(r * 0.22) + 6;
+    const dpr = 2;
+    const size = (r + pad) * 2;
+    const cv = document.createElement("canvas");
+    cv.width = Math.ceil(size * dpr);
+    cv.height = Math.ceil(size * dpr);
+    const c = cv.getContext("2d");
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const x = r + pad;
+    const y = r + pad;
+    c.strokeStyle = "#d92d20";
+    c.lineWidth = 3;
+    c.beginPath();
+    c.moveTo(x - 10, y - 10);
+    c.lineTo(x + 10, y + 10);
+    c.moveTo(x + 10, y - 10);
+    c.lineTo(x - 10, y + 10);
+    c.stroke();
+    return { canvas: cv, size: size };
+  }
+
   function ensureNoteSprites() {
-    if (NOTE_SPRITES.cream) return;
-    NOTE_SPRITES.cream = makeFaceSprite(28, "#fff4d6", "#c4a15a");
-    NOTE_SPRITES.don = makeFaceSprite(28, "#e4453a", "#8e1010");
-    NOTE_SPRITES.ka = makeFaceSprite(28, "#5eb6e6", "#1d6fa3");
-    NOTE_SPRITES.big = makeFaceSprite(36, "#f5c542", "#c48a12");
+    if (NOTE_SPRITES.a) return;
+    NOTE_SPRITES.a = makeNoteSprite("a");
+    NOTE_SPRITES.b = makeNoteSprite("b");
+    NOTE_SPRITES.c = makeNoteSprite("c");
+    NOTE_SPRITES.missX = makeMissSprite();
   }
 
   function blitNote(c, sprite, x, y, alpha) {
     const dest = sprite.size;
-    c.save();
     c.globalAlpha = alpha;
     c.drawImage(sprite.canvas, x - dest / 2, y - dest / 2, dest, dest);
-    c.restore();
+    c.globalAlpha = 1;
   }
 
   function noteSprite(note) {
-    if (!note.judged) return { sprite: NOTE_SPRITES.cream, alpha: 1 };
+    const sprite = NOTE_SPRITES[note.letter] || NOTE_SPRITES.a;
+    if (note.judge === "skip") return { sprite: sprite, alpha: 0.2, miss: false };
+    if (!note.judged) return { sprite: sprite, alpha: 1, miss: false };
     const fail = note.judge === "wrong" || note.judge === "miss";
-    const alpha = fail ? 0.4 : 1;
-    if (note.correctType === "ka") return { sprite: NOTE_SPRITES.ka, alpha: alpha };
-    if (note.correctType === "big") return { sprite: NOTE_SPRITES.big, alpha: alpha };
-    return { sprite: NOTE_SPRITES.don, alpha: alpha };
+    return { sprite: sprite, alpha: fail ? 0.4 : 1, miss: fail };
   }
 
-  function flashActive() {
-    return !!(state.flash && performance.now() - state.flash.at < FLASH_MS);
-  }
-
-  function drawLane(now) {
-    const c = state.laneCtx;
-    if (!c || !state.lane) return;
-    ensureNoteSprites();
+  function ensureTrackSprite() {
+    if (
+      NOTE_SPRITES.track &&
+      NOTE_SPRITES.trackGogo === state.gogo &&
+      NOTE_SPRITES.trackW === state.laneW &&
+      NOTE_SPRITES.trackH === state.laneH &&
+      NOTE_SPRITES.trackDpr === state.dpr &&
+      NOTE_SPRITES.trackJudgeX === state.judgeX
+    ) {
+      return;
+    }
     const dpr = state.dpr;
-    c.setTransform(dpr, 0, 0, dpr, 0, 0);
     const w = state.laneW;
     const h = state.laneH;
-    c.clearRect(0, 0, w, h);
-
+    const cv = document.createElement("canvas");
+    cv.width = Math.floor(w * dpr);
+    cv.height = Math.floor(h * dpr);
+    const c = cv.getContext("2d");
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
     const trackY = 42;
     const trackH = 66;
     c.save();
@@ -1047,10 +1383,8 @@
       c.fill();
     }
     c.restore();
-
     const jx = state.judgeX;
     const jy = trackY + trackH / 2;
-
     c.beginPath();
     c.arc(jx, jy, 34, 0, Math.PI * 2);
     c.strokeStyle = "rgba(245, 197, 66, 0.35)";
@@ -1061,6 +1395,32 @@
     c.strokeStyle = "#f5c542";
     c.lineWidth = 3;
     c.stroke();
+    NOTE_SPRITES.track = cv;
+    NOTE_SPRITES.trackGogo = state.gogo;
+    NOTE_SPRITES.trackW = w;
+    NOTE_SPRITES.trackH = h;
+    NOTE_SPRITES.trackDpr = dpr;
+    NOTE_SPRITES.trackJudgeX = jx;
+  }
+
+  function flashActive() {
+    return !!(state.flash && performance.now() - state.flash.at < FLASH_MS);
+  }
+
+  function drawLane(now) {
+    const c = state.laneCtx;
+    if (!c || !state.lane) return;
+    ensureNoteSprites();
+    ensureTrackSprite();
+    const dpr = state.dpr;
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const w = state.laneW;
+    const h = state.laneH;
+    c.clearRect(0, 0, w, h);
+    c.drawImage(NOTE_SPRITES.track, 0, 0, w, h);
+
+    const jx = state.judgeX;
+    const jy = 42 + 66 / 2;
 
     if (flashActive()) {
       const t = (performance.now() - state.flash.at) / FLASH_MS;
@@ -1076,25 +1436,23 @@
       c.stroke();
     }
 
-    for (let i = state.chart.length - 1; i >= 0; i--) {
+    const span = w - jx - 28;
+    const missX = NOTE_SPRITES.missX;
+    while (state.drawIndex < state.chart.length) {
+      const early = state.chart[state.drawIndex];
+      if (now < early.appearAt) break;
+      const gone = jx + ((early.time - now) / state.diff.scrollMs) * span;
+      if (gone >= -48) break;
+      state.drawIndex += 1;
+    }
+    for (let i = state.drawIndex; i < state.chart.length; i++) {
       const note = state.chart[i];
-      const x = jx + ((note.time - now) / state.diff.scrollMs) * (w - jx - 28);
-      if (x < -48 || x > w + 48) continue;
+      if (now < note.appearAt) break;
+      const x = jx + ((note.time - now) / state.diff.scrollMs) * span;
+      if (x > w + 48) break;
       const look = noteSprite(note);
       blitNote(c, look.sprite, x, jy, look.alpha);
-      if (note.judged && (note.judge === "wrong" || note.judge === "miss")) {
-        c.save();
-        c.globalAlpha = 0.8;
-        c.strokeStyle = "#d92d20";
-        c.lineWidth = 3;
-        c.beginPath();
-        c.moveTo(x - 10, jy - 10);
-        c.lineTo(x + 10, jy + 10);
-        c.moveTo(x + 10, jy - 10);
-        c.lineTo(x - 10, jy + 10);
-        c.stroke();
-        c.restore();
-      }
+      if (look.miss) blitNote(c, missX, x, jy, 0.8);
     }
   }
 
@@ -1125,10 +1483,7 @@
   function maybeFinish(now) {
     if (state.finished || !state.chart.length || state.freeze) return;
     const last = state.chart[state.chart.length - 1];
-    const allDone = state.chart.every(function (n) {
-      return n.judged;
-    });
-    if (allDone && now > last.time + 700) {
+    if (state.liveIndex >= state.chart.length && now > last.time + 700) {
       state.finished = true;
       stopLoop();
       state.timer = setTimeout(renderRecap, 380);
@@ -1136,6 +1491,7 @@
   }
 
   function burstConfetti() {
+    if (preferReducedMotion()) return;
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     const w = window.innerWidth;
     const h = window.innerHeight;
@@ -1145,7 +1501,7 @@
     confettiEl.style.height = h + "px";
     const c = confettiEl.getContext("2d");
     const bits = [];
-    for (let i = 0; i < 80; i++) {
+    for (let i = 0; i < 40; i++) {
       bits.push({
         x: Math.random() * w,
         y: -20 - Math.random() * 80,
@@ -1177,7 +1533,7 @@
   }
 
   function conceptCleared() {
-    const total = state.chart.length || 1;
+    const total = scoredNotes().length || 1;
     return conceptCount() / total >= 0.8;
   }
 
@@ -1205,7 +1561,7 @@
     hudEl.hidden = true;
     playUi = null;
     const crown = resultCrown();
-    const total = state.chart.length || 1;
+    const total = scoredNotes().length || 1;
     const weak = state.weak.length
       ? `<p>${COPY.keep}</p><ul class="weak-list">${state.weak
           .map(function (w) {
@@ -1278,20 +1634,20 @@
         <div class="study-actions">
           <button type="button" class="btn btn-ghost" data-study-prev="1">${COPY.prev}</button>
           <button type="button" class="btn btn-ghost" data-study-next="1">${COPY.next}</button>
-          <button type="button" class="btn" data-start="taiko">${COPY.start}</button>
+          <button type="button" class="btn" data-setup-next="1">${COPY.setupNext}</button>
         </div>
       </div>
     `;
   }
 
   function openStudy() {
-    const pool = poolForRound(false);
+    const pool = TECHNIQUES.slice();
     if (!pool.length) {
       renderHub();
       show("hub");
       return;
     }
-    state.studyList = pool.slice();
+    state.studyList = pool;
     state.studyIndex = 0;
     renderStudy();
   }
@@ -1305,11 +1661,6 @@
       `<li>${COPY.howto5}</li>`;
   }
 
-  function showHowto() {
-    fillHowto();
-    howtoOverlay.hidden = false;
-  }
-
   function hideHowto(save) {
     howtoOverlay.hidden = true;
     if (save) {
@@ -1317,15 +1668,6 @@
         localStorage.setItem(HOWTO_KEY, "1");
       } catch (err) {}
     }
-  }
-
-  function maybeShowHowto() {
-    try {
-      if (localStorage.getItem(HOWTO_KEY)) return;
-    } catch (err) {
-      return;
-    }
-    showHowto();
   }
 
   function pausePlay() {
@@ -1379,47 +1721,64 @@
     state.chart = [];
     state.finished = true;
     state.studyList = [];
+    state.setupStep = 0;
     playUi = null;
+    setupBusy = false;
+    if (setupTimer) {
+      clearTimeout(setupTimer);
+      setupTimer = 0;
+    }
     show("hub");
-    renderHub();
+    renderHub(0);
     updateHud();
   }
 
+  function setupBack() {
+    if (state.setupStep <= 0 || setupBusy) return;
+    goSetupStep(state.setupStep - 1, -1);
+  }
+
   hubEl.addEventListener("click", function (e) {
+    if (setupBusy) return;
+    if (e.target.closest("[data-setup-back]")) {
+      setupBack();
+      return;
+    }
+    if (e.target.closest("[data-setup-next]")) {
+      goSetupStep(1, 1);
+      return;
+    }
     const stageChip = e.target.closest("[data-stage]");
     if (stageChip) {
       if (stageChip.disabled) return;
       state.stage = stageChip.getAttribute("data-stage");
       if (!countPool(state.stage, state.cat)) state.cat = COPY.catAll;
-      renderHub();
+      goSetupStep(2, 1, stageChip);
       return;
     }
     const speedChip = e.target.closest("[data-speed]");
     if (speedChip) {
       if (speedChip.disabled) return;
+      markChipActive(speedChip);
       state.speed = speedChip.getAttribute("data-speed");
-      renderHub();
+      setupBusy = true;
+      setupTimer = setTimeout(function () {
+        setupTimer = 0;
+        setupBusy = false;
+        startTaiko(false);
+      }, preferReducedMotion() ? 0 : 80);
       return;
     }
     const chip = e.target.closest("[data-cat]");
     if (chip) {
       if (chip.disabled) return;
       state.cat = chip.getAttribute("data-cat");
-      renderHub();
-      return;
-    }
-    if (e.target.closest("[data-howto]")) {
-      showHowto();
+      goSetupStep(3, 1, chip);
       return;
     }
     if (e.target.closest("[data-study]")) {
-      if (e.target.closest("[data-study]").disabled) return;
       openStudy();
-      return;
     }
-    const start = e.target.closest("[data-start]");
-    if (!start || start.disabled) return;
-    if (start.getAttribute("data-start") === "taiko") startTaiko(false);
   });
 
   studyEl.addEventListener("click", function (e) {
@@ -1433,8 +1792,11 @@
       renderStudy();
       return;
     }
-    const start = e.target.closest("[data-start]");
-    if (start && start.getAttribute("data-start") === "taiko") startTaiko(false);
+    if (e.target.closest("[data-setup-next]")) {
+      state.setupStep = 1;
+      show("hub");
+      renderHub(0);
+    }
   });
 
   recapEl.addEventListener("click", function (e) {
@@ -1476,6 +1838,10 @@
         requestLeave();
         return;
       }
+      if (state.view === "hub" && state.setupStep > 0) {
+        setupBack();
+        return;
+      }
       if (state.view === "play") {
         requestLeave();
         return;
@@ -1500,19 +1866,24 @@
     if (state.view !== "play" || state.mode !== "taiko" || state.finished) return;
     if (e.repeat) return;
     const key = e.key.toLowerCase();
-    if (key === "1" || key === "f") {
+    if (key === "1" || key === "c") {
       e.preventDefault();
-      hit("don");
+      hit("a");
       return;
     }
-    if (key === "2" || key === "j") {
+    if (key === "2" || key === "v" || key === "b") {
       e.preventDefault();
-      hit("ka");
+      hit("b");
       return;
     }
-    if (e.code === "Space" || key === "3") {
+    if (key === "3" || key === "n") {
       e.preventDefault();
-      hit("big");
+      hit("c");
+      return;
+    }
+    if (e.code === "Space") {
+      e.preventDefault();
+      skip();
     }
   });
 
@@ -1540,5 +1911,4 @@
   fillHowto();
   renderHub();
   show("hub");
-  maybeShowHowto();
 })();

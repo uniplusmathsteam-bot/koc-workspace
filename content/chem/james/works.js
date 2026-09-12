@@ -8,7 +8,7 @@ KOC.works('chem', 'james', [
     submitted: '2026-09-12',
     tags: ['Interactive', '寫作', '修辭'],
     src: 'content/chem/james/taiko/index.html',
-    notes: '看例句選手法。每題三句輪換，不顯示正解提示。通關看概念答對八成。答錯暫停後空白鍵繼續。'
+    notes: '看例句，只打正解的 1／2／3；其餘略過。點對正解才顯示手法名。通關看概念答對八成。'
   },
   {
     id: 'whats-it-for',
