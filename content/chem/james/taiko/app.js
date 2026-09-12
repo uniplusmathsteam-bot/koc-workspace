@@ -241,6 +241,12 @@
     return null;
   }
 
+  function pickExample(tech) {
+    const list = tech && tech.examples;
+    if (!list || !list.length) return "";
+    return list[Math.floor(Math.random() * list.length)];
+  }
+
   function collectDecoyTechs(tech, pool) {
     const out = [];
     const seen = {};
@@ -297,7 +303,7 @@
         id: tech.id,
         cat: tech.cat,
         name: tech.name,
-        example: tech.example,
+        example: pickExample(tech),
         hits: tech.hits.slice(),
         correct: tech.name,
         options: options,
@@ -356,10 +362,6 @@
       return { bpm: 52, scrollMs: 3200, good: 80, ok: 160, miss: 240, drain: 1.25 };
     }
     return { bpm: 42, scrollMs: 4000, good: 120, ok: 250, miss: 380, drain: 1 };
-  }
-
-  function showNameHint() {
-    return state.speed === COPY.speedPractice;
   }
 
   function makeChart(deck) {
@@ -871,8 +873,8 @@
     if (state.legendHold || state.freeze) return;
     const note = nextNote();
     if (!note || !playUi || !playUi.nowName) return;
-    playUi.nowName.textContent = COPY.nameHint + "：" + note.item.name;
-    playUi.nowName.hidden = !showNameHint();
+    playUi.nowName.hidden = true;
+    playUi.nowName.textContent = "";
     playUi.nowCat.textContent = note.item.cat;
     setPadLabel("don", note.labels.don);
     setPadLabel("ka", note.labels.ka);
@@ -1272,7 +1274,7 @@
         <span class="cat-pill">${tech.cat}</span>
         <h2>${tech.name}</h2>
         <p class="study-hits">${COPY.hitsLabel}：${tech.hits.join("、")}</p>
-        <p class="example"><span>${COPY.example}</span>${tech.example || ""}</p>
+        <p class="example"><span>${COPY.example}</span>${pickExample(tech)}</p>
         <div class="study-actions">
           <button type="button" class="btn btn-ghost" data-study-prev="1">${COPY.prev}</button>
           <button type="button" class="btn btn-ghost" data-study-next="1">${COPY.next}</button>
