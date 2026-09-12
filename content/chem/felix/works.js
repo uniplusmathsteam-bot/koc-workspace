@@ -1,6 +1,17 @@
 /* Felix - Chem KOC - submissions. */
 KOC.works('chem', 'felix', [
   {
+    id: 'metal-extraction-arcade',
+    title: 'Metal Extraction Arcade',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'Chem - Planet Earth',
+    submitted: '2026-09-12',
+    tags: ['Interactive', 'Metal extraction', 'Blast furnace', 'Electrolysis', 'Ore hunt'],
+    src: 'content/chem/felix/metal-extraction-arcade/index.html',
+    notes: 'Three arcade paths: Ore Hunt (drag ores to metals then extraction process), Blast Furnace Run (place charge/hot air + reaction and product MCQs), and Electrolysis Sprint (build the aluminium cell + half-equation and product MCQs). Teacher options for Ore Hunt duration and target count.'
+  },
+  {
     id: 'planet-earth-ore-extraction',
     title: 'Planet earth: Ore extraction',
     type: 'interactive',

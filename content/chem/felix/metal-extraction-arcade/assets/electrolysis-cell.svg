@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 460" role="img" aria-label="Electrolysis cell for aluminium">
+  <defs>
+    <pattern id="alSpeck" width="10" height="10" patternUnits="userSpaceOnUse">
+      <rect width="10" height="10" fill="#c4c9d1"/>
+      <circle cx="2.5" cy="3" r="1.4" fill="#8b929c"/>
+      <circle cx="7" cy="7.5" r="1.2" fill="#6b7280"/>
+      <circle cx="5" cy="1.5" r="0.9" fill="#9ca3af"/>
+    </pattern>
+    <linearGradient id="steelGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#dbeafe"/>
+      <stop offset="100%" stop-color="#93c5fd"/>
+    </linearGradient>
+    <linearGradient id="electrolyteGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Steel tank outer shell -->
+  <path d="M90,70 L630,70 L630,390 L545,390 L520,365 L200,365 L175,390 L90,390 Z"
+        fill="url(#steelGrad)" stroke="#1e3a8a" stroke-width="5"/>
+
+  <!-- Negative graphite cathode lining -->
+  <path d="M115,95 L605,95 L605,355 L530,355 L510,335 L210,335 L190,355 L115,355 Z"
+        fill="#4b5563" stroke="#111827" stroke-width="2.5"/>
+
+  <!-- Charge signs on cathode -->
+  <g font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="800" text-anchor="middle">
+    <circle cx="145" cy="220" r="16" fill="#f3f4f6" stroke="#111827" stroke-width="2"/>
+    <text x="145" y="227" fill="#111827">−</text>
+    <circle cx="575" cy="220" r="16" fill="#f3f4f6" stroke="#111827" stroke-width="2"/>
+    <text x="575" y="227" fill="#111827">−</text>
+    <circle cx="360" cy="318" r="16" fill="#f3f4f6" stroke="#111827" stroke-width="2"/>
+    <text x="360" y="325" fill="#111827">−</text>
+  </g>
+
+  <!-- Molten aluminium layer -->
+  <rect x="205" y="300" width="310" height="35" fill="url(#alSpeck)" stroke="#4b5563" stroke-width="1.5"/>
+
+  <!-- Electrolyte -->
+  <rect x="205" y="135" width="310" height="165" fill="url(#electrolyteGrad)" stroke="#92400e" stroke-width="1.5"/>
+
+  <!-- Positive anodes (T-blocks) -->
+  <rect x="250" y="42" width="220" height="16" rx="3" fill="#374151"/>
+  <g stroke="#111827" stroke-width="1.5">
+    <rect x="270" y="58" width="48" height="125" fill="#374151"/>
+    <rect x="336" y="58" width="48" height="125" fill="#374151"/>
+    <rect x="402" y="58" width="48" height="125" fill="#374151"/>
+  </g>
+  <g font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="800" text-anchor="middle" fill="#f8fafc">
+    <text x="294" y="135">+</text>
+    <text x="360" y="135">+</text>
+    <text x="426" y="135">+</text>
+  </g>
+
+  <!-- Oxygen bubbles near anodes -->
+  <g fill="#9ca3af" opacity="0.95">
+    <circle cx="278" cy="155" r="4.5"/><circle cx="292" cy="168" r="3.5"/><circle cx="270" cy="178" r="3"/>
+    <circle cx="300" cy="188" r="3.5"/><circle cx="285" cy="198" r="2.8"/>
+    <circle cx="348" cy="152" r="4.5"/><circle cx="362" cy="166" r="3.5"/><circle cx="340" cy="176" r="3"/>
+    <circle cx="370" cy="186" r="3.5"/><circle cx="355" cy="196" r="2.8"/>
+    <circle cx="414" cy="154" r="4.5"/><circle cx="428" cy="168" r="3.5"/><circle cx="406" cy="178" r="3"/>
+    <circle cx="436" cy="188" r="3.5"/><circle cx="421" cy="198" r="2.8"/>
+  </g>
+
+  <!-- Outlet pipe + flowing aluminium -->
+  <path d="M510,335 L590,385 L575,395 L495,345 Z" fill="url(#alSpeck)" stroke="#4b5563" stroke-width="1.5"/>
+  <path d="M545,365 L600,400 L590,408 L535,372 Z" fill="#9ca3af" stroke="#4b5563" stroke-width="1"/>
+
+  <!-- Labels + leader lines -->
+  <g font-family="Segoe UI, Arial, sans-serif" fill="#0f172a" stroke-linecap="round">
+    <line x1="250" y1="50" x2="120" y2="36" stroke="#334155" stroke-width="1.5"/>
+    <text x="8" y="32" font-size="15" font-weight="700">positive graphite electrodes</text>
+
+    <line x1="115" y1="240" x2="55" y2="240" stroke="#334155" stroke-width="1.5"/>
+    <text x="8" y="236" font-size="15" font-weight="700">negative graphite</text>
+    <text x="8" y="254" font-size="15" font-weight="700">electrode</text>
+
+    <line x1="110" y1="370" x2="55" y2="400" stroke="#334155" stroke-width="1.5"/>
+    <text x="8" y="405" font-size="15" font-weight="700">steel tank</text>
+
+    <line x1="515" y1="160" x2="600" y2="120" stroke="#334155" stroke-width="1.5"/>
+    <text x="555" y="110" font-size="15" font-weight="700">oxygen</text>
+    <text x="555" y="128" font-size="15" font-weight="700">bubbling off</text>
+
+    <line x1="515" y1="220" x2="610" y2="230" stroke="#334155" stroke-width="1.5"/>
+    <text x="555" y="225" font-size="14" font-weight="700">bauxite dissolved</text>
+    <text x="555" y="243" font-size="14" font-weight="700">in molten cryolite</text>
+
+    <line x1="360" y1="318" x2="360" y2="430" stroke="#334155" stroke-width="1.5"/>
+    <text x="285" y="448" font-size="15" font-weight="700">molten aluminium</text>
+
+    <line x1="575" y1="390" x2="640" y2="420" stroke="#2563eb" stroke-width="1.8"/>
+    <text x="545" y="440" font-size="14" font-weight="700" fill="#1d4ed8">molten aluminium out</text>
+  </g>
+</svg>
