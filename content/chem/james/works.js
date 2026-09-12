@@ -8,7 +8,7 @@ KOC.works('chem', 'james', [
     submitted: '2026-09-12',
     tags: ['Interactive', '寫作', '修辭'],
     src: 'content/chem/james/taiko/index.html',
-    notes: '看例句，只打正解的 1／2／3；其餘略過。點對正解才顯示手法名。通關看概念答對八成。'
+    notes: '先讀句子，再打對的數字。其他數字按空白鍵略過。打對了才看見手法名字。答對八成就過關。'
   },
   {
     id: 'whats-it-for',
