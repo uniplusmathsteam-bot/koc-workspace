@@ -10,25 +10,25 @@ const PROCESSES = [
     id: "mechanical",
     title: "Mechanical separation",
     aria: "Mechanical separation (e.g. panning)",
-    icon: "pan",
+    image: "assets/method-panning.png",
   },
   {
     id: "heat-alone",
     title: "Heating alone",
     aria: "Heating the metal ore alone",
-    icon: "flame",
+    image: "assets/method-heat-alone.png",
   },
   {
     id: "heat-carbon",
     title: "Heating with carbon",
     aria: "Heating the metal ore with carbon",
-    icon: "carbon",
+    image: "assets/method-heat-carbon.png",
   },
   {
     id: "electrolysis",
     title: "Electrolysis of molten metal ore",
     aria: "Electrolysis of molten metal ore",
-    icon: "bolt",
+    image: "assets/method-electrolysis.png",
   },
 ];
 
@@ -182,98 +182,11 @@ const toggleKb = document.getElementById("toggle-kb");
 const kbClose = document.getElementById("kb-close");
 const resetLab = document.getElementById("reset-lab");
 
-function iconSvg(kind) {
-  const icons = {
-    pan: `
-      <svg class="station-symbol" viewBox="0 0 120 120" aria-hidden="true">
-        <!-- Gold pan (panning tool) with long handle -->
-        <path d="M78 58 L108 42" stroke="#78350f" stroke-width="7" stroke-linecap="round"/>
-        <path d="M78 58 L108 42" stroke="#b45309" stroke-width="4" stroke-linecap="round"/>
-        <rect x="104" y="34" width="12" height="20" rx="3" transform="rotate(-28 110 44)" fill="#92400e"/>
-        <ellipse cx="52" cy="72" rx="38" ry="14" fill="#d6d3d1" stroke="#78716c" stroke-width="2.5"/>
-        <path d="M18 68 C22 42 36 30 52 30 C68 30 82 42 86 68" fill="#e7e5e4" stroke="#78716c" stroke-width="2.5"/>
-        <ellipse cx="52" cy="68" rx="30" ry="9" fill="#93c5fd" opacity="0.55"/>
-        <path d="M28 66 Q52 74 76 66" fill="none" stroke="#60a5fa" stroke-width="2" opacity="0.7"/>
-        <circle cx="42" cy="66" r="4.5" fill="#eab308"/>
-        <circle cx="56" cy="70" r="3.5" fill="#ca8a04"/>
-        <circle cx="50" cy="62" r="2.8" fill="#facc15"/>
-        <circle cx="62" cy="65" r="2.2" fill="#a16207"/>
-      </svg>`,
-    flame: `
-      <svg class="station-symbol" viewBox="0 0 120 120" aria-hidden="true">
-        <!-- Crucible / dish with ore (contents being heated) -->
-        <ellipse cx="60" cy="34" rx="30" ry="8" fill="#a8a29e" stroke="#57534e" stroke-width="2"/>
-        <path d="M30 34 L36 58 Q60 68 84 58 L90 34" fill="#d6d3d1" stroke="#57534e" stroke-width="2.2"/>
-        <ellipse cx="60" cy="34" rx="26" ry="6" fill="#78716c"/>
-        <ellipse cx="60" cy="32" rx="14" ry="5" fill="#57534e"/>
-        <!-- Stand -->
-        <line x1="38" y1="58" x2="30" y2="72" stroke="#78716c" stroke-width="3" stroke-linecap="round"/>
-        <line x1="82" y1="58" x2="90" y2="72" stroke="#78716c" stroke-width="3" stroke-linecap="round"/>
-        <line x1="60" y1="62" x2="60" y2="74" stroke="#78716c" stroke-width="3" stroke-linecap="round"/>
-        <!-- Fire symbol under the contents -->
-        <path d="M60 112
-                 C48 100 42 90 46 78
-                 C50 88 56 86 58 76
-                 C60 86 68 84 70 74
-                 C76 88 74 100 60 112 Z"
-              fill="#ea580c"/>
-        <path d="M60 108
-                 C52 98 50 90 52 82
-                 C54 90 58 88 60 82
-                 C62 88 66 90 66 82
-                 C70 92 68 100 60 108 Z"
-              fill="#facc15"/>
-        <path d="M60 104 C56 96 57 90 60 86 C63 90 64 96 60 104 Z" fill="#fff7ed"/>
-      </svg>`,
-    carbon: `
-      <svg class="station-symbol" viewBox="0 0 120 120" aria-hidden="true">
-        <!-- Crucible with ore + carbon -->
-        <ellipse cx="60" cy="30" rx="32" ry="8" fill="#78716c" stroke="#44403c" stroke-width="2"/>
-        <path d="M28 30 L34 56 Q60 66 86 56 L92 30" fill="#a8a29e" stroke="#44403c" stroke-width="2.2"/>
-        <ellipse cx="60" cy="30" rx="28" ry="6" fill="#57534e"/>
-        <!-- Ore lump -->
-        <ellipse cx="48" cy="28" rx="10" ry="6" fill="#a8a29e"/>
-        <!-- Carbon piece with C -->
-        <circle cx="72" cy="28" r="9" fill="#1c1917"/>
-        <text x="72" y="32" text-anchor="middle" font-size="11" font-weight="700" fill="#f8fafc">C</text>
-        <!-- Stand -->
-        <line x1="38" y1="56" x2="30" y2="70" stroke="#78716c" stroke-width="3" stroke-linecap="round"/>
-        <line x1="82" y1="56" x2="90" y2="70" stroke="#78716c" stroke-width="3" stroke-linecap="round"/>
-        <line x1="60" y1="60" x2="60" y2="72" stroke="#78716c" stroke-width="3" stroke-linecap="round"/>
-        <!-- Fire symbol under the contents -->
-        <path d="M60 112
-                 C48 100 42 90 46 78
-                 C50 88 56 86 58 76
-                 C60 86 68 84 70 74
-                 C76 88 74 100 60 112 Z"
-              fill="#ea580c"/>
-        <path d="M60 108
-                 C52 98 50 90 52 82
-                 C54 90 58 88 60 82
-                 C62 88 66 90 66 82
-                 C70 92 68 100 60 108 Z"
-              fill="#facc15"/>
-        <path d="M60 104 C56 96 57 90 60 86 C63 90 64 96 60 104 Z" fill="#fff7ed"/>
-      </svg>`,
-    bolt: `
-      <svg class="station-symbol" viewBox="0 0 120 120" aria-hidden="true">
-        <rect x="24" y="34" width="72" height="58" rx="6" fill="#e2e8f0" stroke="#64748b" stroke-width="3"/>
-        <rect x="34" y="22" width="10" height="18" rx="2" fill="#334155"/>
-        <rect x="76" y="22" width="10" height="18" rx="2" fill="#334155"/>
-        <text x="39" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">+</text>
-        <text x="81" y="18" text-anchor="middle" font-size="14" font-weight="700" fill="#2563eb">−</text>
-        <path d="M62 44 L48 66 h12 l-4 22 18-28 H62 l4-16z" fill="#facc15" stroke="#ca8a04" stroke-width="2"/>
-        <ellipse cx="60" cy="88" rx="18" ry="5" fill="#93c5fd" opacity="0.7"/>
-      </svg>`,
-  };
-  return icons[kind] || "";
-}
-
 function renderStations() {
   stationsEl.innerHTML = PROCESSES.map(
     (p) => `
     <div class="station" data-process="${p.id}" role="region" aria-label="${p.aria}">
-      ${iconSvg(p.icon)}
+      <img class="station-symbol" src="${p.image}" alt="${p.aria}" draggable="false" />
       <span class="station-label">${p.title}</span>
     </div>`
   ).join("");
