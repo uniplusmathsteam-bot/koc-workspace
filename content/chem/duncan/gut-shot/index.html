@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gut Shot — Hydrolysis Substance Shooter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg0: #1a1410;
+      --bg1: #2b2118;
+      --ink: #f4e7d3;
+      --muted: #c9b59a;
+      --carb: #e6c34a;
+      --protein: #d4524a;
+      --lipid: #e0893a;
+      --fibre: #5a9e5a;
+      --mono: #fff7d6;
+      --accent: #7ec8a3;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      font-family: "IBM Plex Sans", sans-serif;
+      color: var(--ink);
+      background: linear-gradient(160deg, var(--bg0), var(--bg1));
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      touch-action: manipulation;
+    }
+    button, .weapon, .touch-btn, .stick { touch-action: none; user-select: none; -webkit-user-select: none; }
+    .shell { width: min(960px, 100%); display: grid; gap: 12px; }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    h1 {
+      font-family: "Archivo Black", sans-serif;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      line-height: 1;
+    }
+    .tag { color: var(--muted); font-size: 0.95rem; max-width: 42ch; }
+    .help { color: var(--muted); font-size: 0.9rem; line-height: 1.45; }
+    .help strong { color: var(--ink); }
+    .frame {
+      position: relative;
+      border: 3px solid #6b5138;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+      background: #000000;
+      touch-action: none;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #000000;
+      cursor: crosshair;
+      touch-action: none;
+    }
+    .status-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .topbar, .bottombar {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .pill {
+      background: rgba(20, 14, 10, 0.72);
+      border: 1px solid rgba(244, 231, 211, 0.18);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      backdrop-filter: blur(4px);
+    }
+    .legend { display: flex; gap: 8px; flex-wrap: wrap; }
+    .swatch { display: inline-flex; align-items: center; gap: 6px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .dot.carb { background: var(--carb); }
+    .dot.protein { background: var(--protein); }
+    .dot.lipid { background: var(--lipid); }
+    .dot.fibre { background: var(--fibre); }
+    .dot.mono {
+      background: var(--mono);
+      box-shadow: 0 0 0 2px #ff4fd8;
+    }
+    .dock {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .weapons { display: flex; gap: 8px; flex-wrap: wrap; }
+    .weapon {
+      cursor: pointer;
+      min-width: 118px;
+      background: rgba(20, 14, 10, 0.78);
+      border: 2px solid rgba(244, 231, 211, 0.2);
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-size: 0.78rem;
+      line-height: 1.25;
+      color: var(--ink);
+      font-weight: 600;
+      text-align: left;
+    }
+    .weapon.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(126, 200, 163, 0.35);
+    }
+    .weapon.empty { opacity: 0.45; }
+    .weapon.refilling .ammo { color: #e6c34a; }
+    .weapon .key { opacity: 0.7; font-size: 0.72rem; }
+    .weapon .ammo { color: var(--accent); font-weight: 700; margin-top: 2px; }
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: rgba(10, 8, 6, 0.78);
+      pointer-events: auto;
+      padding: 20px;
+      text-align: center;
+      z-index: 5;
+    }
+    .overlay.hidden { display: none; }
+    .card {
+      width: min(500px, 100%);
+      background: linear-gradient(180deg, #4a3426, #2c2118);
+      border: 2px solid #8a6848;
+      border-radius: 18px;
+      padding: 28px 22px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+    .card h2 {
+      font-family: "Archivo Black", sans-serif;
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
+    .card p { color: var(--muted); margin-bottom: 10px; line-height: 1.45; }
+    .card ul {
+      text-align: left;
+      margin: 12px 0 18px 1.1rem;
+      line-height: 1.5;
+    }
+    .card.pause-card { width: min(540px, 100%); }
+    .card kbd {
+      font: inherit;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    button {
+      appearance: none;
+      border: none;
+      border-radius: 999px;
+      padding: 12px 22px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      background: linear-gradient(180deg, #8fd6b3, #5aaa86);
+      color: #102018;
+    }
+    button:hover { filter: brightness(1.05); }
+    .card .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    button.secondary {
+      background: transparent;
+      border: 2px solid #8a6848;
+      color: var(--ink);
+    }
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .touch-hud {
+      display: none;
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+    body.touch-on .touch-hud { display: block; }
+    body.touch-on .touch-hud.off { display: none; }
+    .stick {
+      position: absolute;
+      bottom: 16px;
+      width: 128px;
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .stick.move { left: 12px; }
+    .stick.aim { right: 12px; }
+    .stick-base {
+      width: 112px;
+      height: 112px;
+      border-radius: 50%;
+      background: rgba(20, 14, 10, 0.45);
+      border: 2px solid rgba(244, 231, 211, 0.28);
+      position: relative;
+      touch-action: none;
+    }
+    .stick-knob {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(126, 200, 163, 0.85);
+      border: 2px solid #f4e7d3;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .dock-actions { display: flex; gap: 8px; align-items: stretch; }
+    .touch-btn {
+      pointer-events: auto;
+      min-width: 88px;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+    }
+    @media (max-width: 700px) {
+      body { padding: 8px; }
+      .shell { width: 100%; gap: 8px; }
+      h1 { font-size: 1.45rem; }
+      .help { font-size: 0.78rem; }
+      .legend { font-size: 0.72rem; }
+      .weapon { min-width: 72px; padding: 8px; }
+      .card { padding: 18px 14px; }
+      .card ul { font-size: 0.88rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div>
+        <h1>GUT SHOT</h1>
+        <p class="tag">Score as many points as you can in 3 minutes.</p>
+      </div>
+      <p class="help">
+        <strong>Move</strong> WASD / left stick · <strong>Shoot</strong> Mouse / right stick ·
+        <strong>1–4</strong> Enzymes (or tap) · <strong>R</strong> Refill ·
+        <strong>Esc</strong> / Pause
+      </p>
+    </header>
+
+    <div class="status-bar">
+      <div class="topbar">
+        <div class="pill" id="waveLabel">Level 1</div>
+        <div class="legend pill">
+          <span class="swatch"><i class="dot carb"></i>Carb</span>
+          <span class="swatch"><i class="dot protein"></i>Protein</span>
+          <span class="swatch"><i class="dot lipid"></i>Lipid</span>
+          <span class="swatch"><i class="dot fibre"></i>Fibre</span>
+          <span class="swatch"><i class="dot mono"></i>Glucose</span>
+        </div>
+          <div class="pill" id="scoreLabel">Score 0</div>
+          <div class="pill" id="timeLabel">3:00</div>
+      </div>
+      <div class="status-row">
+        <div class="pill" id="levelHint">Starts easy · gets brutal fast</div>
+        <button type="button" class="touch-btn secondary" id="pauseBtn">Pause</button>
+      </div>
+    </div>
+
+    <div class="frame">
+      <canvas id="game" width="900" height="560"></canvas>
+      <div class="touch-hud off" id="touchHud">
+        <div class="stick move" id="moveStick">
+          <div class="stick-base" id="moveBase">
+            <div class="stick-knob" id="moveKnob"></div>
+          </div>
+          <span>Move</span>
+        </div>
+        <div class="stick aim" id="aimStick">
+          <div class="stick-base" id="aimBase">
+            <div class="stick-knob" id="aimKnob"></div>
+          </div>
+          <span>Aim / Fire</span>
+        </div>
+      </div>
+
+      <div class="overlay" id="startOverlay">
+        <div class="card">
+          <h2>3-Minute Gut Run</h2>
+          <p><strong style="color:var(--ink)">Objective: get the most points in 3 minutes.</strong> Match the enzyme to the food. Shots spend ammo — select 1–4, then press R (or Refill) to refill.</p>
+          <ul>
+            <li><span style="color:var(--carb)">Yellow</span> carbs → Amylase · <span style="color:var(--protein)">Red</span> protein → Protease · <span style="color:var(--lipid)">Orange</span> fat → Lipase (bile splits big fats)</li>
+            <li>Don’t shoot glucose. Fibre fades on its own.</li>
+            <li><kbd>1–4</kbd> or tap an enzyme, then <kbd>R</kbd> / Refill fills that ammo to 20 (takes 2s). Cap is 20. Other ammos stay usable while one is refilling.</li>
+            <li>Phone: left stick move · right stick aim & hold to fire · Pause button</li>
+            <li><kbd>Esc</kbd> or Pause. Timer pauses with the game.</li>
+          </ul>
+          <button id="startBtn">Start 3-Minute Run</button>
+        </div>
+      </div>
+
+      <div class="overlay hidden" id="endOverlay">
+        <div class="card">
+          <h2 id="endTitle">Run over</h2>
+          <p id="endText">Nice try.</p>
+          <div class="actions">
+            <button id="restartBtn">Play Again</button>
+            <button type="button" class="secondary" id="menuBtn">Main Menu</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="overlay hidden" id="pauseOverlay">
+        <div class="card pause-card">
+          <h2>Paused</h2>
+          <p>Game is frozen. Resume to continue. Objective: most points in 3 minutes.</p>
+          <ul>
+            <li><kbd>WASD</kbd> / left stick move · <kbd>Mouse</kbd> / right stick aim & fire · tap or <kbd>1–4</kbd> enzyme · <kbd>R</kbd> / Refill · Pause</li>
+            <li>No ammo = no shot. Glucose: don’t shoot. Fibre: ignore.</li>
+            <li>Select an enzyme, then refill it to 20 (2s). Other ammos still work. Cap is 20.</li>
+          </ul>
+          <button id="resumeBtn">Resume</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dock">
+      <div class="weapons">
+        <div class="weapon active" data-w="amylase">
+          <div class="key">[1] Amylase</div>
+          <div class="ammo">0</div>
+        </div>
+        <div class="weapon" data-w="protease">
+          <div class="key">[2] Protease</div>
+          <div class="ammo">0</div>
+        </div>
+        <div class="weapon" data-w="lipase">
+          <div class="key">[3] Lipase</div>
+          <div class="ammo">0</div>
+        </div>
+        <div class="weapon" data-w="bile">
+          <div class="key">[4] Bile</div>
+          <div class="ammo">0</div>
+        </div>
+      </div>
+      <div class="dock-actions">
+        <button type="button" class="touch-btn" id="refillBtn">Refill</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const waveLabel = document.getElementById("waveLabel");
+    const scoreLabel = document.getElementById("scoreLabel");
+    const timeLabel = document.getElementById("timeLabel");
+    const levelHint = document.getElementById("levelHint");
+    const startOverlay = document.getElementById("startOverlay");
+    const endOverlay = document.getElementById("endOverlay");
+    const pauseOverlay = document.getElementById("pauseOverlay");
+    const endTitle = document.getElementById("endTitle");
+    const endText = document.getElementById("endText");
+    const weaponEls = [...document.querySelectorAll(".weapon")];
+
+    const W = canvas.width;
+    const H = canvas.height;
+
+    const AMMO_CAP = 20;
+    const AMMO_REFILL_TIME = 120; // ~2 seconds at 60fps
+    const GAME_SECS = 180;
+
+    const COLORS = {
+      carb: "#e6c34a",
+      protein: "#d4524a",
+      lipid: "#e0893a",
+      fibre: "#5a9e5a",
+      mono: "#fff7d6",
+      monoStroke: "#ff4fd8",
+    };
+
+    const MATCH = {
+      amylase: "carb",
+      protease: "protein",
+      lipase: "lipid",
+    };
+
+    const BOSS_CYCLE = ["starch", "protein", "lipid"];
+
+    let state = "start";
+    let score = 0;
+    let level = 1;
+    let player;
+    let bullets = [];
+    let enemies = [];
+    let particles = [];
+    let floats = [];
+    let keys = {};
+    let mouse = { x: W / 2, y: H / 2, down: false };
+    let moveStick = { x: 0, y: 0, active: false };
+    let aimStick = { x: 0, y: 0, active: false };
+    let shootCooldown = 0;
+    let spawnTimer = 0;
+    let mobsLeft = 0;
+    let activeBoss = null;
+    let phase = "mobs"; // mobs | boss | cleanup
+    let message = "";
+    let messageTimer = 0;
+    let bossDelay = 0;
+    let levelClearTimer = 0;
+    let ammo = { amylase: 0, protease: 0, lipase: 0, bile: 0 };
+    let refillWait = { amylase: 0, protease: 0, lipase: 0, bile: 0 };
+    let timeLeft = GAME_SECS;
+    let lastTimeTick = 0;
+
+    // Gradual linear curve: each level a bit harder, not exponential
+    function mobsForLevel(lv) {
+      return 4 + (lv - 1) * 2;
+    }
+
+    function maxOnField(lv) {
+      return Math.min(4 + Math.floor((lv - 1) * 0.5), 10);
+    }
+
+    function mobHpScale(lv) {
+      return 0.55 + (lv - 1) * 0.12;
+    }
+
+    function mobSpeedScale(lv) {
+      return Math.min(0.55 + (lv - 1) * 0.08, 1.35);
+    }
+
+    function bossHpForLevel(lv, base) {
+      return Math.round(base * (0.42 + (lv - 1) * 0.10));
+    }
+
+    function bossSpeedForLevel(lv) {
+      // Gradual climb, always below player speed (4.2)
+      return Math.min(1.55 + (lv - 1) * 0.12, 3.15);
+    }
+
+    function spawnIntervalForLevel(lv) {
+      return Math.max(14, 40 - (lv - 1) * 3);
+    }
+
+    function resetGame() {
+      score = 0;
+      level = 1;
+      bullets = [];
+      enemies = [];
+      particles = [];
+      floats = [];
+      shootCooldown = 0;
+      spawnTimer = 20;
+      activeBoss = null;
+      bossDelay = 0;
+      levelClearTimer = 0;
+      ammo = { amylase: 20, protease: 20, lipase: 20, bile: 20 };
+      refillWait = { amylase: 0, protease: 0, lipase: 0, bile: 0 };
+      timeLeft = GAME_SECS;
+      lastTimeTick = 0;
+      player = {
+        x: W / 2,
+        y: H - 70,
+        r: 18,
+        hp: 100,
+        maxHp: 100,
+        speed: 4.2,
+        enzyme: "amylase",
+      };
+      startLevel(1);
+      updateWeaponUI();
+      updateHUD();
+    }
+
+    function startLevel(lv) {
+      level = lv;
+      phase = "mobs";
+      mobsLeft = mobsForLevel(lv);
+      activeBoss = null;
+      bossDelay = 0;
+      levelClearTimer = 0;
+      spawnTimer = 25;
+      // Keep fibre/glucose from previous briefly, clear threats
+      enemies = enemies.filter((e) => e.fibre || e.mono);
+      message = lv === 1
+        ? `Level 1 — easy warm-up (${mobsLeft} substances)`
+        : `Level ${lv} — ${mobsLeft} substances · ramping up!`;
+      messageTimer = lv === 1 ? 140 : 110;
+      updateHUD();
+    }
+
+    function updateWeaponUI() {
+      weaponEls.forEach((el) => {
+        const w = el.dataset.w;
+        const waiting = (refillWait[w] || 0) > 0;
+        el.classList.toggle("active", w === player.enzyme);
+        el.classList.toggle("empty", (ammo[w] || 0) <= 0 && !waiting);
+        el.classList.toggle("refilling", waiting);
+        const ammoEl = el.querySelector(".ammo");
+        if (!ammoEl) return;
+        if (waiting) ammoEl.textContent = `Refill ${(refillWait[w] / 60).toFixed(1)}s`;
+        else ammoEl.textContent = `${ammo[w] || 0}`;
+      });
+    }
+
+    function refillSelectedAmmo() {
+      if (state !== "play") return;
+      const enz = player.enzyme;
+      if ((refillWait[enz] || 0) > 0) {
+        floatText(player.x, player.y - 36, `${enz} already refilling`, "#c9b59a");
+        return;
+      }
+      refillWait[enz] = AMMO_REFILL_TIME;
+      floatText(player.x, player.y - 36, `${enz} refilling…`, "#7ec8a3");
+      updateWeaponUI();
+    }
+
+    function tickRefills() {
+      let dirty = false;
+      for (const enz of Object.keys(refillWait)) {
+        if (refillWait[enz] <= 0) continue;
+        refillWait[enz]--;
+        dirty = true;
+        if (refillWait[enz] <= 0) {
+          ammo[enz] = AMMO_CAP;
+          floatText(player.x, player.y - 36, `${enz} refilled to ${AMMO_CAP}`, "#7ec8a3");
+        }
+      }
+      if (dirty) updateWeaponUI();
+    }
+
+    function updateHUD() {
+      if (phase === "boss" && activeBoss) {
+        waveLabel.textContent = `Level ${level} · ${activeBoss.toUpperCase()} TITAN`;
+      } else if (phase === "cleanup") {
+        waveLabel.textContent = `Level ${level} · Cleared`;
+      } else {
+        waveLabel.textContent = `Level ${level} · ${enemiesLeftToDefeat()} left`;
+      }
+      scoreLabel.textContent = `Score ${score}`;
+      if (timeLabel) {
+        const secs = Math.max(0, Math.ceil(timeLeft));
+        const m = Math.floor(secs / 60);
+        const s = secs % 60;
+        timeLabel.textContent = `Time ${m}:${String(s).padStart(2, "0")}`;
+      }
+      levelHint.textContent = phase === "boss"
+        ? "Boss is faster now — still slower than you"
+        : "Most points in 3 minutes";
+    }
+
+    function setEnzyme(name) {
+      player.enzyme = name;
+      updateWeaponUI();
+    }
+
+    function pickClearPosition(r, yMin, yMax) {
+      for (let i = 0; i < 24; i++) {
+        const x = 80 + Math.random() * (W - 160);
+        const y = yMin + Math.random() * (yMax - yMin);
+        const clear = enemies.every((e) => Math.hypot(e.x - x, e.y - y) >= e.r + r + 6);
+        if (clear) return { x, y };
+      }
+      return {
+        x: 80 + Math.random() * (W - 160),
+        y: yMin + Math.random() * (yMax - yMin),
+      };
+    }
+
+    function separateEnemies() {
+      const pad = 4;
+      const minX = 24;
+      const maxX = W - 24;
+      const minY = -140;
+      const maxY = H - 28;
+      for (let pass = 0; pass < 4; pass++) {
+        for (let i = 0; i < enemies.length; i++) {
+          for (let j = i + 1; j < enemies.length; j++) {
+            const a = enemies[i];
+            const b = enemies[j];
+            let dx = b.x - a.x;
+            let dy = b.y - a.y;
+            const dist = Math.hypot(dx, dy);
+            const minDist = a.r + b.r + pad;
+            if (dist >= minDist) continue;
+            if (dist < 0.001) {
+              dx = (Math.random() - 0.5) || 0.01;
+              dy = (Math.random() - 0.5) || 0.01;
+            }
+            const n = Math.hypot(dx, dy) || 1;
+            const nx = dx / n;
+            const ny = dy / n;
+            const push = (minDist - (dist < 0.001 ? 0 : dist)) / 2;
+            a.x -= nx * push;
+            a.y -= ny * push;
+            b.x += nx * push;
+            b.y += ny * push;
+            a.x = Math.max(minX, Math.min(maxX, a.x));
+            b.x = Math.max(minX, Math.min(maxX, b.x));
+            a.y = Math.max(minY, Math.min(maxY, a.y));
+            b.y = Math.max(minY, Math.min(maxY, b.y));
+          }
+        }
+      }
+    }
+
+    function makeMob() {
+      const types = [
+        { name: "STARCH", substance: "carb", color: COLORS.carb, hp: 30, r: 22 },
+        { name: "SUCROSE", substance: "carb", color: "#f0d35a", hp: 26, r: 20 },
+        { name: "PROTEIN", substance: "protein", color: COLORS.protein, hp: 34, r: 22 },
+        { name: "LIPID", substance: "lipid", color: COLORS.lipid, hp: 38, r: 22, canSplit: true },
+        { name: "FIBRE", substance: "fibre", color: COLORS.fibre, hp: 100, r: 20, fibre: true },
+        { name: "GLUCOSE", substance: "mono", color: COLORS.mono, hp: 100, r: 24, mono: true },
+      ];
+      // Slightly fewer fibre/glucose so waves stay threatening
+      let t;
+      const roll = Math.random();
+      if (roll < 0.22) t = types[0];
+      else if (roll < 0.38) t = types[1];
+      else if (roll < 0.58) t = types[2];
+      else if (roll < 0.78) t = types[3];
+      else if (roll < 0.90) t = types[4];
+      else t = types[5];
+
+      const hp = Math.max(8, Math.round(t.hp * mobHpScale(level)));
+      const spd = (0.42 + Math.random() * 0.18) * mobSpeedScale(level);
+      const pos = pickClearPosition(t.r, -130, -40);
+      return {
+        kind: "mob",
+        boss: false,
+        name: t.name,
+        x: pos.x,
+        y: pos.y,
+        r: t.r,
+        speed: Math.min(spd, player.speed * 0.85) * 1.5,
+        substance: t.substance,
+        color: t.color,
+        hp,
+        maxHp: hp,
+        fibre: !!t.fibre,
+        mono: !!t.mono,
+        canSplit: !!t.canSplit,
+        droplet: false,
+        bob: Math.random() * Math.PI * 2,
+        spark: Math.random() * Math.PI * 2,
+      };
+    }
+
+    function makeLipidDroplet(x, y) {
+      return {
+        kind: "mob",
+        boss: false,
+        name: "FAT DROP",
+        x, y,
+        r: 13,
+        speed: 0.75 * 1.5,
+        substance: "lipid",
+        color: COLORS.lipid,
+        hp: 10,
+        maxHp: 10,
+        fibre: false,
+        mono: false,
+        canSplit: false,
+        droplet: true,
+        bob: Math.random() * Math.PI * 2,
+        spark: 0,
+      };
+    }
+
+    function makeBoss(type) {
+      const base = {
+        starch: { name: "STARCH TITAN", substance: "carb", color: COLORS.carb, hp: 260, canSplit: false },
+        protein: { name: "PROTEIN TITAN", substance: "protein", color: COLORS.protein, hp: 280, canSplit: false },
+        lipid: { name: "LIPID TITAN", substance: "lipid", color: COLORS.lipid, hp: 280, canSplit: true },
+      }[type];
+      const hp = Math.max(70, bossHpForLevel(level, base.hp));
+      return {
+        kind: "mob",
+        boss: true,
+        bossType: type,
+        name: base.name,
+        x: W / 2,
+        y: -100,
+        r: 58,
+        speed: bossSpeedForLevel(level),
+        substance: base.substance,
+        color: base.color,
+        hp,
+        maxHp: hp,
+        fibre: false,
+        mono: false,
+        canSplit: base.canSplit,
+        droplet: false,
+        bob: 0,
+        spark: 0,
+      };
+    }
+
+    function digestibleMobsLeft() {
+      return enemies.some((e) => !e.boss && !e.fibre && !e.mono && !e.droplet);
+    }
+
+    function threatsLeft() {
+      return enemies.some((e) => !e.fibre && !e.mono);
+    }
+
+    function enemiesLeftToDefeat() {
+      const onField = enemies.filter((e) => !e.fibre && !e.mono && !e.boss).length;
+      return mobsLeft + onField;
+    }
+
+    function spawnBoss() {
+      if (activeBoss || enemies.some((e) => e.boss)) return;
+      enemies = enemies.filter((e) => e.fibre || e.mono);
+      const type = BOSS_CYCLE[(level - 1) % BOSS_CYCLE.length];
+      activeBoss = type;
+      phase = "boss";
+      bossDelay = 0;
+      enemies.push(makeBoss(type));
+      message = `${type.toUpperCase()} Titan — Level ${level}!`;
+      messageTimer = 200;
+      updateHUD();
+    }
+
+    function advanceAfterBoss() {
+      activeBoss = null;
+      phase = "cleanup";
+      levelClearTimer = 40;
+      message = `Level ${level} clear! Next level ramps up...`;
+      messageTimer = 70;
+    }
+
+    function spawnBurst(x, y, color, n = 10) {
+      for (let i = 0; i < n; i++) {
+        particles.push({
+          x, y,
+          vx: (Math.random() - 0.5) * 4,
+          vy: (Math.random() - 0.5) * 4 - 1,
+          life: 28 + Math.random() * 18,
+          color,
+          r: 2 + Math.random() * 3,
+        });
+      }
+    }
+
+    function floatText(x, y, text, color) {
+      floats.push({ x, y, text, color, life: 50, vy: -0.85 });
+    }
+
+    function trySpawn() {
+      if (bossDelay > 0) {
+        bossDelay--;
+        if (bossDelay <= 0) spawnBoss();
+        return;
+      }
+
+      if (phase === "mobs") {
+        if (mobsLeft > 0) {
+          spawnTimer--;
+          const onField = enemies.filter((e) => !e.boss && !e.fibre && !e.mono).length;
+          if (spawnTimer <= 0 && onField < maxOnField(level)) {
+            enemies.push(makeMob());
+            mobsLeft--;
+            spawnTimer = spawnIntervalForLevel(level);
+          }
+        }
+        if (mobsLeft <= 0 && !digestibleMobsLeft()) {
+          message = "Boss incoming...";
+          messageTimer = 80;
+          bossDelay = 50;
+          phase = "boss";
+        }
+        return;
+      }
+
+      if (phase === "cleanup") {
+        // Wait until fat drops / leftovers are gone, then short pause → next level
+        if (!threatsLeft()) {
+          levelClearTimer--;
+          if (levelClearTimer <= 0) startLevel(level + 1);
+        }
+      }
+    }
+
+    function shoot() {
+      if (shootCooldown > 0) return;
+      const enz = player.enzyme;
+      if ((ammo[enz] || 0) <= 0) {
+        if (Math.random() < 0.08) {
+          floatText(player.x, player.y - 30, "No ammo — 1–4 then R", "#c9b59a");
+        }
+        return;
+      }
+
+      const ang = Math.atan2(mouse.y - player.y, mouse.x - player.x);
+      ammo[enz] -= 1;
+      updateWeaponUI();
+
+      if (enz === "bile") {
+        shootCooldown = 16;
+        bullets.push({
+          x: player.x, y: player.y,
+          vx: Math.cos(ang) * 8,
+          vy: Math.sin(ang) * 8,
+          r: 9,
+          enzyme: "bile",
+          life: 70,
+          color: "#9fd6ff",
+        });
+        return;
+      }
+
+      shootCooldown = 9;
+      bullets.push({
+        x: player.x, y: player.y,
+        vx: Math.cos(ang) * 10,
+        vy: Math.sin(ang) * 10,
+        r: 5,
+        enzyme: enz,
+        life: 70,
+        color:
+          enz === "amylase" ? COLORS.carb :
+          enz === "protease" ? COLORS.protein : COLORS.lipid,
+      });
+    }
+
+    function splitLipid(enemy) {
+      const n = enemy.boss ? 5 : 3;
+      const share = Math.max(8, Math.floor((enemy.hp * 0.35) / n));
+      const ox = enemy.x;
+      const oy = enemy.y;
+      const wasBoss = enemy.boss;
+      const spacing = 34;
+
+      enemies = enemies.filter((e) => e !== enemy);
+      for (let i = 0; i < n; i++) {
+        const drop = makeLipidDroplet(ox + (i - (n - 1) / 2) * spacing, oy + 12);
+        drop.hp = share;
+        drop.maxHp = share;
+        enemies.push(drop);
+      }
+      separateEnemies();
+      spawnBurst(ox, oy, "#9fd6ff", 16);
+      floatText(ox, oy - 20, "Bile split → tiny lipids!", "#9fd6ff");
+      message = "Fat split! Lipase the drops";
+      messageTimer = 120;
+      score += wasBoss ? 40 : 10;
+
+      if (wasBoss) advanceAfterBoss();
+    }
+
+    function defeatBoss(enemy) {
+      score += 150 + level * 25;
+      floatText(enemy.x, enemy.y - 40, `${enemy.name} down!`, "#7ec8a3");
+      spawnBurst(enemy.x, enemy.y, enemy.color, 22);
+      enemies = enemies.filter((e) => e !== enemy);
+      advanceAfterBoss();
+    }
+
+    function applyHit(enemy, bullet) {
+      if (enemy.fibre) {
+        floatText(enemy.x, enemy.y - 16, "Fibre: no hydrolysis", "#8fd18f");
+        return true;
+      }
+      if (enemy.mono) {
+        floatText(enemy.x, enemy.y - 16, "Glucose: already small!", "#ff4fd8");
+        return true;
+      }
+
+      if (bullet.enzyme === "bile") {
+        if (enemy.substance === "lipid" && enemy.canSplit && !enemy.droplet) {
+          splitLipid(enemy);
+          return true;
+        }
+        if (enemy.droplet) {
+          floatText(enemy.x, enemy.y - 14, "Already split — lipase!", "#9fd6ff");
+          return true;
+        }
+        floatText(enemy.x, enemy.y - 14, "Bile only splits lipids", "#aaa");
+        return true;
+      }
+
+      if (MATCH[bullet.enzyme] !== enemy.substance) {
+        floatText(enemy.x, enemy.y - 16, "Wrong enzyme", "#ffb4a8");
+        return true;
+      }
+
+      const dmg = enemy.boss ? 14 : enemy.droplet ? 12 : 14;
+      enemy.hp -= dmg;
+      score += enemy.boss ? 6 : 5;
+      spawnBurst(enemy.x, enemy.y, enemy.color, 10);
+      floatText(enemy.x, enemy.y - 22, "Hydrolysis", "#f4e7d3");
+
+      if (enemy.hp <= 0) {
+        if (enemy.boss) {
+          defeatBoss(enemy);
+        } else {
+          score += enemy.droplet ? 8 : 18;
+          floatText(enemy.x, enemy.y - 34, "Digested!", "#7ec8a3");
+          enemies = enemies.filter((e) => e !== enemy);
+        }
+      }
+      return true;
+    }
+
+    function winGame() {
+      state = "end";
+      mouse.down = false;
+      timeLeft = 0;
+      endTitle.textContent = "Time’s up — well done!";
+      endText.textContent = `You scored ${score} points in 3 minutes (reached Level ${level}). Head home or try for a higher score.`;
+      endOverlay.classList.remove("hidden");
+      setTouchHud(false);
+      updateHUD();
+    }
+
+    function loseGame() {
+      state = "end";
+      mouse.down = false;
+      endTitle.textContent = "Overrun!";
+      endText.textContent = `Reached Level ${level} · Score ${score}.`;
+      endOverlay.classList.remove("hidden");
+      setTouchHud(false);
+    }
+
+    function update() {
+      if (state !== "play") return;
+
+      const now = performance.now();
+      if (!lastTimeTick) lastTimeTick = now;
+      timeLeft -= (now - lastTimeTick) / 1000;
+      lastTimeTick = now;
+      if (timeLeft <= 0) {
+        timeLeft = 0;
+        winGame();
+        return;
+      }
+
+      let mx = 0, my = 0;
+      if (keys.a || keys.arrowleft) mx -= 1;
+      if (keys.d || keys.arrowright) mx += 1;
+      if (keys.w || keys.arrowup) my -= 1;
+      if (keys.s || keys.arrowdown) my += 1;
+      if (moveStick.active) {
+        mx += moveStick.x;
+        my += moveStick.y;
+      }
+      if (mx || my) {
+        const len = Math.hypot(mx, my) || 1;
+        player.x += (mx / len) * player.speed;
+        player.y += (my / len) * player.speed;
+      }
+      player.x = Math.max(24, Math.min(W - 24, player.x));
+      player.y = Math.max(28, Math.min(H - 28, player.y));
+
+      if (aimStick.active) {
+        mouse.x = player.x + aimStick.x * 140;
+        mouse.y = player.y + aimStick.y * 140;
+        mouse.down = true;
+      }
+      if (mouse.down) shoot();
+      if (shootCooldown > 0) shootCooldown--;
+      if (messageTimer > 0) messageTimer--;
+      tickRefills();
+
+      trySpawn();
+
+      for (const e of [...enemies]) {
+        e.bob += 0.05;
+        if (e.mono) e.spark += 0.15;
+
+        if (e.fibre || e.mono) {
+          e.y += e.speed * 0.45;
+        } else {
+          const dx = player.x - e.x;
+          const dy = player.y - e.y;
+          const dist = Math.hypot(dx, dy) || 1;
+          const chase = e.boss ? Math.min(e.speed, player.speed * 0.72) : e.speed;
+          e.x += (dx / dist) * chase;
+          e.y += (dy / dist) * chase;
+        }
+        e.x = Math.max(24, Math.min(W - 24, e.x));
+        e.y = Math.max(28, Math.min(H - 28, e.y));
+
+        if (e.fibre) {
+          e.hp -= 0.18;
+          if (e.hp <= 0) {
+            floatText(e.x, e.y - 14, "Egested", "#8fd18f");
+            enemies = enemies.filter((x) => x !== e);
+            continue;
+          }
+        }
+        if (e.mono) {
+          e.hp -= 0.16;
+          if (e.hp <= 0) {
+            floatText(e.x, e.y - 14, "Absorbed", "#ff4fd8");
+            enemies = enemies.filter((x) => x !== e);
+            continue;
+          }
+        }
+
+        if (e.fibre || e.mono) continue;
+
+        const hitR = e.r * (e.boss ? 0.75 : 1);
+        if (Math.hypot(e.x - player.x, e.y - player.y) < hitR + player.r) {
+          const dmgScale = 0.85 + (level - 1) * 0.08;
+          player.hp -= (e.boss ? 0.28 : 0.14) * dmgScale;
+          if (player.hp <= 0) {
+            player.hp = 0;
+            loseGame();
+            return;
+          }
+        }
+      }
+
+      separateEnemies();
+
+      for (const b of bullets) {
+        b.x += b.vx;
+        b.y += b.vy;
+        b.life--;
+      }
+      bullets = bullets.filter((b) => b.life > 0 && b.x > -20 && b.x < W + 20 && b.y > -20 && b.y < H + 20);
+
+      for (const b of [...bullets]) {
+        for (const e of [...enemies]) {
+          if (Math.hypot(b.x - e.x, b.y - e.y) < e.r + b.r + 4) {
+            if (applyHit(e, b)) {
+              bullets = bullets.filter((x) => x !== b);
+              break;
+            }
+          }
+        }
+      }
+
+      for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.05;
+        p.life--;
+      }
+      particles = particles.filter((p) => p.life > 0);
+
+      for (const f of floats) {
+        f.y += f.vy;
+        f.life--;
+      }
+      floats = floats.filter((f) => f.life > 0);
+
+      updateHUD();
+    }
+
+    function drawGlucose(e, bob) {
+      ctx.save();
+      ctx.translate(e.x, e.y + bob);
+      const alpha = Math.max(0.35, e.hp / e.maxHp);
+      ctx.globalAlpha = alpha;
+
+      // Outer neon ring
+      ctx.strokeStyle = COLORS.monoStroke;
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(0, 0, e.r + 3, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Bright body
+      const g = ctx.createRadialGradient(-4, -4, 2, 0, 0, e.r);
+      g.addColorStop(0, "#ffffff");
+      g.addColorStop(0.55, COLORS.mono);
+      g.addColorStop(1, "#f0c84a");
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(0, 0, e.r, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Sparkles
+      ctx.fillStyle = COLORS.monoStroke;
+      for (let i = 0; i < 4; i++) {
+        const a = e.spark + i * (Math.PI / 2);
+        const sx = Math.cos(a) * (e.r + 8);
+        const sy = Math.sin(a) * (e.r + 8);
+        ctx.beginPath();
+        ctx.arc(sx, sy, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = "#1a1410";
+      ctx.font = "800 12px IBM Plex Sans";
+      ctx.textAlign = "center";
+      ctx.strokeText("GLUCOSE", 0, 4);
+      ctx.fillStyle = "#1a1410";
+      ctx.fillText("GLUCOSE", 0, 4);
+
+      ctx.font = "700 9px IBM Plex Sans";
+      ctx.fillStyle = COLORS.monoStroke;
+      ctx.fillText("DON'T SHOOT", 0, -e.r - 12);
+      ctx.restore();
+    }
+
+    function drawEnemy(e) {
+      const bob = Math.sin(e.bob) * (e.boss ? 3 : 2);
+      if (e.mono) {
+        drawGlucose(e, bob);
+        return;
+      }
+
+      ctx.save();
+      ctx.translate(e.x, e.y + bob);
+      const alpha = e.fibre ? Math.max(0.15, e.hp / e.maxHp) : 1;
+      ctx.globalAlpha = alpha;
+
+      ctx.fillStyle = e.color;
+      ctx.beginPath();
+      if (e.boss) ctx.ellipse(0, 0, e.r * 1.05, e.r * 0.9, 0, 0, Math.PI * 2);
+      else ctx.arc(0, 0, e.r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(0,0,0,0.35)";
+      ctx.lineWidth = e.boss ? 3 : 2;
+      ctx.stroke();
+
+      if (e.boss) {
+        ctx.fillStyle = "#1a1410";
+        ctx.beginPath();
+        ctx.arc(-16, -8, 5, 0, Math.PI * 2);
+        ctx.arc(16, -8, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.fillStyle = "#1a1410";
+      ctx.font = e.boss ? "800 14px IBM Plex Sans" : "700 11px IBM Plex Sans";
+      ctx.textAlign = "center";
+      ctx.fillText(e.name, 0, 4);
+
+      if (!e.fibre) {
+        const pct = Math.max(0, e.hp / e.maxHp);
+        const barW = e.boss ? 90 : 40;
+        ctx.fillStyle = "rgba(0,0,0,0.45)";
+        ctx.fillRect(-barW / 2, -e.r - 14, barW, e.boss ? 8 : 5);
+        ctx.fillStyle = "#f4e7d3";
+        ctx.fillRect(-barW / 2, -e.r - 14, barW * pct, e.boss ? 8 : 5);
+        if (e.droplet) {
+          ctx.fillStyle = "#9fd6ff";
+          ctx.font = "700 9px IBM Plex Sans";
+          ctx.fillText("LOW HP", 0, -e.r - 18);
+        }
+      } else {
+        ctx.fillStyle = "#d9f5d9";
+        ctx.font = "700 9px IBM Plex Sans";
+        ctx.fillText("FADING SLOWLY", 0, -e.r - 12);
+      }
+      ctx.restore();
+
+      if (e.boss) {
+        ctx.fillStyle = "#f4e7d3";
+        ctx.font = "800 13px IBM Plex Sans";
+        ctx.textAlign = "center";
+        ctx.fillText(`${e.name}  ${Math.ceil(e.hp)}/${e.maxHp}`, e.x, e.y - e.r - 28);
+      }
+    }
+
+    function drawPlayer() {
+      const ang = Math.atan2(mouse.y - player.y, mouse.x - player.x);
+
+      // HP bar directly above character
+      const barW = 44;
+      const barH = 7;
+      const pct = Math.max(0, player.hp / player.maxHp);
+      const bx = player.x - barW / 2;
+      const by = player.y - 38;
+      ctx.fillStyle = "rgba(0,0,0,0.55)";
+      ctx.fillRect(bx - 1, by - 1, barW + 2, barH + 2);
+      ctx.fillStyle = "#3a2018";
+      ctx.fillRect(bx, by, barW, barH);
+      ctx.fillStyle = pct > 0.35 ? "#7ec8a3" : "#d4524a";
+      ctx.fillRect(bx, by, barW * pct, barH);
+      ctx.fillStyle = "#f4e7d3";
+      ctx.font = "700 9px IBM Plex Sans";
+      ctx.textAlign = "center";
+      ctx.fillText(`${Math.ceil(player.hp)}`, player.x, by - 3);
+
+      ctx.save();
+      ctx.translate(player.x, player.y);
+      ctx.rotate(ang);
+      ctx.fillStyle = "#7ec8a3";
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 18, 14, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#d9c3a5";
+      ctx.fillRect(10, -4, 22, 8);
+      ctx.restore();
+
+      const c =
+        player.enzyme === "amylase" ? COLORS.carb :
+        player.enzyme === "protease" ? COLORS.protein :
+        player.enzyme === "lipase" ? COLORS.lipid : "#9fd6ff";
+      ctx.strokeStyle = (ammo[player.enzyme] || 0) > 0 ? c : "#666";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(player.x, player.y, 26, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    function draw() {
+      ctx.fillStyle = "#000000";
+      ctx.fillRect(0, 0, W, H);
+
+      for (const e of enemies) drawEnemy(e);
+
+      for (const b of bullets) {
+        ctx.fillStyle = b.color;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      for (const p of particles) {
+        ctx.globalAlpha = Math.max(0, p.life / 40);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+
+      for (const f of floats) {
+        ctx.globalAlpha = Math.max(0, f.life / 50);
+        ctx.fillStyle = f.color;
+        ctx.font = "700 12px IBM Plex Sans";
+        ctx.textAlign = "center";
+        ctx.fillText(f.text, f.x, f.y);
+        ctx.globalAlpha = 1;
+      }
+
+      if (state === "play" || state === "end" || state === "pause") drawPlayer();
+
+      if (messageTimer > 0 && (state === "play" || state === "pause")) {
+        ctx.fillStyle = "rgba(20,14,10,0.72)";
+        ctx.fillRect(W / 2 - 280, 46, 560, 36);
+        ctx.fillStyle = "#f4e7d3";
+        ctx.font = "600 14px IBM Plex Sans";
+        ctx.textAlign = "center";
+        ctx.fillText(message, W / 2, 69);
+      }
+
+      ctx.strokeStyle = "rgba(244,231,211,0.55)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(mouse.x - 10, mouse.y);
+      ctx.lineTo(mouse.x + 10, mouse.y);
+      ctx.moveTo(mouse.x, mouse.y - 10);
+      ctx.lineTo(mouse.x, mouse.y + 10);
+      ctx.stroke();
+    }
+
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    function setTouchHud(on) {
+      const hud = document.getElementById("touchHud");
+      if (hud) hud.classList.toggle("off", !on);
+      if (!on) {
+        moveStick.x = 0; moveStick.y = 0; moveStick.active = false;
+        aimStick.x = 0; aimStick.y = 0; aimStick.active = false;
+        resetKnob(document.getElementById("moveKnob"));
+        resetKnob(document.getElementById("aimKnob"));
+      }
+    }
+
+    function startGame() {
+      resetGame();
+      state = "play";
+      startOverlay.classList.add("hidden");
+      endOverlay.classList.add("hidden");
+      pauseOverlay.classList.add("hidden");
+      lastTimeTick = performance.now();
+      setTouchHud(true);
+    }
+
+    function goToMenu() {
+      resetGame();
+      state = "start";
+      mouse.down = false;
+      startOverlay.classList.remove("hidden");
+      endOverlay.classList.add("hidden");
+      pauseOverlay.classList.add("hidden");
+      setTouchHud(false);
+    }
+
+    function pauseGame() {
+      if (state !== "play") return;
+      state = "pause";
+      mouse.down = false;
+      pauseOverlay.classList.remove("hidden");
+      setTouchHud(false);
+    }
+
+    function resumeGame() {
+      if (state !== "pause") return;
+      state = "play";
+      pauseOverlay.classList.add("hidden");
+      lastTimeTick = performance.now();
+      setTouchHud(true);
+    }
+
+    function togglePause() {
+      if (state === "play") pauseGame();
+      else if (state === "pause") resumeGame();
+    }
+
+    document.getElementById("startBtn").addEventListener("click", startGame);
+    document.getElementById("restartBtn").addEventListener("click", startGame);
+    document.getElementById("menuBtn").addEventListener("click", goToMenu);
+    document.getElementById("resumeBtn").addEventListener("click", resumeGame);
+    document.getElementById("pauseBtn").addEventListener("click", () => {
+      if (state === "play") pauseGame();
+      else if (state === "pause") resumeGame();
+    });
+    document.getElementById("refillBtn").addEventListener("click", refillSelectedAmmo);
+
+    weaponEls.forEach((el) => {
+      el.addEventListener("click", () => {
+        if (player) setEnzyme(el.dataset.w);
+      });
+    });
+
+    function resetKnob(knob) {
+      if (knob) knob.style.transform = "translate(-50%, -50%)";
+    }
+
+    function bindStick(baseEl, knobEl, pad) {
+      const maxR = 32;
+      function updateFromEvent(e) {
+        const rect = baseEl.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        let dx = e.clientX - cx;
+        let dy = e.clientY - cy;
+        const len = Math.hypot(dx, dy);
+        if (len > maxR) {
+          dx = (dx / len) * maxR;
+          dy = (dy / len) * maxR;
+        }
+        pad.x = dx / maxR;
+        pad.y = dy / maxR;
+        pad.active = true;
+        knobEl.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+      }
+      function endPad(e) {
+        if (pad.pointerId != null && e.pointerId !== pad.pointerId) return;
+        pad.x = 0;
+        pad.y = 0;
+        pad.active = false;
+        pad.pointerId = null;
+        resetKnob(knobEl);
+        if (pad === aimStick) mouse.down = false;
+      }
+      baseEl.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        pad.pointerId = e.pointerId;
+        baseEl.setPointerCapture(e.pointerId);
+        updateFromEvent(e);
+      });
+      baseEl.addEventListener("pointermove", (e) => {
+        if (!pad.active || e.pointerId !== pad.pointerId) return;
+        e.preventDefault();
+        updateFromEvent(e);
+      });
+      baseEl.addEventListener("pointerup", endPad);
+      baseEl.addEventListener("pointercancel", endPad);
+    }
+
+    bindStick(document.getElementById("moveBase"), document.getElementById("moveKnob"), moveStick);
+    bindStick(document.getElementById("aimBase"), document.getElementById("aimKnob"), aimStick);
+
+    if (navigator.maxTouchPoints > 0 || window.matchMedia("(pointer: coarse)").matches) {
+      document.body.classList.add("touch-on");
+    }
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        togglePause();
+        return;
+      }
+      const k = e.key.toLowerCase();
+      if (k === "1") setEnzyme("amylase");
+      if (k === "2") setEnzyme("protease");
+      if (k === "3") setEnzyme("lipase");
+      if (k === "4") setEnzyme("bile");
+      if (k === "r" && !e.repeat) refillSelectedAmmo();
+      if (state === "play" || state === "pause") keys[k] = true;
+    });
+    window.addEventListener("keyup", (e) => { keys[e.key.toLowerCase()] = false; });
+
+    canvas.addEventListener("pointerdown", (e) => {
+      if (state !== "play") return;
+      e.preventDefault();
+      canvas.setPointerCapture(e.pointerId);
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = (e.clientX - rect.left) * (canvas.width / rect.width);
+      mouse.y = (e.clientY - rect.top) * (canvas.height / rect.height);
+      mouse.down = true;
+    });
+    canvas.addEventListener("pointermove", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = (e.clientX - rect.left) * (canvas.width / rect.width);
+      mouse.y = (e.clientY - rect.top) * (canvas.height / rect.height);
+    });
+    window.addEventListener("pointerup", () => {
+      if (!aimStick.active) mouse.down = false;
+    });
+    window.addEventListener("pointercancel", () => {
+      if (!aimStick.active) mouse.down = false;
+    });
+
+    resetGame();
+    loop();
+  </script>
+</body>
+</html>
