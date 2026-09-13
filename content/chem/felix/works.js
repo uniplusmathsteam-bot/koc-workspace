@@ -1,6 +1,17 @@
 /* Felix - Chem KOC - submissions. */
 KOC.works('chem', 'felix', [
   {
+    id: 'earth1a-laboratory-apparatus-mc',
+    title: 'Earth1A Laboratory Apparatus MC (Sets 2–5)',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'Chem - Planet Earth',
+    submitted: '2026-09-13',
+    tags: ['MC', 'Laboratory apparatus', 'Word worksheet', 'Planet Earth'],
+    src: 'content/chem/felix/earth1a-laboratory-apparatus-mc/index.html',
+    notes: 'Four Word MC practice sets on laboratory apparatus (Sets 2–5), each 14 questions with easy/medium/difficult bands and an answer key citing laboratory-safety.pdf. Open the page and download a .docx to use in Word.'
+  },
+  {
     id: 'metal-extraction-arcade',
     title: 'Metal extraction arcade',
     type: 'interactive',
