@@ -1,6 +1,17 @@
 /* Felix - Chem KOC - submissions. */
 KOC.works('chem', 'felix', [
   {
+    id: 'topic-01-parts-2-3',
+    title: 'Topic 01 Parts 2 & 3',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'Chem - Topic 01',
+    submitted: '2026-09-13',
+    tags: ['Word worksheet', 'Topic 01'],
+    src: 'content/chem/felix/topic-01-parts-2-3/index.html',
+    notes: 'Topic 01 Word documents (Part 2 and Part 3). Open the page and download a .docx to use in Word.'
+  },
+  {
     id: 'earth1b-laboratory-safety-mc',
     title: 'Earth1B Laboratory Safety MC (Sets 2-5)',
     type: 'interactive',
