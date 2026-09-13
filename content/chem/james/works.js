@@ -1,6 +1,16 @@
 /* James · Chem KOC lead — submissions. */
 KOC.works('chem', 'james', [
   {
+    id: 'sheji',
+    title: '射擊',
+    type: 'interactive',
+    chapter: '寫作手法',
+    submitted: '2026-09-13',
+    tags: ['Interactive', '寫作', '修辭'],
+    src: 'content/chem/james/sheji/index.html',
+    notes: '選類別和難度。WASD 開車、滑鼠轉炮、點擊開火。打中屬於這手法的作用，避開其他。'
+  },
+  {
     id: 'taiko',
     title: '打太鼓',
     type: 'interactive',
