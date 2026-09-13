@@ -15,21 +15,19 @@
 <body>
   <div class="app">
     <header class="topbar">
-      <div class="brand">Ch 5 · Food</div>
-      <div class="tabs" role="tablist">
-        <button type="button" class="tab active" data-tab="lab" role="tab" aria-selected="true">Food test</button>
-        <button type="button" class="tab" data-tab="bank" role="tab" aria-selected="false">Food bank</button>
-      </div>
+      <div class="brand">Ch 5 · Food tests</div>
+      <nav class="lab-nav" id="lab-nav" aria-label="Lab panels"></nav>
       <div class="top-actions">
         <button type="button" class="btn" id="btn-drop">Add 1 cm³ of selected food</button>
-        <button type="button" class="btn" id="btn-clear">Clear bench</button>
+        <button type="button" class="btn" id="btn-clear">Reset this lab</button>
       </div>
     </header>
 
     <section class="panel active" id="panel-lab" role="tabpanel">
       <div class="lab-stage">
         <aside class="col col-left">
-          <div class="conc-panel" id="conc-panel">
+          <div class="proc" id="proc"></div>
+          <div class="conc-panel" id="conc-panel" hidden aria-hidden="true">
             <div id="conc-slider-wrap">
               <label><span id="conc-label">DCPIP concentration</span><span class="conc-val" id="conc-val">0.1%</span></label>
               <input type="range" id="conc-slider" min="0.05" max="1" step="0.05" value="0.1" />
@@ -37,34 +35,20 @@
             <div id="protein-scale" class="protein-scale" hidden></div>
             <p class="conc-hint" id="conc-hint"></p>
           </div>
-          <div class="col-head">Food samples</div>
+          <div class="col-head" id="food-head">Samples</div>
           <div class="food-scroll" id="food-list"></div>
         </aside>
 
         <div class="center">
           <div class="apparatus" id="apparatus" aria-label="Apparatus"></div>
           <div class="bench" id="bench">
-            <p class="empty-hint">White bench — pick a test, drag apparatus here, then place test tubes anywhere on the bench. A tube goes into the water bath only if you drop it inside. One dropper of food or test solution = 1 cm³ (vitamin C sample stays dropwise).</p>
+            <p class="empty-hint" id="empty-hint">Pick a lab panel, then use the set-up on this bench.</p>
           </div>
           <div class="obs" id="obs"></div>
         </div>
 
         <aside class="col col-right">
-          <label class="cat-field" for="test-cat">
-            <span class="cat-label">Food test category:</span>
-            <select id="test-cat" class="cat-select">
-              <option value="">-- Please Select --</option>
-              <option value="Carbohydrates">Carbohydrates</option>
-              <option value="Proteins">Proteins</option>
-              <option value="Lipids">Lipids</option>
-              <option value="Vitamin C">Vitamin C</option>
-              <option value="Energy">Energy</option>
-            </select>
-          </label>
-          <div id="test-block">
-            <div class="col-head">Tests</div>
-            <div class="test-scroll" id="test-list"></div>
-          </div>
+          <div id="lab-side"></div>
         </aside>
       </div>
     </section>

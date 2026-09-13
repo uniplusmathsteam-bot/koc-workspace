@@ -53,7 +53,7 @@ KOC.works('bio-is', 'issac', [
     submitted: '2026-09-06',
     tags: ['Interactive', 'Food tests', 'Practical'],
     src: 'content/bio-is/issac/food-nutrition/food-lab.html',
-    notes: 'DSE food-test bench: Benedict, iodine, Biuret, grease spot, DCPIP, and food bank.'
+    notes: 'Separate lab panels aligned to Ch.5 notes: Clinistix, Benedict, iodine (food + green leaf), Biuret, grease spot, DCPIP, and energy burning test with IV/DV/CV.'
   },
   {
     id: 'energy-calories-calculator',

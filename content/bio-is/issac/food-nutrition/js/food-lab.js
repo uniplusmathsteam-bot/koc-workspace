@@ -68,16 +68,34 @@ const FOODS = [
 ];
 
 const TESTS = [
-  { id: "clinistix", cat: "Carbohydrates", name: "Glucose", sub: "Glucose paper · dip 1–2 s · read 60 s · yellow / light green → darker green, brown or blue-grey", reagents: [], extra: ["clinistix", "dropper"] },
-  { id: "benedict", cat: "Carbohydrates", name: "Reducing sugar", sub: "Benedict's · 1 cm³ + equal vol. + boil 5 min", reagents: ["benedict"], extra: ["tube", "dropper", "bath"], heatMin: 5 },
-  { id: "iodine", cat: "Carbohydrates", name: "Starch", sub: "Iodine · food or leaf · boil 5 min", reagents: ["iodine", "alcohol", "water"], extra: ["tube", "dropper", "bath"], heatMin: 5 },
-  { id: "albustix", cat: "Proteins", name: "Protein paper", sub: "Albustix · dip 1 s · read 60 s · yellow → green", reagents: [], extra: ["albustix", "dropper"] },
-  { id: "biuret", cat: "Proteins", name: "Protein", sub: "Biuret reagent + shake", reagents: ["biuret"], extra: ["tube", "dropper"] },
-  { id: "grease", cat: "Lipids", name: "Lipid", sub: "Grease spot + organic solvent", reagents: ["ethanol"], extra: ["paper", "dropper"] },
-  { id: "vitc", cat: "Vitamin C", name: "Vitamin C", sub: "DCPIP · add sample dropwise", reagents: ["dcpip"], extra: ["tube", "dropper"], conc: { key: "dcpip", label: "DCPIP concentration", min: 0.05, max: 1, step: 0.05, unit: "%", def: 0.1, hint: "Add the sample dropwise to DCPIP and mix. Fewer drops to go colourless → higher vitamin C. Higher DCPIP conc. needs more drops." } },
-  { id: "energy", cat: "Energy", name: "Energy in food", sub: "Burning test · time & ΔT", reagents: [], extra: ["burner", "dropper"] },
-  { id: "nrs", cat: "Carbohydrates", name: "Non-reducing sugar", sub: "Hydrolysis + Benedict's", reagents: ["hcl", "nahco3", "benedict"], extra: ["tube", "dropper", "bath"], heatMin: 5 },
+  { id: "clinistix", cat: "Carbohydrates", name: "Glucose paper", sub: "Dip Clinistix into the sample · pink → purple", reagents: [], extra: ["clinistix", "dropper"] },
+  { id: "benedict", cat: "Carbohydrates", name: "Reducing sugar", sub: "Equal volume Benedict's + sample, e.g. 5 cm³ · boil 5 min", reagents: ["benedict"], extra: ["tube", "dropper", "bath"], heatMin: 5 },
+  { id: "iodine", cat: "Carbohydrates", name: "Starch · food", sub: "Drops of iodine on a white tile / in a tube · brown → blue-black", reagents: ["iodine"], extra: ["tube", "dropper", "tile"] },
+  { id: "iodine-leaf", cat: "Carbohydrates", name: "Starch · green leaf", sub: "Boil in water → alcohol tube in water bath → wash → dip in iodine", reagents: ["iodine"], extra: ["bath", "tube"], heatMin: 5 },
+  { id: "albustix", cat: "Proteins", name: "Protein paper", sub: "Dip Albustix into the sample · yellow → blue-green", reagents: [], extra: ["albustix", "dropper"] },
+  { id: "biuret", cat: "Proteins", name: "Protein", sub: "NaOH, then a few drops of CuSO₄ · shake gently", reagents: ["naoh", "cuso4"], extra: ["tube", "dropper"] },
+  { id: "grease", cat: "Lipids", name: "Lipid", sub: "Rub / drop · dry · translucent 半透明 · alcohol", reagents: ["ethanol"], extra: ["paper", "dropper"] },
+  { id: "vitc", cat: "Vitamin C", name: "Vitamin C", sub: "DCPIP · add sample dropwise 逐滴", reagents: ["dcpip"], extra: ["tube", "dropper"], conc: { key: "dcpip", label: "DCPIP concentration", min: 0.05, max: 1, step: 0.05, unit: "%", def: 0.1, hint: "Add the sample dropwise 逐滴 to DCPIP and mix well. Fewer drops to go colourless → higher vitamin C concentration. Heat destroys vitamin C." } },
+  { id: "energy", cat: "Energy", name: "Energy in food", sub: "Burning test · stopwatch + thermometer", reagents: [], extra: ["burner"] },
+  { id: "nrs", cat: "Carbohydrates", name: "Non-reducing sugar", sub: "Hydrolyse · cool · NaHCO₃ until alkaline · Benedict's", reagents: ["hcl", "nahco3", "benedict"], extra: ["tube", "dropper", "bath", "phpaper"], heatMin: 5 },
 ];
+
+const LEAF_FOODS = ["leaf", "spinach", "kale", "cabbage"];
+const LABS = [
+  { id: "clinistix", title: "Glucose paper", foods: ["lemon", "glucose", "honey", "apple", "orange", "banana", "sucrose", "water", "milk"] },
+  { id: "benedict", title: "Reducing sugar", foods: ["glucose", "honey", "apple", "onion", "sucrose", "starchsol", "water", "milk"] },
+  { id: "iodine", title: "Starch · food", foods: ["starchsol", "potato", "bread", "rice", "onion", "banana", "water"] },
+  { id: "iodine-leaf", title: "Starch · green leaf", foods: LEAF_FOODS },
+  { id: "nrs", title: "Non-reducing sugar", foods: ["sucrose", "glucose", "honey", "water"] },
+  { id: "albustix", title: "Protein paper", foods: ["albumen", "milk", "meat", "chicken", "water", "potato"] },
+  { id: "biuret", title: "Protein · Biuret", foods: ["albumen", "milk", "meat", "chicken", "fish", "water", "oil"] },
+  { id: "grease", title: "Lipid", foods: ["oil", "butter", "peanut", "salmon", "water", "potato"] },
+  { id: "vitc", title: "Vitamin C", foods: ["lemon", "orange", "strawberry", "pepper", "cabbage", "apple", "water"] },
+  { id: "energy", title: "Energy in food", foods: ["peanut", "butter", "bread", "rice", "potato", "meat"] },
+  { id: "bank", title: "Food bank", tab: "bank" },
+];
+
+function labById(id) { return LABS.find((l) => l.id === id); }
 
 const REAGENTS = {
   dcpip: { name: "DCPIP", color: "#2a5bdb" },
@@ -87,6 +105,7 @@ const REAGENTS = {
   naoh: { name: "NaOH", color: "#e8eef3" },
   cuso4: { name: "CuSO₄", color: "#4a8fd4" },
   ethanol: { name: "Alcohol", color: "#eef4f8" },
+  phpaper: { name: "pH paper", color: "#f0c070" },
   alcohol: { name: "Hot alcohol", color: "#e8f0f4" },
   water: { name: "Water", color: "#d4e8f4" },
   hcl: { name: "Dil. HCl", color: "#f3efe4" },
@@ -104,17 +123,253 @@ function glucoseOf(food) {
   return 0;
 }
 
-function energyOf(food) {
-  if (!food) return { carb: 0, prot: 0, lip: 0, kJ: 0, time: 0, dT: 0 };
+function burnerDefaults(piece = {}) {
+  return {
+    mass: piece.mass != null ? Number(piece.mass) : 1,
+    waterVol: piece.waterVol != null ? Number(piece.waterVol) : 20,
+    t0: piece.t0 != null ? Number(piece.t0) : 20,
+    distance: piece.distance || "medium",
+  };
+}
+
+function distanceFactor(distance) {
+  if (distance === "close") return 1.12;
+  if (distance === "far") return 0.58;
+  return 0.88;
+}
+
+function energyOf(food, piece) {
+  if (!food) return { carb: 0, prot: 0, lip: 0, kJ: 0, time: 0, dT: 0, t0: 20, t1: 20, mass: 1, waterVol: 20, distance: "medium" };
+  const { mass, waterVol, t0, distance } = burnerDefaults(piece);
   const carb = food.n.rs + food.n.nrs + food.n.starch;
   const prot = food.n.protein;
   const lip = food.n.lipid;
-  const kJ = carb * 1.7 + prot * 1.7 + lip * 3.8;
+  const kJ = (carb * 1.7 + prot * 1.7 + lip * 3.8) * mass;
+  const baseDT = 4 + carb * 0.9 + prot * 0.9 + lip * 1.8;
+  const dT = +(baseDT * mass * (20 / Math.max(5, waterVol)) * distanceFactor(distance)).toFixed(1);
+  const time = Math.max(1, Math.round((3 + carb * 0.35 + prot * 0.35 + lip * 0.7) * mass));
   return {
-    carb, prot, lip, kJ,
-    time: Math.round(3 + carb * 0.35 + prot * 0.35 + lip * 0.7),
-    dT: +(4 + carb * 0.9 + prot * 0.9 + lip * 1.8).toFixed(1),
+    carb, prot, lip, kJ, mass, waterVol, distance,
+    time,
+    dT,
+    t0,
+    t1: +(t0 + Number(dT)).toFixed(1),
   };
+}
+
+function pickEnergyBurner() {
+  const burners = state.pieces.filter((p) => p.kind === "burner");
+  if (!burners.length) return null;
+  const sel = burners.find((p) => p.id === state.selectedPiece);
+  if (sel && !sel.foodId) return sel;
+  const empty = burners.find((p) => !p.foodId);
+  if (empty) return empty;
+  return sel || burners[burners.length - 1];
+}
+
+function burnerIndex(piece) {
+  return state.pieces.filter((p) => p.kind === "burner").findIndex((p) => p.id === piece.id) + 1;
+}
+
+function energyPlan() {
+  const iv = ENERGY_IV_OPTIONS.find((o) => o.id === (state.energyIV || "food")) || ENERGY_IV_OPTIONS[0];
+  const cvs = ENERGY_IV_OPTIONS.filter((o) => o.id !== iv.id);
+  return {
+    iv,
+    dvDT: state.energyDVs?.dT !== false,
+    dvTime: state.energyDVs?.time !== false,
+    cvs,
+    keep: true,
+  };
+}
+
+function resetEnergyReads(piece) {
+  if (!piece || piece.kind !== "burner") return;
+  piece.readDT = false;
+  piece.readTime = false;
+}
+
+function readEnergyDv(piece, which) {
+  if (!piece || piece.kind !== "burner" || !piece.burned || !piece.foodId) return false;
+  const plan = energyPlan();
+  if (which === "dT" && plan.dvDT) {
+    piece.readDT = true;
+    return true;
+  }
+  if (which === "time" && plan.dvTime) {
+    piece.readTime = true;
+    return true;
+  }
+  return false;
+}
+
+function burnerFactorValue(piece, factorId) {
+  if (factorId === "food") return piece.foodId || "";
+  const d = burnerDefaults(piece);
+  if (factorId === "mass") return d.mass;
+  if (factorId === "waterVol") return d.waterVol;
+  if (factorId === "t0") return d.t0;
+  if (factorId === "distance") return d.distance;
+  return "";
+}
+
+function formatFactorValue(piece, factorId) {
+  if (factorId === "food") return foodById(piece.foodId)?.name || "no food";
+  if (factorId === "mass") return `${burnerDefaults(piece).mass} g`;
+  if (factorId === "waterVol") return `${burnerDefaults(piece).waterVol} cm³`;
+  if (factorId === "t0") return `${burnerDefaults(piece).t0}°C`;
+  if (factorId === "distance") {
+    const d = burnerDefaults(piece).distance;
+    return d === "close" ? "near" : d === "far" ? "far" : "middle";
+  }
+  return "—";
+}
+
+function isEnergyCV(field) {
+  return (state.energyIV || "food") !== field;
+}
+
+function applyCaloField(piece, key, value) {
+  piece[key] = value;
+  if (state.test !== "energy" || !energyPlan().keep || !isEnergyCV(key)) return;
+  state.pieces.forEach((p) => {
+    if (p.kind === "burner" && p.id !== piece.id) p[key] = value;
+  });
+}
+
+function copyEnergyCVs(from) {
+  if (!from || from.kind !== "burner") return;
+  const iv = energyPlan().iv.id;
+  state.pieces.forEach((p) => {
+    if (p.kind !== "burner" || p.id === from.id) return;
+    if (iv !== "mass") p.mass = from.mass;
+    if (iv !== "waterVol") p.waterVol = from.waterVol;
+    if (iv !== "t0") p.t0 = from.t0;
+    if (iv !== "distance") p.distance = from.distance;
+    if (iv !== "food" && from.foodId) {
+      p.foodId = from.foodId;
+      p.burned = false;
+      resetEnergyReads(p);
+    }
+  });
+}
+
+function energyCvMismatches() {
+  const plan = energyPlan();
+  const burners = state.pieces.filter((p) => p.kind === "burner");
+  if (burners.length < 2) return [];
+  return plan.cvs.map((cv) => {
+    const values = burners.map((p) => ({
+      n: burnerIndex(p),
+      text: formatFactorValue(p, cv.id),
+      raw: String(burnerFactorValue(p, cv.id)),
+    }));
+    if (new Set(values.map((v) => v.raw)).size <= 1) return null;
+    return { id: cv.id, label: cv.label, values };
+  }).filter(Boolean);
+}
+
+function checkEnergyFairTest() {
+  const plan = energyPlan();
+  const burners = state.pieces.filter((p) => p.kind === "burner");
+  const loaded = burners.filter((p) => p.foodId);
+  const cvMismatches = energyCvMismatches();
+  const issues = [];
+  if (!plan.dvDT && !plan.dvTime) issues.push("Tick ΔT and/or time — that is the DV you will measure.");
+  if (burners.length < 2) issues.push("Next: click Add set-up.");
+  else if (loaded.length < 2) issues.push("Next: click a food onto each set-up.");
+  if (loaded.length >= 2) {
+    const ivVals = new Set(loaded.map((p) => String(burnerFactorValue(p, plan.iv.id))));
+    if (ivVals.size < 2) {
+      issues.push(plan.iv.id === "food"
+        ? "Next: put a different food on each set-up."
+        : `Next: change the ${plan.iv.label.toLowerCase()} on one set-up.`);
+    }
+  }
+  cvMismatches.forEach((cv) => {
+    issues.push(`Not fair: ${cv.label.toLowerCase()} is not the same.`);
+  });
+  return {
+    ok: issues.length === 0 && loaded.length >= 2 && !cvMismatches.length && (plan.dvDT || plan.dvTime),
+    issues,
+    cvMismatches,
+    loaded: loaded.length,
+    n: burners.length,
+  };
+}
+
+function energyCompareTableHtml() {
+  const plan = energyPlan();
+  const burners = state.pieces.filter((p) => p.kind === "burner");
+  if (!burners.length) return "";
+  const bad = new Set(energyCvMismatches().map((c) => c.id));
+  const head = `<tr><th></th>${burners.map((p) => `<th>${burnerIndex(p)}</th>`).join("")}</tr>`;
+  const row = (label, factorId, cls) =>
+    `<tr class="${cls}"><th>${label}</th>${burners.map((p) => `<td>${formatFactorValue(p, factorId)}</td>`).join("")}</tr>`;
+  const dvCells = (kind, getter) => burners.map((p) => {
+    const food = foodById(p.foodId);
+    const e = energyOf(food, p);
+    const read = kind === "dT" ? p.readDT : p.readTime;
+    return `<td>${p.burned && food && read ? getter(e) : "—"}</td>`;
+  }).join("");
+  const extraIv = plan.iv.id !== "food"
+    ? row(plan.iv.label, plan.iv.id, "is-iv")
+    : "";
+  const skip = new Set(["food", plan.iv.id]);
+  const badRows = ENERGY_IV_OPTIONS
+    .filter((o) => bad.has(o.id) && !skip.has(o.id))
+    .map((o) => row(o.label, o.id, "is-bad"))
+    .join("");
+  return `<table class="fair-table">
+        ${head}
+        ${row("Food", "food", plan.iv.id === "food" ? "is-iv" : (bad.has("food") ? "is-bad" : ""))}
+        ${extraIv}
+        ${badRows}
+        ${plan.dvDT ? `<tr class="is-dv"><th>ΔT</th>${dvCells("dT", (e) => `+${e.dT}°C`)}</tr>` : ""}
+        ${plan.dvTime ? `<tr class="is-dv"><th>Time</th>${dvCells("time", (e) => `${e.time} s`)}</tr>` : ""}
+      </table>`;
+}
+
+function energyFairHtml() {
+  const fair = checkEnergyFairTest();
+  const plan = energyPlan();
+  if (fair.cvMismatches.length) {
+    return `<p class="quiz-bad">Not a fair test — CVs are not the same.</p>
+      <ul class="cv-bad-list">${fair.cvMismatches.map((cv) =>
+        `<li><strong>${cv.label}</strong>: ${cv.values.map((v) => `set-up ${v.n} = ${v.text}`).join(" · ")}</li>`
+      ).join("")}</ul>`;
+  }
+  if (fair.ok) return `<p class="quiz-ok">Fair test ✓ You only changed the ${plan.iv.label.toLowerCase()}.</p>`;
+  return `<p class="quiz-next">${fair.issues[0] || "Set up the test."}</p>`;
+}
+
+function renderEnergyFairOverlay() {
+  const bench = document.getElementById("bench");
+  if (!bench) return;
+  bench.querySelectorAll(".fair-cross").forEach((el) => el.remove());
+  if (state.test !== "energy") return;
+  const bad = energyCvMismatches();
+  if (!bad.length) return;
+  const el = document.createElement("div");
+  el.className = "fair-cross";
+  el.setAttribute("role", "alert");
+  el.innerHTML = `
+    <div class="fair-cross-x" aria-hidden="true">✗</div>
+    <div class="fair-cross-msg">
+      <strong>Not a fair test</strong>
+      <p>These CVs are not the same:</p>
+      <ul>${bad.map((cv) =>
+        `<li><strong>${cv.label}</strong><br>${cv.values.map((v) => `Set-up ${v.n}: ${v.text}`).join("<br>")}</li>`
+      ).join("")}</ul>
+    </div>`;
+  bench.prepend(el);
+}
+
+function nextBurnerPos() {
+  const n = state.pieces.filter((p) => p.kind === "burner").length;
+  const w = Math.round(280 * state.energyScale + 28);
+  const h = Math.round(268 * state.energyScale + 28);
+  return { x: 16 + (n % 2) * w, y: 8 + Math.floor(n / 2) * h };
 }
 
 const BLUE = "#2f74c4";
@@ -125,24 +380,17 @@ const BLACK = "#1b1d33";
 const PURPLE = "#7a3d9b";
 const MILK = "#f0eee8";
 const ALBUSTIX_YELLOW = "#f5e000";
-const GLUCOSE_UNUSED = "#efe9a4";
+const GLUCOSE_UNUSED = "#e8a0b8";
 const STRIP_READ_MS = 1000;
 
 const GLUCOSE_SCALE = [
-  { key: "0", label: "0%", reading: "0%", min: 0, max: 0, color: "#efe9a4", word: "light yellow" },
-  { key: "0.1", label: "0.1%", reading: "0.1%", min: 1, max: 2, color: "#c8dc7a", word: "light green" },
-  { key: "0.25", label: "0.25%", reading: "0.25%", min: 3, max: 3, color: "#7eb24a", word: "green" },
-  { key: "0.5", label: "0.5%", reading: "0.5%", min: 4, max: 5, color: "#3f7a32", word: "darker green" },
-  { key: "1", label: "1%", reading: "1%", min: 6, max: 8, color: "#8a5a28", word: "brown" },
-  { key: "2", label: "2%", reading: "2%", min: 9, max: 10, color: "#4a5a68", word: "blue-grey" },
+  { key: "0", label: "no glucose", reading: "pink", min: 0, max: 0, color: "#e8a0b8", word: "pink" },
+  { key: "pos", label: "glucose", reading: "purple", min: 1, max: 10, color: "#7a3d9b", word: "purple" },
 ];
 
 const ALBUSTIX_SCALE = [
-  { key: "neg", label: "NEG.", reading: "NEG.", gl: "0 g/l", min: 0, max: 0, color: "#f5e000", word: "yellow" },
-  { key: "0.3", label: "0.3", reading: "0.3 g/l", gl: "0.3 g/l", min: 1, max: 1, color: "#c8d84a", word: "pale green" },
-  { key: "1.0", label: "1.0", reading: "1.0 g/l", gl: "1.0 g/l", min: 2, max: 3, color: "#6fb8a0", word: "light teal-green" },
-  { key: "3.0", label: "3.0", reading: "3.0 g/l", gl: "3.0 g/l", min: 4, max: 6, color: "#2a8a82", word: "medium teal" },
-  { key: "10", label: "≥ 10", reading: "≥ 10 g/l", gl: "≥ 10 g/l", min: 7, max: 10, color: "#163e42", word: "dark teal" },
+  { key: "neg", label: "NEG.", reading: "yellow", gl: "absent", min: 0, max: 0, color: "#f5e000", word: "yellow" },
+  { key: "pos", label: "protein", reading: "blue-green", gl: "present", min: 1, max: 10, color: "#2a8a82", word: "blue-green" },
 ];
 
 function albustixBand(protein) {
@@ -165,9 +413,17 @@ function dipStrip(piece, foodId) {
   }, STRIP_READ_MS);
 }
 
+const ENERGY_IV_OPTIONS = [
+  { id: "food", label: "The food", how: "Put a different food on each set-up." },
+  { id: "mass", label: "Mass of food", how: "Use the same food. Change the mass on one set-up." },
+  { id: "waterVol", label: "Water volume", how: "Use the same food. Change the water on one set-up." },
+  { id: "t0", label: "Start temperature", how: "Use the same food. Change the start temperature on one set-up." },
+  { id: "distance", label: "Distance from tube", how: "Use the same food. Move the food closer or farther." },
+];
+
 const state = {
   tab: "lab",
-  test: "vitc",
+  test: "clinistix",
   conc: { dcpip: 0.1, sample: 5, iodine: 1 },
   foods: FOODS.map((f) => f.id),
   selectedFood: null,
@@ -178,11 +434,17 @@ const state = {
   bankFilter: "all",
   bankQ: "",
   openCard: null,
-  testCat: "",
+  testCat: "Carbohydrates",
   embedLocked: null,
+  varAnswers: {},
+  energyScale: 1.2,
+  energyIV: "food",
+  energyDVs: { dT: true, time: true },
+  energyKeepCV: true,
 };
 
 let drag = null;
+let energyFoodPlaced = false;
 let heatTicker = null;
 const LAB_MIN_MS = 1000;
 
@@ -204,7 +466,13 @@ function heatingRemainMin(bath) {
 }
 
 function heatingRemainFor(piece) {
-  const bath = state.pieces.find((b) => b.kind === "bath" && isBathHeating(b) && b.heating.pieceIds.includes(piece.id));
+  const bath = state.pieces.find((b) => {
+    if (b.kind !== "bath" || !isBathHeating(b)) return false;
+    const ids = b.heating?.pieceIds || [];
+    if (ids.includes(piece.id)) return true;
+    const host = state.pieces.find((x) => x.id === piece.dockedTo);
+    return !!(host && ids.includes(host.id));
+  });
   return bath ? heatingRemainMin(bath) : 0;
 }
 
@@ -223,22 +491,40 @@ function emptyContents() {
     poured: false,
     dcpip: 0, benedict: 0, iodine: 0, naoh: 0, cuso4: 0, biuret: 0,
     ethanol: 0, alcohol: 0, water: 0, hcl: 0, nahco3: 0,
-    heated: 0, hydrolysed: false, neutralized: false, mixed: false, shaken: false,
+    heated: 0, hydrolysed: false, cooled: false, alkaliAdded: false, neutralized: false, mixed: false, shaken: false,
   };
+}
+
+function isDropReagent(id) {
+  if (id === "iodine") return state.test !== "iodine-leaf";
+  return id === "cuso4";
+}
+
+function reagentDoseLabel(id) {
+  if (isDropReagent(id)) return "1 drop";
+  if (id === "benedict") return "5 cm³";
+  if (id === "naoh") return "2 cm³";
+  return "1 cm³";
 }
 
 function foodAddPayload(foodId) {
   if (state.test === "vitc") return { foodId, drops: 1 };
+  if (state.test === "benedict") return { foodId, cm3: 5 };
+  if (state.test === "biuret") return { foodId, cm3: 2 };
   return { foodId, cm3: 1 };
 }
 
 function reagentAddPayload(reagentId) {
+  if (isDropReagent(reagentId)) return { reagent: reagentId, drops: 1 };
+  if (reagentId === "benedict") return { reagent: reagentId, cm3: 5 };
+  if (reagentId === "naoh") return { reagent: reagentId, cm3: 2 };
   return { reagent: reagentId, cm3: 1 };
 }
 
 function reagentSolutionCm3(c) {
-  return (c.dcpip || 0) + (c.benedict || 0) + (c.iodine || 0) + (c.biuret || 0)
-    + (c.ethanol || 0) + (c.alcohol || 0) + (c.water || 0) + (c.hcl || 0) + (c.nahco3 || 0);
+  return (c.dcpip || 0) + (c.benedict || 0) + (c.biuret || 0) + (c.naoh || 0)
+    + (c.ethanol || 0) + (c.alcohol || 0) + (c.water || 0) + (c.hcl || 0) + (c.nahco3 || 0)
+    + (state.test === "iodine-leaf" ? (c.iodine || 0) : 0);
 }
 
 function tubeMeasuredCm3(c) {
@@ -248,6 +534,9 @@ function tubeMeasuredCm3(c) {
 function dropperDoseLabel() {
   if (!state.dropper.fill) return "1 cm³";
   if (foodById(state.dropper.fill) && state.test === "vitc") return "1 drop";
+  if (foodById(state.dropper.fill) && state.test === "benedict") return "5 cm³";
+  if (foodById(state.dropper.fill) && state.test === "biuret") return "2 cm³ extract";
+  if (REAGENTS[state.dropper.fill]) return reagentDoseLabel(state.dropper.fill);
   return "1 cm³";
 }
 
@@ -272,8 +561,8 @@ function evaluateTube(piece) {
   const test = state.test;
   const hasFood = !!(food && (c.foodDrops || c.foodCm3));
   const reagentCm3 = reagentSolutionCm3(c);
-  const filled = (c.foodCm3 || 0) + c.foodDrops + reagentCm3;
-  const vol = filled ? Math.min(78, 10 + (c.foodCm3 || 0) * 16 + c.foodDrops * 4 + reagentCm3 * 16) : 0;
+  const filled = (c.foodCm3 || 0) + c.foodDrops + reagentCm3 + (c.cuso4 || 0) * 0.05;
+  const vol = filled ? Math.min(78, 12 + (c.foodCm3 || 0) * 6 + c.foodDrops * 3 + reagentCm3 * 6) : 0;
   let color = "transparent";
   let ppt = false;
   let evPptAmt = "none";
@@ -286,7 +575,7 @@ function evaluateTube(piece) {
     const conc = state.conc.dcpip;
     if (c.dcpip <= 0) {
       color = hasFood ? food.color : "transparent";
-      text = "Put 1 cm³ DCPIP in the tube first, then add the sample dropwise and mix after each drop.";
+        text = "Put 1 cm³ DCPIP in the tube first, then add the sample dropwise 逐滴 and mix well after each drop.";
     } else {
       color = DCPIP_BLUE;
       const need = dropsNeededVitC(food, conc);
@@ -295,34 +584,46 @@ function evaluateTube(piece) {
         text = "Remains blue after mixing. No observable change — vitamin C absent.";
       } else if (c.foodDrops >= need) {
         color = COLORLESS;
-        text = `Blue → colourless after ${need} drop(s). Vitamin C present. Fewer drops than another sample would mean a higher vitamin C concentration.`;
+        text = `Blue → colourless after ${need} drop(s). Vitamin C present. Fewer drops needed = higher vitamin C concentration.`;
       } else {
         color = lerpColor(DCPIP_BLUE, COLORLESS, c.foodDrops / need);
         text = `Still blue. Mix, then add more drops. ${c.foodDrops} / ${need} drops needed at ${conc}% DCPIP.`;
       }
     }
   } else if (test === "benedict" || test === "nrs") {
-    if (c.benedict <= 0 && test === "benedict") {
+    if (test === "nrs" && !(c.hydrolysed && c.neutralized)) {
+      color = hasFood ? food.color : "transparent";
+      const left = heatingRemainFor(piece);
+      if (!hasFood) {
+        text = "Add 1 cm³ of food extract, then dilute HCl. Boil 5 min to hydrolyse.";
+      } else if (c.hcl <= 0) {
+        text = "Add 1 cm³ dilute HCl, then drag the tube into the beaker of boiling water.";
+      } else if (!c.hydrolysed) {
+        text = left
+          ? `Heating to hydrolyse… still no colour change. ${left} min left (1 lab min = 1 s).`
+          : "HCl added. Drag the tube into the water bath and boil for 5 minutes to hydrolyse.";
+      } else if (!c.cooled) {
+        text = "Hydrolysed. Cool the tube before adding NaHCO₃ (do not add alkali while it is still hot).";
+      } else if (!c.alkaliAdded) {
+        text = "Cooled. Add NaHCO₃ until the acid is neutralised (it should fizz). Then check with pH paper.";
+      } else {
+        fizz = true;
+        text = "Fizzing — acid is being neutralised. Dip pH paper: it must be alkaline before Benedict’s.";
+      }
+    } else if (c.benedict <= 0 && test === "benedict") {
       color = hasFood ? food.color : "transparent";
       text = hasFood
-        ? "Add an equal volume of Benedict's (1 cm³ with the dropper), then boil in a hot water bath for 5 minutes."
-        : "Add 1 cm³ of food sample with the dropper, then an equal volume of Benedict's.";
-    } else if (test === "nrs" && c.hcl > 0 && !c.hydrolysed) {
-      color = food ? food.color : COLORLESS;
-      const left = heatingRemainFor(piece);
-      text = left
-        ? `Heating to hydrolyse… still no colour change. ${left} min left (1 lab min = 1 s).`
-        : "1 cm³ HCl added. Drag the tube into the water bath and boil for 5 minutes to hydrolyse.";
-    } else if (test === "nrs" && c.hydrolysed && !c.neutralized) {
-      color = food ? food.color : COLORLESS;
-      fizz = c.nahco3 > 0;
-      text = c.nahco3 > 0 ? "Fizzing as acid is neutralised. Add 1 cm³ Benedict's next." : "Hydrolysed. Neutralise with 1 cm³ NaHCO₃ before Benedict's.";
+        ? "Add an equal volume of Benedict's solution (5 cm³ sample + 5 cm³ Benedict's), then stand the tube in a beaker of boiling water for 5 minutes."
+        : "Add 5 cm³ sample and 5 cm³ Benedict's (equal volumes).";
+    } else if (c.benedict <= 0 && test === "nrs") {
+      color = hasFood ? food.color : COLORLESS;
+      text = "Neutralised and alkaline. Now add 5 cm³ Benedict's and boil in the water bath for 5 minutes.";
     } else if (c.benedict > 0 && c.heated < 1) {
       color = BLUE;
       const left = heatingRemainFor(piece);
       text = left
-        ? `Boiling… still blue. ${left} min left (1 lab min = 1 s). The colour change appears after 5 min.`
-        : "Equal volumes mixed — still blue. Drag the tube into the water bath and boil for 5 minutes.";
+        ? `Boiling in the water bath… still blue. ${left} min left (1 lab min = 1 s).`
+        : "Equal volumes mixed — still blue. Stand the tube in the beaker of boiling water for 5 minutes.";
     } else if (c.benedict > 0 && c.heated >= 1) {
       let rs = n.rs;
       if (c.hydrolysed && c.neutralized) rs += n.nrs;
@@ -332,40 +633,51 @@ function evaluateTube(piece) {
       const amount = rs <= 0 ? "no" : rs < 4 ? "a little" : rs < 7 ? "a moderate" : "a large";
       evPptAmt = rs <= 0 ? "none" : rs < 4 ? "low" : rs < 7 ? "mid" : "high";
       if (test === "nrs" && n.nrs > 0 && n.rs === 0 && !(c.hydrolysed && c.neutralized)) {
-        text = "Remains blue. Sucrose is non-reducing until hydrolysed and neutralised.";
+        text = "Remains blue. Sucrose is non-reducing until hydrolysed, cooled, and made alkaline.";
       } else if (rs <= 0) {
         text = "Remains blue after boiling. No brick-red precipitate — reducing sugar absent.";
       } else {
-        text = `${result.word} after boiling 5 min. ${amount} amount of precipitate — higher reducing-sugar concentration gives more precipitate.`;
+        text = `${result.word} after boiling 5 min. ${amount} amount of brick-red precipitate — more precipitate = more reducing sugar.`;
       }
-    } else if (test === "nrs") {
-      text = "Add 1 cm³ of food with the dropper, then 1 cm³ dilute HCl → heat → 1 cm³ NaHCO₃ → 1 cm³ Benedict's → heat.";
     }
   } else if (test === "iodine") {
-    const conc = state.conc.iodine;
     if (c.iodine <= 0) {
       color = hasFood ? food.color : "transparent";
-      text = hasFood ? "Add 1 cm³ iodine solution with the dropper." : "Add 1 cm³ of sample with the dropper, then 1 cm³ iodine.";
-    } else if (n.starch > 0 && c.iodine * conc >= 0.6) {
-      color = BLACK;
-      text = "Brown / yellow → blue-black. Starch present.";
+      text = hasFood ? "Add a few drops of iodine solution." : "Liquid sample in the tube, then a few drops of iodine. Solid food goes on the white tile.";
     } else if (n.starch > 0) {
-      color = lerpColor(BROWN, BLACK, 0.35);
-      text = "Colour deepening. Add another 1 cm³ of iodine (or raise conc.).";
+      color = BLACK;
+      text = "Brown → blue-black. Starch present.";
     } else {
-      color = lerpColor("#e6d48a", BROWN, Math.min(1, conc / 2));
-      text = "Remains brown / yellow. No observable starch.";
+      color = BROWN;
+      text = "Remains brown. Starch absent.";
+    }
+  } else if (test === "iodine-leaf") {
+    if (c.iodine <= 0) {
+      color = "transparent";
+      text = "Add iodine solution to this test tube. Then dip the washed leaf into the iodine, or drag this tube onto the leaf on the white tile.";
+    } else {
+      color = BROWN;
+      const nested = state.pieces.find((x) => x.kind === "block" && x.dockedTo === piece.id);
+      text = nested?.iodine
+        ? evaluateBlock(nested).text
+        : "Iodine ready. Dip the washed leaf into this tube, or pour it onto the leaf on the white tile.";
     }
   } else if (test === "biuret") {
-    const hasReagent = c.biuret > 0 || (c.naoh > 0 && c.cuso4 > 0);
-    if (!hasReagent) {
-      color = hasFood ? food.color : "transparent";
-      text = hasFood
-        ? "Add 1 cm³ Biuret reagent to the sample, then shake gently."
-        : "Add 1 cm³ of sample with the dropper, then 1 cm³ Biuret reagent.";
+    if (!hasFood) {
+      color = "transparent";
+      text = "Add 2 cm³ of sample (grind solid food with water and filter to make an extract). Then add NaOH, then a few drops of CuSO₄.";
+    } else if (c.naoh <= 0 && c.cuso4 <= 0 && c.biuret <= 0) {
+      color = food.color;
+      text = "Add about 2 cm³ sodium hydroxide (NaOH) first, then a few drops of copper sulfate (CuSO₄). Shake gently.";
+    } else if (c.naoh <= 0 && c.cuso4 > 0) {
+      color = "#7eb4e0";
+      text = "CuSO₄ added too early. Add sodium hydroxide (NaOH) first, then the copper sulfate drops.";
+    } else if (c.cuso4 <= 0 && c.biuret <= 0) {
+      color = hasFood ? food.color : COLORLESS;
+      text = "NaOH added. Now add a few drops of CuSO₄, then shake gently.";
     } else if (!c.shaken) {
       color = "#3d7ec9";
-      text = "Biuret added — still blue. Click Shake on the tube.";
+      text = "NaOH + CuSO₄ added — still blue. Click Shake on the tube.";
     } else if (n.protein > 0) {
       color = PURPLE;
       text = "Blue → violet / purple after shaking. Protein present.";
@@ -377,58 +689,127 @@ function evaluateTube(piece) {
     text = "Use filter paper for the grease-spot test (not a test tube).";
   } else if (test === "clinistix" || test === "albustix" || test === "energy") {
     text = test === "energy"
-      ? "Use the burning set-up — drag it onto the bench, then drop a food on it."
+      ? "Click a food sample to load it onto the burning set-up. Ignite, then record the stopwatch and thermometer."
       : test === "albustix"
-        ? "Dip the yellow test end into the sample for 1 s. Wait 60 s, then compare the pad with the PROTEIN g/l colour chart."
-        : "Dip the light-yellow glucose paper into the sample for 1–2 s. Wait 60 s — it darkens to green, brown, or blue-grey if glucose is present.";
+        ? "Dip unused yellow Albustix into the sample. Color change to blue-green indicates protein."
+        : "Dip unused pink Clinistix into the sample. Color change to purple indicates glucose.";
   }
 
   return { color, vol, ppt, pptAmt: evPptAmt, cloudy, fizz, text, drops };
 }
 
+function alcoholHostOf(piece) {
+  const host = state.pieces.find((x) => x.id === piece.dockedTo);
+  if (host?.kind === "beaker" && host.role === "alcohol") return host;
+  return null;
+}
+
+function alcoholTubeInBath(beaker) {
+  return !!(beaker && state.pieces.some((b) => b.kind === "bath" && beaker.dockedTo === b.id));
+}
+
 function evaluatePaper(piece) {
   const food = foodById(piece.foodId);
-  if (!food) return { on: false, translucent: false, gone: false, text: "Drop the sample onto filter paper, then view the spot under light." };
-  if (food.n.lipid <= 0) {
-    return { on: true, translucent: false, gone: false, text: `No translucent (半透明) spot under light. Lipid not detected in ${food.name}.` };
+  if (!food) return { on: false, translucent: false, gone: false, text: "Drop a liquid or rub a solid food onto filter paper, then leave the spot to dry." };
+  const lipid = food.n.lipid > 0;
+  if (!piece.dried) {
+    return {
+      on: true,
+      translucent: false,
+      gone: false,
+      wet: true,
+      text: piece.rubbed
+        ? `Rubbed ${food.name} onto the paper. Leave the spot to dry — a water spot disappears; a lipid spot stays.`
+        : `Spot of ${food.name} on the paper. Leave it to dry before holding it up to the light.`,
+    };
+  }
+  if (!lipid) {
+    return { on: false, translucent: false, gone: true, text: `Spot disappeared after drying. Not a lipid (water evaporates). Lipid not detected in ${food.name}.` };
   }
   if (piece.solvent) {
-    return { on: false, translucent: false, gone: true, text: "Translucent spot disappears after alcohol (organic solvent). Lipid present — the grease dissolved." };
+    return { on: false, translucent: false, gone: true, text: "Translucent spot dissolves in alcohol (organic solvent). Lipid present." };
   }
   if (!piece.lit) {
-    return { on: true, translucent: true, gone: false, text: "Spot on the paper. Click “Under light” to check if it is translucent (半透明)." };
+    return { on: true, translucent: false, gone: false, text: "Spot remains after drying. Hold the paper up to the light to check if it is translucent (半透明)." };
   }
-  return { on: true, translucent: true, gone: false, text: "Translucent spot under light. Now drip alcohol onto the spot — a lipid spot will disappear." };
+  return { on: true, translucent: true, gone: false, text: "Translucent 半透明 spot under light — lipid present. Optional: drip alcohol onto the spot; a lipid spot dissolves." };
 }
 
 function evaluateBlock(piece) {
   const food = foodById(piece.foodId);
   if (!food) return { stain: null, pale: false, text: "" };
   const isLeaf = LEAF_IDS.has(food.id);
-  if (isLeaf && state.test === "iodine") {
+  if (isLeaf && (state.test === "iodine" || state.test === "iodine-leaf")) {
+    const alcohol = alcoholHostOf(piece);
     if (!piece.boiled) {
       const left = heatingRemainFor(piece);
-      if (left) return { stain: null, pale: false, text: `Boiling the leaf… ${left} min left (1 lab min = 1 s). Result after 5 min.` };
-      return { stain: null, pale: false, text: "Leaf test: drop the leaf into the water bath and boil for 5 minutes to destroy cell membranes." };
+      if (left) return { stain: null, pale: false, text: `Boiling the leaf in water… ${left} min left (1 lab min = 1 s). This destroys the cell membrane.` };
+      const inBath = state.pieces.some((b) => b.kind === "bath" && piece.dockedTo === b.id);
+      if (inBath) return { stain: null, pale: false, text: "Leaf is in the water bath. Click Boil 5 min (destroy cell membrane)." };
+      return { stain: null, pale: false, text: "1. Drop the green leaf into the beaker of water and boil (destroy cell membrane)." };
     }
-    if (!piece.decolourised) return { stain: null, pale: false, text: "Boiled. Place the leaf in hot alcohol to remove chlorophyll." };
-    if (!piece.washed) return { stain: null, pale: true, text: "Chlorophyll removed — leaf is pale. Wash with water to remove alcohol." };
-    if (!piece.iodine) return { stain: null, pale: true, text: "Washed. Add iodine solution." };
+    if (!piece.decolourised) {
+      if (!alcohol) {
+        return { stain: null, pale: false, text: "2. Put the boiled leaf into the alcohol boiling tube. Then heat that tube in the water bath — never heat alcohol directly." };
+      }
+      const inBath = alcoholTubeInBath(alcohol);
+      const left = heatingRemainFor(alcohol) || (inBath ? heatingRemainFor(piece) : 0);
+      if (inBath && left) return { stain: null, pale: false, text: `Heating the alcohol tube in the water bath… ${left} min left. Chlorophyll is dissolving.` };
+      if (inBath) return { stain: null, pale: false, text: "Alcohol tube is in the water bath. Click Boil 5 min to remove chlorophyll." };
+      return { stain: null, pale: false, text: "Leaf is in alcohol. Drag the alcohol boiling tube into the water bath and boil. Never heat alcohol directly — it is flammable." };
+    }
+    if (!piece.washed) return { stain: null, pale: true, text: "3. Wash with water (wash away alcohol and soften the leaf)." };
+    if (!piece.iodine) return { stain: null, pale: true, text: "4. Add iodine to a test tube, then dip the pale leaf into the iodine (or pour the iodine onto the leaf on the white tile)." };
     if (food.n.starch > 0) return { stain: BLACK, pale: true, text: "Brown → blue-black. Starch present in the leaf." };
     return { stain: BROWN, pale: true, text: "Remains brown. Starch absent." };
   }
   if (piece.iodine && food.n.starch > 0) return { stain: BLACK, pale: false, text: `Iodine on ${food.name}: brown → blue-black. Starch present.` };
   if (piece.iodine) return { stain: BROWN, pale: false, text: `Iodine on ${food.name}: remains brown. Starch absent.` };
-  return { stain: null, pale: false, text: "Add iodine to the food, or follow the leaf steps if it is a green leaf." };
+  return { stain: null, pale: false, text: "Put solid food on the white tile and add a few drops of iodine." };
 }
 
 function evaluateStrip(piece) {
+  if (piece.strip === "phpaper") {
+    const tube = state.pieces.find((p) => p.id === piece.tubeId && p.kind === "tube");
+    const c = tube?.contents;
+    if (!tube || !c) {
+      return {
+        color: "#f0c070",
+        text: "Unused pH paper. Dip it into the hydrolysed mixture after adding NaHCO₃. Alkaline (blue-green) means you may add Benedict’s.",
+        reading: "",
+        band: "",
+      };
+    }
+    if (c.alkaliAdded || c.neutralized) {
+      if (tube.contents) tube.contents.neutralized = true;
+      return {
+        color: "#2a8a82",
+        text: "pH paper → blue-green. Mixture is alkaline. Now add 5 cm³ Benedict’s and boil.",
+        reading: "alkaline",
+        band: "alk",
+      };
+    }
+    if (c.hydrolysed || c.hcl > 0) {
+      return {
+        color: "#d94a2a",
+        text: "pH paper → red / orange. Still acidic. Add more NaHCO₃ until alkaline.",
+        reading: "acidic",
+        band: "acid",
+      };
+    }
+    return {
+      color: "#f0c070",
+      text: "pH paper unchanged. Hydrolyse with HCl first, cool, then add NaHCO₃.",
+      reading: "",
+      band: "",
+    };
+  }
   const food = foodById(piece.foodId);
   if (piece.strip === "clinistix") {
     if (!food) {
       return {
         color: GLUCOSE_UNUSED,
-        text: "The unused glucose paper is light yellow. Dip it into the sample for 1–2 s. Wait 60 s — it darkens to green, brown, or blue-grey if glucose is present.",
+        text: "Unused Clinistix paper is pink. Dip it into the sample. Color change (pink → purple) indicates presence of glucose.",
         reading: "",
         band: "",
       };
@@ -437,7 +818,7 @@ function evaluateStrip(piece) {
     if (developing) {
       return {
         color: GLUCOSE_UNUSED,
-        text: `Dipped 1–2 s in ${food.name}. Wait 60 s (1 lab min) — watch for darker green, brown, or blue-grey.`,
+        text: `Dipped in ${food.name}. Watch for pink → purple.`,
         reading: "",
         band: "",
         developing: true,
@@ -447,14 +828,14 @@ function evaluateStrip(piece) {
     if (band.key === "0") {
       return {
         color: band.color,
-        text: `Paper stays light yellow (0%). No darkening — glucose not detected in ${food.name}.`,
+        text: `Paper stays pink. No color change — glucose not detected in ${food.name}.`,
         reading: band.reading,
         band: band.key,
       };
     }
     return {
       color: band.color,
-      text: `Light yellow → ${band.word}. Glucose present in ${food.name} (about ${band.reading}).`,
+      text: `Pink → purple. Glucose present in ${food.name}.`,
       reading: band.reading,
       band: band.key,
     };
@@ -462,7 +843,7 @@ function evaluateStrip(piece) {
   if (!food) {
     return {
       color: ALBUSTIX_YELLOW,
-      text: "The test end of Albustix paper is yellow. Dip it into the food sample for 1 s, wait 60 s, then compare with the colour chart.",
+      text: "Unused Albustix paper is yellow. Dip it into the sample. Color change (yellow → blue-green) indicates protein.",
       reading: "",
       band: "",
     };
@@ -471,7 +852,7 @@ function evaluateStrip(piece) {
   if (developing) {
     return {
       color: ALBUSTIX_YELLOW,
-      text: `Dipped 1 s in ${food.name}. Wait 60 s (1 lab min), then read the pad against the PROTEIN g/l chart.`,
+      text: `Dipped in ${food.name}. Watch for yellow → blue-green.`,
       reading: "",
       band: "",
       developing: true,
@@ -481,14 +862,14 @@ function evaluateStrip(piece) {
   if (band.key === "neg") {
     return {
       color: band.color,
-      text: `Pad remains yellow (NEG.). Protein not detected in ${food.name}.`,
+      text: `Pad remains yellow. No color change — protein not detected in ${food.name}.`,
       reading: band.reading,
       band: band.key,
     };
   }
   return {
     color: band.color,
-    text: `The test end turns ${band.word} — about ${band.reading} protein in ${food.name}.`,
+    text: `Yellow → blue-green. Protein present in ${food.name}.`,
     reading: band.reading,
     band: band.key,
   };
@@ -496,25 +877,51 @@ function evaluateStrip(piece) {
 
 function evaluateBurner(piece) {
   const food = foodById(piece.foodId);
-  if (!food) return { text: "Drop a food sample onto the burning set-up. Ignite, then read the stopwatch and thermometer." };
-  const e = energyOf(food);
+  const plan = energyPlan();
+  const n = burnerIndex(piece);
+  if (!plan.dvDT && !plan.dvTime) return { text: "Tick ΔT and/or time on the right — that is the DV you will measure." };
+  if (!food) return { text: `Set-up ${n}: click a food on the left, then Ignite.` };
+  const e = energyOf(food, piece);
+  const taps = [plan.dvDT ? "the thermometer (ΔT)" : null, plan.dvTime ? "the stopwatch (time)" : null].filter(Boolean);
   if (!piece.burned) {
-    return { text: `${food.name} ready. Click Ignite. Lipids give about double the energy per gram of carbohydrate or protein.` };
+    return { text: `Set-up ${n} has ${food.name}. Click Ignite, then tap ${taps.join(" and ")} to record the DV.` };
   }
-  const note = e.lip >= 6
-    ? "High lipid — flame lasts longer and ΔT is larger (lipid energy per gram is about double)."
-    : "Mostly carbohydrate / protein — shorter flame and smaller ΔT than a fatty food of the same mass.";
-  return { text: `${food.name}: flame ${e.time} s · water ΔT +${e.dT} °C. ${note}` };
+  const missing = [];
+  if (plan.dvDT && !piece.readDT) missing.push("tap the thermometer for ΔT");
+  if (plan.dvTime && !piece.readTime) missing.push("tap the stopwatch for time");
+  if (missing.length) return { text: `Set-up ${n}: flame out. Next: ${missing.join(" and ")}.` };
+  const bits = [
+    plan.dvDT ? `ΔT +${e.dT}°C` : null,
+    plan.dvTime ? `${e.time} s` : null,
+  ].filter(Boolean).join(" · ");
+  const extra = e.lip >= 6
+    ? " High fat — about double the energy of starch or protein."
+    : plan.dvDT && plan.iv.id === "waterVol" && e.waterVol !== 20
+      ? (e.waterVol > 20 ? " More water → smaller ΔT." : " Less water → larger ΔT.")
+      : plan.dvDT && plan.iv.id === "mass" && e.mass !== 1
+        ? (e.mass > 1 ? " More food → larger ΔT." : " Less food → smaller ΔT.")
+        : plan.dvDT && plan.iv.id === "distance" && e.distance === "far"
+          ? " Farther away → more heat lost → smaller ΔT."
+          : "";
+  return { text: `Set-up ${n} · ${food.name}: ${bits}.${extra}` };
 }
 
 function currentObservation() {
+  if (state.test === "iodine-leaf") {
+    const sel = state.pieces.find((p) => p.id === state.selectedPiece);
+    if (sel?.kind === "tube") return evaluateTube(sel).text;
+    const leaf = (sel?.kind === "block" ? sel : null)
+      || [...state.pieces].reverse().find((p) => p.kind === "block" && LEAF_IDS.has(p.foodId));
+    if (leaf) return evaluateBlock(leaf).text;
+    return "Click a green leaf (or drag it into the water bath), then boil 5 min in water. Next: leaf into the alcohol tube → heat that tube in the water bath → wash → white tile → dip in iodine from a test tube.";
+  }
   const sel = state.pieces.find((p) => p.id === state.selectedPiece);
   if (sel?.kind === "tube") return evaluateTube(sel).text;
   if (sel?.kind === "paper") return evaluatePaper(sel).text;
   if (sel?.kind === "block") return evaluateBlock(sel).text;
   if (sel?.kind === "strip") return evaluateStrip(sel).text;
   if (sel?.kind === "burner") return evaluateBurner(sel).text;
-  const prefer = { clinistix: "strip", albustix: "strip", grease: "paper", energy: "burner", iodine: "block" }[state.test];
+  const prefer = { clinistix: "strip", albustix: "strip", grease: "paper", energy: "burner", iodine: "block", "iodine-leaf": "block" }[state.test];
   if (prefer) {
     const hit = [...state.pieces].reverse().find((p) => p.kind === prefer);
     if (hit?.kind === "strip") return evaluateStrip(hit).text;
@@ -531,7 +938,7 @@ function currentObservation() {
     const filled = foodById(state.dropper.fill)?.name || REAGENTS[state.dropper.fill]?.name || state.dropper.fill;
     return `Dropper holds ${filled} (${dropperDoseLabel()}). Click a test tube or filter paper to add it.`;
   }
-  return "Drag a test tube onto the bench and place it anywhere. Each dropper squeeze of food or test solution is 1 cm³ (vitamin C sample stays dropwise). Drag a tube into the water bath only when you want to heat it.";
+  return "Follow the procedure on the left. Drag apparatus if you need extra pieces, then add the sample.";
 }
 
 function currentDrops() {
@@ -541,9 +948,18 @@ function currentDrops() {
   return evaluateTube(tube).drops;
 }
 
+function visibleFoods() {
+  const lab = labById(state.test);
+  const ids = lab?.foods;
+  if (!ids?.length) return FOODS;
+  return FOODS.filter((f) => ids.includes(f.id));
+}
+
 function renderFoods() {
   const box = document.getElementById("food-list");
-  box.innerHTML = FOODS.map((f) => `
+  if (!box) return;
+  const foods = visibleFoods();
+  box.innerHTML = foods.map((f) => `
     <button type="button" class="food-item ${state.selectedFood === f.id ? "selected" : ""}" data-food="${f.id}">
       <span class="food-swatch ${f.form}" style="--swatch:${f.color}"></span>
       <span><span class="name">${f.name}</span><br><span class="sub">${f.zh} · ${f.form === "liquid" ? "liquid" : "block"}</span></span>
@@ -551,27 +967,216 @@ function renderFoods() {
   `).join("");
 }
 
-function renderTests() {
-  const box = document.getElementById("test-list");
-  const block = document.getElementById("test-block");
-  const sel = document.getElementById("test-cat");
-  if (sel && sel.value !== state.testCat) sel.value = state.testCat;
-  if (sel) sel.disabled = !!state.embedLocked;
-  if (!state.testCat && !state.embedLocked) {
-    block.hidden = true;
+function renderLabNav() {
+  const nav = document.getElementById("lab-nav");
+  if (!nav) return;
+  nav.innerHTML = LABS.map((lab) => {
+    const on = lab.tab === "bank" ? state.tab === "bank" : (state.tab === "lab" && state.test === lab.id);
+    return `<button type="button" data-lab="${lab.id}" class="${on ? "active" : ""}">${lab.title}</button>`;
+  }).join("");
+}
+
+function leafStepIndex() {
+  const leaf = [...state.pieces].reverse().find((p) => p.kind === "block" && LEAF_IDS.has(p.foodId));
+  if (!leaf) return 0;
+  if (!leaf.boiled) return 1;
+  if (!leaf.decolourised) return 2;
+  if (!leaf.washed) return 3;
+  if (!leaf.iodine) return 4;
+  return 5;
+}
+
+function procedureFor(testId) {
+  const steps = {
+    clinistix: {
+      title: "Glucose test paper (Clinistix)",
+      items: ["Dip Clinistix paper into the sample.", "Look for a color change."],
+      why: "Positive result: pink → purple. Color change indicates presence of glucose.",
+    },
+    benedict: {
+      title: "Benedict’s test (reducing sugar)",
+      items: [
+        "Add equal volumes: 5 cm³ sample + 5 cm³ Benedict’s.",
+        "Stand the tube in a beaker of boiling water (water bath) for 5 min.",
+        "Observe the precipitate.",
+      ],
+      why: "Positive: brick-red precipitate. More precipitate = more reducing sugar. Sucrose is non-reducing until hydrolysed.",
+    },
+    iodine: {
+      title: "Iodine test (starch in food)",
+      items: [
+        "Solid food: put it on a white tile and add a few drops of iodine.",
+        "Liquid: add a few drops of iodine to the sample in a test tube.",
+        "Observe the colour.",
+      ],
+      why: "Positive: brown → blue-black. Starch is the storage polysaccharide in plants.",
+    },
+    "iodine-leaf": {
+      title: "Iodine test on a green leaf",
+      items: [
+        "Boil the leaf in water (destroy cell membrane).",
+        "Put the leaf in a boiling tube of alcohol. Heat that tube in the water bath (never heat alcohol directly).",
+        "Wash with water (wash away alcohol).",
+        "Spread the leaf on a white tile. Put iodine in a test tube and dip the leaf into it (or pour the iodine onto the leaf).",
+      ],
+      why: "Chlorophyll would hide the blue-black colour, so remove it in hot alcohol. Alcohol is flammable — heat the alcohol tube in a water bath, never with a naked flame. Positive: brown → blue-black.",
+    },
+    nrs: {
+      title: "Non-reducing sugar (sucrose)",
+      items: [
+        "Add sample + dilute HCl. Boil 5 min to hydrolyse.",
+        "Cool the tube.",
+        "Add NaHCO₃ until alkaline (check with pH paper).",
+        "Then do Benedict’s test (5 cm³, boil 5 min).",
+      ],
+      why: "Sucrose is the ★ exception: a non-reducing sugar. After hydrolysis it gives glucose + fructose, so Benedict’s can go brick-red.",
+    },
+    albustix: {
+      title: "Protein test paper (Albustix)",
+      items: ["Dip Albustix paper into the sample.", "Look for a color change."],
+      why: "Positive: yellow → blue-green.",
+    },
+    biuret: {
+      title: "Biuret test (protein)",
+      items: [
+        "Add the sample (grind solid food and filter to make an extract).",
+        "Add sodium hydroxide (NaOH).",
+        "Add a few drops of copper sulfate (CuSO₄).",
+        "Shake gently.",
+      ],
+      why: "Positive: blue → violet/purple.",
+    },
+    grease: {
+      title: "Grease spot test (lipid)",
+      items: [
+        "Drop a liquid or rub a solid food onto filter paper.",
+        "Leave the spot to dry.",
+        "Hold the paper up to the light. A lipid spot stays translucent 半透明.",
+        "Drip alcohol onto a lipid spot — it dissolves.",
+      ],
+      why: "Positive: spot remains after drying and is translucent; it then dissolves in organic solvent. Water spots disappear on drying. Lipids are insoluble in water (non-polar).",
+    },
+    vitc: {
+      title: "DCPIP test (vitamin C)",
+      items: ["Add sample dropwise 逐滴 to DCPIP solution.", "Mix well.", "Observe color change."],
+      why: "Positive: blue → colorless. Fewer drops needed = higher vitamin C concentration. Heat destroys vitamin C.",
+    },
+    energy: (() => {
+      const plan = energyPlan();
+      const read = [plan.dvDT ? "tap the thermometer" : null, plan.dvTime ? "tap the stopwatch" : null].filter(Boolean).join(" and ");
+      return {
+        title: "Energy in food",
+        items: [
+          "Choose what you change (IV) and what you measure (DV) on the right.",
+          plan.iv.id === "food"
+            ? "Add a second set-up. Put a different food on each one."
+            : `Add a second set-up. Use the same food. Change only the ${plan.iv.label.toLowerCase()}.`,
+          plan.dvDT || plan.dvTime
+            ? `Click Ignite, then ${read} to record the DV.`
+            : "Tick ΔT and/or time first — that is the DV.",
+        ],
+        why: "Change only one thing (the IV). Keep the rest the same. The DV is what you read from the apparatus. Fat has about double the energy of starch or protein.",
+      };
+    })(),
+  };
+  return steps[testId];
+}
+
+function renderProcedure() {
+  const box = document.getElementById("proc");
+  if (!box) return;
+  const p = procedureFor(state.test);
+  if (!p) {
     box.innerHTML = "";
     return;
   }
-  block.hidden = false;
-  const rows = state.embedLocked
-    ? TESTS.filter((t) => t.id === state.embedLocked)
-    : TESTS.filter((t) => t.cat === state.testCat);
-  box.innerHTML = rows.map((t) => `
-    <button type="button" class="test-item ${state.test === t.id ? "active" : ""}" data-test="${t.id}">
-      <span class="t-name">${t.name}</span>
-      <span class="t-sub">${t.sub}</span>
-    </button>
-  `).join("");
+  const leafNow = state.test === "iodine-leaf" ? leafStepIndex() : -1;
+  box.innerHTML = `<h3>${p.title}</h3><ol>${p.items.map((s, i) => {
+    let cls = "";
+    if (leafNow >= 0) {
+      if (i + 1 < leafNow) cls = "done";
+      else if (i + 1 === Math.min(leafNow, 4)) cls = "now";
+    }
+    return `<li class="${cls}">${s}</li>`;
+  }).join("")}</ol><p class="why">${p.why}</p>`;
+}
+
+function renderVars() {
+  const side = document.getElementById("lab-side");
+  if (!side) return;
+  if (state.test !== "energy") {
+    const extra = {
+      clinistix: "Notes table: dip Clinistix into the sample. Pink to purple (color change).",
+      benedict: "Equal volumes (5 cm³ + 5 cm³). Stand the tube in a beaker of boiling water for 5 min. Brick-red precipitate — more precipitate = more reducing sugar.",
+      iodine: "Solid food: white tile + drops of iodine. Liquid: drops in a test tube. Use the Green leaf panel for chlorophyll-removal.",
+      "iodine-leaf": "Boil in water first. Heat the alcohol tube in the water bath — never heat alcohol directly. After washing, dip the leaf in iodine from a test tube.",
+      nrs: "Hydrolyse with HCl → cool → NaHCO₃ until pH paper is alkaline → Benedict’s. Sucrose is non-reducing until then.",
+      albustix: "Notes table: dip Albustix into the sample. Yellow to blue-green.",
+      biuret: "NaOH first, then a few drops of CuSO₄. Shake gently. Blue → violet/purple. Solid food: grind and filter an extract.",
+      grease: "Rub or drop onto paper, dry, then hold up to the light. Lipid spot stays translucent 半透明 and dissolves in alcohol. Water spots vanish on drying.",
+      vitc: "Fewer drops to decolorize a fixed volume of DCPIP = higher vitamin C. Heat destroys vitamin C.",
+    }[state.test] || "";
+    side.innerHTML = extra ? `<div class="side-card"><h3>From the notes</h3><p>${extra}</p></div>` : "";
+    return;
+  }
+  const plan = energyPlan();
+  const calo = state.pieces.find((p) => p.id === state.selectedPiece && p.kind === "burner")
+    || [...state.pieces].reverse().find((p) => p.kind === "burner");
+  const ivOpts = ENERGY_IV_OPTIONS.map((o) =>
+    `<option value="${o.id}" ${plan.iv.id === o.id ? "selected" : ""}>${o.label}</option>`
+  ).join("");
+  const cid = calo ? calo.id : "";
+  const fieldInput = (p, field) => {
+    const d = burnerDefaults(p);
+    if (field === "mass") return `<input type="range" min="0.5" max="2" step="0.5" value="${d.mass}" data-calo="${p.id}" data-calo-field="mass" /><span class="conc-val">${d.mass} g</span>`;
+    if (field === "waterVol") return `<input type="range" min="10" max="40" step="5" value="${d.waterVol}" data-calo="${p.id}" data-calo-field="waterVol" /><span class="conc-val">${d.waterVol} cm³</span>`;
+    if (field === "t0") return `<input type="range" min="10" max="30" step="5" value="${d.t0}" data-calo="${p.id}" data-calo-field="t0" /><span class="conc-val">${d.t0}°C</span>`;
+    return `<select data-calo="${p.id}" data-calo-field="distance">
+          <option value="close" ${d.distance === "close" ? "selected" : ""}>Near</option>
+          <option value="medium" ${d.distance === "medium" ? "selected" : ""}>Middle</option>
+          <option value="far" ${d.distance === "far" ? "selected" : ""}>Far</option>
+        </select>`;
+  };
+  const slider = (p, field, label, cls) => `
+      <label class="quiz-row ${cls}">${label}
+        ${fieldInput(p, field)}
+      </label>`;
+  const burners = state.pieces.filter((p) => p.kind === "burner");
+  const ivCtrl = plan.iv.id === "food"
+    ? `<p class="why">Put a different food on each set-up (click the food, then the next food).</p>`
+    : burners.map((p) => slider(p, plan.iv.id, `${plan.iv.label} · set-up ${burnerIndex(p)}`, "is-iv")).join("");
+  const cvSliders = calo ? plan.cvs.filter((c) => c.id !== "food").map((c) => slider(calo, c.id, c.label, "is-cv")).join("") : "";
+  side.innerHTML = `
+    <div class="side-card">
+      <h3>Fair test</h3>
+      <label class="quiz-row"><span class="var-tag iv">IV</span> What I change
+        <select data-energy-iv>${ivOpts}</select>
+      </label>
+      <p class="keep-line"><span class="var-tag cv">CV</span> Same on both: ${plan.cvs.map((c) => c.label.toLowerCase()).join(", ")}</p>
+      <p class="check-label"><span class="var-tag dv">DV</span> What I measure</p>
+      <label class="check-row"><input type="checkbox" data-energy-dv="dT" ${plan.dvDT ? "checked" : ""} /> ΔT (temperature change)</label>
+      <label class="check-row"><input type="checkbox" data-energy-dv="time" ${plan.dvTime ? "checked" : ""} /> Time until the flame goes out</label>
+      <p class="why">${!plan.dvDT && !plan.dvTime
+        ? "Tick at least one DV."
+        : `After Ignite, ${[plan.dvDT ? "tap the thermometer" : null, plan.dvTime ? "tap the stopwatch" : null].filter(Boolean).join(" and ")}.`}</p>
+      <div data-fair-status>${energyFairHtml()}</div>
+      ${energyCompareTableHtml()}
+      ${ivCtrl}
+      ${calo ? `<details class="energy-more"${energyCvMismatches().length ? " open" : ""}><summary>Same on both (CV)</summary>${cvSliders}<p class="why">Changing these copies them to every set-up.</p></details>` : ""}
+      <details class="energy-more"><summary>Picture size</summary>
+        <label class="quiz-row">Size
+          <input type="range" min="0.85" max="1.8" step="0.05" value="${state.energyScale}" data-energy-scale />
+          <span class="conc-val">${Math.round(state.energyScale * 100)}%</span>
+        </label>
+      </details>
+      <p class="why">Bigger ΔT = more energy. Fat ≈ double starch / protein.</p>
+    </div>`;
+}
+
+function renderTests() {
+  renderLabNav();
+  renderProcedure();
+  renderVars();
 }
 
 function renderColorScale(title, bands, matchKey) {
@@ -592,17 +1197,19 @@ function renderConc() {
   const scale = document.getElementById("protein-scale");
   if (t?.id === "albustix" || t?.id === "clinistix") {
     panel.classList.add("on");
+    panel.hidden = false;
+    panel.removeAttribute("aria-hidden");
     if (sliderWrap) sliderWrap.hidden = true;
     const stripId = t.id;
     const sel = state.pieces.find((p) => p.id === state.selectedPiece && p.kind === "strip" && p.strip === stripId)
       || [...state.pieces].reverse().find((p) => p.kind === "strip" && p.strip === stripId);
     const ev = sel ? evaluateStrip(sel) : null;
     if (t.id === "clinistix") {
-      renderColorScale("GLUCOSE %", GLUCOSE_SCALE, ev?.band || "");
-      document.getElementById("conc-hint").textContent = "Unused paper is light yellow. After 60 s, glucose darkens it through green, then brown, then blue-grey. Darker shade means higher concentration.";
+      renderColorScale("Glucose", GLUCOSE_SCALE, ev?.band || "");
+      document.getElementById("conc-hint").textContent = "Unused Clinistix is pink. Color change to purple indicates glucose.";
     } else {
-      renderColorScale("PROTEIN g/l", ALBUSTIX_SCALE, ev?.band || "");
-      document.getElementById("conc-hint").textContent = "Dip the yellow test end into the food sample for 1 s. Wait 60 s, then compare the pad colour with this chart. Shade may be greener than blue, depending on the strip chart.";
+      renderColorScale("Protein", ALBUSTIX_SCALE, ev?.band || "");
+      document.getElementById("conc-hint").textContent = "Unused Albustix is yellow. Color change to blue-green indicates protein.";
     }
     return;
   }
@@ -613,9 +1220,13 @@ function renderConc() {
   if (sliderWrap) sliderWrap.hidden = false;
   if (!t?.conc) {
     panel.classList.remove("on");
+    panel.hidden = true;
+    panel.setAttribute("aria-hidden", "true");
     return;
   }
   panel.classList.add("on");
+  panel.hidden = false;
+  panel.removeAttribute("aria-hidden");
   const v = state.conc[t.conc.key];
   document.getElementById("conc-label").textContent = t.conc.label;
   document.getElementById("conc-val").textContent = `${v}${t.conc.unit}`;
@@ -630,26 +1241,32 @@ function renderConc() {
 function dropperLabel() {
   if (!state.dropper.on) return "Dropper";
   if (state.dropper.fill && foodById(state.dropper.fill)) {
-    const dose = state.test === "vitc" ? " · 1 drop" : " · 1 cm³";
+    const dose = state.test === "vitc" ? " · 1 drop"
+      : state.test === "benedict" ? " · 5 cm³"
+      : state.test === "biuret" ? " · 2 cm³ extract"
+      : " · 1 cm³";
     return "Dropper · " + foodById(state.dropper.fill).name + dose;
   }
   if (state.dropper.fill && REAGENTS[state.dropper.fill]) {
-    return "Dropper · " + REAGENTS[state.dropper.fill].name + " · 1 cm³";
+    return "Dropper · " + REAGENTS[state.dropper.fill].name + " · " + reagentDoseLabel(state.dropper.fill);
   }
   return "Dropper · empty";
 }
 
 function apparatusList() {
   const t = testById(state.test);
+  if (!t) return [];
   const items = [];
   if (t.extra.includes("tube")) items.push({ id: "tube", label: "Test tube" });
-  items.push({ id: "dropper", label: dropperLabel() });
-  if (t.extra.includes("bath")) items.push({ id: "bath", label: t.id === "benedict" ? "Hot water bath" : "Water bath" });
+  if (t.id !== "energy" && t.id !== "iodine-leaf") items.push({ id: "dropper", label: dropperLabel() });
+  if (t.extra.includes("bath")) items.push({ id: "bath", label: "Water bath (beaker)" });
   if (t.extra.includes("paper")) items.push({ id: "paper", label: "Filter paper" });
+  if (t.extra.includes("tile")) items.push({ id: "tile", label: "White tile" });
   if (t.extra.includes("clinistix")) items.push({ id: "clinistix", label: "Glucose paper" });
   if (t.extra.includes("albustix")) items.push({ id: "albustix", label: "Albustix" });
-  if (t.extra.includes("burner")) items.push({ id: "burner", label: "Burning set-up" });
-  (t.reagents || []).forEach((r) => items.push({ id: r, label: REAGENTS[r].name + " · 1 cm³", reagent: true }));
+  if (t.extra.includes("phpaper")) items.push({ id: "phpaper", label: "pH paper" });
+  if (t.extra.includes("burner")) items.push({ id: "burner", label: "Add set-up" });
+  (t.reagents || []).forEach((r) => items.push({ id: r, label: REAGENTS[r].name + " · " + reagentDoseLabel(r), reagent: true }));
   return items;
 }
 
@@ -662,11 +1279,13 @@ function renderApparatus() {
   box.innerHTML = apparatusList().map((a) => {
     const col = a.reagent ? REAGENTS[a.id].color : "#eef3f6";
     const preview = a.id === "tube" ? miniTubeSVG("#eef3f6")
-      : a.id === "bath" ? `<span style="width:28px;height:14px;background:#f3c56b;border:1px solid #c5a04a;display:inline-block"></span>`
+      : a.id === "bath" ? `<span style="width:22px;height:18px;background:#c5e0f0;border:1px solid #8aa;border-radius:0 0 8px 8px;display:inline-block"></span>`
       : a.id === "paper" ? `<span style="width:22px;height:16px;background:#f3f1ea;border:1px solid #ccc;display:inline-block"></span>`
+      : a.id === "tile" ? `<span style="width:22px;height:14px;background:#fbfbfb;border:1px solid #ccc;display:inline-block"></span>`
       : a.id === "dropper" ? `<svg width="18" height="28" viewBox="0 0 18 28"><rect x="7" y="2" width="4" height="10" fill="#c5d0d8"/><path d="M5 12 h8 l-2 14 h-4z" fill="#9eb0bc"/></svg>`
       : a.id === "clinistix" ? `<span class="mini-glucose"><i></i></span>`
       : a.id === "albustix" ? `<span class="mini-albustix"><i></i></span>`
+      : a.id === "phpaper" ? `<span class="mini-phpaper"><i></i></span>`
       : a.id === "burner" ? `<span style="width:22px;height:22px;background:#f4a024;border-radius:50%;display:inline-block"></span>`
       : miniTubeSVG(col);
     return `<button type="button" class="app-item ${a.id === "dropper" && state.dropper.on ? "selected" : ""}" data-app="${a.id}" data-reagent="${a.reagent ? "1" : "0"}">
@@ -680,7 +1299,7 @@ function tubeInBath(tube, bath) {
 }
 
 function dockedItems(bath) {
-  return state.pieces.filter((p) => (p.kind === "tube" || p.kind === "block") && p.dockedTo === bath.id);
+  return state.pieces.filter((p) => (p.kind === "tube" || p.kind === "block" || p.kind === "beaker") && p.dockedTo === bath.id);
 }
 
 function bathAtClientPoint(clientX, clientY) {
@@ -692,7 +1311,7 @@ function bathAtClientPoint(clientX, clientY) {
   return state.pieces.find((p) => {
     if (p.kind !== "bath") return false;
     if (drag?.kind === "piece" && drag.id === p.id) return false;
-    return x >= p.x + 8 && x <= p.x + 312 && y >= p.y + 22 && y <= p.y + 216;
+    return x >= p.x + 8 && x <= p.x + 208 && y >= p.y + 18 && y <= p.y + 188;
   }) || null;
 }
 
@@ -714,6 +1333,25 @@ function dockIntoBath(piece, bath) {
   piece.y = bath.y + 36;
 }
 
+function stationAtClientPoint(clientX, clientY) {
+  const bench = document.getElementById("bench");
+  if (!bench) return null;
+  const r = bench.getBoundingClientRect();
+  const x = clientX - r.left;
+  const y = clientY - r.top;
+  const hits = state.pieces.filter((p) => {
+    if (drag?.kind === "piece" && drag.id === p.id) return false;
+    const size = p.kind === "tile" ? { w: 120, h: 88 } : p.kind === "beaker" ? { w: 86, h: 120 } : null;
+    if (!size) return false;
+    return x >= p.x && x <= p.x + size.w && y >= p.y && y <= p.y + size.h;
+  });
+  return hits[hits.length - 1] || null;
+}
+
+function hitStation(clientX, clientY) {
+  return stationAtClientPoint(clientX, clientY);
+}
+
 function highlightBathUnderPointer(clientX, clientY) {
   const over = bathAtClientPoint(clientX, clientY);
   document.querySelectorAll(".piece.bath").forEach((el) => {
@@ -728,9 +1366,10 @@ function dockedTubes(bath) {
 function blockInnerHtml(p) {
   const food = foodById(p.foodId);
   const ev = evaluateBlock(p);
+  const leaf = LEAF_IDS.has(food.id);
   return `
     <button class="x" type="button" data-del="${p.id}">×</button>
-    <div class="solid-cube ${ev.pale ? "pale" : ""}" style="background:${ev.pale ? "#e8e4c8" : food.color}"></div>
+    <div class="solid-cube ${leaf ? "leaf-shape" : ""} ${ev.pale ? "pale" : ""}" style="background:${ev.pale ? "#e8e4c8" : food.color}"></div>
     <div class="solid-stain ${ev.stain ? "on" : ""}" style="background:${ev.stain || "transparent"}"></div>
     <div class="tube-tag">${food.name}</div>`;
 }
@@ -738,29 +1377,42 @@ function blockInnerHtml(p) {
 function tubeInnerHtml(p, extraClass = "") {
   const ev = evaluateTube(p);
   const cm3 = tubeMeasuredCm3(p.contents);
-  const shakeBtn = state.test === "biuret" && p.contents.biuret + p.contents.naoh > 0 && !p.contents.shaken
+  const c = p.contents;
+  const shakeBtn = state.test === "biuret" && c.naoh > 0 && (c.cuso4 > 0 || c.biuret > 0) && !c.shaken
     ? `<button type="button" class="btn heat-btn" data-shake="${p.id}">Shake</button>` : "";
+  const coolBtn = state.test === "nrs" && c.hydrolysed && !c.cooled
+    ? `<button type="button" class="btn heat-btn" data-cool="${p.id}">Cool</button>` : "";
+  const nestedLeaf = state.pieces.filter((x) => x.kind === "block" && x.dockedTo === p.id)
+    .map((item) => `<div class="bath-item bath-block in-tube ${state.selectedPiece === item.id ? "selected" : ""}" data-id="${item.id}">${blockInnerHtml(item)}</div>`)
+    .join("");
+  const tag = c.iodine > 0 && !c.foodId ? "iodine" : (c.alcohol > 0 && !c.foodId ? "alcohol" : (foodById(c.foodId)?.name || (c.alcohol ? "alcohol" : "empty")));
   return `
     <button class="x" type="button" data-del="${p.id}">×</button>
     <div class="tube-lip"></div>
     <div class="tube-glass">
       <div class="tube-liquid ${ev.ppt ? "ppt ppt-" + (ev.pptAmt || "mid") : ""} ${ev.cloudy ? "cloudy" : ""}" style="height:${ev.vol}%;background:${ev.color}"></div>
       <div class="tube-fizz ${ev.fizz ? "on" : ""}"><i style="left:30%;bottom:20%"></i><i style="left:55%;bottom:10%;animation-delay:.2s"></i><i style="left:40%;bottom:30%;animation-delay:.4s"></i></div>
+      ${nestedLeaf}
     </div>
-    <div class="tube-tag">${foodById(p.contents.foodId)?.name || "empty"}${cm3 ? ` · ${cm3} cm³` : ""}</div>${shakeBtn}`;
+    <div class="tube-tag">${tag}${cm3 ? ` · ${cm3} cm³` : ""}</div>${coolBtn}${shakeBtn}`;
 }
 
 function renderPieces() {
   const bench = document.getElementById("bench");
   bench.classList.toggle("has-items", state.pieces.length > 0);
   bench.querySelectorAll(".piece").forEach((el) => el.remove());
-  const baths = state.pieces.filter((p) => p.kind === "bath");
+  const hosts = state.pieces.filter((p) => p.kind === "bath" || p.kind === "beaker" || p.kind === "tile" || p.kind === "tube");
   const hidden = new Set();
-  baths.forEach((b) => dockedItems(b).forEach((t) => hidden.add(t.id)));
+  hosts.forEach((h) => {
+    state.pieces.forEach((p) => {
+      if ((p.kind === "tube" || p.kind === "block" || p.kind === "beaker") && p.dockedTo === h.id) hidden.add(p.id);
+    });
+  });
   state.pieces.forEach((p) => {
     if (hidden.has(p.id)) return;
     bench.appendChild(pieceEl(p));
   });
+  renderEnergyFairOverlay();
 }
 
 function pieceEl(p) {
@@ -785,14 +1437,22 @@ function pieceEl(p) {
       if (item.kind === "block") {
         return `<div class="bath-item bath-block ${state.selectedPiece === item.id ? "selected" : ""}" data-id="${item.id}">${blockInnerHtml(item)}</div>`;
       }
+      if (item.kind === "beaker") {
+        const innerLeaf = state.pieces.filter((x) => x.kind === "block" && x.dockedTo === item.id)
+          .map((leaf) => `<div class="bath-item bath-block ${state.selectedPiece === leaf.id ? "selected" : ""}" data-id="${leaf.id}">${blockInnerHtml(leaf)}</div>`)
+          .join("");
+        return `<div class="bath-item bath-alcohol ${state.selectedPiece === item.id ? "selected" : ""}" data-id="${item.id}">
+          <div class="alcohol-tube-mini"><span>alcohol</span>${innerLeaf}</div>
+        </div>`;
+      }
       return `<div class="bath-item bath-tube tube ${state.selectedPiece === item.id ? "selected" : ""}" data-id="${item.id}">${tubeInnerHtml(item)}</div>`;
     }).join("");
-    const emptyHint = state.test === "iodine"
-      ? "Drop a leaf or test tube in here"
-      : "Drop a test tube in here";
+    const emptyHint = state.test === "iodine-leaf"
+      ? "1. Drop a green leaf in here and boil in water"
+      : "Stand the test tube in this beaker of water";
     el.innerHTML = `
       <button class="x" type="button" data-del="${p.id}">×</button>
-      <div class="bath-label">Water bath${heatingNow ? ` · boiling · ${remain} min left` : (p.hot ? " · boiled" : "")}</div>
+      <div class="bath-label">Water bath (beaker)${heatingNow ? ` · boiling · ${remain} min left` : (p.hot ? " · boiling" : "")}</div>
       <div class="bath-box">
         <div class="bath-water"></div>
         <div class="bath-rack">${nested || `<span style="font-size:11px;color:#355;padding:8px">${emptyHint}</span>`}</div>
@@ -802,11 +1462,16 @@ function pieceEl(p) {
   } else if (p.kind === "paper") {
     const ev = evaluatePaper(p);
     el.classList.add("paper");
+    const dryBtn = !p.dried && p.foodId
+      ? `<button type="button" class="btn heat-btn" data-dry="${p.id}">Dry</button>`
+      : (p.dried && !p.lit
+        ? `<button type="button" class="btn heat-btn" data-light="${p.id}">Hold up to light</button>`
+        : "");
     el.innerHTML = `
       <button class="x" type="button" data-del="${p.id}">×</button>
       <div class="bath-label">Filter paper</div>
-      <div class="paper-sheet ${p.lit ? "lit" : ""}"><div class="paper-spot ${ev.on ? "on" : ""} ${ev.translucent ? "translucent" : ""} ${ev.gone ? "gone" : ""}"></div></div>
-      <button type="button" class="btn heat-btn" data-light="${p.id}">Under light</button>`;
+      <div class="paper-sheet ${p.lit ? "lit" : ""}"><div class="paper-spot ${ev.on ? "on" : ""} ${ev.wet ? "wet" : ""} ${ev.translucent ? "translucent" : ""} ${ev.gone ? "gone" : ""}"></div></div>
+      ${dryBtn}`;
   } else if (p.kind === "block") {
     el.classList.add("solid-block");
     el.innerHTML = blockInnerHtml(p);
@@ -817,8 +1482,18 @@ function pieceEl(p) {
       el.classList.add("clinistix-strip");
       el.innerHTML = `
         <button class="x" type="button" data-del="${p.id}">×</button>
-        <div class="strip-body${ev.developing ? " developing" : ""}" style="background:${ev.color}"></div>
-        <div class="tube-tag">${ev.reading ? `Glucose · ${ev.reading}` : "Glucose paper"}</div>`;
+        <div class="strip-body">
+          <div class="strip-pad${ev.developing ? " developing" : ""}" style="background:${ev.color}"></div>
+        </div>
+        <div class="tube-tag">${ev.reading ? `Glucose · ${ev.reading}` : "Clinistix"}</div>`;
+    } else if (p.strip === "phpaper") {
+      el.classList.add("phpaper-strip");
+      el.innerHTML = `
+        <button class="x" type="button" data-del="${p.id}">×</button>
+        <div class="strip-body">
+          <div class="strip-pad${ev.developing ? " developing" : ""}" style="background:${ev.color}"></div>
+        </div>
+        <div class="tube-tag">${ev.reading ? `pH · ${ev.reading}` : "pH paper"}</div>`;
     } else {
       el.classList.add("albustix-strip");
       el.innerHTML = `
@@ -830,19 +1505,78 @@ function pieceEl(p) {
     }
   } else if (p.kind === "burner") {
     const food = foodById(p.foodId);
-    const e = food ? energyOf(food) : null;
+    const e = food ? energyOf(food, p) : energyOf(null, p);
+    const s = burnerDefaults(p);
+    const n = burnerIndex(p);
+    const plan = energyPlan();
+    const needDT = !!(p.burned && food && plan.dvDT && !p.readDT);
+    const needTime = !!(p.burned && food && plan.dvTime && !p.readTime);
+    const thermoTxt = !p.burned || !food
+      ? `T ${s.t0}°C`
+      : !plan.dvDT ? `T ${s.t0}°C`
+      : p.readDT ? `T ${e.t1}°C`
+      : "Tap to read T";
+    const watchTxt = !p.burned || !food
+      ? "0:00"
+      : !plan.dvTime ? "—"
+      : p.readTime ? `${e.time} s`
+      : "Tap to read";
+    const dTTxt = !plan.dvDT
+      ? ""
+      : p.readDT && p.burned && food ? `ΔT +${e.dT}°C` : "ΔT = T₁ − T₀";
     el.classList.add("burner");
+    if (energyCvMismatches().length) el.classList.add("cv-bad");
+    el.setAttribute("aria-label", food ? `Set-up ${n}, ${food.name}` : `Set-up ${n}, empty`);
+    const scale = state.energyScale;
+    el.style.width = `${280 * scale}px`;
+    el.style.height = `${268 * scale}px`;
+    const foodBottom = s.distance === "close" ? 58 : s.distance === "far" ? 28 : 48;
+    const needleH = s.distance === "close" ? 12 : s.distance === "far" ? 24 : 18;
+    const needleBottom = foodBottom - needleH + 2;
+    const flameBottom = foodBottom + 8;
+    el.innerHTML = `
+      <div class="burn-scale" style="transform:scale(${scale})">
+        <button class="x" type="button" data-del="${p.id}">×</button>
+        <div class="bath-label">Set-up ${n}</div>
+        <div class="burn-stand">
+          <div class="stand-pole"></div>
+          <div class="stand-base"></div>
+          <div class="clamp-arm"></div>
+          <div class="calo-tube">
+            <div class="thermo-stem"></div>
+            <div class="thermo-bulb"></div>
+            <span class="calo-water">${s.waterVol} cm³ water</span>
+          </div>
+          <div class="needle" style="height:${needleH}px;bottom:${needleBottom}px"></div>
+          <div class="burn-food" style="background:${food ? food.color : "#ddd"};bottom:${foodBottom}px"></div>
+          <div class="flame" style="bottom:${flameBottom}px"></div>
+          <div class="bunsen"><i></i></div>
+          <button type="button" class="read-inst thermo ${plan.dvDT ? (needDT ? "need-read is-dv" : "is-dv") : "is-muted"}" data-read-dv="dT" data-read="${p.id}" ${plan.dvDT && p.burned && food ? "" : "disabled"}>${thermoTxt}</button>
+          <button type="button" class="read-inst watch ${plan.dvTime ? (needTime ? "need-read is-dv" : "is-dv") : "is-muted"}" data-read-dv="time" data-read="${p.id}" ${plan.dvTime && p.burned && food ? "" : "disabled"}>${watchTxt}</button>
+          ${plan.dvDT ? `<div class="dT ${p.readDT ? "is-dv" : ""}">${dTTxt}</div>` : ""}
+        </div>
+        <button type="button" class="btn heat-btn" data-burn="${p.id}">Ignite</button>
+        <div class="tube-tag">${food ? `${food.name} · ${s.mass} g` : "no food on needle"}</div>
+      </div>`;
+  } else if (p.kind === "beaker") {
+    el.classList.add("beaker", p.role || "alcohol");
+    const nested = state.pieces.filter((x) => x.kind === "block" && x.dockedTo === p.id)
+      .map((item) => `<div class="bath-item bath-block ${state.selectedPiece === item.id ? "selected" : ""}" data-id="${item.id}">${blockInnerHtml(item)}</div>`)
+      .join("");
     el.innerHTML = `
       <button class="x" type="button" data-del="${p.id}">×</button>
-      <div class="bath-label">Burning set-up</div>
-      <div class="burn-stand">
-        <div class="burn-food" style="background:${food ? food.color : "#ddd"}"></div>
-        ${p.burned ? `<div class="flame"></div>` : ""}
-        <div class="thermo">θ ${p.burned && e ? `+${e.dT}°C` : "20°C"}</div>
-        <div class="watch">${p.burned && e ? e.time + " s" : "0:00"}</div>
-      </div>
-      <button type="button" class="btn heat-btn" data-burn="${p.id}">Ignite</button>
-      <div class="tube-tag">${food ? food.name : "no food"}</div>`;
+      <div class="bath-label">${p.role === "rinse" ? "Water (wash)" : "Alcohol boiling tube"}</div>
+      <div class="beaker-body"><div class="beaker-fill"></div>${nested}</div>
+      <div class="tube-tag">${p.role === "rinse" ? "wash away alcohol" : "heat this tube in the water bath"}</div>`;
+  } else if (p.kind === "tile") {
+    el.classList.add("tile-piece");
+    const onTile = state.pieces.filter((x) => x.kind === "block" && x.dockedTo === p.id);
+    const nested = onTile.map((item) => `<div class="bath-item bath-block on-tile ${state.selectedPiece === item.id ? "selected" : ""}" data-id="${item.id}">${blockInnerHtml(item)}</div>`).join("");
+    el.innerHTML = `
+      <button class="x" type="button" data-del="${p.id}">×</button>
+      <div class="bath-label">White tile</div>
+      <div class="tile-sheet">${nested}</div>
+      <div class="tube-tag">${onTile[0] ? foodById(onTile[0].foodId)?.name || "sample" : (state.test === "iodine-leaf" ? "leaf · dip iodine from the tube" : "solid food + drops of iodine")}</div>`;
   }
   return el;
 }
@@ -855,6 +1589,30 @@ function renderObs() {
   document.getElementById("obs").innerHTML = `<strong>Observation</strong> ${dropHtml}<div class="muted">${currentObservation()}</div>`;
 }
 
+function syncCaloFieldLabels() {
+  document.querySelectorAll("[data-calo-field]").forEach((el) => {
+    const p = state.pieces.find((x) => x.id === el.dataset.calo);
+    if (!p) return;
+    const span = el.closest("label")?.querySelector(".conc-val");
+    if (!span) return;
+    const key = el.dataset.caloField;
+    if (key === "mass") span.textContent = `${p.mass} g`;
+    else if (key === "waterVol") span.textContent = `${p.waterVol} cm³`;
+    else if (key === "t0") span.textContent = `${p.t0}°C`;
+  });
+}
+
+function refreshEnergyLive() {
+  renderPieces();
+  renderObs();
+  syncCaloFieldLabels();
+  const table = document.querySelector(".fair-table");
+  const next = energyCompareTableHtml();
+  if (table && next) table.outerHTML = next;
+  const status = document.querySelector("[data-fair-status]");
+  if (status) status.innerHTML = energyFairHtml();
+}
+
 function renderLab() {
   renderFoods();
   renderTests();
@@ -864,9 +1622,19 @@ function renderLab() {
   renderObs();
   const btnDrop = document.getElementById("btn-drop");
   if (btnDrop) {
+    const hideDrop = ["energy", "iodine-leaf", "clinistix", "albustix"].includes(state.test);
+    btnDrop.hidden = hideDrop;
     btnDrop.textContent = state.test === "vitc"
       ? "Add 1 drop of selected food"
-      : "Add 1 cm³ of selected food";
+      : state.test === "benedict"
+        ? "Add 5 cm³ of selected food"
+        : state.test === "biuret"
+          ? "Add 2 cm³ extract of selected food"
+          : "Add 1 cm³ of selected food";
+  }
+  const hint = document.getElementById("empty-hint");
+  if (hint) {
+    hint.textContent = procedureFor(state.test)?.items[0] || "Use the set-up on this bench.";
   }
 }
 
@@ -946,14 +1714,14 @@ function renderBank() {
     const pills = NUT.filter((k) => f.n[k] > 0).map((k) => `<span class="pill yes">${NUT_LABEL[k]} ${LEVEL(f.n[k])}</span>`).join("");
     const rowsN = NUT.map((k) => `<span>${NUT_LABEL[k]}</span><b>${LEVEL(f.n[k])}</b>`).join("");
     const tests = [
-      `Glucose paper: ${(() => { const b = glucoseBand(glucoseOf(f)); return b.key === "0" ? "stays light yellow (0%)" : `light yellow → ${b.word} (${b.reading})`; })()}`,
+      `Glucose paper: ${(() => { const b = glucoseBand(glucoseOf(f)); return b.key === "0" ? "stays pink" : "pink → purple"; })()}`,
       `Benedict's: ${f.n.rs ? "brick-red ppt (more ppt = more reducing sugar)" : (f.n.nrs ? "blue until hydrolysed" : "remains blue")}`,
       `Iodine: ${f.n.starch ? "brown → blue-black" : "remains brown"}`,
-      `Albustix: ${(() => { const b = albustixBand(f.n.protein); return b.key === "neg" ? "remains yellow (NEG.)" : `yellow → ${b.word} (${b.reading})`; })()}`,
+      `Albustix: ${(() => { const b = albustixBand(f.n.protein); return b.key === "neg" ? "stays yellow" : "yellow → blue-green"; })()}`,
       `Biuret: ${f.n.protein ? "blue → violet / purple" : "remains blue"}`,
       `Grease spot: ${f.n.lipid ? "translucent spot; disappears in alcohol" : "no translucent spot"}`,
       `DCPIP: ${f.n.vitC ? "blue → colourless (fewer drops = more vit. C)" : "remains blue"}`,
-      `Burning: lipids ≈ 2× energy of carb / protein per gram`,
+      `Burning: lipids’ energy per gram is DOUBLE carb / protein`,
     ].join("<br>");
     return `<article class="bank-card ${state.openCard === f.id ? "open" : ""}" data-card="${f.id}">
       <div class="bank-img">${foodArt(f)}</div>
@@ -972,15 +1740,82 @@ function renderBank() {
 
 function setTab(tab) {
   state.tab = tab;
-  document.querySelectorAll(".tab").forEach((b) => {
-    const on = b.dataset.tab === tab;
-    b.classList.toggle("active", on);
-    b.setAttribute("aria-selected", on ? "true" : "false");
-  });
   document.getElementById("panel-lab").classList.toggle("active", tab === "lab");
   document.getElementById("panel-bank").classList.toggle("active", tab === "bank");
-  document.querySelector(".top-actions").hidden = tab !== "lab";
+  const actions = document.querySelector(".top-actions");
+  if (actions) actions.hidden = tab !== "lab";
   if (tab === "bank") renderBank();
+  renderLabNav();
+}
+
+function applyLeafStation(leaf, target) {
+  if (!leaf || leaf.kind !== "block") return false;
+  if (target?.kind === "beaker" && target.role === "alcohol") {
+    if (!leaf.boiled) return false;
+    leaf.dockedTo = target.id;
+    leaf.x = target.x + 10;
+    leaf.y = target.y + 18;
+    state.selectedPiece = leaf.id;
+    return true;
+  }
+  if (target?.kind === "beaker" && target.role === "rinse") {
+    if (!leaf.decolourised) return false;
+    leaf.washed = true;
+    leaf.dockedTo = target.id;
+    leaf.x = target.x + 10;
+    leaf.y = target.y + 18;
+    state.selectedPiece = leaf.id;
+    return true;
+  }
+  if (target?.kind === "tile") {
+    leaf.dockedTo = target.id;
+    leaf.x = target.x + 20;
+    leaf.y = target.y + 8;
+    state.selectedPiece = leaf.id;
+    return true;
+  }
+  return false;
+}
+
+function tubeHasIodine(tube) {
+  return !!(tube?.kind === "tube" && tube.contents && tube.contents.iodine > 0);
+}
+
+function leafOnTileOrWashed(leaf) {
+  if (!leaf || leaf.kind !== "block") return false;
+  return !!leaf.washed;
+}
+
+function applyIodineFromTube(tube, leaf) {
+  if (!tubeHasIodine(tube) || !leafOnTileOrWashed(leaf)) return false;
+  leaf.iodine = true;
+  state.selectedPiece = leaf.id;
+  return true;
+}
+
+function dipLeafInIodineTube(leaf, tube) {
+  if (!applyIodineFromTube(tube, leaf)) return false;
+  leaf.dockedTo = tube.id;
+  leaf.x = tube.x + 4;
+  leaf.y = tube.y + 48;
+  return true;
+}
+
+function fillIodineTube(tube) {
+  if (!tube || tube.kind !== "tube") return false;
+  if (!tubeHasIodine(tube)) addToTube(tube, reagentAddPayload("iodine"));
+  state.selectedPiece = tube.id;
+  return true;
+}
+
+function iodineTubeOnBench() {
+  return state.pieces.find((p) => p.kind === "tube" && !p.dockedTo)
+    || state.pieces.find((p) => p.kind === "tube")
+    || null;
+}
+
+function leafOnHost(host) {
+  return state.pieces.find((p) => p.kind === "block" && p.dockedTo === host?.id) || null;
 }
 
 function addPiece(kind, extra = {}) {
@@ -1003,6 +1838,8 @@ function addPiece(kind, extra = {}) {
     if (piece.foodId === undefined) piece.foodId = null;
     piece.lit = !!piece.lit;
     piece.solvent = !!piece.solvent;
+    piece.dried = !!piece.dried;
+    piece.rubbed = !!piece.rubbed;
   }
   if (kind === "block") {
     piece.iodine = !!piece.iodine;
@@ -1011,13 +1848,22 @@ function addPiece(kind, extra = {}) {
     piece.washed = !!piece.washed;
     piece.dockedTo = piece.dockedTo || null;
   }
+  if (kind === "beaker") piece.role = piece.role || "alcohol";
+  if (kind === "tile") piece.dockedTo = null;
   if (kind === "strip" && piece.foodId === undefined) piece.foodId = null;
   if (kind === "burner") {
     if (piece.foodId === undefined) piece.foodId = null;
     piece.burned = !!piece.burned;
+    piece.readDT = !!piece.readDT;
+    piece.readTime = !!piece.readTime;
+    const d = burnerDefaults(piece);
+    piece.mass = d.mass;
+    piece.waterVol = d.waterVol;
+    piece.t0 = d.t0;
+    piece.distance = d.distance;
   }
-  if (piece.x > r.width - 80) piece.x = 36;
-  if (piece.y > r.height - 80) piece.y = 28;
+  if (extra.x == null && piece.x > r.width - 80) piece.x = Math.max(8, r.width - 96);
+  if (extra.y == null && piece.y > r.height - 80) piece.y = Math.max(8, r.height - 90);
   state.pieces.push(piece);
   state.selectedPiece = piece.id;
   return piece;
@@ -1033,10 +1879,11 @@ function removePiece(id) {
 
 function targetPieceAt(clientX, clientY) {
   const el = document.elementFromPoint(clientX, clientY);
+  const skip = (node) => node && (node.classList.contains("lifted") || (drag?.kind === "piece" && node.dataset.id === drag.id));
   const inner = el?.closest?.(".bath-item");
-  if (inner) return state.pieces.find((p) => p.id === inner.dataset.id) || null;
+  if (inner && !skip(inner)) return state.pieces.find((p) => p.id === inner.dataset.id) || null;
   const piece = el?.closest?.(".piece");
-  if (!piece) return null;
+  if (!piece || skip(piece)) return null;
   return state.pieces.find((p) => p.id === piece.dataset.id) || null;
 }
 
@@ -1057,14 +1904,19 @@ function addToTube(tube, payload) {
   }
   if (payload.reagent) {
     c[payload.reagent] = (c[payload.reagent] || 0) + (payload.cm3 || payload.drops || 1);
-    if (payload.reagent === "biuret") { c.naoh += 1; c.cuso4 += 1; }
-    if (payload.reagent === "nahco3" && c.hydrolysed) c.neutralized = true;
+    if (payload.reagent === "biuret") { c.naoh += 2; c.cuso4 += 1; }
+    if (payload.reagent === "nahco3" && c.hydrolysed && c.cooled) c.alkaliAdded = true;
     if (payload.reagent === "hcl" && c.heated >= 1) c.hydrolysed = true;
   }
 }
 
 function applyHeatToPiece(p) {
   if (p.kind === "block") {
+    const host = state.pieces.find((x) => x.id === p.dockedTo);
+    if (host?.kind === "beaker" && host.role === "alcohol") {
+      if (p.boiled) p.decolourised = true;
+      return;
+    }
     p.boiled = true;
     return;
   }
@@ -1075,18 +1927,22 @@ function applyHeatToPiece(p) {
     return;
   }
   if (c.benedict > 0) c.heated += 1;
-  if (c.hydrolysed && c.nahco3 > 0) c.neutralized = true;
 }
 
 function finishHeat(bath) {
   const ids = new Set(bath.heating?.pieceIds || []);
   bath.heating = null;
   bath.hot = true;
+  const targets = [];
   state.pieces.forEach((p) => {
     if (p.dockedTo !== bath.id) return;
     if (ids.size && !ids.has(p.id)) return;
-    applyHeatToPiece(p);
+    targets.push(p);
+    state.pieces.forEach((x) => {
+      if (x.dockedTo === p.id) targets.push(x);
+    });
   });
+  targets.forEach(applyHeatToPiece);
 }
 
 function updateHeatUi(bath) {
@@ -1123,13 +1979,14 @@ function ensureHeatTicker() {
 
 function applyHeat(bath) {
   if (isBathHeating(bath)) return;
-  const ids = state.pieces.filter((p) => p.dockedTo === bath.id).map((p) => p.id);
+  const direct = state.pieces.filter((p) => p.dockedTo === bath.id);
+  const ids = direct.map((p) => p.id);
   const mins = heatMinutesNeeded();
   if (mins <= 0) {
     bath.hot = true;
-    ids.forEach((id) => {
-      const p = state.pieces.find((x) => x.id === id);
-      if (p) applyHeatToPiece(p);
+    direct.forEach((p) => {
+      applyHeatToPiece(p);
+      state.pieces.filter((x) => x.dockedTo === p.id).forEach(applyHeatToPiece);
     });
     return;
   }
@@ -1158,19 +2015,46 @@ function usePalette(appId, reagent, clientX, clientY) {
   else if (appId === "paper" && !hit) addPiece("paper");
   else if (appId === "clinistix" && !hit) addPiece("strip", { strip: "clinistix" });
   else if (appId === "albustix" && !hit) addPiece("strip", { strip: "albustix" });
-  else if (appId === "burner" && !hit) addPiece("burner");
+  else if (appId === "phpaper" && !hit) addPiece("strip", { strip: "phpaper" });
+  else if (appId === "tile" && !hit) addPiece("tile");
+  else if (appId === "burner" && !hit) {
+    const keep = state.selectedPiece;
+    addPiece("burner", nextBurnerPos());
+    const prev = state.pieces.find((p) => p.id === keep && p.kind === "burner");
+    if (prev) state.selectedPiece = prev.id;
+  }
   else if ((appId === "alcohol" || appId === "ethanol") && hit?.kind === "paper") {
-    hit.solvent = true;
-    state.selectedPiece = hit.id;
+    if (hit.dried && hit.lit) {
+      hit.solvent = true;
+      state.selectedPiece = hit.id;
+    }
+  } else if (appId === "phpaper" && hit?.kind === "tube") {
+    const strip = addPiece("strip", { strip: "phpaper", x: hit.x + 50, y: hit.y });
+    strip.tubeId = hit.id;
+    if (hit.contents.alkaliAdded) hit.contents.neutralized = true;
+    state.selectedPiece = strip.id;
   } else if ((appId === "alcohol" || appId === "ethanol") && hit?.kind === "block" && hit.boiled) {
-    hit.decolourised = true;
+    const alc = state.pieces.find((p) => p.kind === "beaker" && p.role === "alcohol");
+    if (alc) applyLeafStation(hit, alc);
     state.selectedPiece = hit.id;
   } else if (appId === "water" && hit?.kind === "block" && hit.decolourised) {
     hit.washed = true;
     state.selectedPiece = hit.id;
+  } else if (appId === "iodine" && state.test === "iodine-leaf") {
+    const tube = hit?.kind === "tube"
+      ? hit
+      : (state.pieces.find((p) => p.id === state.selectedPiece && p.kind === "tube") || iodineTubeOnBench() || addPiece("tube"));
+    fillIodineTube(tube);
   } else if (appId === "iodine" && hit?.kind === "block") {
     hit.iodine = true;
     state.selectedPiece = hit.id;
+  } else if (appId === "iodine" && (hit?.kind === "tile" || hit?.kind === "beaker")) {
+    const leaf = state.pieces.find((p) => p.kind === "block" && p.dockedTo === hit.id)
+      || [...state.pieces].reverse().find((p) => p.kind === "block" && (p.washed || state.test === "iodine"));
+    if (leaf) {
+      leaf.iodine = true;
+      state.selectedPiece = leaf.id;
+    }
   } else if (reagent && hit?.kind === "tube") {
     addToTube(hit, reagentAddPayload(appId));
     state.selectedPiece = hit.id;
@@ -1181,10 +2065,61 @@ function usePalette(appId, reagent, clientX, clientY) {
   }
 }
 
+function dropLeafIntoLab(food) {
+  if (!food || food.form !== "block") return;
+  const bath = state.pieces.find((p) => p.kind === "bath");
+  const existing = state.pieces.find((p) => p.kind === "block" && p.foodId === food.id);
+  if (existing && bath) {
+    if (!existing.boiled) dockIntoBath(existing, bath);
+    state.selectedPiece = existing.id;
+    return;
+  }
+  useFoodOn(food, bath || null, true);
+}
+
 function useFoodOn(food, target, pour) {
-  if (target?.kind === "tube" || target?.kind === "paper") return;
+  if (target?.kind === "paper") {
+    target.foodId = food.id;
+    target.dried = false;
+    target.lit = false;
+    target.solvent = false;
+    target.rubbed = food.form === "block";
+    state.selectedPiece = target.id;
+    return;
+  }
+  if (state.test === "energy") {
+    const burner = target?.kind === "burner" ? target : pickEnergyBurner();
+    if (burner) {
+      burner.foodId = food.id;
+      burner.burned = false;
+      resetEnergyReads(burner);
+      state.selectedPiece = burner.id;
+    }
+    return;
+  }
+  if (state.test === "iodine" && food.form === "block") {
+    if (!target || target.kind === "tube") {
+      const tile = state.pieces.find((p) => p.kind === "tile");
+      if (tile) target = tile;
+    }
+  }
+  if (state.test === "iodine-leaf" && food.form === "block") {
+    if (!target || target.kind === "tube" || target.kind === "paper") {
+      const bath = state.pieces.find((p) => p.kind === "bath");
+      if (bath) target = bath;
+    }
+  }
   if (!target) {
-    if (food.form === "block" && (state.test === "iodine" || state.test === "energy")) {
+    if (state.test === "energy") {
+      const burner = pickEnergyBurner();
+      if (burner) {
+        burner.foodId = food.id;
+        burner.burned = false;
+        state.selectedPiece = burner.id;
+        return;
+      }
+    }
+    if (food.form === "block" && (state.test === "iodine" || state.test === "iodine-leaf" || state.test === "energy")) {
       addPiece("block", { foodId: food.id, iodine: false, boiled: false, decolourised: false, washed: false });
     }
     return;
@@ -1196,8 +2131,13 @@ function useFoodOn(food, target, pour) {
     target.foodId = food.id;
     target.burned = false;
     state.selectedPiece = target.id;
-  } else if (target.kind === "block" && state.dropper.fill === "iodine") {
-    target.iodine = true;
+  } else if (target.kind === "bath" && food.form === "block") {
+    const leaf = addPiece("block", { foodId: food.id, iodine: false, boiled: false, decolourised: false, washed: false });
+    dockIntoBath(leaf, target);
+  } else if (target.kind === "beaker" || target.kind === "tile") {
+    const leaf = state.pieces.find((p) => p.kind === "block" && p.foodId === food.id)
+      || addPiece("block", { foodId: food.id, iodine: false, boiled: false, decolourised: false, washed: false });
+    applyLeafStation(leaf, target);
   }
 }
 
@@ -1254,10 +2194,24 @@ function onPointerMove(ev) {
         el.classList.add("lifted");
       }
     }
-    if (p.kind === "tube" || p.kind === "block") highlightBathUnderPointer(ev.clientX, ev.clientY);
+    if (p.kind === "tube" || p.kind === "block" || p.kind === "beaker") {
+      highlightBathUnderPointer(ev.clientX, ev.clientY);
+      const overStation = hitStation(ev.clientX, ev.clientY);
+      const overPiece = targetPieceAt(ev.clientX, ev.clientY);
+      document.querySelectorAll(".piece.beaker, .piece.tile-piece, .piece.tube").forEach((el) => {
+        const hot = (overStation && el.dataset.id === overStation.id) || (overPiece && el.dataset.id === overPiece.id);
+        el.classList.toggle("drop-hot", !!hot);
+      });
+    }
     return;
   }
   moveGhost(ev);
+  if (drag.kind === "food" && state.test === "energy") {
+    const hit = targetPieceAt(ev.clientX, ev.clientY);
+    document.querySelectorAll(".piece.burner").forEach((el) => {
+      el.classList.toggle("drop-hot", !!(hit && hit.kind === "burner" && el.dataset.id === hit.id));
+    });
+  }
 }
 
 function endDrag(ev) {
@@ -1268,12 +2222,18 @@ function endDrag(ev) {
   const bench = document.getElementById("bench");
   const overBench = bench.contains(document.elementFromPoint(ev.clientX, ev.clientY)) || ev.target === bench;
   const hit = targetPieceAt(ev.clientX, ev.clientY);
+  const bath = bathAtClientPoint(ev.clientX, ev.clientY);
+  const station = stationAtClientPoint(ev.clientX, ev.clientY);
   if (drag.kind === "food") {
     const f = foodById(drag.id);
     state.selectedFood = f.id;
-    if (overBench) useFoodOn(f, hit, true);
+    if (state.test === "energy") {
+      const onto = overBench && hit?.kind === "burner" ? hit : pickEnergyBurner();
+      useFoodOn(f, onto, true);
+      energyFoodPlaced = true;
+    } else if (overBench) useFoodOn(f, bath || station || hit, true);
   } else if (drag.kind === "app") {
-    if (drag.id === "dropper" || overBench || ["tube", "bath", "paper", "clinistix", "albustix", "burner"].includes(drag.id)) {
+    if (drag.id === "dropper" || overBench || drag.id === "iodine" || ["tube", "bath", "paper", "clinistix", "albustix", "phpaper", "tile", "burner"].includes(drag.id)) {
       usePalette(drag.id, drag.reagent, ev.clientX, ev.clientY);
     }
   } else if (drag.kind === "piece") {
@@ -1283,14 +2243,27 @@ function endDrag(ev) {
       if (moved) {
         placePieceAtClient(p, ev.clientX, ev.clientY);
         p.dockedTo = null;
-        if ((p.kind === "tube" || p.kind === "block") && overBench) {
-          const bath = bathAtClientPoint(ev.clientX, ev.clientY);
-          if (bath) dockIntoBath(p, bath);
+        if (p.kind === "strip" && p.strip === "phpaper" && hit?.kind === "tube") {
+          p.tubeId = hit.id;
+          if (hit.contents.alkaliAdded) hit.contents.neutralized = true;
+          state.selectedPiece = p.id;
+        } else if ((p.kind === "tube" || p.kind === "block" || p.kind === "beaker") && overBench) {
+          if (state.test === "iodine-leaf" && p.kind === "tube") {
+            const leaf = hit?.kind === "block" ? hit : (hit?.kind === "tile" ? leafOnHost(hit) : null);
+            if (!applyIodineFromTube(p, leaf) && bath) dockIntoBath(p, bath);
+          } else if (state.test === "iodine-leaf" && p.kind === "block" && hit?.kind === "tube") {
+            if (!dipLeafInIodineTube(p, hit)) {
+              if (bath) dockIntoBath(p, bath);
+              else applyLeafStation(p, station);
+            }
+          } else if (bath) dockIntoBath(p, bath);
+          else if (p.kind === "block") applyLeafStation(p, station);
         }
       }
     }
   }
   drag = null;
+  document.querySelectorAll(".drop-hot").forEach((el) => el.classList.remove("drop-hot"));
   renderLab();
 }
 
@@ -1304,11 +2277,38 @@ function onPointerDown(ev) {
       renderLab();
       return;
     }
+    if (state.test === "energy") {
+      startDrag("food", f.id, false, ev);
+      return;
+    }
+    if (state.test === "iodine" && f.form === "block") {
+      const tile = state.pieces.find((p) => p.kind === "tile");
+      useFoodOn(f, tile || null, true);
+      renderLab();
+      return;
+    }
+    if (state.test === "grease") {
+      startDrag("food", f.id, false, ev);
+      return;
+    }
+    if (state.test === "iodine-leaf") {
+      dropLeafIntoLab(f);
+      renderLab();
+      return;
+    }
     startDrag("food", f.id, false, ev);
     return;
   }
   const appBtn = ev.target.closest("[data-app]");
   if (appBtn && ev.target.closest("#apparatus")) {
+    if (state.test === "iodine-leaf" && appBtn.dataset.app === "iodine") {
+      const tube = state.pieces.find((p) => p.id === state.selectedPiece && p.kind === "tube")
+        || iodineTubeOnBench()
+        || addPiece("tube", { x: 312, y: 8 });
+      fillIodineTube(tube);
+      renderLab();
+      return;
+    }
     if (state.dropper.on && REAGENTS[appBtn.dataset.app]) {
       state.dropper.fill = appBtn.dataset.app;
       renderLab();
@@ -1341,6 +2341,22 @@ function onPointerDown(ev) {
     renderLab();
     return;
   }
+  const cool = ev.target.closest("[data-cool]");
+  if (cool) {
+    ev.stopPropagation();
+    const tube = state.pieces.find((p) => p.id === cool.dataset.cool);
+    if (tube?.contents) tube.contents.cooled = true;
+    renderLab();
+    return;
+  }
+  const dry = ev.target.closest("[data-dry]");
+  if (dry) {
+    ev.stopPropagation();
+    const paper = state.pieces.find((p) => p.id === dry.dataset.dry);
+    if (paper) paper.dried = true;
+    renderLab();
+    return;
+  }
   const light = ev.target.closest("[data-light]");
   if (light) {
     ev.stopPropagation();
@@ -1349,11 +2365,24 @@ function onPointerDown(ev) {
     renderLab();
     return;
   }
+  const readDv = ev.target.closest("[data-read-dv]");
+  if (readDv) {
+    ev.stopPropagation();
+    const b = state.pieces.find((p) => p.id === readDv.dataset.read);
+    if (readEnergyDv(b, readDv.dataset.readDv)) {
+      state.selectedPiece = b.id;
+      renderLab();
+    }
+    return;
+  }
   const burn = ev.target.closest("[data-burn]");
   if (burn) {
     ev.stopPropagation();
     const b = state.pieces.find((p) => p.id === burn.dataset.burn);
-    if (b?.foodId) b.burned = true;
+    if (b?.foodId) {
+      b.burned = true;
+      resetEnergyReads(b);
+    }
     renderLab();
     return;
   }
@@ -1362,18 +2391,58 @@ function onPointerDown(ev) {
   if (piece) {
     const p = state.pieces.find((x) => x.id === (innerTube?.dataset.id || piece.dataset.id));
     if (!p) return;
+    const prevStrip = state.pieces.find((x) => x.id === state.selectedPiece && x.strip === "phpaper");
+    if (p.kind === "tube" && prevStrip) {
+      prevStrip.tubeId = p.id;
+      if (p.contents.alkaliAdded) p.contents.neutralized = true;
+      state.selectedPiece = prevStrip.id;
+      renderLab();
+      return;
+    }
+    const prevSel = state.pieces.find((x) => x.id === state.selectedPiece);
+    if (state.test === "iodine-leaf" && prevSel && prevSel.id !== p.id) {
+      if (prevSel.kind === "tube" && (p.kind === "block" || p.kind === "tile")) {
+        const leaf = p.kind === "block" ? p : leafOnHost(p);
+        if (applyIodineFromTube(prevSel, leaf)) {
+          renderLab();
+          return;
+        }
+      }
+      if (prevSel.kind === "block" && p.kind === "tube") {
+        if (dipLeafInIodineTube(prevSel, p)) {
+          renderLab();
+          return;
+        }
+      }
+    }
     state.selectedPiece = p.id;
     if (state.dropper.on) {
       if (p.kind === "tube") {
         if (state.dropper.fill && REAGENTS[state.dropper.fill]) addToTube(p, reagentAddPayload(state.dropper.fill));
         else if (state.dropper.fill) addToTube(p, foodAddPayload(state.dropper.fill));
       } else if (p.kind === "block") {
-        if (state.dropper.fill === "iodine") p.iodine = true;
-        if (state.dropper.fill === "alcohol" || state.dropper.fill === "ethanol") p.decolourised = !!p.boiled;
+        if (state.dropper.fill === "iodine" && state.test !== "iodine-leaf") p.iodine = true;
+        if ((state.dropper.fill === "alcohol" || state.dropper.fill === "ethanol") && p.boiled) {
+          const alc = state.pieces.find((x) => x.kind === "beaker" && x.role === "alcohol");
+          if (alc) applyLeafStation(p, alc);
+        }
         if (state.dropper.fill === "water" && p.decolourised) p.washed = true;
+      } else if ((p.kind === "tile" || p.kind === "beaker") && state.dropper.fill === "iodine" && state.test !== "iodine-leaf") {
+        const leaf = state.pieces.find((x) => x.kind === "block" && x.dockedTo === p.id)
+          || [...state.pieces].reverse().find((x) => x.kind === "block" && x.washed);
+        if (leaf) {
+          leaf.iodine = true;
+          state.selectedPiece = leaf.id;
+        }
       } else if (p.kind === "paper") {
-        if (state.dropper.fill === "ethanol" || state.dropper.fill === "alcohol") p.solvent = true;
-        else if (state.dropper.fill && foodById(state.dropper.fill)) p.foodId = state.dropper.fill;
+        if ((state.dropper.fill === "ethanol" || state.dropper.fill === "alcohol") && p.dried && p.lit) p.solvent = true;
+        else if (state.dropper.fill && foodById(state.dropper.fill)) {
+          p.foodId = state.dropper.fill;
+          p.dried = false;
+          p.lit = false;
+          p.solvent = false;
+          p.rubbed = foodById(state.dropper.fill).form === "block";
+        }
       } else if (p.kind === "strip" && state.dropper.fill && foodById(state.dropper.fill)) {
         dipStrip(p, state.dropper.fill);
       } else if (p.kind === "burner" && state.dropper.fill && foodById(state.dropper.fill)) {
@@ -1387,14 +2456,92 @@ function onPointerDown(ev) {
 }
 
 function onClick(ev) {
-  const tab = ev.target.closest("[data-tab]");
-  if (tab) { setTab(tab.dataset.tab); return; }
+  const labBtn = ev.target.closest("[data-lab]");
+  if (labBtn) {
+    setLab(labBtn.dataset.lab);
+    return;
+  }
+  const foodPick = ev.target.closest("#food-list [data-food]");
+  if (foodPick && (state.test === "energy" || state.test === "iodine-leaf" || (state.test === "iodine" && foodById(foodPick.dataset.food)?.form === "block"))) {
+    const f = foodById(foodPick.dataset.food);
+    if (f) {
+      state.selectedFood = f.id;
+      if (state.test === "energy") {
+        if (energyFoodPlaced) {
+          energyFoodPlaced = false;
+          return;
+        }
+        useFoodOn(f, pickEnergyBurner(), true);
+      } else if (state.test === "iodine-leaf") dropLeafIntoLab(f);
+      else if (state.test === "iodine") useFoodOn(f, state.pieces.find((p) => p.kind === "tile") || null, true);
+      renderLab();
+    }
+    return;
+  }
+  const iodineBtn = ev.target.closest("#apparatus [data-app=\"iodine\"]");
+  if (iodineBtn && state.test === "iodine-leaf") {
+    const tube = state.pieces.find((p) => p.id === state.selectedPiece && p.kind === "tube")
+      || iodineTubeOnBench()
+      || addPiece("tube", { x: 286, y: 8 });
+    fillIodineTube(tube);
+    renderLab();
+    return;
+  }
+  const heat = ev.target.closest("[data-heat]");
+  if (heat) {
+    const bath = state.pieces.find((p) => p.id === heat.dataset.heat);
+    if (bath && !isBathHeating(bath)) {
+      applyHeat(bath);
+      const leaf = state.pieces.find((p) => p.kind === "block" && (
+        p.dockedTo === bath.id
+        || state.pieces.some((h) => h.id === p.dockedTo && h.dockedTo === bath.id)
+      ));
+      if (leaf) state.selectedPiece = leaf.id;
+      renderLab();
+    }
+    return;
+  }
+  const cool = ev.target.closest("[data-cool]");
+  if (cool) {
+    const tube = state.pieces.find((p) => p.id === cool.dataset.cool);
+    if (tube?.contents) tube.contents.cooled = true;
+    renderLab();
+    return;
+  }
+  const dry = ev.target.closest("[data-dry]");
+  if (dry) {
+    const paper = state.pieces.find((p) => p.id === dry.dataset.dry);
+    if (paper) paper.dried = true;
+    renderLab();
+    return;
+  }
+  const readDv = ev.target.closest("[data-read-dv]");
+  if (readDv) {
+    const b = state.pieces.find((p) => p.id === readDv.dataset.read);
+    if (readEnergyDv(b, readDv.dataset.readDv)) {
+      state.selectedPiece = b.id;
+      renderLab();
+    }
+    return;
+  }
+  const burn = ev.target.closest("[data-burn]");
+  if (burn) {
+    const b = state.pieces.find((p) => p.id === burn.dataset.burn);
+    if (b?.foodId) {
+      b.burned = true;
+      resetEnergyReads(b);
+      state.selectedPiece = b.id;
+      renderLab();
+    }
+    return;
+  }
   const testBtn = ev.target.closest("[data-test]");
   if (testBtn) {
     if (state.embedLocked && testBtn.dataset.test !== state.embedLocked) return;
     state.test = testBtn.dataset.test;
     const t = testById(state.test);
     if (t.conc && state.conc[t.conc.key] == null) state.conc[t.conc.key] = t.conc.def;
+    seedLab();
     renderLab();
     return;
   }
@@ -1417,20 +2564,49 @@ function bind() {
   document.addEventListener("pointerdown", onPointerDown);
   document.addEventListener("pointermove", onPointerMove);
   document.addEventListener("pointerup", endDrag);
-  document.getElementById("test-cat").addEventListener("change", (e) => {
-    if (state.embedLocked) {
-      e.target.value = state.testCat;
-      return;
-    }
-    state.testCat = e.target.value;
-    const rows = TESTS.filter((t) => !state.testCat || t.cat === state.testCat);
-    if (rows.length && !rows.some((t) => t.id === state.test)) {
-      state.test = rows[0].id;
-      const t = testById(state.test);
-      if (t.conc && state.conc[t.conc.key] == null) state.conc[t.conc.key] = t.conc.def;
-    }
-    renderLab();
-  });
+  const side = document.getElementById("lab-side");
+  if (side) {
+    side.addEventListener("change", (e) => {
+      const ivSel = e.target.closest("[data-energy-iv]");
+      if (ivSel) {
+        state.energyIV = ivSel.value;
+        renderLab();
+        return;
+      }
+      const dvBox = e.target.closest("[data-energy-dv]");
+      if (dvBox) {
+        state.energyDVs = state.energyDVs || { dT: true, time: true };
+        state.energyDVs[dvBox.dataset.energyDv] = dvBox.checked;
+        renderLab();
+        return;
+      }
+      const field = e.target.closest("[data-calo-field]");
+      if (field) {
+        const p = state.pieces.find((x) => x.id === field.dataset.calo);
+        if (!p) return;
+        const key = field.dataset.caloField;
+        applyCaloField(p, key, key === "distance" ? field.value : Number(field.value));
+        renderLab();
+        return;
+      }
+    });
+    side.addEventListener("input", (e) => {
+      const sl = e.target.closest("[data-energy-scale]");
+      if (sl) {
+        state.energyScale = Number(sl.value);
+        renderLab();
+        return;
+      }
+      const field = e.target.closest("[data-calo-field]");
+      if (!field) return;
+      const p = state.pieces.find((x) => x.id === field.dataset.calo);
+      if (!p) return;
+      const key = field.dataset.caloField;
+      if (key === "distance") return;
+      applyCaloField(p, key, Number(field.value));
+      refreshEnergyLive();
+    });
+  }
   document.getElementById("conc-slider").addEventListener("input", (e) => {
     const t = testById(state.test);
     if (!t.conc) return;
@@ -1439,12 +2615,7 @@ function bind() {
     renderObs();
   });
   document.getElementById("btn-clear").addEventListener("click", () => {
-    state.pieces = [];
-    state.selectedPiece = null;
-    if (heatTicker) {
-      clearInterval(heatTicker);
-      heatTicker = null;
-    }
+    seedLab();
     renderLab();
   });
   document.getElementById("btn-drop").addEventListener("click", () => {
@@ -1498,22 +2669,69 @@ function applyQuery() {
   }
 }
 
-function seedApparatus() {
-  if (!state.embedLocked) return;
+function clearHeat() {
+  if (heatTicker) {
+    clearInterval(heatTicker);
+    heatTicker = null;
+  }
+}
+
+function seedLab() {
+  clearHeat();
+  state.pieces = [];
+  state.selectedPiece = null;
   const t = testById(state.test);
   if (!t) return;
-  if (t.extra.includes("bath")) addPiece("bath", { x: 70, y: 36, hot: t.id === "benedict" || t.id === "nrs" });
-  if (t.extra.includes("tube")) addPiece("tube", { x: 410, y: 48 });
-  if (t.extra.includes("paper")) addPiece("paper", { x: 210, y: 56 });
+  if (t.id === "iodine-leaf") {
+    addPiece("bath", { x: 8, y: 16 });
+    addPiece("beaker", { role: "alcohol", x: 216, y: 8 });
+    addPiece("beaker", { role: "rinse", x: 216, y: 172 });
+    addPiece("tile", { x: 312, y: 172 });
+    addPiece("tube", { x: 286, y: 8 });
+    const bath = state.pieces.find((p) => p.kind === "bath");
+    state.selectedPiece = bath ? bath.id : null;
+    return;
+  }
+  if (t.extra.includes("bath")) addPiece("bath", { x: 16, y: 28 });
+  if (t.id === "iodine") {
+    addPiece("tile", { x: 24, y: 40 });
+    addPiece("tube", { x: 168, y: 36 });
+    return;
+  }
+  if (t.extra.includes("tube")) addPiece("tube", { x: 236, y: 40 });
+  if (t.extra.includes("paper")) addPiece("paper", { x: 210, y: 48 });
   if (t.extra.includes("clinistix")) addPiece("strip", { strip: "clinistix", x: 210, y: 36 });
   if (t.extra.includes("albustix")) addPiece("strip", { strip: "albustix", x: 210, y: 36 });
-  if (t.extra.includes("burner")) addPiece("burner", { x: 190, y: 40 });
+  if (t.extra.includes("phpaper")) addPiece("strip", { strip: "phpaper", x: 300, y: 36 });
+  if (t.extra.includes("burner")) addPiece("burner", { x: 24, y: 8 });
+}
+
+function setLab(id) {
+  if (state.embedLocked && id !== state.embedLocked && id !== "bank") return;
+  const lab = labById(id);
+  if (!lab) return;
+  if (lab.tab === "bank") {
+    setTab("bank");
+    return;
+  }
+  const t = testById(lab.id);
+  if (!t) return;
+  state.test = t.id;
+  state.testCat = t.cat;
+  if (t.conc && state.conc[t.conc.key] == null) state.conc[t.conc.key] = t.conc.def;
+  setTab("lab");
+  seedLab();
+  renderLab();
+}
+
+function seedApparatus() {
+  seedLab();
 }
 
 function init() {
   applyQuery();
   bind();
-  seedApparatus();
+  seedLab();
   renderLab();
   renderBank();
 }
