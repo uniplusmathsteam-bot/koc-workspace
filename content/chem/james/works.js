@@ -2,13 +2,13 @@
 KOC.works('chem', 'james', [
   {
     id: 'sheji',
-    title: '射擊',
+    title: '寫作地牢',
     type: 'interactive',
     chapter: '寫作手法',
-    submitted: '2026-09-14',
+    submitted: '2026-09-15',
     tags: ['Interactive', '寫作', '修辭'],
     src: 'content/chem/james/sheji/index.html',
-    notes: '選類別、題型和難度。WASD 開車、滑鼠轉炮、點擊開火。空白鍵暫停。'
+    notes: '選類別、題型和難度。WASD 走動、滑鼠瞄準、點擊攻擊。可開首領模式：打齊正確碎片才進最後一房。空白鍵暫停。'
   },
   {
     id: 'taiko',
