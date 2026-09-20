@@ -1,6 +1,17 @@
 /* Felix - Chem KOC - submissions. */
 KOC.works('chem', 'felix', [
   {
+    id: 'earth2c-air-mc',
+    title: 'Earth2C Air MC (Sets 2–5)',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'Chem - Planet Earth',
+    submitted: '2026-09-20',
+    tags: ['MC', 'Air', 'Word worksheet', 'Planet Earth'],
+    src: 'content/chem/felix/earth2c-air-mc/index.html',
+    notes: 'Four Word MC practice sets on air (Sets 2–5), each 12 questions with easy/medium/difficult bands and an answer key citing topic-01-planet-earth.pdf. Open the page and download a .docx to use in Word.'
+  },
+  {
     id: 'earth2b-physical-chemical-change-mc',
     title: 'Earth2B Physical and Chemical Change MC (Sets 2–5)',
     type: 'interactive',
