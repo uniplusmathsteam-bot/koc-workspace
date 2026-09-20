@@ -1,6 +1,17 @@
 /* Felix - Chem KOC - submissions. */
 KOC.works('chem', 'felix', [
   {
+    id: 'earth2b-physical-chemical-change-mc',
+    title: 'Earth2B Physical and Chemical Change MC (Sets 2–5)',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'Chem - Planet Earth',
+    submitted: '2026-09-20',
+    tags: ['MC', 'Physical and chemical change', 'Word worksheet', 'Planet Earth'],
+    src: 'content/chem/felix/earth2b-physical-chemical-change-mc/index.html',
+    notes: 'Four Word MC practice sets on physical and chemical change (Sets 2–5), each 9 questions with easy/medium/difficult bands and an answer key citing topic-01-planet-earth.pdf. Open the page and download a .docx to use in Word.'
+  },
+  {
     id: 'earth2a-matters-mc',
     title: 'Earth2A Matters MC (Sets 2–5)',
     type: 'interactive',
