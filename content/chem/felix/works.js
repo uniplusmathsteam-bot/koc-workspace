@@ -1,6 +1,17 @@
 /* Felix - Chem KOC - submissions. */
 KOC.works('chem', 'felix', [
   {
+    id: 'earth2a-matters-mc',
+    title: 'Earth2A Matters MC (Sets 2–5)',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'Chem - Planet Earth',
+    submitted: '2026-09-20',
+    tags: ['MC', 'Matters', 'Word worksheet', 'Planet Earth'],
+    src: 'content/chem/felix/earth2a-matters-mc/index.html',
+    notes: 'Four Word MC practice sets on classification of matter (Sets 2–5), each 14 questions with easy/medium/difficult bands and an answer key citing topic-01-planet-earth.pdf. Open the page and download a .docx to use in Word.'
+  },
+  {
     id: 'topic-01-parts-2-3',
     title: 'Topic 01 Parts 2 & 3',
     type: 'interactive',
