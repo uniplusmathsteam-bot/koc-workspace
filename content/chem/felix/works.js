@@ -1,6 +1,17 @@
 /* Felix - Chem KOC - submissions. */
 KOC.works('chem', 'felix', [
   {
+    id: 'topic-01-part-2-lq-set-2',
+    title: 'Topic 01 Part 2 LQ Set 2',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'Chem - Planet Earth',
+    submitted: '2026-09-20',
+    tags: ['LQ', 'Long questions', 'Word worksheet', 'Planet Earth', 'Topic 01'],
+    src: 'content/chem/felix/topic-01-part-2-lq-set-2/index.html',
+    notes: 'Long-question practice Set 2 for Topic 01 Part 2 (Planet Earth). Download the .docx to use in Word — questions with writing space and an answer key.'
+  },
+  {
     id: 'earth3a-physical-separation-mc',
     title: 'Earth3A Physical Separation MC (Sets 2-5)',
     type: 'interactive',
