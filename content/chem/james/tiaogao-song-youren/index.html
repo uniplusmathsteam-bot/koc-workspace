@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>跳高高 · 送友人</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="top-inner">
+      <div>
+        <p class="kicker" id="header-kicker">背書 · 李白《送友人》</p>
+        <h1 id="header-title">跳高高 · 送友人</h1>
+        <p id="header-lead">①溫書 ②跳高高 ③默寫 ④貪吃蛇。粵語／普通話逐句朗讀。Esc 回主頁。</p>
+      </div>
+      <div class="top-side">
+        <div id="hud" class="hud" hidden></div>
+        <nav class="nav">
+          <button type="button" class="btn btn-ghost" id="btn-home">主頁</button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="view active taiko-select" id="hub"></section>
+    <section class="view" id="play"></section>
+    <section class="view" id="recap"></section>
+  </main>
+
+  <div id="confirm" class="confirm" hidden>
+    <div class="confirm-card">
+      <p>進度會清掉。確定回主頁？</p>
+      <div class="confirm-actions">
+        <button type="button" class="btn" data-confirm="yes">確定</button>
+        <button type="button" class="btn btn-ghost" data-confirm="no">繼續</button>
+      </div>
+    </div>
+  </div>
+
+  <canvas id="confetti" aria-hidden="true"></canvas>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

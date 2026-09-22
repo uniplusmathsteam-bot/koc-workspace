@@ -1,6 +1,16 @@
 /* James · Chem KOC lead — submissions. */
 KOC.works('chem', 'james', [
   {
+    id: 'tiaogao-song-youren',
+    title: '跳高高 · 送友人',
+    type: 'interactive',
+    chapter: '李白《送友人》',
+    submitted: '2026-09-23',
+    tags: ['Interactive', '背書', '李白', '送友人'],
+    src: 'content/chem/james/tiaogao-song-youren/index.html',
+    notes: '①溫書 ②跳高高 ③默寫 ④貪吃蛇。粵語／普通話逐句朗讀。Esc 回主頁。'
+  },
+  {
     id: 'sheji',
     title: '射擊 / 寫作地牢',
     type: 'interactive',
