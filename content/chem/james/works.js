@@ -2,13 +2,13 @@
 KOC.works('chem', 'james', [
   {
     id: 'chem-lab-hq-scramble',
-    title: 'Scramble',
+    title: 'Chem Lab HQ · Scramble',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'Chem Topic 01',
     submitted: '2026-09-23',
     tags: ['Interactive', 'S3', 'Lab apparatus'],
-    src: 'content/chem/james/chem-lab-hq-scramble/index.html',
+    src: 'content/chem/james/chem-lab-hq-scramble/index.html?v=20260923',
     notes: 'HKDSE Topic 01 timed mix: ten questions from apparatus stations and Lab Safety. Press 1–4. 15 minutes. Only the best score is kept.'
   },
   {
