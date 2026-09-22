@@ -7,7 +7,7 @@ KOC.works('chem', 'james', [
     chapter: '寫作手法',
     submitted: '2026-09-23',
     tags: ['Interactive', '射擊', '寫作', '修辭'],
-    src: 'content/chem/james/sheji/index.html',
+    src: 'content/chem/james/sheji/index.html?v=20260923',
     notes: '先選類別、題型和難度。每一題是一層。簡單打 1 個正確、普通 3 個、困難 5 個。題型：認作用、辨句子、辨一對。WASD 走動、滑鼠瞄準、點擊攻擊。空白鍵暫停。'
   },
   {
