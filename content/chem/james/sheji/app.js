@@ -19,6 +19,7 @@
   let floorTimer = 0;
   let doorAnimTimer = 0;
   let bossCueTimer = 0;
+  let buffToastTimer = 0;
   const reduceMotionMq = window.matchMedia
     ? window.matchMedia("(prefers-reduced-motion: reduce)")
     : { matches: false };
@@ -37,7 +38,11 @@
     missHeart: false,
     sameCat: false,
     enemyFire: false,
-    bossHp: 5,
+    bossHp: 20,
+    bossFireMs: 2400,
+    bossFireJitter: 400,
+    bossBullet: 5,
+    bossGrace: 2500,
   };
   DIFF[COPY.speedNormal] = {
     mul: 1,
@@ -47,16 +52,16 @@
     missHeart: true,
     sameCat: false,
     enemyFire: true,
-    enemyBullet: 3,
-    enemyFireMs: 5200,
+    enemyBullet: 2.5,
+    enemyFireMs: 6000,
     enemyFireJitter: 1800,
-    enemyGrace: 7000,
+    enemyGrace: 8000,
     enemyArmJitter: 4000,
-    bossHp: 35,
-    bossFireMs: 1500,
+    bossHp: 180,
+    bossFireMs: 450,
     bossFireJitter: 400,
-    bossBullet: 7,
-    bossGrace: 2000,
+    bossBullet: 10,
+    bossGrace: 1400,
   };
   DIFF[COPY.speedFast] = {
     mul: 2.3,
@@ -66,14 +71,14 @@
     missHeart: true,
     sameCat: true,
     enemyFire: true,
-    enemyBullet: 8,
-    enemyFireMs: 2000,
+    enemyBullet: 6,
+    enemyFireMs: 2400,
     enemyFireJitter: 800,
-    enemyGrace: 5000,
-    enemyArmJitter: 2200,
+    enemyGrace: 6000,
+    enemyArmJitter: 2600,
     roomAgro: true,
-    bossHp: 120,
-    bossFireMs: 550,
+    bossHp: 240,
+    bossFireMs: 450,
     bossFireJitter: 150,
     bossBullet: 13,
     bossGrace: 600,
@@ -173,6 +178,27 @@
 
   function diff() {
     return DIFF[state.speed] || DIFF[COPY.speedNormal];
+  }
+
+  function bossFlavor() {
+    return BOSS_BY_CAT[state.cat] || BOSS_BY_CAT[COPY.catAll];
+  }
+
+  function bossName() {
+    return bossFlavor().name;
+  }
+
+  function floorVsLine() {
+    const item = current();
+    if (item && item.vs) return item.vs;
+    if (item && item.comboIds && item.comboIds.length) {
+      for (let i = 0; i < item.comboIds.length; i++) {
+        const tech = TECH_BY_ID[item.comboIds[i]];
+        if (tech && tech.vs) return tech.vs;
+      }
+    }
+    const hits = bossFlavor().hits || [];
+    return hits[0] || "";
   }
 
   function shuffle(list) {
@@ -1497,6 +1523,22 @@
     return total ? walk / total : 0;
   }
 
+  function bossRoomSized(rooms) {
+    if (!rooms || !rooms.length) return false;
+    const last = rooms[rooms.length - 1];
+    const w = last.tx1 - last.tx0;
+    const h = last.ty1 - last.ty0;
+    if (w < 8 || h < 8) return false;
+    let total = 0;
+    for (let i = 0; i < rooms.length; i++) {
+      const room = rooms[i];
+      total += (room.tx1 - room.tx0) * (room.ty1 - room.ty0);
+    }
+    if (!total) return false;
+    const frac = (w * h) / total;
+    return frac >= 0.15 && frac < 0.45;
+  }
+
   function tryRandomRooms(n, cols, mapH) {
     const h0 = randInt(6, 10);
     const w0 = randInt(7, 12);
@@ -1605,9 +1647,7 @@
     const mapH = rows - entranceRows;
     let rooms = null;
     let bossDoorTiles = [];
-    for (let attempt = 0; attempt < 12 && !rooms; attempt++) {
-      const candidate = tryRandomRooms(n, cols, mapH);
-      if (!candidate) continue;
+    function tryAcceptRooms(candidate) {
       inflateRooms(candidate, cols, mapH);
       const doorTiles = carveDungeon(blocked, cols, rows, mapH, candidate);
       const mid = Math.floor((candidate[0].tx0 + candidate[0].tx1) / 2);
@@ -1622,10 +1662,34 @@
       }
       if (
         dungeonCentersReachable(blocked, cols, rows, candidate, sx, sy) &&
-        mapWalkFrac(blocked, cols, mapH) >= 0.75
+        mapWalkFrac(blocked, cols, mapH) >= 0.75 &&
+        (!state.bossMode || bossRoomSized(candidate))
       ) {
         rooms = candidate;
         bossDoorTiles = doorTiles || [];
+        return true;
+      }
+      return false;
+    }
+    const maxTries = state.bossMode ? 36 : 12;
+    for (let attempt = 0; attempt < maxTries && !rooms; attempt++) {
+      const candidate = tryRandomRooms(n, cols, mapH);
+      if (!candidate) continue;
+      tryAcceptRooms(candidate);
+    }
+    if (!rooms) {
+      const fallback = eastFallbackRooms(n, cols, mapH);
+      inflateRooms(fallback, cols, mapH);
+      if (!state.bossMode || bossRoomSized(fallback)) {
+        rooms = fallback;
+        bossDoorTiles = carveDungeon(blocked, cols, rows, mapH, rooms) || [];
+      }
+    }
+    if (!rooms) {
+      for (let extra = 0; extra < 24 && !rooms; extra++) {
+        const candidate = tryRandomRooms(n, cols, mapH);
+        if (!candidate) continue;
+        tryAcceptRooms(candidate);
       }
     }
     if (!rooms) {
@@ -1734,6 +1798,7 @@
   }
 
   function maybeRoom0Drain(now) {
+    if (state.bossLockedIn) return;
     if (state.speed !== COPY.speedFast) return;
     if (!state.liveAt) return;
     if (!playerInSpawnHall()) {
@@ -1751,6 +1816,50 @@
     }
   }
 
+  function flattenBossInnerWalls() {
+    const d = state.dungeon;
+    if (!d || !d.blocked) return;
+    let grew = true;
+    while (grew) {
+      grew = false;
+      for (let y = 1; y < d.rows - 1; y++) {
+        for (let x = 1; x < d.cols - 1; x++) {
+          if (!d.blocked[y][x]) continue;
+          const n = !d.blocked[y - 1][x];
+          const s = !d.blocked[y + 1][x];
+          const e = !d.blocked[y][x + 1];
+          const w = !d.blocked[y][x - 1];
+          if ((n && s) || (e && w)) {
+            d.blocked[y][x] = 0;
+            grew = true;
+          }
+        }
+      }
+    }
+  }
+
+  function clearBossFightExtras() {
+    state.movers = state.movers.filter(function (m) {
+      if (m.isBoss) return true;
+      if (m.el && m.el.parentNode) m.el.remove();
+      return false;
+    });
+    (state.buffs || []).forEach(function (buff) {
+      if (buff.el && buff.el.parentNode) buff.el.remove();
+    });
+    state.buffs = [];
+    const keep = [];
+    for (let i = 0; i < state.bullets.length; i++) {
+      const b = state.bullets[i];
+      if (b.enemy && !b.fromBoss) {
+        if (b.el && b.el.parentNode) b.el.remove();
+        continue;
+      }
+      keep.push(b);
+    }
+    state.bullets = keep;
+  }
+
   function maybeSealBossRoom() {
     if (!state.bossMode || state.bossDead || state.bossLockedIn || !state.bossDoorOpen) return;
     const boss = bossMover();
@@ -1760,6 +1869,13 @@
     state.bossFightAt = performance.now();
     state.bossDoorOpen = false;
     setBossDoorOpen(false);
+    flattenBossInnerWalls();
+    renderDungeonWalls();
+    const d = state.dungeon;
+    if (d) {
+      boss.homeTiles = { tx0: 1, ty0: 1, tx1: d.cols - 1, ty1: d.rows - 1 };
+    }
+    clearBossFightExtras();
     showBossFightBanner();
   }
 
@@ -1779,8 +1895,37 @@
   function syncBossArena() {
     const field = state.field;
     if (!field) return;
-    const on = !!(state.bossMode && !state.bossDead && playerInLastRoom());
+    const on = !!(state.bossMode && !state.bossDead && (state.bossLockedIn || playerInLastRoom()));
     field.classList.toggle("boss-arena", on);
+  }
+
+  function hideBuffToast() {
+    if (buffToastTimer) {
+      clearTimeout(buffToastTimer);
+      buffToastTimer = 0;
+    }
+    const el = document.getElementById("buff-toast");
+    if (el) {
+      el.hidden = true;
+      el.textContent = "";
+      el.classList.remove("hp", "atk");
+    }
+  }
+
+  function showBuffToast(kind) {
+    const el = document.getElementById("buff-toast");
+    if (!el) return;
+    el.textContent = kind === "hp" ? COPY.buffGotHp : COPY.buffGotAtk;
+    el.classList.remove("hp", "atk");
+    el.classList.add(kind === "hp" ? "hp" : "atk");
+    el.hidden = true;
+    void el.offsetWidth;
+    el.hidden = false;
+    if (buffToastTimer) clearTimeout(buffToastTimer);
+    buffToastTimer = setTimeout(function () {
+      buffToastTimer = 0;
+      if (el.parentNode) el.hidden = true;
+    }, 1200);
   }
 
   function hideBossFightBanner() {
@@ -1801,12 +1946,17 @@
     const banner = document.getElementById("boss-banner");
     if (!banner) return;
     banner.hidden = false;
-    banner.textContent = COPY.bossFight;
+    const flavor = bossFlavor();
+    const title = document.createElement("strong");
+    title.textContent = flavor.fight;
+    const line = document.createElement("span");
+    line.textContent = flavor.line;
+    banner.replaceChildren(title, line);
     if (bossCueTimer) clearTimeout(bossCueTimer);
     bossCueTimer = setTimeout(function () {
       bossCueTimer = 0;
       if (banner.parentNode) banner.hidden = true;
-    }, 1200);
+    }, 2500);
   }
 
   function spawnKeyPop(x, y) {
@@ -2123,6 +2273,7 @@
     }
     cancelDoorAnim();
     hideBossFightBanner();
+    hideBuffToast();
     const flying = playEl.querySelectorAll(".bullet");
     for (let i = 0; i < flying.length; i++) flying[i].remove();
     state.bullets = [];
@@ -2167,12 +2318,44 @@
     else el.textContent = text;
   }
 
+  function setBossSay(text) {
+    const m = bossMover();
+    if (!m || !m.el || !text) return;
+    let bubble = m.el.querySelector(".boss-say");
+    if (!bubble) {
+      bubble = document.createElement("span");
+      bubble.className = "boss-say";
+      m.el.appendChild(bubble);
+    }
+    bubble.textContent = text;
+  }
+
   function removeFloater(el) {
     if (!el) return;
     state.movers = state.movers.filter(function (m) {
       return m.el !== el;
     });
     if (el.parentNode) el.remove();
+  }
+
+  function clearLeftoverMonsters() {
+    const leftover = [];
+    for (let i = 0; i < state.movers.length; i++) {
+      const m = state.movers[i];
+      if (m.isBoss) continue;
+      if (m.el && m.el.getAttribute("data-token")) leftover.push(m.el);
+    }
+    leftover.forEach(removeFloater);
+    const keep = [];
+    for (let i = 0; i < state.bullets.length; i++) {
+      const b = state.bullets[i];
+      if (b.enemy && !b.fromBoss) {
+        if (b.el && b.el.parentNode) b.el.remove();
+        continue;
+      }
+      keep.push(b);
+    }
+    state.bullets = keep;
   }
 
   function placeEl(el, x, y) {
@@ -2289,6 +2472,7 @@
   }
 
   function leftoversHarmless() {
+    if (state.speed === COPY.speedFast) return false;
     return !state.remaining.length;
   }
 
@@ -2427,6 +2611,9 @@
         if (m.isBoss && state.speed === COPY.speedFast) {
           m.bossPattern = 1 + Math.floor(Math.random() * 3);
           if (m.bossPattern > 1) fireMs = 1200;
+        } else if (m.isBoss && state.speed === COPY.speedNormal) {
+          m.bossPattern = 1 + Math.floor(Math.random() * 3);
+          if (m.bossPattern > 1) fireMs = 1100;
         }
         m.nextFire = nowFire + fireMs + Math.random() * jitter;
         if (!wallHitOnSegment(m.x, m.y, player.x, player.y)) {
@@ -2564,6 +2751,7 @@
     } else {
       state.bossDamage = 3;
     }
+    showBuffToast(buff.kind);
     if (buff.el && buff.el.parentNode) buff.el.remove();
     state.buffs = state.buffs.filter(function (b) {
       return b !== buff;
@@ -2838,7 +3026,9 @@
         const cx = (room.tx0 + room.tx1) * 0.5 * state.dungeon.tileW;
         const cy = (room.ty0 + room.ty1) * 0.5 * state.dungeon.tileH;
         const pos = nearestOpen(cx, cy, BOSS_HALF);
-        const speed = (0.32 + Math.random() * 0.36) * mul;
+        let speed = (0.32 + Math.random() * 0.36) * mul;
+        if (state.speed === COPY.speedFast) speed *= 2.6;
+        else if (state.speed === COPY.speedNormal) speed *= 2.4;
         const hp = diff().bossHp || 10;
         placeEl(el, pos.x, pos.y);
         return {
@@ -3069,8 +3259,8 @@
     if (state.bossMode) {
       if (!state.remaining.length) {
         const boss = bossMover();
-        if (boss) return COPY.bossName + " " + Math.max(0, boss.hp) + "/" + boss.hpMax;
-        return COPY.bossName;
+        if (boss) return bossName() + " " + Math.max(0, boss.hp) + "/" + boss.hpMax;
+        return bossName();
       }
       return COPY.fragments + " " + state.collected.length + "/" + (state.fragmentTotal || 0);
     }
@@ -3124,7 +3314,7 @@
         })
         .join("") +
       (state.bossMode
-        ? '<div class="floater boss" data-boss="1">' + mobMarkup(COPY.bossName, "#8b1a1a", "skull") + "</div>"
+        ? '<div class="floater boss" data-boss="1">' + mobMarkup(bossName(), "#8b1a1a", "skull") + "</div>"
         : "");
     playEl.innerHTML = `
       <div class="stage">
@@ -3152,6 +3342,7 @@
           <div class="player-tank" aria-hidden="true">${heroMarkup()}</div>
           <div class="count-banner" id="count-banner" hidden></div>
           <div class="boss-banner" id="boss-banner" hidden></div>
+          <div class="buff-toast" id="buff-toast" hidden></div>
           <div class="pause-banner"><div>${COPY.paused} · ${COPY.pauseHint}</div><p class="pause-fb" id="pause-fb"></p></div>
           <div id="teach" class="clear-card" hidden></div>
         </div>
@@ -3198,6 +3389,14 @@
       } else if (pat === 3) {
         angs = [theta - 0.32, theta, theta + 0.32];
         speed = 8;
+      }
+      speed *= 1.2;
+    } else if (m.isBoss && state.speed === COPY.speedNormal) {
+      const pat = m.bossPattern || 1;
+      if (pat === 2) {
+        angs = [theta - 0.32, theta + 0.32];
+      } else if (pat === 3) {
+        angs = [theta - 0.32, theta, theta + 0.32];
       }
     }
     for (let i = 0; i < angs.length; i++) {
@@ -3297,13 +3496,24 @@
     if (state.locked || !state.bossLockedIn) return;
     const m = bossMover();
     if (!m || m.hp <= 0) return;
+    const prev = m.hp;
+    const max = m.hpMax || prev;
     m.hp -= state.bossDamage || 1;
     if (m.hp < 0) m.hp = 0;
-    setTankLabel(m.el, COPY.bossName + " " + m.hp + "/" + m.hpMax);
+    setTankLabel(m.el, bossName() + " " + m.hp + "/" + m.hpMax);
     syncRemainCount();
-    if (m.hp > 0) return;
+    if (m.hp > 0) {
+      const first = prev === max;
+      const half = prev > max * 0.5 && m.hp <= max * 0.5;
+      const low = prev > max * 0.2 && m.hp <= max * 0.2;
+      if (first || half || low) {
+        const line = floorVsLine();
+        if (line) setBossSay(line);
+      }
+      return;
+    }
     m.el.classList.add("hit");
-    setTankLabel(m.el, "✓ " + COPY.bossName);
+    setTankLabel(m.el, "✓ " + bossName());
     state.bossDead = true;
     state.locked = true;
     if (state.field) state.field.classList.remove("boss-arena");
@@ -3364,6 +3574,7 @@
       if (state.remaining.length === 0) {
         if (!item.missed.length && !item.usedTip) state.firstHits += 1;
         updateHud();
+        clearLeftoverMonsters();
         if (state.bossMode) {
           openBossDoor();
         } else {

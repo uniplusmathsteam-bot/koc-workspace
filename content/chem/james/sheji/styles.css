@@ -620,6 +620,49 @@ main {
   border-color: #7a3f04;
 }
 
+.buff-toast {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9;
+  pointer-events: none;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  color: #fff8e8;
+  display: none;
+  box-shadow: 0 4px 12px rgba(20, 10, 8, 0.35);
+}
+
+.buff-toast:not([hidden]) {
+  display: block;
+  animation: buff-toast-in 0.2s ease-out;
+}
+
+.buff-toast.hp {
+  background: #178a57;
+  border: 2px solid #0d4c30;
+}
+
+.buff-toast.atk {
+  background: #d97706;
+  border: 2px solid #7a3f04;
+}
+
+@keyframes buff-toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
 .playfield {
   position: relative;
   width: 100%;
@@ -771,6 +814,24 @@ main {
   letter-spacing: 0.12em;
   z-index: 8;
   pointer-events: none;
+  padding: 24px;
+  text-align: center;
+}
+
+.boss-banner strong {
+  display: block;
+  font-size: 3.2rem;
+  letter-spacing: 0.12em;
+}
+
+.boss-banner span {
+  display: block;
+  margin-top: 0.45em;
+  max-width: 22em;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.45;
 }
 
 .boss-banner:not([hidden]) {
@@ -824,6 +885,53 @@ main {
   width: 56px;
   height: 56px;
   z-index: 3;
+  overflow: visible;
+}
+
+.boss-say {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 28px);
+  transform: translateX(-50%);
+  min-width: 7.5em;
+  max-width: 14em;
+  padding: 0.7em 1.1em 0.85em;
+  background: #fff;
+  color: #111;
+  border: 2.5px solid #111;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  letter-spacing: 0;
+  white-space: normal;
+  pointer-events: none;
+  z-index: 6;
+}
+
+.boss-say::before,
+.boss-say::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+}
+
+.boss-say::before {
+  margin-left: -8px;
+  border-top: 14px solid #111;
+}
+
+.boss-say::after {
+  margin-left: -6px;
+  border-left-width: 6px;
+  border-right-width: 6px;
+  border-top: 11px solid #fff;
 }
 
 .floater.boss .mob-slime {
@@ -1581,6 +1689,9 @@ body.play-fill #play .key-hint {
     transition: none;
   }
   .floor-veil {
+    animation: none;
+  }
+  .buff-toast:not([hidden]) {
     animation: none;
   }
 }

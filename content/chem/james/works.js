@@ -5,10 +5,10 @@ KOC.works('chem', 'james', [
     title: '射擊 / 寫作地牢',
     type: 'interactive',
     chapter: '寫作手法',
-    submitted: '2026-09-15',
+    submitted: '2026-09-23',
     tags: ['Interactive', '射擊', '寫作', '修辭'],
     src: 'content/chem/james/sheji/index.html',
-    notes: '選類別、題型和難度。WASD 走動、滑鼠瞄準、點擊攻擊。可開首領模式：打齊正確碎片才進最後一房。空白鍵暫停。'
+    notes: '先選類別、題型和難度。每一題是一層。簡單打 1 個正確、普通 3 個、困難 5 個。題型：認作用、辨句子、辨一對。WASD 走動、滑鼠瞄準、點擊攻擊。空白鍵暫停。'
   },
   {
     id: 'taiko',
