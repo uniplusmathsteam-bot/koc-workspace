@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Scramble — HKDSE Topic 1 for S3</title>
+  <link rel="stylesheet" href="styles.css?v=21" />
+</head>
+<body>
+  <header class="top">
+    <div class="top-inner">
+      <div>
+        <p class="kicker">HKDSE Chemistry · Topic 01 · S3 lab</p>
+        <h1>Scramble</h1>
+        <p>Ten mixed questions from apparatus stations and Lab Safety. Press 1–4 to choose an answer.</p>
+      </div>
+      <div class="top-side">
+        <button type="button" id="theme-toggle" class="theme-toggle" aria-pressed="false">Dark mode</button>
+        <div id="streak-hud"></div>
+        <nav class="nav" id="nav"></nav>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="view active" id="home">
+      <h2>Choose your station</h2>
+      <p class="lead">This folder is the Scramble station on its own. Closing the page starts a new mix. Only your best score is kept.</p>
+      <div id="home-games" class="home-stations"></div>
+      <p class="export-note">This is an offline website. Double-click <strong>index.html</strong> — no install. Keep this folder together when you share it. Chem Lab HQ and What's It For? are unchanged in their own folders.</p>
+    </section>
+
+    <section class="view" id="scramble"></section>
+  </main>
+
+  <canvas id="confetti" aria-hidden="true"></canvas>
+  <script src="data.js?v=20"></script>
+  <script src="app.js?v=20"></script>
+</body>
+</html>
