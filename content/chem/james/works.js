@@ -1,6 +1,17 @@
 /* James · Chem KOC lead — submissions. */
 KOC.works('chem', 'james', [
   {
+    id: 'classification-of-matter',
+    title: 'Classification of matter',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'Planet Earth',
+    submitted: '2026-09-23',
+    tags: ['Interactive', 'Classification', 'Matter'],
+    src: 'content/chem/james/classification-of-matter/index.html?v=20260923',
+    notes: 'Shoot each formula with the matching ammo: 1 pure element, 2 pure compound, 3 mixture of elements. WASD to move, mouse to aim, click to shoot.'
+  },
+  {
     id: 'chem-lab-hq-scramble',
     title: 'Chem Lab HQ · Scramble',
     type: 'interactive',
