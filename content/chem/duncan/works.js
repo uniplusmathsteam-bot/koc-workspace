@@ -14,10 +14,10 @@ KOC.works('chem', 'duncan', [
   },
   {
     id: 'gut-shot',
-    title: 'Gut Shot',
+    title: 'S3/S4 Senior Biology SB02 2.4 Digestion',
     type: 'interactive',
     subject: 'Chem',
-    chapter: 'Chem Topic 00',
+    chapter: 'S3/S4 Senior Biology SB02 Nutrition in humans (HumanNutri)',
     submitted: '2026-09-13',
     tags: ['Interactive', 'Game', 'Hydrolysis'],
     src: 'content/chem/duncan/gut-shot/index.html',
