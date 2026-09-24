@@ -2,10 +2,10 @@
 KOC.works('bio-is', 'issac', [
   {
     id: 'cell-code-comic',
-    title: 'S3 BB03 Cellular organization 3.1–3.4 · Cell Code Comic',
+    title: 'Cells as the Basic Unit of Life to Prokaryotic and Eukaryotic Cells',
     type: 'pdf',
     subject: 'Bio',
-    chapter: 'S3 BB03 Cellular organization 3.1–3.4',
+    chapter: 'S3 BB03 Cellular organization',
     submitted: '2026-09-10',
     tags: ['Comics', 'Cells'],
     src: 'content/bio-is/issac/cell-code-comic.pdf',
