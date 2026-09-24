@@ -29,6 +29,7 @@ KOC.works('bio-is', 'jeff', [
     id: 'organelle-explorer',
     title: 'S3 Basic Biology BB03 Cellular organization (CellOrg)',
     type: 'interactive',
+    subject: 'Bio',
     chapter: 'S3 Basic Biology BB03 3.3 Structures of Animal and Plant Cells',
     submitted: '2026-08-06',
     status: 'approved',
