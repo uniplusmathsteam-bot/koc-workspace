@@ -27,9 +27,9 @@ KOC.works('bio-is', 'jeff', [
   },
   {
     id: 'organelle-explorer',
-    title: 'Cell Organelle Explorer',
+    title: 'S3 Basic Biology BB03 Cellular organization (CellOrg)',
     type: 'interactive',
-    chapter: 'Bio Ch. 2',
+    chapter: 'S3 Basic Biology BB03 3.3 Structures of Animal and Plant Cells',
     submitted: '2026-08-06',
     status: 'approved',
     tags: ['Interactive', 'Revision tool', 'Quiz'],
