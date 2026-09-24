@@ -23,6 +23,7 @@ const state = {
   cleared: {},
   bestFirst: 0,
   fb: null,
+  hideDescriptions: false,
 };
 
 function displayName(item) {
@@ -207,12 +208,36 @@ function loadThemeFallback() {
 function applyLang() {
   const zh = state.lang === "zh";
   document.documentElement.lang = zh ? "zh-Hant" : "en";
-  const btn = document.getElementById("lang-toggle");
-  if (btn) {
-    btn.setAttribute("aria-pressed", zh ? "true" : "false");
-    btn.textContent = zh ? "EN" : "中";
-    btn.setAttribute("aria-label", zh ? "Switch to English labels" : "Switch to Chinese labels");
-  }
+  document.querySelectorAll(".language-switch [data-lang]").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.lang === state.lang);
+  });
+  syncDescToggle();
+}
+
+function easyOf(item) {
+  return state.lang === "zh" && item.easyZh ? item.easyZh : item.easy;
+}
+
+function examOf(item) {
+  return state.lang === "zh" && item.examZh ? item.examZh : item.exam;
+}
+
+function modeTitle(mode) {
+  return state.lang === "zh" ? mode.titleZh || mode.title : mode.title;
+}
+
+function modeBlurb(mode) {
+  return state.lang === "zh" ? mode.blurbZh || mode.blurb : mode.blurb;
+}
+
+function syncDescToggle() {
+  document.documentElement.classList.toggle("hide-descriptions", state.hideDescriptions);
+  const btn = document.getElementById("desc-toggle");
+  if (!btn) return;
+  btn.setAttribute("aria-pressed", state.hideDescriptions ? "true" : "false");
+  btn.textContent = state.hideDescriptions
+    ? (state.lang === "zh" ? "顯示描述" : "Show description")
+    : (state.lang === "zh" ? "隱藏描述" : "Hide description");
 }
 
 function clampPreviewSize(n) {
@@ -365,7 +390,7 @@ function buildNav() {
   const nav = document.getElementById("nav");
   nav.innerHTML = "";
   const btn = document.createElement("button");
-  btn.textContent = "Home";
+  btn.textContent = state.lang === "zh" ? "主頁" : "Home";
   btn.dataset.view = "home";
   btn.addEventListener("click", () => show("home"));
   nav.appendChild(btn);
@@ -375,22 +400,22 @@ function renderHome() {
   const root = document.getElementById("home");
   const hint = resumeHint();
   root.innerHTML = `
-    <h2>Study, then drill</h2>
-    <p class="lead">Look at the tray first. Then name pieces, spot them from a name, or match the job. Misses stay in recap until you get them right. Only a clean first-try run is Cleared.</p>
+    <h2>${state.lang === "zh" ? "先觀察，再練習" : "Study, then drill"}</h2>
+    <p class="lead">${state.lang === "zh" ? "先看實驗盤。然後說出名稱、按名稱找出圖，或配對用途。錯題會留在重溫，直到答對。只有第一次就答對的完整一輪才算過關。" : "Look at the tray first. Then name pieces, spot them from a name, or match the job. Misses stay in recap until you get them right. Only a clean first-try run is Cleared."}</p>
     <div class="grid home-grid">
       <button class="game-card" data-go="learn">
         ${learnStamp()}
         <img class="card-thumb" src="images/notes-beaker-diagram.jpg" alt="" />
-        <span class="level-pill">Tray</span>
-        <h3>Lab tray</h3>
-        <p>All ${APPARATUS.length} pieces. Photo and 2D diagram side by side, with the easy line and the exam wording.</p>
+        <span class="level-pill">${state.lang === "zh" ? "實驗盤" : "Tray"}</span>
+        <h3>${state.lang === "zh" ? "實驗盤" : "Lab tray"}</h3>
+        <p>${state.lang === "zh" ? `全部 ${APPARATUS.length} 件。相片和平面圖並排，附簡單說明和考試用語。` : `All ${APPARATUS.length} pieces. Photo and 2D diagram side by side, with the easy line and the exam wording.`}</p>
       </button>
       <button class="game-card" data-go="drill">
         ${drillStamp()}
         <img class="card-thumb" src="images/notes-conical-flask-diagram.jpg" alt="" />
-        <span class="level-pill">Drill</span>
-        <h3>Name · Spot · Use</h3>
-        <p>Four modes. Press 1–4. The picture stays up after you answer.</p>
+        <span class="level-pill">${state.lang === "zh" ? "練習" : "Drill"}</span>
+        <h3>${state.lang === "zh" ? "名稱 · 辨圖 · 用途" : "Name · Spot · Use"}</h3>
+        <p>${state.lang === "zh" ? "四種模式。按 1–4。作答後圖片仍然顯示。" : "Four modes. Press 1–4. The picture stays up after you answer."}</p>
         ${hint ? `<span class="resume-tag">${hint}</span>` : ""}
         ${state.deck.length ? `<span class="fresh-link" data-fresh="1">New mix</span>` : ""}
       </button>
@@ -398,12 +423,12 @@ function renderHome() {
     <div class="mode-row" role="group" aria-label="Drill modes">
       ${DRILL_MODES.map((mode) => `
         <button class="mode-chip${state.mode === mode.id && hasRun() ? " on" : ""}" data-mode="${mode.id}">
-          <strong>${mode.title}</strong>
-          <span>${mode.blurb}</span>
+          <strong>${modeTitle(mode)}</strong>
+          <span>${modeBlurb(mode)}</span>
         </button>
       `).join("")}
     </div>
-    <p class="export-note">This is an offline website. Double-click <strong>index.html</strong> — no install. Keep this folder together when you share it.</p>
+    <p class="export-note">${state.lang === "zh" ? "這是離線網頁。雙擊 <strong>index.html</strong> 即可開啟，不用安裝。分享時請連同整個資料夾。" : "This is an offline website. Double-click <strong>index.html</strong> — no install. Keep this folder together when you share it."}</p>
   `;
   root.querySelector("[data-go=learn]").addEventListener("click", () => show("learn"));
   root.querySelector("[data-go=drill]").addEventListener("click", () => show("drill"));
@@ -433,40 +458,42 @@ function renderLearn() {
   root.innerHTML = `
     <div class="toolbar">
       <div>
-        <h2>Lab tray</h2>
-        <p class="lead">Browse every piece. Photo and diagram stay visible. Reveal is not required — this is study, not a test.</p>
+        <h2>${state.lang === "zh" ? "實驗盤" : "Lab tray"}</h2>
+        <p class="lead">${state.lang === "zh" ? "逐件瀏覽。相片和圖一直可見。這是學習，不是測驗。" : "Browse every piece. Photo and diagram stay visible. Reveal is not required — this is study, not a test."}</p>
       </div>
       <div class="score-wrap">
         ${learnStamp()}
-        <button class="btn btn-primary" data-go="drill">Start a drill</button>
-        <button class="btn btn-ghost" data-go="home">Home</button>
+        <button class="btn btn-primary" data-go="drill">${state.lang === "zh" ? "開始練習" : "Start a drill"}</button>
+        <button class="btn btn-ghost" data-go="home">${state.lang === "zh" ? "主頁" : "Home"}</button>
       </div>
     </div>
     <div class="learn-layout">
       <aside class="learn-options">
-        <p class="caption">In the notes as a 2D drawing</p>
+        <p class="caption">${state.lang === "zh" ? "筆記中的平面圖" : "In the notes as a 2D drawing"}</p>
         <div class="chips" id="learn-core"></div>
-        <p class="caption">Photo in the kit</p>
+        <p class="caption">${state.lang === "zh" ? "套件中的相片" : "Photo in the kit"}</p>
         <div class="chips quiet" id="learn-extra"></div>
       </aside>
       <div class="learn-stage">
         <p class="exam-line"><strong>${nameLine}</strong></p>
         <div class="detail">
           <div>
-            <p class="caption">${item.diagram ? "2D diagram" : "No 2D diagram in the notes"}</p>
+            <p class="caption">${item.diagram ? (state.lang === "zh" ? "平面圖" : "2D diagram") : (state.lang === "zh" ? "筆記沒有平面圖" : "No 2D diagram in the notes")}</p>
             ${item.diagram
               ? `<div class="photo-frame"><img src="${drawingSrc(item.id)}" alt="2D diagram of ${item.name}" /></div>`
               : `<div class="photo-frame"><span class="tiny">This piece is a photograph only.</span></div>`}
           </div>
           <div>
-            <p class="caption">Photograph</p>
+            <p class="caption">${state.lang === "zh" ? "相片" : "Photograph"}</p>
             <div class="photo-frame"><img src="${photoSrc(item.id)}" alt="Photograph of ${item.name}" /></div>
           </div>
         </div>
-        <p class="exam-kicker">In class</p>
-        <p>${item.easy}</p>
-        <p class="exam-kicker">Model answer</p>
-        <p class="exam-line"><strong>${item.name}</strong> — ${item.exam}</p>
+        <div class="word-desc">
+          <p class="exam-kicker">${state.lang === "zh" ? "課堂說明" : "In class"}</p>
+          <p>${easyOf(item)}</p>
+          <p class="exam-kicker">${state.lang === "zh" ? "參考答案" : "Model answer"}</p>
+          <p class="exam-line"><strong>${displayName(item)}</strong> — ${examOf(item)}</p>
+        </div>
       </div>
     </div>
   `;
@@ -546,8 +573,8 @@ function feedbackHtml(q) {
     <strong>${fb.title}</strong>
     <p>${fb.body}</p>
     <p class="exam-kicker">Model answer</p>
-    <p><strong>${displayName(fb.item)}</strong> — ${fb.item.exam}</p>
-    <p class="tiny">${fb.item.easy}</p>
+    <p><strong>${displayName(fb.item)}</strong> — ${examOf(fb.item)}</p>
+    <p class="tiny">${easyOf(fb.item)}</p>
     ${fb.ok ? "" : `<p>You chose <strong>${optionLabel(fb.chosen, false)}</strong>.</p>`}
     ${trap}
     ${pair}
@@ -590,7 +617,7 @@ function specimenHtml(q, item) {
     ? `${kindLabel(kind)} of ${item.name}`
     : `${kindLabel(kind)} of unnamed apparatus`;
   if (q.type === "use" && !state.checked) {
-    return `<div class="use-prompt exam-line">${item.exam}</div>`;
+    return `<div class="use-prompt exam-line">${examOf(item)}</div>`;
   }
   return `${zoomBar()}<div class="photo-frame specimen"><img src="${src}" alt="${alt}" /></div>`;
 }
@@ -658,7 +685,7 @@ function renderDrill() {
       <div class="score-wrap">${drillStamp()}<div class="score">${firstTryCorrect()} / ${state.deck.length}</div></div>
     </div>
     <div class="mode-row compact">
-      ${DRILL_MODES.map((mode) => `<button class="mode-chip${mode.id === state.mode ? " on" : ""}" data-mode="${mode.id}">${mode.title}</button>`).join("")}
+      ${DRILL_MODES.map((mode) => `<button class="mode-chip${mode.id === state.mode ? " on" : ""}" data-mode="${mode.id}">${modeTitle(mode)}</button>`).join("")}
     </div>
     ${progress}
     <div class="drill-stage${q.type === "spot" ? " is-spot" : ""}">
@@ -796,14 +823,23 @@ document.getElementById("theme-toggle").addEventListener("click", () => {
   applyTheme(!document.documentElement.classList.contains("dark"));
 });
 
-document.getElementById("lang-toggle").addEventListener("click", () => {
-  state.lang = state.lang === "zh" ? "en" : "zh";
-  applyLang();
-  saveProgress();
-  if (state.view === "home") renderHome();
-  if (state.view === "learn") renderLearn();
-  if (state.view === "drill") renderDrill();
+document.querySelectorAll(".language-switch [data-lang]").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    state.lang = btn.dataset.lang === "zh" ? "zh" : "en";
+    applyLang();
+    saveProgress();
+    if (state.view === "home") renderHome();
+    if (state.view === "learn") renderLearn();
+    if (state.view === "drill") renderDrill();
+  });
 });
+const descToggle = document.getElementById("desc-toggle");
+if (descToggle) {
+  descToggle.addEventListener("click", () => {
+    state.hideDescriptions = !state.hideDescriptions;
+    syncDescToggle();
+  });
+}
 
 document.addEventListener("keydown", (event) => {
   if (event.target && /^(INPUT|TEXTAREA)$/.test(event.target.tagName)) return;

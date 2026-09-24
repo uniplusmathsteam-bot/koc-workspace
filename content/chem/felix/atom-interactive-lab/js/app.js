@@ -26,6 +26,8 @@
       "atomForm": "atom",
       "ionForm": "ion",
       "btn.resetElement": "Reset to element defaults",
+      "btn.hideText": "Hide description",
+      "btn.showText": "Show description",
       "zoom.in": "Zoom in",
       "zoom.out": "Zoom out",
       "zoom.resetTitle": "Reset view",
@@ -81,6 +83,8 @@
       "atomForm": "原子",
       "ionForm": "離子",
       "btn.resetElement": "重設為元素預設",
+      "btn.hideText": "隱藏描述",
+      "btn.showText": "顯示描述",
       "zoom.in": "放大",
       "zoom.out": "縮小",
       "zoom.resetTitle": "重設視圖",
@@ -137,7 +141,8 @@
     busy: false,
     zoom: 1,
     panX: 0,
-    panY: 0
+    panY: 0,
+    hideDescriptions: false
   };
 
   const svg = document.getElementById("atom-svg");
@@ -221,6 +226,17 @@
     zoomResetBtn.setAttribute("aria-label", t("zoom.resetTitle"));
     buildPeriodicTable();
     updateUI();
+    syncDescToggle();
+  }
+
+  function syncDescToggle() {
+    document.body.classList.toggle("hide-descriptions", state.hideDescriptions);
+    const btn = document.getElementById("desc-toggle");
+    if (!btn) return;
+    const key = state.hideDescriptions ? "btn.showText" : "btn.hideText";
+    btn.setAttribute("data-i18n", key);
+    btn.textContent = t(key);
+    btn.setAttribute("aria-pressed", state.hideDescriptions ? "true" : "false");
   }
 
   function loadElement(Z) {
@@ -483,6 +499,15 @@
       applyI18n();
     });
   });
+
+  const descToggle = document.getElementById("desc-toggle");
+  if (descToggle) {
+    descToggle.addEventListener("click", () => {
+      state.hideDescriptions = !state.hideDescriptions;
+      syncDescToggle();
+      window.dispatchEvent(new Event("resize"));
+    });
+  }
 
   zoomInBtn.addEventListener("click", () => setZoom(state.zoom + ZOOM_STEP));
   zoomOutBtn.addEventListener("click", () => setZoom(state.zoom - ZOOM_STEP));

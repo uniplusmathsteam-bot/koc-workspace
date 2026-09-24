@@ -60,6 +60,35 @@ header p {
   margin-top: 0.2rem;
 }
 
+.header-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.desc-toggle {
+  border: none;
+  border-radius: 8px;
+  padding: 0.4rem 0.9rem;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.desc-toggle:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.desc-toggle[aria-pressed="true"] {
+  background: #fff;
+  color: #1e3a5f;
+}
+
 .lang-switch {
   display: flex;
   gap: 0.35rem;
@@ -824,6 +853,30 @@ main {
 
 .process-log.active {
   color: var(--text);
+}
+
+body.hide-descriptions .concepts-panel,
+body.hide-descriptions .panel-splitter,
+body.hide-descriptions .process-log,
+body.hide-descriptions .calc-badge,
+body.hide-descriptions .hint,
+body.hide-descriptions header p {
+  display: none;
+}
+
+body.hide-descriptions .side-stack > .panel[aria-label="Controls"] .controls {
+  --panel-body-h: auto;
+  height: auto;
+  max-height: none;
+}
+
+body.hide-descriptions main {
+  grid-template-columns: 1.7fr 0.55fr;
+  max-width: none;
+}
+
+body.hide-descriptions .lab-scene {
+  min-height: min(72vh, 820px);
 }
 
 @media (max-width: 900px) {

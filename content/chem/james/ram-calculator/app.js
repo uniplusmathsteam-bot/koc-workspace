@@ -68,6 +68,8 @@
       learningNoteAbundances: "When Aᵣ and all isotope masses are known, two unknown abundances can be found using the 100% total and the Aᵣ equation.",
       simplifiedNote: "This element has no characteristic terrestrial isotopic abundance, so a simplified single-isotope example is used.",
       footer: "An original educational tool for isotope calculations.",
+      hideText: "Hide description",
+      showText: "Show description",
       missingValues: "Enter a valid non-negative mass and abundance for every isotope.",
       missingAr: "Enter a valid non-negative relative atomic mass (Aᵣ).",
       abundanceRange: "Each abundance must be between 0% and 100%.",
@@ -167,6 +169,8 @@
       learningNoteAbundances: "當已知 Aᵣ 及所有同位素質量時，可利用豐度總和為 100% 及 Aᵣ 方程式求出兩個未知豐度。",
       simplifiedNote: "此元素沒有特徵的陸地同位素豐度，因此使用簡化單同位素例子。",
       footer: "原創同位素計算學習工具。",
+      hideText: "隱藏描述",
+      showText: "顯示描述",
       missingValues: "請為每個同位素輸入有效的非負質量及豐度。",
       missingAr: "請輸入有效的非負相對原子質量 (Aᵣ)。",
       abundanceRange: "每個豐度必須介乎 0% 至 100%。",
@@ -257,7 +261,8 @@
     arValue: null,
     isotopeMeta: null,
     loadNote: null,
-    periodicFilter: ""
+    periodicFilter: "",
+    hideDescriptions: false
   };
 
   const $ = id => document.getElementById(id);
@@ -1249,6 +1254,17 @@
     });
     $("closePeriodicTableButton").setAttribute("aria-label", state.lang === "zh" ? "關閉週期表" : "Close periodic table");
     updateModeChrome();
+    syncDescToggle();
+  }
+
+  function syncDescToggle() {
+    document.body.classList.toggle("hide-descriptions", state.hideDescriptions);
+    const btn = $("descToggle");
+    if (!btn) return;
+    const key = state.hideDescriptions ? "showText" : "hideText";
+    btn.dataset.i18n = key;
+    btn.textContent = t(key);
+    btn.setAttribute("aria-pressed", state.hideDescriptions ? "true" : "false");
   }
 
   function switchLanguage(lang) {
@@ -1292,6 +1308,13 @@
   document.querySelectorAll("[data-lang]").forEach(button => {
     button.addEventListener("click", () => switchLanguage(button.dataset.lang));
   });
+  const descToggle = $("descToggle");
+  if (descToggle) {
+    descToggle.addEventListener("click", () => {
+      state.hideDescriptions = !state.hideDescriptions;
+      syncDescToggle();
+    });
+  }
   document.querySelectorAll(".mode-tab").forEach(button => {
     button.addEventListener("click", () => switchMode(button.dataset.mode));
   });

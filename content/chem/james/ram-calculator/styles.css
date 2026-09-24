@@ -123,6 +123,37 @@ button {
   font-size: 0.78rem;
 }
 
+.header-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.desc-toggle {
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.14);
+  color: #e9f1ff;
+  border-radius: 10px;
+  padding: 8px 13px;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 750;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.desc-toggle:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.desc-toggle[aria-pressed="true"] {
+  background: #fff;
+  color: var(--blue-950);
+}
+
 .language-switch {
   padding: 4px;
   display: flex;
@@ -1085,6 +1116,21 @@ footer {
   border: 0;
 }
 
+body.hide-descriptions .working-section,
+body.hide-descriptions .learning-note,
+body.hide-descriptions .isotope-summary-note,
+body.hide-descriptions .mode-hint {
+  display: none;
+}
+
+body.hide-descriptions .dashboard {
+  grid-template-columns: minmax(320px, 0.9fr) minmax(420px, 1.2fr);
+}
+
+body.hide-descriptions .abundance-chart {
+  min-height: 220px;
+}
+
 @media (max-width: 880px) {
   .dashboard {
     grid-template-columns: 1fr;
@@ -1098,6 +1144,7 @@ footer {
     flex-direction: column;
   }
 
+  .header-tools,
   .language-switch {
     align-self: stretch;
   }

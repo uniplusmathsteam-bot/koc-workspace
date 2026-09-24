@@ -95,7 +95,7 @@ img { max-width: 100%; display: block; }
 .top-side { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
 .top-actions { display: flex; gap: 8px; }
 
-.theme-toggle, .lang-toggle, .nav button {
+.theme-toggle, .lang-toggle, .desc-toggle, .nav button {
   border: 1px solid rgba(240, 249, 255, 0.28);
   background: transparent;
   color: #f0f9ff;
@@ -111,6 +111,7 @@ img { max-width: 100%; display: block; }
 
 .theme-toggle[aria-pressed="true"],
 .lang-toggle[aria-pressed="true"],
+.desc-toggle[aria-pressed="true"],
 .nav button[aria-current="page"] {
   background: #e0f2fe;
   color: #0b4f8a;
@@ -221,6 +222,21 @@ h2 { margin: 0 0 8px; font-size: 26px; }
 .stamp.progress { background: #e0f2fe; border-color: #0284c7; }
 .stamp.todo { opacity: 0.7; }
 html.dark .stamp.progress { background: #16324a; border-color: var(--navy); }
+
+html.hide-descriptions #learn .word-desc,
+html.hide-descriptions #learn .lead,
+html.hide-descriptions #learn .kit-hint,
+html.hide-descriptions #learn .learn-answer .exam-line {
+  display: none !important;
+}
+
+html.hide-descriptions #learn .learn-layout {
+  grid-template-columns: minmax(140px, 0.5fr) 1fr;
+}
+
+html.hide-descriptions #learn .detail {
+  min-height: 52vh;
+}
 
 .learn-layout {
   display: grid;

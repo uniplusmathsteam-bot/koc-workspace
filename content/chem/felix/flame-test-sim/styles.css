@@ -101,6 +101,20 @@ header p {
   display: none !important;
 }
 
+.btn-header[aria-pressed="true"] {
+  background: var(--accent-light);
+}
+
+body.hide-descriptions .side-stack,
+body.hide-descriptions #stage-hint {
+  display: none;
+}
+
+body.hide-descriptions .lab-main {
+  grid-template-columns: 1fr;
+  max-width: none;
+}
+
 .screen {
   display: none;
 }

@@ -63,6 +63,7 @@
     btnTest: document.getElementById("btn-test"),
     btnHome: document.getElementById("btn-home"),
     btnRestart: document.getElementById("btn-restart"),
+    btnHideText: document.getElementById("btn-hide-text"),
     modeBadge: document.getElementById("mode-badge"),
     phaseBadge: document.getElementById("phase-badge"),
     procedureHeading: document.getElementById("procedure-heading"),
@@ -119,6 +120,7 @@
   let sessionToken = 0;
   let pendingGuidedCation = null;
   let tipZoneActive = null;
+  let hideDescriptions = false;
 
   function createInitialState() {
     return {
@@ -1157,6 +1159,14 @@
     if (state.mode === "guided") startSession("guided", state.cation);
     else if (state.mode === "test") startSession("test");
   });
+  if (els.btnHideText) {
+    els.btnHideText.addEventListener("click", () => {
+      hideDescriptions = !hideDescriptions;
+      document.body.classList.toggle("hide-descriptions", hideDescriptions);
+      els.btnHideText.setAttribute("aria-pressed", hideDescriptions ? "true" : "false");
+      els.btnHideText.textContent = hideDescriptions ? "Show description" : "Hide description";
+    });
+  }
   els.btnErrorOk.addEventListener("click", hideError);
 
   els.btnSampleCancel.addEventListener("click", () => {

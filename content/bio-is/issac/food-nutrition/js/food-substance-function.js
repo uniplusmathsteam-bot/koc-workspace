@@ -176,10 +176,170 @@
   ];
 
   const GROUPS = [
-    { id: "primary", title: "Primary food substances", note: "Supply energy. Carbohydrates / proteins ~17 kJ/g · lipids ~37 kJ/g (~2×)." },
-    { id: "protective", title: "Protective food substances", note: "No energy value (except water’s roles). Needed to regulate metabolism and build tissues." },
-    { id: "other", title: "Also organic in the notes", note: "Nucleic acids contain CHONP — not an energy food, but the notes cover their functions." }
+    { id: "primary", title: "Primary food substances", titleZh: "主要食物物質", note: "Supply energy. Carbohydrates / proteins ~17 kJ/g · lipids ~37 kJ/g (~2×).", noteZh: "提供能量。碳水化合物／蛋白質約 17 kJ/g，脂質約 37 kJ/g（約兩倍）。" },
+    { id: "protective", title: "Protective food substances", titleZh: "保護性食物物質", note: "No energy value (except water’s roles). Needed to regulate metabolism and build tissues.", noteZh: "沒有能量價值（水的功能除外）。用來調節代謝和建造組織。" },
+    { id: "other", title: "Also organic in the notes", titleZh: "筆記中的其他有機物", note: "Nucleic acids contain CHONP — not an energy food, but the notes cover their functions.", noteZh: "核酸含 CHONP——不是能量食物，但筆記有講它們的功能。" }
   ];
+
+  let lang = "en";
+  let hideDescriptions = false;
+  const UI = {
+    en: {
+      title: "Food substance functions",
+      lead: "Click a nutrient tag, then a function. The model stays on the left.",
+      hide: "Hide description",
+      show: "Show description",
+      home: "Food substance functions",
+      intro: "Click a nutrient tag, then a function. Each function opens a 2D block tool. Content follows Ch5 Food and humans notes (v2026).",
+      all: "All nutrients",
+      choose: "Choose a function. Each card opens a simple block animation.",
+      notes: "From the notes"
+    },
+    zh: {
+      title: "食物物質的功能",
+      lead: "先點營養素，再點功能。模型留在左邊。",
+      hide: "隱藏描述",
+      show: "顯示描述",
+      home: "食物物質的功能",
+      intro: "先點營養素，再點功能。每個功能會開啟一個平面模型。內容跟第 5 章「食物與人類」筆記（v2026）。",
+      all: "全部營養素",
+      choose: "選擇一個功能。每張卡會開啟簡單的方塊動畫。",
+      notes: "筆記內容"
+    }
+  };
+  const SLIDER_ZH = {
+    "Lipid around body": "體內脂質",
+    "Duration of starvation (week)": "飢餓時間（週）",
+    "Stored carbohydrate": "儲存的碳水化合物",
+    "Cellulose in wall": "細胞壁中的纖維素",
+    "Dietary fibre": "膳食纖維",
+    "Amount stored (g)": "儲存量（g）",
+    "Fat padding": "脂肪墊",
+    "Lipid insulation": "脂質絕緣",
+    "Lipid coat": "脂質層",
+    "Cholesterol / flexibility": "膽固醇／柔韌度",
+    "Protein for tissues": "組織所需蛋白質",
+    "Fibre in diet": "膳食中的纖維",
+    "Amount of water": "水量",
+    "Sweating": "出汗",
+    "Energy supplied": "供應的能量",
+    "Vitamin A / visual purple": "維生素 A／視紫素",
+    "Vitamin A": "維生素 A",
+    "Vitamin C / collagen": "維生素 C／膠原蛋白",
+    "Light intensity": "光照強度",
+    "Calcium in skeleton": "骨骼中的鈣",
+    "Calcium": "鈣",
+    "Iron / haemoglobin": "鐵／血紅蛋白",
+    "Iodine / thyroid hormone": "碘／甲狀腺激素",
+    "Phosphorus": "磷",
+    "Magnesium": "鎂",
+    "Nitrate (NO₃⁻)": "硝酸鹽（NO₃⁻）"
+  };
+  const LIVE_ZH = {
+    "Too little calcium — bones tear and show scars. The skeleton shakes gently, about to collapse.": "鈣太少——骨骼裂開並出現疤痕。骨架輕輕搖晃，快要倒塌。",
+    "Calcium is a component of bones and teeth. The skeleton stands firm.": "鈣是骨骼和牙齒的成分。骨架站得很穩。",
+    "Low Ca: muscle stays limp, nerve impulse barely moves, clot does not plug the cut.": "鈣低：肌肉無力，神經脈衝幾乎不動，血塊未能堵住傷口。",
+    "Calcium fires all three: muscle contracts, nerve impulse travels, clot seals the wound.": "鈣同時啟動三項：肌肉收縮、神經脈衝傳遞、血塊封住傷口。",
+    "Little iron — few O₂ blocks make it from mouth to lung. Anaemia: pale, tired.": "鐵少——只有很少 O₂ 從口到肺。貧血：面色蒼白、疲倦。",
+    "O₂ keeps entering the mouth. Iron in haemoglobin lets more oxygen reach the lungs and blood.": "O₂ 不斷入口。血紅蛋白中的鐵讓更多氧到達肺和血液。",
+    "Iron also activates enzymes. Without enough iron, metabolic reactions that need those enzymes slow down.": "鐵也會活化酶。鐵不足時，需要這些酶的代謝反應會變慢。",
+    "Iodine low — goitre (enlarged thyroid), slow metabolism.": "碘低——甲狀腺腫大，代謝變慢。",
+    "Thyroid hormone from iodine keeps metabolic rate up.": "由碘製成的甲狀腺激素維持代謝速率。",
+    "Low phosphorus — bones tear and scar, teeth included. Gentle shake; about to collapse.": "磷低——骨骼（包括牙齒）裂開並留疤。輕輕搖晃，快要倒塌。",
+    "P is in phosphate groups (phospholipids) and hardens bones and teeth.": "磷在磷酸基（磷脂）中，並使骨骼和牙齒變硬。",
+    "Yellowing leaves — chlorophyll needs Mg²⁺.": "葉片變黃——葉綠素需要 Mg²⁺。",
+    "Magnesium sits in chlorophyll. Also activates enzymes in animals.": "鎂在葉綠素中。在動物體內也會活化酶。",
+    "Little nitrate — the whole plant shrinks. Yellow leaves: not enough N for amino groups.": "硝酸鹽少——整株植物縮小。葉片變黃：氨基沒有足夠的氮。",
+    "Nitrate supplies N for plant amino acids (proteins) and chlorophyll. The plant grows larger.": "硝酸鹽為植物氨基酸（蛋白質）和葉綠素提供氮。植株長大。",
+    "DNA is a double helix: two sugar–phosphate backbones twist, with A–T (2 H-bonds) and C–G (3 H-bonds) as rungs. The sequence stores the genetic code.": "DNA 是雙螺旋：兩條糖–磷酸骨架扭在一起，橫檔是 A–T（2 個氫鍵）和 C–G（3 個氫鍵）。序列儲存遺傳密碼。",
+    "Base sequence on DNA → mRNA → amino-acid sequence → protein structure and function. A pairs with T (or U in RNA); C pairs with G.": "DNA 上的鹼基序列 → mRNA → 氨基酸序列 → 蛋白質的結構和功能。A 與 T 配對（RNA 中是 U）；C 與 G 配對。",
+    "Night blindness — rod cells lack visual purple. Scene stays black.": "夜盲——視桿細胞缺乏視紫素。畫面保持黑暗。",
+    "Visual purple lets rod cells see in dim light.": "視紫素讓視桿細胞在弱光中看見。",
+    "Dry, thickened linings — eye, skin, gut and airway suffer.": "內壁乾燥變厚——眼、皮膚、腸道和氣道受影響。",
+    "Healthy skin and linings of alimentary canal and breathing system.": "皮膚，以及消化道和呼吸系統的內壁保持健康。",
+    "Greater vitamin C concentration, fewer drops to decolorize DCPIP. Heat destroys vitamin C, so hot tea needs more drops.": "維生素 C 濃度愈高，使 DCPIP 褪色所需的滴數愈少。加熱會破壞維生素 C，所以熱茶需要更多滴。",
+    "Vitamin D is not a bone component. It promotes Ca and phosphate absorption from the gut into blood.": "維生素 D 不是骨骼的成分。它促進鈣和磷酸鹽從腸道吸收到血液。",
+    "Sucrose is loaded in the leaf, then travels down sieve tubes in the phloem (yellow tube). Xylem is the water path, not the sugar path.": "蔗糖在葉中裝載，再沿韌皮部篩管（黃管）向下運輸。木質部是水的通道，不是糖的通道。",
+    "Lock-and-key enzyme action from the Enzyme tool: substrate fits the active site, products leave, enzyme unchanged.": "酶工具中的鎖鑰模型：底物配合活性部位，產物離開，酶本身不變。",
+    "Membrane Transport from the tools hub: rotate the 3D bilayer and use the buttons to see channels, carriers and other paths.": "工具中的膜運輸：旋轉立體雙層，用按鈕查看通道、載體和其他路徑。",
+    "Water is a reactant. Hydrolysis: maltose + 1 H₂O → two glucose. Use Play / Next on the extracted Ch5 tool.": "水是反應物。水解：麥芽糖 + 1 H₂O → 兩分子葡萄糖。在第 5 章工具中按播放／下一步。",
+    "Water supports the animal body (buoyancy) and keeps the plant erect by turgor in a connected stem and leaves.": "水以浮力支撐動物身體，並靠相連莖葉的膨脹壓使植物直立。",
+    "Blood is mainly water. Many red blood cells and dissolved substances move together through the vessel. In plants, water carries minerals from roots to leaves.": "血液主要是水。大量紅血球和溶解物質一起在血管中流動。在植物中，水把礦物質從根運到葉。",
+    "Little myelin — impulse leaks and crawls.": "髓鞘少——脈衝外漏並爬得很慢。",
+    "Lipid wrap insulates. Impulse stays on the axon.": "脂質包裹作絕緣。脈衝留在軸突上。"
+  };
+
+  const TEXT_ZH = {
+    "Fast respiratory fuel": ["葡萄糖最先、最快被使用。", "葡萄糖是主要的呼吸燃料，而且很快：直接吸收並用來產生能量。所以糖果比必須先水解的澱粉更快提升能量。"],
+    "Energy storage": ["動物儲肝醣，植物儲澱粉。", "多糖儲存能量。肝醣存在動物的肝和肌肉。澱粉是植物（馬鈴薯、穀物）的儲存形式。"],
+    "Energy reserve in starvation": ["碳水化合物最先被用完。", "長期飢餓時，身體先用碳水化合物，然後脂質，最後才用蛋白質。肝醣由約 3.2 kg 開始，大約第 1.2 週就耗盡。"],
+    "Transport form in plants": ["蔗糖在植物內運送糖。", "蔗糖是非還原性雙糖，也是植物運輸碳水化合物的形式——糖由葉運到其他部分。"],
+    "Support plant cell wall": ["纖維素砌成細胞壁。", "纖維素是植物細胞壁的結構多糖。植物製造纖維素是為了支撐自己的細胞，不是為了給人類當膳食纖維。"],
+    "Dietary fibre in humans": ["沒有能量，但幫助腸道蠕動和飽腹。", "人類沒有消化纖維素的酶。它沒有能量價值，但帶來飽腹感，並促進腸道蠕動。"],
+    "Energy storage (2×)": ["每克能量是兩倍。", "三酸甘油酯儲存能量。每克能量約是碳水化合物或蛋白質的兩倍（約 37 kJ/g 對 17 kJ/g）。計算脂質能量前先乘 2。植物也儲油（例如花生油）。"],
+    "Long-term reserve in starvation": ["肝醣用完後，脂質是主要燃料。", "碳水化合物耗盡後，脂質是主要的長期儲備。由第 0 週到第 4 週，脂質質量由 10 kg 穩步降至約 2 kg。"],
+    "Reduce heat loss": ["皮下脂肪保住熱量。", "皮下脂肪減少熱量散失。體內脂質愈多，熱愈留在體內；脂肪少則熱更容易散走。同一組織也儲能和吸收震盪。"],
+    "Organ protection": ["脂肪墊吸收震盪。", "器官周圍的脂肪吸收震盪並保護器官。墊層薄，器官會受震；墊層厚，則能緩衝撞擊。"],
+    "Insulating nerve": ["脂質包裹防止訊號外漏。", "脂質使神經絕緣。類似髓鞘的脂質包裹讓脈衝留在軸突上；沒有它，訊號會外漏並變慢。"],
+    "Waterproofing": ["非極性脂質把水排走。", "脂質不溶於水（非極性／疏水）。脂質層使表面防水，水珠滾走而不是滲入。"],
+    "Cell membrane bilayer": ["親水頭、疏水尾。", "磷脂有親水（極性）頭和疏水（非極性）尾，所以尾對尾形成雙層。膽固醇（類固醇）影響膜的流動性。磷脂是細胞膜的主要成分。"],
+    "Sex hormone precursor": ["膽固醇 → 性荷爾蒙。", "膽固醇等類固醇是細胞膜成分，也是性荷爾蒙的前體。荷爾蒙與受體結合後，細胞作出反應。"],
+    "Growth and repair": ["建造肌肉、皮膚、指甲。", "蛋白質用於組織的生長和修復——肌肉、皮膚、指甲。不同氨基酸序列（由 DNA 決定）摺成不同結構和功能。必需氨基酸只能從食物獲得。"],
+    "Enzymes catalyse reactions": ["形狀＝功能。高溫或不合適的 pH 會變性。", "酶催化反應。活性部位是由氫鍵維持的立體形狀。高溫（煮沸）或不合適的 pH 會令變性不可逆：失去構象就失去功能。"],
+    "Hormones": ["與受體結合 → 反應。", "血液中大多數荷爾蒙是蛋白質。它們與受體結合，觸發調節身體功能的反應。"],
+    "Antibodies": ["免疫防禦蛋白質。", "抗體和抗原是蛋白質。它們不是抗生素。抗體積木與配合的抗原積木結合。"],
+    "Membrane proteins": ["通道、載體、受體、抗原。", "細胞膜蛋白包括通道、受體、載體和抗原。它們位於磷脂雙層中，運送或識別特定物質。"],
+    "Last-resort energy": ["身體盡量保留蛋白質。", "長期飢餓時蛋白質是最後的能量來源。由第 0 週到第 4 週，蛋白質質量只由 10 kg 降至約 8 kg——身體保護肌肉和重要組織。"],
+    "Help gut peristalsis": ["吸水，增加糞便體積。", "不溶性纖維（植物細胞壁的纖維素）吸水並增加糞便體積，幫助蠕動。缺乏會便秘，毒素停留較久，增加大腸癌風險。"],
+    "Sense of fullness": ["有飽腹感，但沒有能量攝入。", "纖維帶來飽腹感（覺得飽但沒有能量攝入），有助控制體重。植物製造纖維素不是為了我們的飲食——我們只是吃到細胞壁。"],
+    "Reactant": ["用於水解和光合作用。", "水是反應物，例如水解（每斷一個鍵加入 1 個 H₂O）和光合作用。"],
+    "Solvent": ["細胞質中反應的介質。", "水是溶劑——化學反應進行的介質，例如在細胞質中。"],
+    "Support": ["動物的浮力，植物的膨脹。", "在動物中，水提供支持和浮力。在植物中，液泡裡的水靠膨脹壓使莖直立。"],
+    "Transport": ["人體靠血液；植物靠木質部水流。", "在人體，血液主要是水並循環全身。在植物，水連同糖和溶解的礦物質由根運到葉。"],
+    "High latent heat": ["出汗帶走大量熱。", "高潛熱使水成為良好的冷卻劑：蒸發時出汗會吸收大量熱。"],
+    "High specific heat": ["體內溫度保持穩定。", "高比熱容使體內環境較穩定——即使供應很多能量，水溫也變化不大。"],
+    "Vitamin A — dim-light vision": ["視桿細胞中的視紫素。", "維生素 A 用來形成視紫素，讓人在弱光中看見（視桿細胞）。缺乏：夜盲、眼和皮膚乾燥、角膜變厚。"],
+    "Vitamin A — skin and linings": ["保持內壁健康。", "維生素 A 保持皮膚，以及消化道和呼吸系統內壁健康。它溶於脂肪，隨脂肪吸收，儲在肝和脂肪組織。"],
+    "Vitamin C — connective tissue": ["C 代表結締組織。", "維生素 C 用於結締組織的生長和修復——傷口癒合、健康的皮膚和牙齦。缺乏：壞血病。加熱會破壞維生素 C！"],
+    "Vitamin C — DCPIP test": ["維生素 C 愈多，滴數愈少。", "DCPIP 試驗：由藍變無色。維生素 C 濃度愈高，使固定體積褪色所需的滴數愈少。熱檸檬茶的維生素 C 比冷的少，所以需要更多滴。"],
+    "Vitamin D — absorb Ca & phosphate": ["不是骨骼和牙齒的成分。", "維生素 D 促進鈣和磷酸鹽吸收。它不是骨骼和牙齒的成分。缺乏時，鈣／磷留在腸道，繼而出現佝僂病或骨質疏鬆。"],
+    "Vitamin D — made in skin": ["在陽光下合成。", "維生素 D 在皮膚受陽光照射時合成，也隨脂肪在小腸吸收。儲在肝和脂肪組織。少出門的人需要更多維生素 D。"],
+    "Calcium — bones and teeth": ["骨骼和牙齒的成分（99% 儲在那裡）。", "鈣是骨骼和牙齒的成分（99% 儲在那裡）。吸收受維生素 D 促進。缺乏：兒童佝僂病（腿彎曲）；成人骨質疏鬆。過量：腎結石。"],
+    "Calcium — muscle, nerve, clotting": ["也活化酶。", "鈣也用於肌肉收縮、神經脈衝傳遞、血液凝固和酶活化。"],
+    "Iron — oxygen transport": ["血紅蛋白的一部分。", "鐵（Fe²⁺）是血紅蛋白的一部分，負責運氧。血紅蛋白是紅血球中的攜氧蛋白。儲在肝。缺乏：貧血——疲倦、面色蒼白、無力。過量：肝受損。"],
+    "Iron — enzyme activation": ["幫助酶運作。", "鐵也活化酶。鐵不足時，需要這些酶的代謝反應會變慢。"],
+    "Iodine — thyroid hormone": ["調節代謝。", "碘（I⁻）用於合成甲狀腺激素和調節代謝。缺乏：甲狀腺腫大。過量：甲狀腺問題。"],
+    "Phosphorus — bones & phospholipids": ["磷酸基和硬組織。", "磷是磷酸基的成分（例如磷脂），也用於形成骨骼和牙齒。缺乏：骨骼和牙齒變弱。"],
+    "Magnesium — chlorophyll": ["綠色色素需要 Mg²⁺。", "鎂（Mg²⁺）用於製造葉綠素，並在動物體內活化酶。缺乏：植物變黃。"],
+    "Nitrate — plant protein": ["氨基中的氮。", "硝酸鹽（NO₃⁻）用於植物蛋白質合成（氨基中的氮）和製造葉綠素。缺乏：植物生長差、葉片變黃。"],
+    "DNA stores genetic information": ["雙螺旋，A–T 和 C–G。", "DNA 是雙鏈核苷酸聚合物（A–T、C–G），以氫鍵相連。功能：儲存遺傳信息和攜帶遺傳密碼。比 RNA 穩定。糖是脫氧核糖。"],
+    "RNA — protein synthesis": ["mRNA 和 tRNA。", "RNA 是單鏈（A–U、C–G），糖是核糖。參與蛋白質合成和基因表達調控。位置：細胞核和細胞質。"],
+    "Base sequence → protein": ["DNA 序列決定氨基酸序列。", "DNA 上的鹼基序列 → 多肽的氨基酸序列 → 決定蛋白質的結構和功能。互補配對：A 與 T 有 2 個氫鍵；C 與 G 有 3 個氫鍵。"]
+  };
+
+  function zhCopy(fn) {
+    return TEXT_ZH[fn.title] || null;
+  }
+
+  function uiText(key) { return UI[lang][key]; }
+
+  function syncChrome() {
+    document.documentElement.lang = lang === "zh" ? "zh-Hant" : "en";
+    document.body.classList.toggle("hide-descriptions", hideDescriptions);
+    const title = document.getElementById("toolTitle");
+    const lead = document.getElementById("toolLead");
+    const btn = document.getElementById("descToggle");
+    if (title) title.textContent = uiText("title");
+    if (lead) lead.textContent = uiText("lead");
+    if (btn) {
+      btn.textContent = hideDescriptions ? uiText("show") : uiText("hide");
+      btn.setAttribute("aria-pressed", hideDescriptions ? "true" : "false");
+    }
+    document.querySelectorAll(".language-switch [data-lang]").forEach((b) => {
+      b.classList.toggle("active", b.dataset.lang === lang);
+    });
+    document.title = lang === "zh" ? "食物物質的功能 | S3 Biology" : "Food Substance Functions | S3 Biology";
+  }
 
   function personMarkup() {
     return `<div class="person">
@@ -305,7 +465,7 @@
   function sliderCtrl(panel, label, min, max, step, value, oninput) {
     const wrap = document.createElement("div");
     wrap.className = "ctrl";
-    wrap.innerHTML = `<label><span>${label}</span><span class="val"></span></label>
+    wrap.innerHTML = `<label><span>${lang === "zh" && SLIDER_ZH[label] ? SLIDER_ZH[label] : label}</span><span class="val"></span></label>
       <input type="range" min="${min}" max="${max}" step="${step}" value="${value}" />`;
     const input = wrap.querySelector("input");
     const val = wrap.querySelector(".val");
@@ -345,11 +505,12 @@
   function panelShell(panel, fn, extraLead) {
     panel.innerHTML = "";
     const h = document.createElement("h2");
-    h.textContent = "From the notes";
+    h.textContent = uiText("notes");
     panel.appendChild(h);
     const lead = document.createElement("p");
     lead.className = "lead";
-    lead.textContent = extraLead || fn.text;
+    const copy = zhCopy(fn);
+    lead.textContent = extraLead || (lang === "zh" && copy ? copy[1] : fn.text);
     panel.appendChild(lead);
     const cap = document.createElement("p");
     cap.className = "caption";
@@ -360,7 +521,7 @@
 
   function live(text) {
     const el = document.getElementById("live-cap");
-    if (el) el.textContent = text;
+    if (el) el.textContent = lang === "zh" && LIVE_ZH[text] ? LIVE_ZH[text] : text;
   }
 
   function showPhoto(stage, panel, fn, src, alt, caption) {
@@ -498,7 +659,9 @@
           ).join("");
           return `<div class="stack"><div class="col">${units}</div><div class="lbl">${c.name}</div><div class="kg">${m[c.key]} kg</div></div>`;
         }).join("");
-        live(`Week ${week}: glycogen ${m.glycogen} kg → lipids ${m.lipids} kg → proteins ${m.proteins} kg (last resort).`);
+        live(lang === "zh"
+          ? `第 ${week} 週：肝醣 ${m.glycogen} kg → 脂質 ${m.lipids} kg → 蛋白質 ${m.proteins} kg（最後手段）。`
+          : `Week ${week}: glycogen ${m.glycogen} kg → lipids ${m.lipids} kg → proteins ${m.proteins} kg (last resort).`);
       }
 
       sliderCtrl(panel, "Duration of starvation (week)", 0, 4, 0.1, 0, draw);
@@ -608,7 +771,9 @@
         numEl.textContent = pct + "%";
         fill(stage.querySelector("#a"), v, "glycogen", "Liver & muscle");
         fill(stage.querySelector("#p"), v, "glycogen", "Potato / grains");
-        live(pct + "% of the carbohydrate energy store is filled. More blocks = more energy stored for later.");
+        live(lang === "zh"
+          ? "碳水化合物能量庫已填滿 " + pct + "%。方塊愈多，代表儲起供日後使用的能量愈多。"
+          : pct + "% of the carbohydrate energy store is filled. More blocks = more energy stored for later.");
       });
     },
 
@@ -805,7 +970,9 @@
         numEl.textContent = Math.round(((carbKj + lipKj) / maxKj) * 100) + "%";
         c.style.height = Math.max(8, g * 22) + "px";
         l.style.height = Math.max(8, g * 44) + "px";
-        live("Same mass: orange = carbohydrate energy (" + carbKj + " kJ), green = lipid energy (" + lipKj + " kJ). Lipid is about twice the share.");
+        live(lang === "zh"
+          ? "相同質量：橙色＝碳水化合物能量（" + carbKj + " kJ），綠色＝脂質能量（" + lipKj + " kJ）。脂質約佔兩倍。"
+          : "Same mass: orange = carbohydrate energy (" + carbKj + " kJ), green = lipid energy (" + lipKj + " kJ). Lipid is about twice the share.");
       });
     },
 
@@ -1314,7 +1481,9 @@
         setThermo(tho, to, 18, 70);
         w.style.background = `rgb(${187 - v * 4},${222 - v * 6},${253 - v * 8})`;
         o.style.background = `rgb(255,${204 - v * 14},${128 - v * 8})`;
-        live(`Same energy. Water: ${tw.toFixed(1)}°C (barely rises). Other block: ${to.toFixed(1)}°C (heats fast). High specific heat keeps the internal environment steady.`);
+        live(lang === "zh"
+          ? `相同能量。水：${tw.toFixed(1)}°C（幾乎不升）。另一方塊：${to.toFixed(1)}°C（升得很快）。高比熱容使體內環境穩定。`
+          : `Same energy. Water: ${tw.toFixed(1)}°C (barely rises). Other block: ${to.toFixed(1)}°C (heats fast). High specific heat keeps the internal environment steady.`);
       });
     },
 
@@ -1692,15 +1861,17 @@
 
   function renderHome() {
     cleanup();
-    setCrumb([{ label: "Food substance functions" }]);
+    setCrumb([{ label: uiText("home") }]);
     app.innerHTML = `<header class="head">
-      <h1>Food substance functions</h1>
-      <p>Click a nutrient tag, then a function. Each function opens a 2D block tool. Content follows Ch5 Food and humans notes (v2026).</p>
+      <h1>${uiText("title")}</h1>
+      <p>${uiText("intro")}</p>
     </header>`;
     GROUPS.forEach((g) => {
       const box = document.createElement("section");
       box.className = "group";
-      box.innerHTML = `<div class="group-kicker">${g.title}</div><p class="group-note">${g.note}</p>`;
+      const title = lang === "zh" ? g.titleZh : g.title;
+      const note = lang === "zh" ? g.noteZh : g.note;
+      box.innerHTML = `<div class="group-kicker">${title}</div><p class="group-note">${note}</p>`;
       const tags = document.createElement("div");
       tags.className = "tags";
       NUTRIENTS.filter((n) => n.group === g.id).forEach((n) => {
@@ -1708,7 +1879,7 @@
         b.type = "button";
         b.className = "tag";
         b.dataset.accent = n.accent;
-        b.innerHTML = `${n.name}<span class="zh">${n.zh}</span>`;
+        b.innerHTML = lang === "zh" ? n.zh : `${n.name}<span class="zh">${n.zh}</span>`;
         b.addEventListener("click", () => go(n.id));
         tags.appendChild(b);
       });
@@ -1720,12 +1891,12 @@
   function renderNutrient(n) {
     cleanup();
     setCrumb([
-      { label: "All nutrients", on: () => go() },
-      { label: n.name }
+      { label: uiText("all"), on: () => go() },
+      { label: lang === "zh" ? n.zh : n.name }
     ]);
     app.innerHTML = `<header class="head">
-      <h1>${n.name} <span class="zh" style="font-size:1rem;color:var(--muted);font-weight:600">${n.zh}</span></h1>
-      <p>Choose a function. Each card opens a simple block animation.</p>
+      <h1>${lang === "zh" ? n.zh : n.name} <span class="zh" style="font-size:1rem;color:var(--muted);font-weight:600">${lang === "zh" ? n.name : n.zh}</span></h1>
+      <p>${uiText("choose")}</p>
     </header>
     <div class="facts">${n.facts.map((f) => `<div class="fact">${f}</div>`).join("")}</div>
     <div class="fn-grid" id="grid"></div>`;
@@ -1734,7 +1905,10 @@
       const b = document.createElement("button");
       b.type = "button";
       b.className = "fn-card";
-      b.innerHTML = `<div class="n">${String(i + 1).padStart(2, "0")}</div><h3>${fn.title}</h3><p>${fn.zh} · ${fn.blurb}</p>`;
+      const copy = zhCopy(fn);
+      const blurb = lang === "zh" && copy ? copy[0] : fn.blurb;
+      const heading = lang === "zh" ? fn.zh : fn.title;
+      b.innerHTML = `<div class="n">${String(i + 1).padStart(2, "0")}</div><h3>${heading}</h3><p>${lang === "zh" ? fn.title : fn.zh} · ${blurb}</p>`;
       b.addEventListener("click", () => go(n.id, fn.id));
       grid.appendChild(b);
     });
@@ -1743,13 +1917,13 @@
   function renderDemo(n, fn) {
     cleanup();
     setCrumb([
-      { label: "All nutrients", on: () => go() },
-      { label: n.name, on: () => go(n.id) },
-      { label: fn.title }
+      { label: uiText("all"), on: () => go() },
+      { label: lang === "zh" ? n.zh : n.name, on: () => go(n.id) },
+      { label: lang === "zh" ? fn.zh : fn.title }
     ]);
     app.innerHTML = `<header class="head">
-      <h1>${fn.title}</h1>
-      <p>${fn.zh}</p>
+      <h1>${lang === "zh" ? fn.zh : fn.title}</h1>
+      <p>${lang === "zh" ? fn.title : fn.zh}</p>
     </header>
     <div class="demo-layout">
       <section class="stage" id="demo-stage" aria-label="Animation"></section>
@@ -1776,6 +1950,19 @@
     else renderHome();
   }
 
+  document.getElementById("descToggle").addEventListener("click", () => {
+    hideDescriptions = !hideDescriptions;
+    syncChrome();
+  });
+  document.querySelectorAll(".language-switch [data-lang]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      lang = btn.dataset.lang === "zh" ? "zh" : "en";
+      syncChrome();
+      route();
+    });
+  });
+
   window.addEventListener("hashchange", route);
+  syncChrome();
   route();
 })();

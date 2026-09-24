@@ -25,6 +25,8 @@
       stop: "Stop",
       step: "Step",
       reset: "Reset",
+      hideText: "Hide description",
+      showText: "Show description",
       processProgress: "Process progress",
       workspace: "Workspace",
       notes: "Process notes",
@@ -107,6 +109,8 @@
       stop: "停止",
       step: "單步",
       reset: "重設",
+      hideText: "隱藏描述",
+      showText: "顯示描述",
       processProgress: "過程進度",
       workspace: "工作區",
       notes: "過程說明",
@@ -220,6 +224,7 @@
     lastProgress: 0,
     autoRun: false,
     lang: "en",
+    hideDescriptions: false,
     viewStage: 1,
     lastTs: 0,
     flow: [],
@@ -285,6 +290,17 @@
         ? "液態空氣分餾 · Liquid Air Fractional Distillation"
         : "Liquid Air Fractional Distillation · 液態空氣分餾";
     syncAutoButton();
+    syncDescToggle();
+  }
+
+  function syncDescToggle() {
+    document.body.classList.toggle("hide-descriptions", state.hideDescriptions);
+    const btn = document.getElementById("descToggle");
+    if (!btn) return;
+    const key = state.hideDescriptions ? "showText" : "hideText";
+    btn.dataset.i18n = key;
+    btn.textContent = STRINGS[state.lang][key];
+    btn.setAttribute("aria-pressed", state.hideDescriptions ? "true" : "false");
   }
 
   // ——— Particle helpers ———
@@ -1990,6 +2006,14 @@
         updateUI(stateFromProgress(state.progress));
       });
     });
+
+    const descToggle = document.getElementById("descToggle");
+    if (descToggle) {
+      descToggle.addEventListener("click", () => {
+        state.hideDescriptions = !state.hideDescriptions;
+        syncDescToggle();
+      });
+    }
   }
 
   function start() {

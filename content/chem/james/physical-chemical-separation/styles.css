@@ -91,6 +91,36 @@ button:focus-visible {
   max-width: 46rem;
 }
 
+.header-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.desc-toggle {
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.14);
+  color: #e8f1ff;
+  border-radius: 10px;
+  padding: 9px 14px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.desc-toggle:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.desc-toggle[aria-pressed="true"] {
+  background: #fff;
+  color: var(--blue-dark);
+}
+
 .language-switch {
   display: flex;
   padding: 4px;
@@ -1633,4 +1663,14 @@ body[data-sample="ironSulphur"][data-phase="compound"] .fes-lump {
   .secondary-button {
     padding: 10px 11px;
   }
+}
+
+body.hide-descriptions .live-caption,
+body.hide-descriptions .equation-line,
+body.hide-descriptions .warning-banner p {
+  display: none;
+}
+
+body.hide-descriptions .bench-wrap {
+  min-height: min(78vh, 860px);
 }

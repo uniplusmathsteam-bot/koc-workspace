@@ -25,12 +25,71 @@
   .quiz button:hover { background: #eef7f2; }
   .quiz .msg { font-weight: 600; min-height: 22px; }
   .ok { color: #1c6b5b; } .no { color: #a83f37; }
+  .hero {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin: -24px -24px 18px;
+    padding: 22px 24px;
+    color: #fff;
+    background: linear-gradient(112deg, #0d6b46 0%, #1f9d55 100%);
+  }
+  .hero h1 { color: #fff; font-size: 26px; }
+  .hero .lead { color: #e7f6ee; margin: 6px 0 0; max-width: 40rem; }
+  .header-tools { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .desc-toggle {
+    border: 1px solid rgba(255,255,255,.28);
+    background: rgba(255,255,255,.14);
+    color: #fff;
+    border-radius: 10px;
+    padding: 9px 14px;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .desc-toggle[aria-pressed="true"] { background: #fff; color: #0d6b46; }
+  .language-switch {
+    display: flex;
+    padding: 4px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.18);
+  }
+  .language-switch button {
+    min-width: 78px;
+    border: 0;
+    border-radius: 8px;
+    padding: 9px 14px;
+    color: #fff;
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+  }
+  .language-switch button.active { color: #0d6b46; background: #fff; }
+  body.hide-descriptions .lead,
+  body.hide-descriptions .panel { display: none; }
+  body.hide-descriptions .split { display: block; }
+  body.hide-descriptions svg { width: 100%; height: min(82vh, 900px); min-width: 0; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Cell Organelle Explorer</h1>
-  <p class="lead">Click any labelled part of the animal cell to read its function, then try the quick check at the bottom.</p>
+  <header class="hero">
+    <div>
+      <h1 id="pageTitle">Cell Organelle Explorer</h1>
+      <p class="lead" id="pageLead">Click any labelled part of the animal cell to read its function, then try the quick check at the bottom.</p>
+    </div>
+    <div class="header-tools">
+      <button id="descToggle" class="desc-toggle" type="button" aria-pressed="false">Hide description</button>
+      <div class="language-switch" role="group" aria-label="Language">
+        <button type="button" data-lang="zh">中文</button>
+        <button type="button" data-lang="en" class="active">English</button>
+      </div>
+    </div>
+  </header>
 
   <div class="split">
     <svg id="cell" viewBox="0 0 460 380" aria-label="Animal cell diagram">
@@ -38,19 +97,19 @@
 
       <g class="hit" data-key="membrane">
         <ellipse data-shape cx="230" cy="190" rx="205" ry="165" fill="none" stroke="#1f9d55" stroke-width="3"/>
-        <text x="230" y="368" text-anchor="middle" font-size="13" fill="#0d6b46">cell membrane</text>
+        <text class="svg-label" data-key="membrane" x="230" y="368" text-anchor="middle" font-size="13" fill="#0d6b46">cell membrane</text>
       </g>
 
       <g class="hit" data-key="nucleus">
         <circle data-shape cx="205" cy="175" r="62" fill="#8fd3bf" stroke="#0d6b46" stroke-width="1.5"/>
         <circle cx="215" cy="168" r="20" fill="#0d6b46" opacity=".55"/>
-        <text x="205" y="180" text-anchor="middle" font-size="13" font-weight="700" fill="#0b3d2a">nucleus</text>
+        <text class="svg-label" data-key="nucleus" x="205" y="180" text-anchor="middle" font-size="13" font-weight="700" fill="#0b3d2a">nucleus</text>
       </g>
 
       <g class="hit" data-key="mitochondria">
         <ellipse data-shape cx="352" cy="118" rx="46" ry="26" fill="#f6a8d8" stroke="#a83f37" stroke-width="1.5"/>
         <path d="M312 118q14-14 22 0t22 0 22 0" fill="none" stroke="#a83f37" stroke-width="2"/>
-        <text x="352" y="160" text-anchor="middle" font-size="12" fill="#7a2c26">mitochondrion</text>
+        <text class="svg-label" data-key="mitochondria" x="352" y="160" text-anchor="middle" font-size="12" fill="#7a2c26">mitochondrion</text>
       </g>
 
       <g class="hit" data-key="ribosome">
@@ -59,12 +118,12 @@
           <circle cx="140" cy="302" r="7" fill="#3b6fd4"/>
           <circle cx="103" cy="308" r="7" fill="#3b6fd4"/>
         </g>
-        <text x="122" y="332" text-anchor="middle" font-size="12" fill="#26467f">ribosomes</text>
+        <text class="svg-label" data-key="ribosome" x="122" y="332" text-anchor="middle" font-size="12" fill="#26467f">ribosomes</text>
       </g>
 
       <g class="hit" data-key="er">
         <path data-shape d="M258 258q34-22 66-4t62-2" fill="none" stroke="#d97706" stroke-width="7" stroke-linecap="round"/>
-        <text x="330" y="288" text-anchor="middle" font-size="12" fill="#8a4f06">endoplasmic reticulum</text>
+        <text class="svg-label" data-key="er" x="330" y="288" text-anchor="middle" font-size="12" fill="#8a4f06">endoplasmic reticulum</text>
       </g>
 
       <g class="hit" data-key="golgi">
@@ -73,12 +132,12 @@
           <path d="M100 134q28-14 56 0"/>
           <path d="M104 150q24-12 48 0"/>
         </g>
-        <text x="128" y="98" text-anchor="middle" font-size="12" fill="#4c1d95">Golgi apparatus</text>
+        <text class="svg-label" data-key="golgi" x="128" y="98" text-anchor="middle" font-size="12" fill="#4c1d95">Golgi apparatus</text>
       </g>
 
       <g class="hit" data-key="vacuole">
         <circle data-shape cx="300" cy="196" r="26" fill="#cfe6ff" stroke="#2b5c9b" stroke-width="1.5"/>
-        <text x="300" y="200" text-anchor="middle" font-size="11" fill="#1e3f8f">vacuole</text>
+        <text class="svg-label" data-key="vacuole" x="300" y="200" text-anchor="middle" font-size="11" fill="#1e3f8f">vacuole</text>
       </g>
     </svg>
 
@@ -98,32 +157,143 @@
 
 <script>
 (function () {
+  var lang = 'en';
+  var hideDescriptions = false;
+  var selected = 'nucleus';
   var DATA = {
-    membrane:     { name: 'Cell membrane', fn: 'boundary · transport', pts: ['Phospholipid bilayer with embedded proteins.', 'Partially permeable — controls what enters and leaves.', 'Site of diffusion, osmosis and active transport.'] },
-    nucleus:      { name: 'Nucleus', fn: 'control centre', pts: ['Holds DNA as chromosomes.', 'Nucleolus makes ribosome subunits.', 'Nuclear envelope has pores for mRNA to exit.'] },
-    mitochondria: { name: 'Mitochondrion', fn: 'aerobic respiration', pts: ['Makes ATP from glucose and oxygen.', 'Inner membrane folded into cristae for surface area.', 'Muscle and liver cells carry very many.'] },
-    ribosome:     { name: 'Ribosomes', fn: 'protein synthesis', pts: ['Reads mRNA and joins amino acids.', 'Free in cytoplasm or bound to rough ER.', 'Not membrane-bound.'] },
-    er:           { name: 'Endoplasmic reticulum', fn: 'transport network', pts: ['Rough ER (with ribosomes) processes proteins.', 'Smooth ER makes lipids and stores calcium.', 'Continuous with the nuclear envelope.'] },
-    golgi:        { name: 'Golgi apparatus', fn: 'modify · package', pts: ['Modifies proteins from the ER.', 'Packages them into vesicles.', 'Sends products to the membrane for secretion.'] },
-    vacuole:      { name: 'Vacuole', fn: 'storage', pts: ['Small and temporary in animal cells.', 'Stores water, food or waste.', 'Plant cells have one large permanent vacuole.'] }
+    membrane: {
+      label: { en: 'cell membrane', zh: '細胞膜' },
+      name: { en: 'Cell membrane', zh: '細胞膜' },
+      fn: { en: 'boundary · transport', zh: '邊界 · 運輸' },
+      pts: {
+        en: ['Phospholipid bilayer with embedded proteins.', 'Partially permeable — controls what enters and leaves.', 'Site of diffusion, osmosis and active transport.'],
+        zh: ['磷脂雙層，嵌有蛋白質。', '選擇性透膜——控制物質進出。', '擴散、滲透和主動運輸的場所。']
+      }
+    },
+    nucleus: {
+      label: { en: 'nucleus', zh: '細胞核' },
+      name: { en: 'Nucleus', zh: '細胞核' },
+      fn: { en: 'control centre', zh: '控制中心' },
+      pts: {
+        en: ['Holds DNA as chromosomes.', 'Nucleolus makes ribosome subunits.', 'Nuclear envelope has pores for mRNA to exit.'],
+        zh: ['以染色體形式存放 DNA。', '核仁製造核糖體亞單位。', '核膜有孔，讓 mRNA 離開。']
+      }
+    },
+    mitochondria: {
+      label: { en: 'mitochondrion', zh: '線粒體' },
+      name: { en: 'Mitochondrion', zh: '線粒體' },
+      fn: { en: 'aerobic respiration', zh: '有氧呼吸' },
+      pts: {
+        en: ['Makes ATP from glucose and oxygen.', 'Inner membrane folded into cristae for surface area.', 'Muscle and liver cells carry very many.'],
+        zh: ['由葡萄糖和氧製造 ATP。', '內膜摺成嵴以增加表面積。', '肌肉和肝細胞含有很多。']
+      }
+    },
+    ribosome: {
+      label: { en: 'ribosomes', zh: '核糖體' },
+      name: { en: 'Ribosomes', zh: '核糖體' },
+      fn: { en: 'protein synthesis', zh: '蛋白質合成' },
+      pts: {
+        en: ['Reads mRNA and joins amino acids.', 'Free in cytoplasm or bound to rough ER.', 'Not membrane-bound.'],
+        zh: ['閱讀 mRNA 並連接氨基酸。', '游離在細胞質，或附在粗糙內質網。', '沒有膜包着。']
+      }
+    },
+    er: {
+      label: { en: 'endoplasmic reticulum', zh: '內質網' },
+      name: { en: 'Endoplasmic reticulum', zh: '內質網' },
+      fn: { en: 'transport network', zh: '運輸網絡' },
+      pts: {
+        en: ['Rough ER (with ribosomes) processes proteins.', 'Smooth ER makes lipids and stores calcium.', 'Continuous with the nuclear envelope.'],
+        zh: ['粗糙內質網（有核糖體）加工蛋白質。', '光滑內質網製造脂質並儲存鈣。', '與核膜相連。']
+      }
+    },
+    golgi: {
+      label: { en: 'Golgi apparatus', zh: '高爾基體' },
+      name: { en: 'Golgi apparatus', zh: '高爾基體' },
+      fn: { en: 'modify · package', zh: '修飾 · 包裝' },
+      pts: {
+        en: ['Modifies proteins from the ER.', 'Packages them into vesicles.', 'Sends products to the membrane for secretion.'],
+        zh: ['修飾來自內質網的蛋白質。', '把它們包裝成囊泡。', '把產物送到細胞膜以便分泌。']
+      }
+    },
+    vacuole: {
+      label: { en: 'vacuole', zh: '液泡' },
+      name: { en: 'Vacuole', zh: '液泡' },
+      fn: { en: 'storage', zh: '儲存' },
+      pts: {
+        en: ['Small and temporary in animal cells.', 'Stores water, food or waste.', 'Plant cells have one large permanent vacuole.'],
+        zh: ['在動物細胞中小而短暫。', '儲存水、食物或廢物。', '植物細胞有一個大而永久的液泡。']
+      }
+    }
   };
-
+  var UI = {
+    en: {
+      title: 'Cell Organelle Explorer',
+      lead: 'Click any labelled part of the animal cell to read its function, then try the quick check at the bottom.',
+      hide: 'Hide description',
+      show: 'Show description',
+      pick: 'Pick an organelle',
+      count: '7 parts to explore',
+      tap: 'Tap any coloured structure in the diagram.',
+      check: 'Quick check: ',
+      ok: 'Correct — next question loading…',
+      no: 'Not quite. Read ',
+      again: ' in the diagram and try again.'
+    },
+    zh: {
+      title: '細胞器探索',
+      lead: '點選動物細胞上的標示部分，閱讀功能，然後做底部的小測驗。',
+      hide: '隱藏描述',
+      show: '顯示描述',
+      pick: '選擇一個細胞器',
+      count: '可探索 7 個部分',
+      tap: '點選圖中任何有顏色的結構。',
+      check: '小測驗：',
+      ok: '正確——下一題即將出現…',
+      no: '還未對。請在圖中閱讀',
+      again: '，再試一次。'
+    }
+  };
   var QUIZ = [
-    { q: 'Which organelle releases ATP during aerobic respiration?', a: 'mitochondria' },
-    { q: 'Where are proteins packaged into vesicles for secretion?', a: 'golgi' },
-    { q: 'Which structure controls what enters and leaves the cell?', a: 'membrane' },
-    { q: 'Which organelle joins amino acids into a polypeptide?', a: 'ribosome' }
+    { q: { en: 'Which organelle releases ATP during aerobic respiration?', zh: '哪個細胞器在有氧呼吸中釋放 ATP？' }, a: 'mitochondria' },
+    { q: { en: 'Where are proteins packaged into vesicles for secretion?', zh: '蛋白質在哪裡被包裝成囊泡以便分泌？' }, a: 'golgi' },
+    { q: { en: 'Which structure controls what enters and leaves the cell?', zh: '哪個結構控制物質進出細胞？' }, a: 'membrane' },
+    { q: { en: 'Which organelle joins amino acids into a polypeptide?', zh: '哪個細胞器把氨基酸接成多肽？' }, a: 'ribosome' }
   ];
   var qi = 0;
-
   var groups = [].slice.call(document.querySelectorAll('.hit'));
 
+  function t(key) { return UI[lang][key]; }
+  function field(obj) { return obj[lang] || obj.en; }
+
+  function paintLabels() {
+    [].slice.call(document.querySelectorAll('.svg-label')).forEach(function (node) {
+      var d = DATA[node.getAttribute('data-key')];
+      if (d) node.textContent = field(d.label);
+    });
+  }
+
+  function syncChrome() {
+    document.documentElement.lang = lang === 'zh' ? 'zh-Hant' : 'en';
+    document.body.classList.toggle('hide-descriptions', hideDescriptions);
+    document.getElementById('pageTitle').textContent = t('title');
+    document.getElementById('pageLead').textContent = t('lead');
+    document.title = t('title');
+    var btn = document.getElementById('descToggle');
+    btn.textContent = hideDescriptions ? t('show') : t('hide');
+    btn.setAttribute('aria-pressed', hideDescriptions ? 'true' : 'false');
+    [].slice.call(document.querySelectorAll('.language-switch [data-lang]')).forEach(function (b) {
+      b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+    });
+    paintLabels();
+  }
+
   function show(key) {
+    selected = key;
     var d = DATA[key];
     groups.forEach(function (g) { g.classList.toggle('sel', g.getAttribute('data-key') === key); });
-    document.getElementById('oname').textContent = d.name;
-    document.getElementById('ofn').textContent = d.fn;
-    document.getElementById('opts').innerHTML = d.pts.map(function (p) { return '<li>' + p + '</li>'; }).join('');
+    document.getElementById('oname').textContent = field(d.name);
+    document.getElementById('ofn').textContent = field(d.fn);
+    document.getElementById('opts').innerHTML = field(d.pts).map(function (p) { return '<li>' + p + '</li>'; }).join('');
   }
 
   groups.forEach(function (g) {
@@ -132,30 +302,44 @@
 
   function ask() {
     var item = QUIZ[qi % QUIZ.length];
-    document.getElementById('q').textContent = 'Quick check: ' + item.q;
+    document.getElementById('q').textContent = t('check') + field(item.q);
     document.getElementById('qmsg').textContent = '';
     var keys = Object.keys(DATA).sort(function () { return Math.random() - 0.5; }).slice(0, 3);
     if (keys.indexOf(item.a) < 0) keys[0] = item.a;
     keys.sort(function () { return Math.random() - 0.5; });
     document.getElementById('qopts').innerHTML = keys.map(function (k) {
-      return '<button data-ans="' + k + '">' + DATA[k].name + '</button>';
+      return '<button data-ans="' + k + '">' + field(DATA[k].name) + '</button>';
     }).join('');
     [].slice.call(document.querySelectorAll('#qopts button')).forEach(function (b) {
       b.addEventListener('click', function () {
         var msg = document.getElementById('qmsg');
         if (b.getAttribute('data-ans') === item.a) {
           msg.className = 'msg ok';
-          msg.textContent = 'Correct — next question loading…';
+          msg.textContent = t('ok');
           qi++;
           setTimeout(ask, 900);
         } else {
           msg.className = 'msg no';
-          msg.textContent = 'Not quite. Read ' + DATA[item.a].name + ' in the diagram and try again.';
+          msg.textContent = t('no') + field(DATA[item.a].name) + t('again');
         }
       });
     });
   }
 
+  document.getElementById('descToggle').addEventListener('click', function () {
+    hideDescriptions = !hideDescriptions;
+    syncChrome();
+  });
+  [].slice.call(document.querySelectorAll('.language-switch [data-lang]')).forEach(function (b) {
+    b.addEventListener('click', function () {
+      lang = b.getAttribute('data-lang') === 'zh' ? 'zh' : 'en';
+      syncChrome();
+      show(selected);
+      ask();
+    });
+  });
+
+  syncChrome();
   show('nucleus');
   ask();
 })();

@@ -13,6 +13,7 @@ const state = {
   zoom: ZOOM_DEFAULT,
   core: [],
   extra: [],
+  hideDescriptions: false,
   deck: [],
   i: 0,
   pick: "",
@@ -146,6 +147,17 @@ function applyLang() {
     btn.setAttribute("aria-pressed", zh ? "true" : "false");
     btn.textContent = zh ? "EN" : "中";
   }
+  syncDescToggle();
+}
+
+function syncDescToggle() {
+  document.documentElement.classList.toggle("hide-descriptions", state.hideDescriptions);
+  const btn = document.getElementById("desc-toggle");
+  if (!btn) return;
+  btn.setAttribute("aria-pressed", state.hideDescriptions ? "true" : "false");
+  btn.textContent = state.hideDescriptions
+    ? (state.lang === "zh" ? "顯示描述" : "Show description")
+    : (state.lang === "zh" ? "隱藏描述" : "Hide description");
 }
 
 function prefersReducedMotion() {
@@ -333,11 +345,13 @@ function renderLearn() {
         </div>
         <div class="learn-answer">
           ${state.revealed
-            ? `<p class="exam-kicker">In class</p>
+            ? `<div class="word-desc">
+               <p class="exam-kicker">In class</p>
                <p>${item.easy}</p>
                <p class="exam-kicker">Model answer</p>
                <p class="exam-line"><strong>${displayName(item)}</strong> — ${item.exam}</p>
-               ${lookalikeHtml(item)}`
+               ${lookalikeHtml(item)}
+               </div>`
             : ""}
           <div class="toolbar learn-actions">
             <div>
@@ -637,6 +651,13 @@ document.getElementById("lang-toggle").addEventListener("click", () => {
   if (state.view === "learn") renderLearn();
   if (state.view === "check") renderCheck();
 });
+const descToggle = document.getElementById("desc-toggle");
+if (descToggle) {
+  descToggle.addEventListener("click", () => {
+    state.hideDescriptions = !state.hideDescriptions;
+    syncDescToggle();
+  });
+}
 
 document.addEventListener("keydown", (event) => {
   if (event.target && /^(INPUT|TEXTAREA)$/.test(event.target.tagName)) return;

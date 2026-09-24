@@ -52,6 +52,74 @@
 
     html.bio-embed .page { min-height: 0; padding: 10px 14px 18px; }
 
+    .lab-hero {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      margin: -18px -22px 16px;
+      padding: 20px 22px;
+      color: #fff;
+      background: linear-gradient(112deg, #1d4e89 0%, #2f6fbf 100%);
+    }
+    .lab-hero h1 { font-size: 1.45rem; letter-spacing: -0.02em; }
+    .lab-hero p { margin-top: 4px; color: #e4eefc; max-width: 40rem; font-size: 0.92rem; }
+    .header-tools { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .desc-toggle {
+      border: 1px solid rgba(255,255,255,.28);
+      background: rgba(255,255,255,.14);
+      color: #fff;
+      border-radius: 10px;
+      padding: 9px 14px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .desc-toggle[aria-pressed="true"] { background: #fff; color: #1d4e89; }
+    .language-switch {
+      display: flex;
+      padding: 4px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    .language-switch button {
+      min-width: 78px;
+      border: 0;
+      border-radius: 8px;
+      padding: 9px 14px;
+      color: #fff;
+      background: transparent;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .language-switch button.active { background: #fff; color: #1d4e89; }
+    body.hide-descriptions .lab-hero p,
+    body.hide-descriptions .head p,
+    body.hide-descriptions .group-note,
+    body.hide-descriptions .facts,
+    body.hide-descriptions .fn-card p,
+    body.hide-descriptions .panel h2,
+    body.hide-descriptions .panel .lead,
+    body.hide-descriptions .panel .caption,
+    body.hide-descriptions .scene-label {
+      display: none;
+    }
+    body.hide-descriptions .demo-layout:not(:has(.ctrl)):not(:has(.step-row)) {
+      grid-template-columns: 1fr;
+    }
+    body.hide-descriptions .demo-layout:not(:has(.ctrl)):not(:has(.step-row)) .panel {
+      display: none;
+    }
+    body.hide-descriptions .stage,
+    body.hide-descriptions .scene,
+    body.hide-descriptions .photo-stage {
+      min-height: min(78vh, 860px);
+    }
+    body.hide-descriptions .photo-model { max-height: min(72vh, 780px); }
+
     .crumb {
       display: flex;
       flex-wrap: wrap;
@@ -1298,6 +1366,19 @@
 </head>
 <body>
   <div class="page">
+    <header class="lab-hero">
+      <div>
+        <h1 id="toolTitle">Food substance functions</h1>
+        <p id="toolLead">Click a nutrient tag, then a function. The model stays on the left.</p>
+      </div>
+      <div class="header-tools">
+        <button id="descToggle" class="desc-toggle" type="button" aria-pressed="false">Hide description</button>
+        <div class="language-switch" role="group" aria-label="Language">
+          <button type="button" data-lang="zh">中文</button>
+          <button type="button" data-lang="en" class="active">English</button>
+        </div>
+      </div>
+    </header>
     <nav class="crumb" id="crumb" aria-label="Breadcrumb"></nav>
     <div id="app"></div>
   </div>

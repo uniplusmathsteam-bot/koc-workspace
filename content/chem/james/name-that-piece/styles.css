@@ -141,7 +141,7 @@ html.dark .lab-bg {
   gap: 8px;
 }
 
-.theme-toggle, .lang-toggle, .nav button {
+.theme-toggle, .lang-toggle, .desc-toggle, .nav button {
   border: 1px solid rgba(240, 249, 255, 0.28);
   background: transparent;
   color: #f0f9ff;
@@ -152,13 +152,35 @@ html.dark .lab-bg {
   cursor: pointer;
 }
 
-.lang-toggle {
-  min-width: 2.4rem;
-  font-weight: 800;
+.language-switch {
+  display: flex;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(240, 249, 255, 0.28);
+}
+
+.language-switch button {
+  min-width: 72px;
+  border: 0;
+  border-radius: 999px;
+  padding: 6px 12px;
+  color: #f0f9ff;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.language-switch button.active {
+  background: #e0f2fe;
+  color: #0b4f8a;
 }
 
 .theme-toggle[aria-pressed="true"],
 .lang-toggle[aria-pressed="true"],
+.desc-toggle[aria-pressed="true"],
 .nav button[aria-current="page"] {
   background: #e0f2fe;
   color: #0b4f8a;
@@ -385,6 +407,31 @@ html.dark .stamp.progress { background: #16324a; border-color: var(--navy); }
   background: var(--export-bg);
   font-size: 14px;
   max-width: 44rem;
+}
+
+html.hide-descriptions #learn .word-desc,
+html.hide-descriptions #learn .lead,
+html.hide-descriptions #learn .learn-stage > .exam-line,
+html.hide-descriptions .export-note {
+  display: none !important;
+}
+
+html.hide-descriptions #learn .learn-layout {
+  grid-template-columns: minmax(180px, 0.55fr) 1fr;
+}
+
+html.hide-descriptions #learn .detail {
+  min-height: min(78vh, 860px);
+}
+
+html.hide-descriptions #learn .photo-frame img {
+  max-height: min(68vh, 720px);
+}
+
+html.hide-descriptions .lead,
+html.hide-descriptions .game-card p,
+html.hide-descriptions .mode-chip span {
+  display: none !important;
 }
 
 .learn-layout {

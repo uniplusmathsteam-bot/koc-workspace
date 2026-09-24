@@ -36,6 +36,8 @@
       melt: "Molten state",
       heat: "Strong heat",
       reset: "Reset",
+      hideText: "Hide description",
+      showText: "Show description",
       tableKicker: "Periodic table",
       tableTitle: "Choose two elements",
       tableHint: "Select two solids or liquids for the watch glass. Room-temperature gases cannot be placed on the plate. Iron + sulphur still forms FeS with strong heat.",
@@ -151,6 +153,8 @@
       melt: "熔融態",
       heat: "強熱",
       reset: "重設",
+      hideText: "隱藏描述",
+      showText: "顯示描述",
       tableKicker: "週期表",
       tableTitle: "選擇兩種元素",
       tableHint: "請選兩種固體或液體放在表面皿上。室溫氣體不能放在碟上。鐵 + 硫仍可用強熱製成 FeS。",
@@ -236,7 +240,8 @@
 
   const ui = {
     lang: "en",
-    pendingLang: null
+    pendingLang: null,
+    hideDescriptions: false
   };
 
   const MOTION = {
@@ -444,6 +449,17 @@
     document.title = ui.lang === "zh"
       ? "物理與化學分離 · Physical vs Chemical Separation"
       : "Physical vs Chemical Separation · 物理與化學分離";
+    syncDescToggle();
+  }
+
+  function syncDescToggle() {
+    document.body.classList.toggle("hide-descriptions", ui.hideDescriptions);
+    const btn = document.getElementById("descToggle");
+    if (!btn) return;
+    const key = ui.hideDescriptions ? "showText" : "hideText";
+    btn.setAttribute("data-i18n", key);
+    btn.textContent = t(key);
+    btn.setAttribute("aria-pressed", ui.hideDescriptions ? "true" : "false");
   }
 
   function seedParticles(state) {
@@ -1832,6 +1848,14 @@
   document.querySelectorAll("[data-lang]").forEach((button) => {
     button.addEventListener("click", () => switchLanguage(button.dataset.lang));
   });
+
+  const descToggle = document.getElementById("descToggle");
+  if (descToggle) {
+    descToggle.addEventListener("click", () => {
+      ui.hideDescriptions = !ui.hideDescriptions;
+      syncDescToggle();
+    });
+  }
 
   window.addEventListener("resize", handleViewportChange, { passive: true });
   window.addEventListener("orientationchange", handleViewportChange, { passive: true });

@@ -80,7 +80,9 @@
       alreadyChecked: "Choose a new challenge to score again.",
       footer: "An original educational simulation for learning atomic structure.",
       beyondRange: "H–Ar learning range",
-      dragLimit: "The builder supports elements from hydrogen to argon."
+      dragLimit: "The builder supports elements from hydrogen to argon.",
+      hideText: "Hide description",
+      showText: "Show description"
     },
     zh: {
       title: "原子建造器",
@@ -138,7 +140,9 @@
       alreadyChecked: "選擇新挑戰後可再次得分。",
       footer: "原創原子結構互動學習工具。",
       beyondRange: "氫至氬學習範圍",
-      dragLimit: "此建造器支援氫至氬的元素。"
+      dragLimit: "此建造器支援氫至氬的元素。",
+      hideText: "隱藏描述",
+      showText: "顯示描述"
     }
   };
 
@@ -187,7 +191,8 @@
     quizIndex: 1,
     correct: 0,
     attempts: 0,
-    checked: false
+    checked: false,
+    hideDescriptions: false
   };
 
   const $ = id => document.getElementById(id);
@@ -300,6 +305,17 @@
     const headingKey = state.mode === "quest" ? "labHeadingQuest" : "labHeadingBuilder";
     $("labHeading").textContent = t(headingKey);
     $("labHeading").dataset.i18n = headingKey;
+    syncDescToggle();
+  }
+
+  function syncDescToggle() {
+    document.body.classList.toggle("hide-descriptions", state.hideDescriptions);
+    const btn = $("descToggle");
+    if (!btn) return;
+    const key = state.hideDescriptions ? "showText" : "hideText";
+    btn.dataset.i18n = key;
+    btn.textContent = t(key);
+    btn.setAttribute("aria-pressed", state.hideDescriptions ? "true" : "false");
   }
 
   function setMode(mode) {
@@ -650,6 +666,15 @@
   document.querySelectorAll("[data-lang]").forEach(button => {
     button.addEventListener("click", () => switchLanguage(button.dataset.lang));
   });
+
+  const descToggle = $("descToggle");
+  if (descToggle) {
+    descToggle.addEventListener("click", () => {
+      state.hideDescriptions = !state.hideDescriptions;
+      syncDescToggle();
+      window.dispatchEvent(new Event("resize"));
+    });
+  }
 
   $("resetButton").addEventListener("click", () => setAtom(PRESETS.carbon));
   $("checkButton").addEventListener("click", checkQuiz);
