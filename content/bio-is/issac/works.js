@@ -2,10 +2,10 @@
 KOC.works('bio-is', 'issac', [
   {
     id: 'cell-code-comic',
-    title: 'Cell Code Comic',
+    title: 'S3 BB03 Cellular organization 3.1–3.4 · Cell Code Comic',
     type: 'pdf',
     subject: 'Bio',
-    chapter: 'Bio Ch. 2',
+    chapter: 'S3 BB03 Cellular organization 3.1–3.4',
     submitted: '2026-09-10',
     tags: ['Comics', 'Cells'],
     src: 'content/bio-is/issac/cell-code-comic.pdf',
