@@ -8,7 +8,7 @@ KOC.works('chem', 'james', [
     chapter: 'S3 Atmosphere Earth2 Earth2A Matters',
     submitted: '2026-09-23',
     tags: ['Interactive', 'Classification', 'Matter'],
-    src: 'content/chem/james/classification-of-matter/index.html?v=20260923',
+    src: 'content/chem/james/classification-of-matter/index.html?v=20260925',
     notes: 'Shoot each formula with the matching ammo: 1 pure element, 2 pure compound, 3 mixture of elements. WASD to move, mouse to aim, click to shoot.'
   },
   {

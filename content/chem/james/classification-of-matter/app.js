@@ -31,6 +31,12 @@
     if (CATS.indexOf(tech.cat) === -1) CATS.push(tech.cat);
   });
   const AMMO = ["Pure element", "Pure compound", "Mixture of elements"];
+  const TRIO = ["Fe", "FeS", "Fe + S"];
+  const FLOOR_ANCHOR = {
+    "pure-element": "Fe",
+    "pure-compound": "FeS",
+    "mixture-elements": "Fe + S",
+  };
 
   const DIFF = {};
   DIFF[COPY.speedSlow] = {
@@ -901,6 +907,17 @@
     return out;
   }
 
+  function groupTrio(tokens) {
+    const members = tokens.filter(function (t) {
+      return TRIO.indexOf(t.text) !== -1;
+    });
+    if (members.length < 2) return;
+    const room = members[0].room;
+    members.forEach(function (t) {
+      t.room = room;
+    });
+  }
+
   function comboMatchesCat(combo, cat) {
     if (cat === COPY.catAll) return true;
     return (combo.ids || []).every(function (id) {
@@ -1110,6 +1127,18 @@
           skip[text] = true;
         });
         raw = padCorrectCopies(raw);
+        const anchor = FLOOR_ANCHOR[tech.id];
+        if (
+          anchor &&
+          !raw.some(function (t) {
+            return t.ok && t.text === anchor;
+          })
+        ) {
+          const ok = raw.find(function (t) {
+            return t.ok;
+          });
+          if (ok) ok.text = anchor;
+        }
         tech.decoys.forEach(function (text) {
           if (skip[text]) return;
           skip[text] = true;
@@ -3208,6 +3237,7 @@
     const item = current();
     state.roomCount = rollRoomCount();
     item.tokens = assignRooms(item.tokens, state.bossMode ? Math.max(1, state.roomCount - 1) : state.roomCount);
+    groupTrio(item.tokens);
     state.ammo = AMMO[0];
     state.remaining = item.tokens.filter(function (t) {
       return isHitType() || t.ok;
@@ -3250,7 +3280,7 @@
     playEl.innerHTML = `
       <div class="stage">
         <div class="meta-row">
-          <span class="cat-pill">${item.cat}</span>
+          <span class="cat-pill rule-pill">1 same atom · 2 joined, no + · 3 plus sign</span>
           ${isHitType() ? `<span class="cat-pill" id="ammo-label">1 ${state.ammo}</span>` : ""}
           <span class="hearts" id="play-hearts"></span>
           <span id="remain-count">${fragmentLabel()}</span>
@@ -3385,7 +3415,11 @@
     const hitsText = card.hits ? card.hits.join(", ") : uniqueHitText(item.tokens);
     const acc = state.tankHits ? Math.min(100, Math.round((state.okHits / state.tankHits) * 100)) : 0;
     const what = card.pair ? card.hinge : card.plain || "";
-    const effect = hitsText ? "Correct formulas: " + hitsText + "." : card.plain || "";
+    const effect = card.pair
+      ? hitsText
+        ? "Correct formulas: " + hitsText + "."
+        : card.plain || ""
+      : "Fe → 1, FeS → 2, Fe + S → 3";
     const exampleBody = card.pair
       ? `<div class="pair-cols teach-pair">` +
         `<div class="pair-card"><span>${COPY.jia}</span><p>${card.jia}</p></div>` +
@@ -3410,7 +3444,11 @@
       `<div class="teach-block"><span>${COPY.teachEffect}</span><p>${effect}</p></div>` +
       `<div class="teach-block"><span>${COPY.teachExample}</span>${exampleBody}<p class="teach-mark">${mark}</p></div>` +
       `<div class="teach-block"><span>${COPY.teachVs}</span><p>${vs}</p></div>` +
-      `<div class="teach-block teach-write"><span>${COPY.teachWrite}</span><p>${card.writeStem || ""}</p><p class="write-model">${card.writeModel || ""}</p></div>` +
+      `<div class="teach-block teach-write"><span>${COPY.teachWrite}</span><p>${card.writeStem || ""}</p>` +
+      (card.writeModel
+        ? `<p class="write-model" hidden></p><button type="button" class="btn btn-ghost" data-reveal="1" data-answer="${card.writeModel}">${COPY.showAnswer}</button>`
+        : "") +
+      `</div>` +
       `<div class="clear-stats">` +
       `<div><span>${COPY.timeUsed}</span><b>${formatPlayTime(playElapsed())}</b></div>` +
       `<div><span>${COPY.accuracy}</span><b>${acc}%</b></div>` +
@@ -3443,12 +3481,22 @@
     return HIT_OWNER[text] || "";
   }
 
+  function ammoReason(cls) {
+    if (cls === AMMO[0]) return "one kind of atom, even O2";
+    if (cls === AMMO[1]) return "two elements joined, no plus sign";
+    if (cls === AMMO[2]) return "plus sign, not yet joined";
+    return "";
+  }
+
   function setAmmo(cat) {
     state.ammo = cat;
     const el = document.getElementById("ammo-label");
     if (!el) return;
     const i = AMMO.indexOf(cat);
     el.textContent = (i >= 0 ? i + 1 + " " : "") + cat;
+    el.classList.remove("ammo-flash");
+    void el.offsetWidth;
+    el.classList.add("ammo-flash");
   }
 
   function rememberWeakFloor(item) {
@@ -3497,7 +3545,11 @@
     state.misses += 1;
     item.ammoWrong = true;
     rememberWeakFloor(item);
-    setFeedback(cls ? "✗ " + token.text + " is " + cls + "." : "✗ " + token.text + " is not " + state.ammo + ".");
+    setFeedback(
+      cls
+        ? "✗ " + token.text + " is a " + cls.charAt(0).toLowerCase() + cls.slice(1) + ": " + ammoReason(cls) + "."
+        : "✗ " + token.text + " is not " + state.ammo + "."
+    );
     state.fireLockUntil = performance.now() + FIRE_LOCK_MS;
     state.hearts -= 1;
     if (endIfNoHearts()) return;
@@ -3840,6 +3892,16 @@
       return;
     }
     if (overlayOpen()) return;
+    const reveal = e.target.closest("[data-reveal]");
+    if (reveal) {
+      const model = reveal.parentElement.querySelector(".write-model");
+      if (model) {
+        model.hidden = false;
+        model.textContent = reveal.getAttribute("data-answer") || "";
+      }
+      reveal.hidden = true;
+      return;
+    }
     if (e.target.closest("[data-next]")) {
       if (state.teachQueue && state.teachPos + 1 < state.teachQueue.length) {
         state.teachPos += 1;
