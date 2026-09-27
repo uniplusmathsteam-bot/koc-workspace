@@ -1,6 +1,17 @@
 /* James · Chem KOC lead — submissions. */
 KOC.works('chem', 'james', [
   {
+    id: 'build-the-bench',
+    title: 'S3 Fundamentals of chemistry (Earth1)',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Fundamentals of chemistry Earth1 Earth1A Laboratory apparatus',
+    submitted: '2026-09-27',
+    tags: ['Interactive', 'S3', 'Lab apparatus'],
+    src: 'content/chem/james/build-the-bench/index.html?v=20260927',
+    notes: 'Six set-ups in lesson order, from a few cm³ of water to filtration. Match each name and 2D diagram. Light or dark follows the computer theme.'
+  },
+  {
     id: 'classification-of-matter',
     title: 'S3 Atmosphere (Earth2)',
     type: 'interactive',
