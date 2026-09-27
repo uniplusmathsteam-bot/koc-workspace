@@ -2,13 +2,13 @@
 KOC.works('chem', 'james', [
   {
     id: 'build-the-bench',
-    title: 'S3 Fundamentals of chemistry (Earth1)',
+    title: 'Earth1A_Laboratory apparatus_(ex)',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Fundamentals of chemistry Earth1 Earth1A Laboratory apparatus',
     submitted: '2026-09-27',
     tags: ['Interactive', 'S3', 'Lab apparatus'],
-    src: 'content/chem/james/build-the-bench/index.html?v=20260927',
+    src: 'content/chem/james/build-the-bench/Earth1A_Laboratory%20apparatus_(ex).html?v=20260927d',
     notes: 'Six set-ups in lesson order, from a few cm³ of water to filtration. Match each name and 2D diagram. Light or dark follows the computer theme.'
   },
   {
