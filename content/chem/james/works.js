@@ -2,7 +2,7 @@
 KOC.works('chem', 'james', [
   {
     id: 'build-the-bench',
-    title: 'S3 Fundamentals of chemistry (Earth1)',
+    title: 'Build the Bench',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Fundamentals of chemistry Earth1 Earth1A Laboratory apparatus',
