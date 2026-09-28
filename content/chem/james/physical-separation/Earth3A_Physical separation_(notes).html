@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Earth3A Physical separation — crystallisation</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: #111827;
+    background: #eef3f8;
+    padding-left: env(safe-area-inset-left);
+    padding-right: calc(64px + env(safe-area-inset-right));
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  button, input { font-family: inherit; }
+  button { cursor: pointer; }
+  .topbar {
+    position: relative;
+    z-index: 55;
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: calc(52px + env(safe-area-inset-top));
+    padding: env(safe-area-inset-top) 12px 0;
+  }
+  .topbar h1 {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    font-size: 18px;
+    font-weight: 650;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #stepLabel { flex-shrink: 0; font-size: 16px; color: #334155; white-space: nowrap; }
+  .nav {
+    min-width: 64px;
+    min-height: 44px;
+    padding: 0 12px;
+    border: 1px solid #d7e0ec;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 16px;
+  }
+  .nav:disabled { opacity: 0.35; cursor: default; }
+  main {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 12px 8px;
+  }
+  #stage {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid #d7e0ec;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  body.zoomed #stage {
+    position: fixed;
+    z-index: 30;
+    margin: 0;
+  }
+  .stage-head {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 48px;
+    padding: 0 8px 0 14px;
+    font-size: 38px;
+    font-weight: 650;
+    line-height: 1.05;
+    color: #111827;
+  }
+  #stageName { flex: 1; min-width: 0; }
+  #zoomBtn {
+    width: 44px;
+    height: 44px;
+    border: 1px solid #d7e0ec;
+    border-radius: 10px;
+    background: #fff;
+    color: #163a86;
+    font-size: 28px;
+    line-height: 1;
+  }
+  #zoomBtn { flex: none; }
+  #zoomBtn[aria-pressed="true"] { background: #163a86; color: #fff; }
+  #zoomFit {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .pair {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 16px;
+  }
+  .beaker-wrap { flex: 1 1 42%; height: 100%; min-height: 0; min-width: 0; }
+  .beaker-wrap svg { width: 100%; height: 100%; display: block; }
+  .readings {
+    flex: 1 1 58%;
+    min-width: 0;
+    font-size: 38px;
+    line-height: 1.25;
+  }
+  .readings p { margin: 0; white-space: nowrap; }
+  .water { color: #2563eb; font-weight: 700; }
+  .aq { color: #0f766e; font-weight: 700; }
+  .solid { color: #1e3a8a; font-weight: 700; }
+  .sol { color: #9a3412; font-weight: 700; }
+  .answer {
+    flex: none;
+    height: 58px;
+    margin: 0;
+    display: grid;
+    place-items: center;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .answer[aria-hidden="true"] { visibility: hidden; }
+  #answerInner { display: inline-block; transform-origin: center center; }
+  .bar-block { flex: none; padding: 0 12px 8px; }
+  .bar-cap {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 14px;
+    color: #64748b;
+  }
+  .hint { white-space: nowrap; }
+  .bar-wrap { position: relative; }
+  #bar {
+    -webkit-appearance: none;
+    appearance: none;
+    display: block;
+    width: 100%;
+    height: 44px;
+    margin: 0;
+    background: transparent;
+    transform: scaleX(-1);
+  }
+  #bar::-webkit-slider-runnable-track {
+    height: 12px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #1e3a8a, #93c5fd);
+  }
+  #bar::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 32px;
+    height: 32px;
+    margin-top: -10px;
+    border-radius: 50%;
+    background: #fff;
+    border: 4px solid #163a86;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.25);
+  }
+  #bar::-moz-range-track {
+    height: 12px;
+    border: 0;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #1e3a8a, #93c5fd);
+  }
+  #bar::-moz-range-thumb {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #fff;
+    border: 4px solid #163a86;
+  }
+  .ticks { position: relative; height: 44px; margin: 0 16px; }
+  .ticks button {
+    position: absolute;
+    top: 0;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    transform: translateX(-50%);
+    border: 0;
+    background: transparent;
+    color: #475569;
+    font-size: 14px;
+  }
+  .ticks button[data-v="100"] { color: #9a3412; font-weight: 700; }
+  .ticks button.on { color: #163a86; font-weight: 700; }
+  #desc {
+    flex: none;
+    margin: 0;
+    font-size: 38px;
+    line-height: 1.25;
+    min-height: calc(38px * 1.25 * 3);
+  }
+  @media (min-width: 1200px) {
+    #desc { min-height: calc(38px * 1.25 * 2); }
+  }
+  #desc.hidden { display: none; }
+  @media (max-width: 800px) {
+    .topbar h1 { display: none; }
+    #stepLabel { flex: 1; text-align: center; }
+    .pair { flex-direction: column; align-items: stretch; padding-top: 4px; }
+    .beaker-wrap { width: 100%; flex: 1 1 auto; }
+  }
+  @media (max-width: 720px) {
+    .answer-rest { display: none; }
+  }
+
+  .pen-canvas { position: fixed; inset: 0; z-index: 40; pointer-events: none; touch-action: none; }
+  .laser-canvas { position: fixed; inset: 0; z-index: 45; pointer-events: none; }
+  .laser-dot {
+    position: fixed; width: 22px; height: 22px; margin: -11px 0 0 -11px;
+    border-radius: 50%; pointer-events: none; z-index: 48;
+    background: radial-gradient(circle, rgba(255, 60, 60, 0.98), rgba(255, 0, 0, 0) 72%);
+  }
+  .laser-dot.hidden, .dcolors.hidden { display: none; }
+  body.pen-on { cursor: crosshair; touch-action: none; }
+  body.pen-on .pen-canvas { pointer-events: auto; }
+  body.laser-on { cursor: none; touch-action: none; }
+  body.pen-on, body.laser-on { user-select: none; }
+  .teach-dock {
+    position: fixed; right: 8px; top: 50%; transform: translateY(-50%);
+    z-index: 60; display: flex; flex-direction: column; gap: 6px;
+    padding: 8px 6px; background: rgba(255, 255, 255, 0.94);
+    border: 1px solid #d7e0ec; border-radius: 16px;
+  }
+  .dbtn {
+    width: 44px; height: 44px; border: 0; border-radius: 12px;
+    background: transparent; display: grid; place-items: center; color: #111827;
+  }
+  .dbtn svg { width: 22px; height: 22px; }
+  .dbtn.active { background: #163a86; color: #fff; }
+  #dkLaser.active { background: #e11d48; }
+  #dkPen.active { background: #0f8a62; }
+  .dcolors { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+  .dcolor { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #fff; background: var(--sc); box-shadow: 0 0 0 1px #d7e0ec; }
+  .dcolor.active { box-shadow: 0 0 0 2px #111827; }
+  .derase.active { background: #d97706; color: #3f2a00; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <button type="button" class="nav" id="backBtn">Back</button>
+  <h1>Slow crystallisation of sodium chloride</h1>
+  <span id="stepLabel">1 / 5</span>
+  <button type="button" class="nav" id="hideBtn" aria-pressed="false">Hide</button>
+  <button type="button" class="nav" id="nextBtn">Next</button>
+</header>
+<main>
+  <section id="stage">
+    <div class="stage-head" id="stageHead">
+      <span id="stageName">Unsaturated</span>
+      <button type="button" id="zoomBtn" aria-label="Zoom" aria-pressed="false">+</button>
+    </div>
+    <div id="zoomFit">
+      <div class="pair">
+        <div class="beaker-wrap">
+          <svg id="beakerSvg" viewBox="0 0 360 340" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Beaker of sea water">
+            <defs>
+              <clipPath id="cup">
+                <path d="M118 58 L136 286 Q188 302 240 286 L258 58 Z"/>
+              </clipPath>
+              <linearGradient id="waterGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop id="wTop" offset="0" stop-color="#e7f6ff"/>
+                <stop id="wMid" offset="0.45" stop-color="#b9dff3"/>
+                <stop id="wBot" offset="1" stop-color="#6eaed4"/>
+              </linearGradient>
+              <linearGradient id="glassGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#ffffff" stop-opacity="0.72"/>
+                <stop offset="0.18" stop-color="#d7ebf7" stop-opacity="0.28"/>
+                <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.08"/>
+                <stop offset="0.86" stop-color="#e2e8f0" stop-opacity="0.22"/>
+                <stop offset="1" stop-color="#94a3b8" stop-opacity="0.45"/>
+              </linearGradient>
+              <linearGradient id="baseGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#f8fafc"/>
+                <stop offset="1" stop-color="#cbd5e1"/>
+              </linearGradient>
+            </defs>
+            <ellipse cx="188" cy="318" rx="78" ry="8" fill="#cbd5e1" opacity="0.45"/>
+            <g id="steam" visibility="hidden" fill="none" stroke="#94a3b8" stroke-width="1.6" stroke-linecap="round" opacity="0.55">
+              <path d="M150 46c6-10 2-14 8-22"/>
+              <path d="M176 42c8-12 2-16 10-26"/>
+              <path d="M206 46c6-10 1-14 8-22"/>
+            </g>
+            <ellipse cx="188" cy="58" rx="78" ry="13" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>
+            <path d="M110 58 L128 292 Q188 316 248 292 L266 58" fill="url(#glassGrad)" stroke="#475569" stroke-width="2.4"/>
+            <path d="M248 292 Q188 316 128 292 L136 300 Q188 322 240 300 Z" fill="url(#baseGrad)" stroke="#64748b" stroke-width="1.4"/>
+            <g clip-path="url(#cup)">
+              <path id="water" fill="url(#waterGrad)"></path>
+              <ellipse id="meniscus" cx="188" cy="78" rx="68" ry="7" fill="#f4fbff" fill-opacity="0.55" stroke="#7eb0cc" stroke-width="1.3"/>
+              <g id="crystals"></g>
+            </g>
+            <path d="M124 78c-2 70 2 140 8 198" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" opacity="0.55"/>
+            <path d="M118 64 A78 13 0 0 0 258 64" fill="none" stroke="#334155" stroke-width="3"/>
+            <path d="M258 56c16-6 28 2 18 16" fill="#f8fafc" stroke="#475569" stroke-width="2"/>
+            <line id="satLine" x1="131" y1="182" x2="245" y2="182" fill="none" stroke="#9a3412" stroke-width="2.4" stroke-dasharray="7 5" stroke-linecap="round">
+              <title>Saturation level, 100 cm³</title>
+            </line>
+            <g fill="none" stroke="#64748b" stroke-width="1.2" font-size="11" font-family="system-ui, sans-serif">
+              <path d="M112 78h12"/><text x="108" y="82" text-anchor="end" stroke="none" fill="#64748b">200</text>
+              <path d="M116 130h12"/><text x="112" y="134" text-anchor="end" stroke="none" fill="#64748b">150</text>
+              <path d="M120 182h12"/><text x="116" y="186" text-anchor="end" stroke="none" fill="#64748b">100</text>
+              <path d="M124 234h12"/><text x="120" y="238" text-anchor="end" stroke="none" fill="#64748b">50</text>
+            </g>
+          </svg>
+        </div>
+        <div class="readings" id="readings">
+          <p><span id="vNum" class="water">200</span> cm³ water</p>
+          <p>can dissolve <span id="capNum" class="sol">72 g</span></p>
+          <p><span id="aqNum" class="aq">36 g</span> NaCl(aq)</p>
+          <p><span id="sNum" class="solid">0 g</span> NaCl(s)</p>
+        </div>
+      </div>
+      <p id="answer" class="answer" aria-hidden="true"><span id="answerInner"><span class="solid">27 g NaCl(s)</span><span class="answer-rest"> — large crystals</span></span></p>
+      <div class="bar-block">
+        <div class="bar-cap">
+          <span>Volume of water / cm³</span>
+          <span class="hint">Dashed line = 100 cm³</span>
+        </div>
+        <div class="bar-wrap">
+          <input id="bar" type="range" min="25" max="200" step="1" value="200" aria-label="Volume of water in cubic centimetres">
+          <div class="ticks">
+            <button type="button" data-v="200" style="left:0%" aria-label="200 cubic centimetres">200</button>
+            <button type="button" data-v="150" style="left:28.571%" aria-label="150 cubic centimetres">150</button>
+            <button type="button" data-v="100" style="left:57.143%" aria-label="100 cubic centimetres">100</button>
+            <button type="button" data-v="50" style="left:85.714%" aria-label="50 cubic centimetres">50</button>
+            <button type="button" data-v="25" style="left:100%" aria-label="25 cubic centimetres">25</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <p id="desc">Solubility of NaCl at 25°C is <span class="sol">36 g / 100 cm³</span> water. <span id="descMore">All the NaCl stays dissolved. The solution is unsaturated.</span></p>
+</main>
+
+<canvas id="penCanvas" class="pen-canvas"></canvas>
+<canvas id="laserCanvas" class="laser-canvas"></canvas>
+<div id="laserDot" class="laser-dot hidden"></div>
+<div class="teach-dock">
+  <button type="button" class="dbtn" id="dkLaser" aria-label="Laser pointer">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="currentColor"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path></svg>
+  </button>
+  <button type="button" class="dbtn" id="dkPen" aria-label="Pen">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20l4.5-1.2L19 8.3 15.7 5 5.2 15.5 4 20z"></path><path d="M13.5 7.2l3.3 3.3"></path></svg>
+  </button>
+  <div class="dcolors hidden" id="dkColors">
+    <button type="button" class="dcolor active" data-c="#e11d48" style="--sc:#e11d48" aria-label="Red"></button>
+    <button type="button" class="dcolor" data-c="#2563eb" style="--sc:#2563eb" aria-label="Blue"></button>
+    <button type="button" class="dcolor" data-c="#059669" style="--sc:#059669" aria-label="Green"></button>
+    <button type="button" class="dcolor" data-c="#111827" style="--sc:#111827" aria-label="Black"></button>
+    <button type="button" class="dbtn derase" id="dkErase" aria-label="Eraser">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="8" width="16" height="9" rx="1.5"></rect><path d="M4 13h16"></path></svg>
+    </button>
+  </div>
+  <button type="button" class="dbtn" id="dkClear" aria-label="Clear writing">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 7h14M9 7V5h6v2M8 7l1 13h6l1-13"></path></svg>
+  </button>
+</div>
+
+<script>
+(function () {
+  var STAGES = [200, 150, 100, 50, 25];
+  var G = { rimY: 58, topY: 78, botY: 286, rimL: 118, rimR: 258, botL: 136, botR: 240, cx: 188 };
+  var svgNS = 'http://www.w3.org/2000/svg';
+  var vol = 200;
+  var crystalKey = -1;
+  var zoomed = false;
+  var descHidden = false;
+  var penOn = false;
+  var laserOn = false;
+  var erasing = false;
+  var ink = '#e11d48';
+  var drawing = false;
+  var lastPt = null;
+  var laserX = 0;
+  var laserY = 0;
+  var hasPointer = false;
+  var lastFrame = 0;
+
+  var bar = document.getElementById('bar');
+  var vNum = document.getElementById('vNum');
+  var aqNum = document.getElementById('aqNum');
+  var capNum = document.getElementById('capNum');
+  var sNum = document.getElementById('sNum');
+  var stageName = document.getElementById('stageName');
+  var descMore = document.getElementById('descMore');
+  var desc = document.getElementById('desc');
+  var answer = document.getElementById('answer');
+  var answerInner = document.getElementById('answerInner');
+  var stepLabel = document.getElementById('stepLabel');
+  var backBtn = document.getElementById('backBtn');
+  var nextBtn = document.getElementById('nextBtn');
+  var hideBtn = document.getElementById('hideBtn');
+  var zoomBtn = document.getElementById('zoomBtn');
+  var zoomFit = document.getElementById('zoomFit');
+  var stage = document.getElementById('stage');
+  var water = document.getElementById('water');
+  var meniscus = document.getElementById('meniscus');
+  var crystals = document.getElementById('crystals');
+  var steam = document.getElementById('steam');
+  var wTop = document.getElementById('wTop');
+  var wMid = document.getElementById('wMid');
+  var wBot = document.getElementById('wBot');
+  var beakerSvg = document.getElementById('beakerSvg');
+  var ticks = document.querySelectorAll('.ticks button');
+  var penCanvas = document.getElementById('penCanvas');
+  var laserCanvas = document.getElementById('laserCanvas');
+  var laserDot = document.getElementById('laserDot');
+  var penCtx = penCanvas.getContext('2d');
+  var laserCtx = laserCanvas.getContext('2d');
+
+  function masses(V) {
+    var cap = Math.round(V * 3.6) / 10;
+    var dissolved = Math.min(36, cap);
+    var solid = Math.round((36 - dissolved) * 10) / 10;
+    return { cap: cap, dissolved: dissolved, solid: solid };
+  }
+
+  function fmt(n) {
+    var t = Math.round(n * 10) / 10;
+    return Number.isInteger(t) ? String(t) : t.toFixed(1);
+  }
+
+  function stageTitle(V) {
+    if (V === 200) return 'Unsaturated';
+    if (V > 100) return 'Still unsaturated';
+    if (V === 100) return 'Saturated';
+    if (V > 25) return 'Crystals form';
+    return 'Large crystals';
+  }
+
+  function moreText(V) {
+    if (V === 200) return 'All the NaCl stays dissolved. The solution is unsaturated.';
+    if (V > 100) return 'Still unsaturated. All the NaCl stays dissolved.';
+    if (V === 100) return 'Saturated: maximum NaCl has dissolved. No crystals yet.';
+    if (V > 25) return 'The solution stays saturated. Excess NaCl crystallises.';
+    return 'Particles have sufficient time to arrange regularly.';
+  }
+
+  function mixHex(a, b, t) {
+    var i, n, out = '#';
+    for (i = 0; i < 3; i++) {
+      n = Math.round(parseInt(a.substr(1 + i * 2, 2), 16) + (parseInt(b.substr(1 + i * 2, 2), 16) - parseInt(a.substr(1 + i * 2, 2), 16)) * t);
+      out += (n < 16 ? '0' : '') + n.toString(16);
+    }
+    return out;
+  }
+
+  function wallX(y) {
+    var t = (y - G.rimY) / (G.botY - G.rimY);
+    return {
+      xL: G.rimL + (G.botL - G.rimL) * t,
+      xR: G.rimR + (G.botR - G.rimR) * t
+    };
+  }
+
+  function surfaceY(V) {
+    return G.botY - (G.botY - G.topY) * (V / 200);
+  }
+
+  function waterPath(V) {
+    var y = surfaceY(V);
+    var w = wallX(y);
+    var mid = (w.xL + w.xR) / 2;
+    return 'M ' + w.xL.toFixed(1) + ' ' + y.toFixed(1) +
+      ' Q ' + mid.toFixed(1) + ' ' + (y + 9).toFixed(1) + ' ' + w.xR.toFixed(1) + ' ' + y.toFixed(1) +
+      ' L ' + G.botR + ' ' + G.botY +
+      ' Q ' + G.cx + ' ' + (G.botY + 14) + ' ' + G.botL + ' ' + G.botY + ' Z';
+  }
+
+  function placeMeniscus(V) {
+    var y = surfaceY(V);
+    var w = wallX(y);
+    meniscus.setAttribute('cx', ((w.xL + w.xR) / 2).toFixed(1));
+    meniscus.setAttribute('cy', y.toFixed(1));
+    meniscus.setAttribute('rx', Math.max(8, (w.xR - w.xL) / 2 - 1).toFixed(1));
+    meniscus.setAttribute('ry', '7');
+  }
+
+  function addFace(points, fill) {
+    var el = document.createElementNS(svgNS, 'polygon');
+    el.setAttribute('points', points);
+    el.setAttribute('fill', fill);
+    el.setAttribute('stroke', '#334155');
+    el.setAttribute('stroke-width', '1.8');
+    el.setAttribute('stroke-linejoin', 'round');
+    crystals.appendChild(el);
+  }
+
+  function addCube(x, baseY, s) {
+    var side = s * 0.16;
+    var lift = s * 0.28;
+    var x0 = x - s / 2;
+    var x1 = x + s / 2;
+    var y0 = baseY - s;
+    var y1 = baseY;
+    function pt(px, py) { return px.toFixed(1) + ',' + py.toFixed(1); }
+    addFace([pt(x0, y0), pt(x0 + side, y0 - lift), pt(x1 + side, y0 - lift), pt(x1, y0)].join(' '), '#ffffff');
+    addFace([pt(x1, y0), pt(x1 + side, y0 - lift), pt(x1 + side, y1 - lift), pt(x1, y1)].join(' '), '#d5dee8');
+    addFace([pt(x0, y0), pt(x1, y0), pt(x1, y1), pt(x0, y1)].join(' '), '#f4f8fb');
+  }
+
+  function crystalBody(solid) {
+    if (solid <= 0) return 0;
+    return 18 + Math.pow(Math.min(1, solid / 27), 0.7) * 24;
+  }
+
+  function drawCrystals(solid) {
+    var s, baseY, edge, innerL, innerR, gap, sideFrac, maxBody, scales, widths, total, x, i;
+    while (crystals.firstChild) crystals.removeChild(crystals.firstChild);
+    if (solid <= 0) return;
+    baseY = 284;
+    edge = wallX(baseY);
+    innerL = edge.xL + 3;
+    innerR = edge.xR - 3;
+    gap = 6;
+    sideFrac = 0.16;
+    scales = [0.72, 1];
+    maxBody = (innerR - innerL - gap) / (scales[0] * (1 + sideFrac) + (1 + sideFrac));
+    s = Math.min(crystalBody(solid), maxBody);
+    widths = [s * scales[0] * (1 + sideFrac), s * (1 + sideFrac)];
+    total = widths[0] + widths[1] + gap;
+    x = innerL + Math.max(0, (innerR - innerL - total) / 2);
+    for (i = 0; i < 2; i++) {
+      addCube(x + (s * scales[i]) / 2, baseY, s * scales[i]);
+      x += widths[i] + gap;
+    }
+  }
+
+  function fitAnswer() {
+    answerInner.style.transform = 'none';
+    var room = answer.clientWidth - 8;
+    if (room <= 0 || !answerInner.scrollWidth) return;
+    var scale = Math.min(1, room / answerInner.scrollWidth);
+    if (scale < 0.99) answerInner.style.transform = 'scale(' + scale + ')';
+  }
+
+  function render() {
+    var m = masses(vol);
+    var idx = STAGES.indexOf(vol);
+    var concT = Math.max(0, Math.min(1, (m.dissolved / vol - 0.18) / 0.18));
+    var cKey = Math.round(crystalBody(m.solid) * 2);
+    vNum.textContent = String(vol);
+    capNum.textContent = fmt(m.cap) + ' g';
+    aqNum.textContent = fmt(m.dissolved) + ' g';
+    sNum.textContent = fmt(m.solid) + ' g';
+    stageName.textContent = stageTitle(vol);
+    descMore.textContent = moreText(vol);
+    answer.setAttribute('aria-hidden', vol === 25 ? 'false' : 'true');
+    stepLabel.textContent = idx >= 0 ? (idx + 1) + ' / 5' : vol + ' cm³';
+    backBtn.disabled = vol >= 200;
+    nextBtn.disabled = vol <= 25;
+    if (bar.value !== String(vol)) bar.value = String(vol);
+    bar.setAttribute('aria-valuetext', vol + ' cm³ water, can dissolve ' + fmt(m.cap) + ' g, ' + fmt(m.dissolved) + ' g NaCl(aq), ' + fmt(m.solid) + ' g NaCl(s)');
+    water.setAttribute('d', waterPath(vol));
+    wTop.setAttribute('stop-color', mixHex('#e7f6ff', '#c5dcf0', concT));
+    wMid.setAttribute('stop-color', mixHex('#b9dff3', '#3f86b3', concT));
+    wBot.setAttribute('stop-color', mixHex('#7eb6d6', '#1d4e89', concT));
+    placeMeniscus(vol);
+    steam.style.visibility = vol < 200 ? 'visible' : 'hidden';
+    if (cKey !== crystalKey) {
+      crystalKey = cKey;
+      drawCrystals(m.solid);
+    }
+    beakerSvg.setAttribute('aria-label', vol + ' cm³ water, can dissolve ' + fmt(m.cap) + ' g, ' + fmt(m.dissolved) + ' g dissolved, ' + fmt(m.solid) + ' g crystals');
+    ticks.forEach(function (btn) {
+      btn.classList.toggle('on', Number(btn.dataset.v) === vol);
+    });
+    fitAnswer();
+  }
+
+  function setDesc(show) {
+    descHidden = !show;
+    desc.classList.toggle('hidden', descHidden);
+    hideBtn.textContent = descHidden ? 'Show' : 'Hide';
+    hideBtn.setAttribute('aria-pressed', String(descHidden));
+  }
+
+  function placeZoom() {
+    if (!zoomed) {
+      stage.style.top = '';
+      stage.style.left = '';
+      stage.style.right = '';
+      stage.style.bottom = '';
+      return;
+    }
+    stage.style.top = document.querySelector('.topbar').offsetHeight + 'px';
+    stage.style.left = '8px';
+    stage.style.right = '72px';
+    stage.style.bottom = '8px';
+  }
+
+  function fitZoom() {
+    zoomFit.style.transform = '';
+    if (!zoomed) return;
+    var haveH = zoomFit.clientHeight;
+    var needH = zoomFit.scrollHeight;
+    var haveW = zoomFit.clientWidth;
+    var needW = zoomFit.scrollWidth;
+    if (!needH || !needW) return;
+    var scale = Math.min(1, haveH / needH, haveW / needW);
+    if (scale < 0.99) {
+      zoomFit.style.transformOrigin = 'top center';
+      zoomFit.style.transform = 'scale(' + scale + ')';
+    }
+  }
+
+  bar.addEventListener('input', function () {
+    vol = Number(bar.value);
+    render();
+  });
+  ticks.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      vol = Number(btn.dataset.v);
+      render();
+    });
+  });
+  nextBtn.addEventListener('click', function () {
+    var n = STAGES.find(function (s) { return s < vol; });
+    if (n != null) { vol = n; render(); }
+  });
+  backBtn.addEventListener('click', function () {
+    var prev = STAGES.slice().reverse().find(function (s) { return s > vol; });
+    if (prev != null) { vol = prev; render(); }
+  });
+  hideBtn.addEventListener('click', function () { setDesc(descHidden); });
+  zoomBtn.addEventListener('click', function () {
+    zoomed = !zoomed;
+    document.body.classList.toggle('zoomed', zoomed);
+    zoomBtn.setAttribute('aria-pressed', String(zoomed));
+    placeZoom();
+    requestAnimationFrame(fitZoom);
+  });
+
+  function resizeCanvas(canvas) {
+    var dpr = window.devicePixelRatio || 1;
+    var cssW = window.innerWidth;
+    var cssH = window.innerHeight;
+    var w = Math.round(cssW * dpr);
+    var h = Math.round(cssH * dpr);
+    canvas.style.width = cssW + 'px';
+    canvas.style.height = cssH + 'px';
+    if (canvas.width === w && canvas.height === h) return;
+    canvas.width = w;
+    canvas.height = h;
+    canvas.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function wipe(canvas) {
+    var ctx = canvas.getContext('2d');
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+  }
+
+  function setPen(on) {
+    if (on) {
+      laserOn = false;
+      document.body.classList.remove('laser-on');
+      document.getElementById('dkLaser').classList.remove('active');
+      laserDot.classList.add('hidden');
+    }
+    penOn = on;
+    document.body.classList.toggle('pen-on', on);
+    document.getElementById('dkPen').classList.toggle('active', on);
+    document.getElementById('dkColors').classList.toggle('hidden', !on);
+    if (!on) {
+      erasing = false;
+      document.getElementById('dkErase').classList.remove('active');
+    }
+  }
+
+  function setLaser(on) {
+    if (on) setPen(false);
+    laserOn = on;
+    document.body.classList.toggle('laser-on', on);
+    document.getElementById('dkLaser').classList.toggle('active', on);
+    if (!on) laserDot.classList.add('hidden');
+    else if (hasPointer) laserDot.classList.remove('hidden');
+  }
+
+  document.getElementById('dkPen').addEventListener('click', function () { setPen(!penOn); });
+  document.getElementById('dkLaser').addEventListener('click', function () { setLaser(!laserOn); });
+  document.getElementById('dkErase').addEventListener('click', function () {
+    erasing = !erasing;
+    document.getElementById('dkErase').classList.toggle('active', erasing);
+  });
+  document.getElementById('dkColors').addEventListener('click', function (e) {
+    var btn = e.target.closest('.dcolor');
+    if (!btn) return;
+    ink = btn.dataset.c;
+    erasing = false;
+    document.getElementById('dkErase').classList.remove('active');
+    document.querySelectorAll('.dcolor').forEach(function (el) {
+      el.classList.toggle('active', el === btn);
+    });
+  });
+  document.getElementById('dkClear').addEventListener('click', function () {
+    wipe(penCanvas);
+    wipe(laserCanvas);
+  });
+
+  function stroke(a, b) {
+    penCtx.lineCap = 'round';
+    penCtx.lineJoin = 'round';
+    if (erasing) {
+      penCtx.globalCompositeOperation = 'destination-out';
+      penCtx.strokeStyle = 'rgba(0,0,0,1)';
+      penCtx.lineWidth = 26;
+    } else {
+      penCtx.globalCompositeOperation = 'source-over';
+      penCtx.strokeStyle = ink;
+      penCtx.lineWidth = 3.6;
+    }
+    penCtx.beginPath();
+    penCtx.moveTo(a.x, a.y);
+    penCtx.lineTo(b.x, b.y);
+    penCtx.stroke();
+  }
+
+  penCanvas.addEventListener('pointerdown', function (e) {
+    if (!penOn) return;
+    penCanvas.setPointerCapture(e.pointerId);
+    drawing = true;
+    lastPt = { x: e.clientX, y: e.clientY };
+    stroke(lastPt, lastPt);
+  });
+  penCanvas.addEventListener('pointermove', function (e) {
+    if (!drawing) return;
+    var p = { x: e.clientX, y: e.clientY };
+    stroke(lastPt, p);
+    lastPt = p;
+  });
+  function endDraw() { drawing = false; }
+  penCanvas.addEventListener('pointerup', endDraw);
+  penCanvas.addEventListener('pointercancel', endDraw);
+
+  document.addEventListener('pointermove', function (e) {
+    laserX = e.clientX;
+    laserY = e.clientY;
+    hasPointer = true;
+    if (!laserOn) return;
+    laserDot.style.left = laserX + 'px';
+    laserDot.style.top = laserY + 'px';
+    laserDot.classList.remove('hidden');
+  });
+  document.addEventListener('pointerleave', function () {
+    hasPointer = false;
+    laserDot.classList.add('hidden');
+  });
+
+  function laserFrame(now) {
+    var dt = lastFrame ? Math.min(40, now - lastFrame) : 16;
+    lastFrame = now;
+    laserCtx.save();
+    laserCtx.setTransform(1, 0, 0, 1, 0, 0);
+    laserCtx.globalCompositeOperation = 'destination-out';
+    laserCtx.fillStyle = 'rgba(0,0,0,' + (dt / 1600) + ')';
+    laserCtx.fillRect(0, 0, laserCanvas.width, laserCanvas.height);
+    laserCtx.restore();
+    if (laserOn && hasPointer) {
+      laserCtx.globalCompositeOperation = 'source-over';
+      laserCtx.fillStyle = 'rgba(255,40,40,0.7)';
+      laserCtx.beginPath();
+      laserCtx.arc(laserX, laserY, 5, 0, Math.PI * 2);
+      laserCtx.fill();
+    }
+    requestAnimationFrame(laserFrame);
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { setPen(false); setLaser(false); }
+  });
+
+  window.addEventListener('resize', function () {
+    resizeCanvas(penCanvas);
+    resizeCanvas(laserCanvas);
+    placeZoom();
+    fitZoom();
+    fitAnswer();
+  });
+
+  setDesc(!window.matchMedia('(max-width: 800px)').matches);
+  resizeCanvas(penCanvas);
+  resizeCanvas(laserCanvas);
+  render();
+  requestAnimationFrame(laserFrame);
+})();
+</script>
+</body>
+</html>

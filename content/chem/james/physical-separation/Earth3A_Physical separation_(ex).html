@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Earth3A Physical separation — distillation</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: #111827;
+    background: #eef3f8;
+    padding-left: env(safe-area-inset-left);
+    padding-right: calc(64px + env(safe-area-inset-right));
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  button { font-family: inherit; cursor: pointer; }
+  .topbar {
+    position: relative;
+    z-index: 55;
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: calc(52px + env(safe-area-inset-top));
+    padding: env(safe-area-inset-top) 12px 0;
+  }
+  .topbar h1 {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    font-size: 18px;
+    font-weight: 650;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #stepLabel { flex-shrink: 0; font-size: 16px; color: #334155; white-space: nowrap; }
+  .nav {
+    min-width: 64px;
+    min-height: 44px;
+    padding: 0 12px;
+    border: 1px solid #d7e0ec;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 16px;
+  }
+  .nav:disabled { opacity: 0.35; cursor: default; }
+  #turnBtn[aria-pressed="true"], #checkBtn[aria-pressed="true"] { background: #163a86; color: #fff; }
+  main {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 12px 8px;
+    overflow: hidden;
+  }
+  #stage {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid #d7e0ec;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  body.zoomed #stage { position: fixed; z-index: 30; margin: 0; }
+  .stage-head {
+    flex: none;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: calc(38px * 1.15 * 2 + 12px);
+    padding: 6px 8px 0 14px;
+  }
+  #stageName {
+    flex: 1;
+    min-width: 0;
+    font-size: 38px;
+    font-weight: 650;
+    line-height: 1.15;
+    color: #111827;
+  }
+  #zoomBtn {
+    flex: none;
+    width: 44px;
+    height: 44px;
+    margin-top: 2px;
+    border: 1px solid #d7e0ec;
+    border-radius: 10px;
+    background: #fff;
+    color: #163a86;
+    font-size: 28px;
+    line-height: 1;
+  }
+  #zoomBtn[aria-pressed="true"] { background: #163a86; color: #fff; }
+  #zoomFit {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  #view {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    touch-action: none;
+    user-select: none;
+  }
+  #c { display: block; width: 100%; height: 100%; }
+  #labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .plabel {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 1px 7px;
+    border: 1px solid #d7e0ec;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.94);
+    color: #111827;
+    font-size: 13px;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .answer {
+    flex: none;
+    height: 58px;
+    margin: 0;
+    display: grid;
+    place-items: center;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .answer[aria-hidden="true"] { visibility: hidden; }
+  #answerInner { display: inline-block; transform-origin: center center; }
+  .tray {
+    flex: none;
+    display: grid;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    gap: 6px;
+    padding: 6px 8px 8px;
+  }
+  .chip {
+    min-height: 44px;
+    padding: 4px 3px;
+    border: 1px solid #d7e0ec;
+    border-radius: 10px;
+    background: #fff;
+    color: #111827;
+    font-size: 13px;
+    line-height: 1.1;
+    white-space: normal;
+    overflow-wrap: break-word;
+    touch-action: none;
+    user-select: none;
+  }
+  .chip.on { border-color: #163a86; background: #e8eefc; font-weight: 650; }
+  .chip.hot { background: #dbeafe; }
+  #desc {
+    flex: none;
+    margin: 0;
+    font-size: 38px;
+    line-height: 1.15;
+  }
+  #desc.hidden { display: none; }
+  .hl-joint { color: #163a86; font-weight: 700; }
+  .hl-pos { color: #9a3412; font-weight: 700; }
+  .hl-water { color: #2563eb; font-weight: 700; }
+  .hl-gran { color: #0f766e; font-weight: 700; }
+  .hl-heat { color: #c2410c; font-weight: 700; }
+  .hl-bad { color: #b91c1c; font-weight: 700; }
+  @media (max-width: 900px) {
+    .stage-head { min-height: calc(38px * 1.15 * 3 + 12px); }
+    .tray { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  }
+  @media (max-width: 560px) {
+    .stage-head { min-height: calc(38px * 1.15 * 5 + 12px); }
+    .tray { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .chip { font-size: 11px; padding: 4px 1px; }
+  }
+  @media (max-width: 800px) {
+    .topbar h1 { display: none; }
+    #stepLabel { flex: 1; text-align: center; }
+    .nav { min-width: 44px; padding: 0 8px; }
+  }
+  .pen-canvas { position: fixed; inset: 0; z-index: 40; pointer-events: none; touch-action: none; }
+  .laser-canvas { position: fixed; inset: 0; z-index: 45; pointer-events: none; }
+  .laser-dot {
+    position: fixed; width: 22px; height: 22px; margin: -11px 0 0 -11px;
+    border-radius: 50%; pointer-events: none; z-index: 48;
+    background: radial-gradient(circle, rgba(255, 60, 60, 0.98), rgba(255, 0, 0, 0) 72%);
+  }
+  .laser-dot.hidden, .dcolors.hidden { display: none; }
+  body.pen-on { cursor: crosshair; touch-action: none; }
+  body.pen-on .pen-canvas { pointer-events: auto; }
+  body.laser-on { cursor: none; touch-action: none; }
+  body.pen-on, body.laser-on { user-select: none; }
+  .teach-dock {
+    position: fixed; right: 8px; top: 50%; transform: translateY(-50%);
+    z-index: 60; display: flex; flex-direction: column; gap: 6px;
+    padding: 8px 6px; background: rgba(255, 255, 255, 0.94);
+    border: 1px solid #d7e0ec; border-radius: 16px;
+  }
+  .dbtn {
+    width: 44px; height: 44px; border: 0; border-radius: 12px;
+    background: transparent; display: grid; place-items: center; color: #111827;
+  }
+  .dbtn svg { width: 22px; height: 22px; }
+  .dbtn.active { background: #163a86; color: #fff; }
+  #dkLaser.active { background: #e11d48; }
+  #dkPen.active { background: #0f8a62; }
+  .dcolors { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+  .dcolor { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #fff; background: var(--sc); box-shadow: 0 0 0 1px #d7e0ec; }
+  .dcolor.active { box-shadow: 0 0 0 2px #111827; }
+  .derase.active { background: #d97706; color: #3f2a00; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <button type="button" class="nav" id="backBtn">Back</button>
+  <h1>Distillation — quick-fit apparatus</h1>
+  <span id="stepLabel">Build</span>
+  <button type="button" class="nav" id="turnBtn" aria-pressed="false">Turn</button>
+  <button type="button" class="nav" id="checkBtn" aria-pressed="false">Check</button>
+  <button type="button" class="nav" id="hideBtn" aria-pressed="false">Hide</button>
+  <button type="button" class="nav" id="nextBtn">Next</button>
+</header>
+<main>
+  <section id="stage">
+    <div class="stage-head">
+      <span id="stageName">Join the quick-fit apparatus.</span>
+      <button type="button" id="zoomBtn" aria-label="Zoom" aria-pressed="false">+</button>
+    </div>
+    <div id="zoomFit">
+      <div id="view">
+        <canvas id="c" aria-label="Quick-fit distillation bench"></canvas>
+        <div id="labels"></div>
+      </div>
+      <p id="answer" class="answer" aria-hidden="true"><span id="answerInner"></span></p>
+      <div id="tray" class="tray"></div>
+    </div>
+  </section>
+  <p id="desc">Distillation is a method to obtain <span class="hl-water">pure water</span> from sea water. (Obtain solvent from solution)</p>
+</main>
+
+<canvas id="penCanvas" class="pen-canvas"></canvas>
+<canvas id="laserCanvas" class="laser-canvas"></canvas>
+<div id="laserDot" class="laser-dot hidden"></div>
+<div class="teach-dock">
+  <button type="button" class="dbtn" id="dkLaser" aria-label="Laser pointer">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="currentColor"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path></svg>
+  </button>
+  <button type="button" class="dbtn" id="dkPen" aria-label="Pen">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20l4.5-1.2L19 8.3 15.7 5 5.2 15.5 4 20z"></path><path d="M13.5 7.2l3.3 3.3"></path></svg>
+  </button>
+  <div class="dcolors hidden" id="dkColors">
+    <button type="button" class="dcolor active" data-c="#e11d48" style="--sc:#e11d48" aria-label="Red"></button>
+    <button type="button" class="dcolor" data-c="#2563eb" style="--sc:#2563eb" aria-label="Blue"></button>
+    <button type="button" class="dcolor" data-c="#059669" style="--sc:#059669" aria-label="Green"></button>
+    <button type="button" class="dcolor" data-c="#111827" style="--sc:#111827" aria-label="Black"></button>
+    <button type="button" class="dbtn derase" id="dkErase" aria-label="Eraser">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="8" width="16" height="9" rx="1.5"></rect><path d="M4 13h16"></path></svg>
+    </button>
+  </div>
+  <button type="button" class="dbtn" id="dkClear" aria-label="Clear writing">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 7h14M9 7V5h6v2M8 7l1 13h6l1-13"></path></svg>
+  </button>
+</div>
+
+<script src="vendor/three.min.js"></script>
+<script>
+(function () {
+  var GAUZE_Y = 1.18;
+  var NECK_Y = 4.05;
+  var SIDE_Y = 1.62;
+  var SIDE_LEN = 1.7;
+  var COND_LEN = 6.2;
+  var THERM_TOP = 3.7;
+  var THERM_BOT = -2.3;
+  var T_SIDE = (THERM_TOP - SIDE_Y) / (THERM_TOP - THERM_BOT);
+  var T_BAND = 0.08;
+  var MOUTH = new THREE.Vector3(1.15, -2.2, 0);
+  var UP = new THREE.Vector3(0, 1, 0);
+  var OK = 0x15803d;
+  var BAD = 0xb91c1c;
+  var sideDir = new THREE.Vector3(1, -0.28, 0).normalize();
+  var sideEnd = new THREE.Vector3(0, SIDE_Y, 0).addScaledVector(sideDir, SIDE_LEN);
+  var nozzleLocal = {
+    nozzleA: new THREE.Vector3(1.25, 0, 1.05),
+    nozzleB: new THREE.Vector3(4.95, 0, 1.05)
+  };
+  var REST_Y = {
+    flask: 0, granules: 0.15, heat: 0, still: 0, thermo: 0.3,
+    condenser: 1.9, win: 0.2, wout: 0.2, adaptor: 2.4, receiver: 0
+  };
+  var CHILD_OF = {
+    flask: ['granules', 'heat', 'still'],
+    still: ['thermo', 'condenser'],
+    condenser: ['win', 'wout', 'adaptor'],
+    adaptor: ['receiver']
+  };
+
+  var backBtn = document.getElementById('backBtn');
+  var nextBtn = document.getElementById('nextBtn');
+  var hideBtn = document.getElementById('hideBtn');
+  var turnBtn = document.getElementById('turnBtn');
+  var checkBtn = document.getElementById('checkBtn');
+  var stepLabel = document.getElementById('stepLabel');
+  var stage = document.getElementById('stage');
+  var stageName = document.getElementById('stageName');
+  var zoomBtn = document.getElementById('zoomBtn');
+  var zoomFit = document.getElementById('zoomFit');
+  var view = document.getElementById('view');
+  var canvas = document.getElementById('c');
+  var labels = document.getElementById('labels');
+  var answer = document.getElementById('answer');
+  var answerInner = document.getElementById('answerInner');
+  var tray = document.getElementById('tray');
+  var desc = document.getElementById('desc');
+  var penCanvas = document.getElementById('penCanvas');
+  var laserCanvas = document.getElementById('laserCanvas');
+  var laserDot = document.getElementById('laserDot');
+
+  var step = -1;
+  var zoomed = false;
+  var descHidden = false;
+  var turnOn = false;
+  var penOn = false;
+  var laserOn = false;
+  var erasing = false;
+  var ink = '#e11d48';
+  var drawing = false;
+  var lastPt = null;
+  var laserX = 0;
+  var laserY = 0;
+  var hasPointer = false;
+  var lastFrame = 0;
+  var penCtx = penCanvas.getContext('2d');
+  var laserCtx = laserCanvas.getContext('2d');
+  var drag = null;
+  var turning = null;
+  var pending = false;
+  var azimuth = 0.62;
+  var polar = 1.08;
+  var radius = 18;
+  var target = new THREE.Vector3(4.1, 3.6, 0);
+
+  var META = [
+    ['flask', 'flask', 'Pear-shaped flask of sea water'],
+    ['granules', 'granules', 'Anti-bumping granules'],
+    ['heat', 'heat', 'Heat'],
+    ['still', 'still head', 'Still head'],
+    ['thermo', 'thermometer', 'Thermometer'],
+    ['condenser', 'condenser', 'Condenser'],
+    ['win', 'water in', 'Water in'],
+    ['wout', 'water out', 'Water out'],
+    ['adaptor', 'adaptor', 'Receiver adaptor'],
+    ['receiver', 'receiver', 'Receiver for pure water (distillate)']
+  ];
+
+  function glassMat() {
+    return new THREE.MeshPhongMaterial({
+      color: 0xd7eefc,
+      transparent: true,
+      opacity: 0.4,
+      shininess: 90,
+      specular: new THREE.Color('white'),
+      side: THREE.DoubleSide,
+      depthWrite: false,
+      emissive: new THREE.Color(0x000000)
+    });
+  }
+  function solidMat(color, extra) {
+    var opt = {
+      color: color,
+      shininess: 40,
+      specular: new THREE.Color('white'),
+      emissive: new THREE.Color(0x000000)
+    };
+    if (extra) {
+      Object.keys(extra).forEach(function (k) { opt[k] = extra[k]; });
+    }
+    return new THREE.MeshPhongMaterial(opt);
+  }
+  function addPart(group, geo, mat, id, mark) {
+    var mesh = new THREE.Mesh(geo, mat);
+    mesh.userData.pieceId = id;
+    mesh.userData.mark = !!mark;
+    group.add(mesh);
+    return mesh;
+  }
+  function lathe(pairs) {
+    return new THREE.LatheGeometry(pairs.map(function (p) {
+      return new THREE.Vector2(p[0], p[1]);
+    }), 28);
+  }
+  function alongX(mesh, length) {
+    mesh.rotation.z = -Math.PI / 2;
+    mesh.position.x = length / 2;
+  }
+
+  var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+  if (THREE.SRGBColorSpace) renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.setClearColor(0xf8fafc, 1);
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(32, 1, 0.1, 80);
+  var raycaster = new THREE.Raycaster();
+  var pointer = new THREE.Vector2();
+  scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xcbd5e1, 0.4));
+  var sun = new THREE.DirectionalLight(0xffffff, 0.85);
+  sun.position.set(7, 14, 9);
+  scene.add(sun);
+
+  var bench = new THREE.Mesh(
+    new THREE.BoxGeometry(22, 0.28, 12),
+    solidMat(0xe7e5e4)
+  );
+  bench.position.set(4, -0.14, 0);
+  scene.add(bench);
+  var gauze = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.65, 1.65, 0.06, 24),
+    solidMat(0x94a3b8)
+  );
+  gauze.position.y = GAUZE_Y;
+  scene.add(gauze);
+  var legMat = solidMat(0x475569);
+  for (var li = 0; li < 3; li++) {
+    var leg = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, GAUZE_Y, 8), legMat);
+    var ang = li * Math.PI * 2 / 3;
+    leg.position.set(Math.cos(ang) * 1.15, GAUZE_Y / 2, Math.sin(ang) * 1.15);
+    scene.add(leg);
+  }
+
+  var pieces = {};
+  function makePiece(id) {
+    var group = new THREE.Group();
+    group.name = id;
+    group.visible = false;
+    scene.add(group);
+    var label = document.createElement('div');
+    label.className = 'plabel';
+    labels.appendChild(label);
+    pieces[id] = {
+      id: id,
+      group: group,
+      labelEl: label,
+      place: 'tray',
+      socket: null,
+      t: T_SIDE,
+      slopeUp: false,
+      pointUp: false
+    };
+    return group;
+  }
+
+  (function buildFlask() {
+    var g = makePiece('flask');
+    addPart(g, lathe([
+      [0.02, 0], [1.15, 0.02], [1.75, 0.45], [1.95, 1.35], [1.72, 2.25],
+      [1.05, 2.9], [0.46, 3.35], [0.36, 3.9], [0.58, 4.02], [0.42, 4.08]
+    ]), glassMat(), 'flask', true);
+    addPart(g, lathe([
+      [0.02, 0.04], [1.0, 0.08], [1.55, 0.5], [1.7, 1.25], [1.45, 2.0], [0.7, 2.2]
+    ]), solidMat(0x1a7a96, { transparent: true, opacity: 0.78 }), 'flask', true);
+    var skin = addPart(g, new THREE.CircleGeometry(1.35, 24), solidMat(0x7dd3e8, { shininess: 90 }), 'flask', false);
+    skin.rotation.x = -Math.PI / 2;
+    skin.position.y = 2.2;
+  })();
+
+  (function buildGranules() {
+    var g = makePiece('granules');
+    var mat = solidMat(0xe7e5e4);
+    [[0, 0, 0], [0.34, 0.06, 0.12], [-0.28, 0.04, 0.18], [0.1, 0.1, -0.3],
+      [-0.2, 0.14, -0.14], [0.24, 0.16, 0.2], [0, 0.2, 0]].forEach(function (p) {
+      var s = addPart(g, new THREE.SphereGeometry(0.16, 10, 8), mat, 'granules', true);
+      s.position.set(p[0], p[1], p[2]);
+    });
+  })();
+
+  (function buildHeat() {
+    var g = makePiece('heat');
+    addPart(g, new THREE.CylinderGeometry(0.78, 0.84, 0.22, 16), solidMat(0x334155), 'heat', true).position.y = 0.11;
+    addPart(g, new THREE.CylinderGeometry(0.16, 0.2, 0.72, 12), solidMat(0x1f2937), 'heat', true).position.y = 0.52;
+    var flame = addPart(g, new THREE.CylinderGeometry(0.02, 0.36, 0.7, 12), solidMat(0xfde047, { emissive: new THREE.Color(0xf97316) }), 'heat', false);
+    flame.position.set(0, 0.86, 0.45);
+  })();
+
+  (function buildStill() {
+    var g = makePiece('still');
+    var joint = addPart(g, new THREE.CylinderGeometry(0.34, 0.55, 0.42, 16), glassMat(), 'still', true);
+    joint.position.y = 0.21;
+    var neck = addPart(g, new THREE.CylinderGeometry(0.32, 0.32, 3.35, 16), glassMat(), 'still', true);
+    neck.position.y = 1.95;
+    var lip = addPart(g, new THREE.CylinderGeometry(0.48, 0.34, 0.16, 16), glassMat(), 'still', true);
+    lip.position.y = 3.68;
+    var arm = addPart(g, new THREE.CylinderGeometry(0.26, 0.26, SIDE_LEN, 12), glassMat(), 'still', true);
+    arm.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), sideDir);
+    arm.position.copy(sideEnd).addScaledVector(sideDir, -SIDE_LEN / 2);
+    var cuff = addPart(g, new THREE.CylinderGeometry(0.34, 0.28, 0.22, 12), glassMat(), 'still', true);
+    cuff.quaternion.copy(arm.quaternion);
+    cuff.position.copy(sideEnd);
+  })();
+
+  (function buildThermo() {
+    var g = makePiece('thermo');
+    addPart(g, new THREE.SphereGeometry(0.28, 16, 12), solidMat(0xdc2626), 'thermo', true);
+    var stem = addPart(g, new THREE.CylinderGeometry(0.1, 0.1, 3.3, 12), solidMat(0x64748b), 'thermo', true);
+    stem.position.y = 1.8;
+    var col = addPart(g, new THREE.CylinderGeometry(0.04, 0.04, 1.15, 8), solidMat(0xdc2626), 'thermo', true);
+    col.position.y = 0.86;
+  })();
+
+  (function buildCondenser() {
+    var g = makePiece('condenser');
+    var outer = addPart(g, new THREE.CylinderGeometry(0.58, 0.58, COND_LEN, 18), glassMat(), 'condenser', true);
+    alongX(outer, COND_LEN);
+    var inner = addPart(g, new THREE.CylinderGeometry(0.22, 0.22, COND_LEN + 0.3, 12), solidMat(0xf8fafc, { transparent: true, opacity: 0.55 }), 'condenser', true);
+    alongX(inner, COND_LEN);
+    ['nozzleA', 'nozzleB'].forEach(function (name) {
+      var n = addPart(g, new THREE.CylinderGeometry(0.12, 0.12, 0.7, 10), glassMat(), 'condenser', true);
+      n.rotation.x = Math.PI / 2;
+      n.position.copy(nozzleLocal[name]);
+      n.position.z -= 0.28;
+    });
+  })();
+
+  function buildHose(id) {
+    var g = makePiece(id);
+    var hose = addPart(g, new THREE.CylinderGeometry(0.14, 0.14, 1.7, 12), solidMat(id === 'win' ? 0x2563eb : 0x0369a1), id, true);
+    hose.rotation.x = Math.PI / 2;
+    hose.position.z = 0.85;
+  }
+  buildHose('win');
+  buildHose('wout');
+
+  (function buildAdaptor() {
+    var g = makePiece('adaptor');
+    var run = addPart(g, new THREE.CylinderGeometry(0.24, 0.24, 1.15, 12), glassMat(), 'adaptor', true);
+    alongX(run, 1.15);
+    var drop = addPart(g, new THREE.CylinderGeometry(0.24, 0.28, 2.2, 12), glassMat(), 'adaptor', true);
+    drop.position.set(1.15, -1.1, 0);
+  })();
+
+  (function buildReceiver() {
+    var g = makePiece('receiver');
+    addPart(g, new THREE.SphereGeometry(0.68, 16, 12), glassMat(), 'receiver', true).position.y = 0.4;
+    var wall = addPart(g, new THREE.CylinderGeometry(0.68, 0.68, 1.9, 16), glassMat(), 'receiver', true);
+    wall.position.y = 1.35;
+    var lip = addPart(g, new THREE.CylinderGeometry(0.78, 0.68, 0.12, 16), glassMat(), 'receiver', true);
+    lip.position.y = 2.28;
+  })();
+
+  META.forEach(function (row) {
+    pieces[row[0]].labelEl.textContent = row[1];
+    var chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'chip';
+    chip.innerHTML = row[0] === 'thermo' ? 'thermo<br>meter' : row[1];
+    chip.setAttribute('aria-label', row[2]);
+    chip.dataset.id = row[0];
+    tray.appendChild(chip);
+    pieces[row[0]].chip = chip;
+  });
+
+  function applyCamera() {
+    var sp = Math.sin(polar);
+    camera.position.set(
+      target.x + radius * sp * Math.sin(azimuth),
+      target.y + radius * Math.cos(polar),
+      target.z + radius * sp * Math.cos(azimuth)
+    );
+    camera.lookAt(target);
+  }
+
+  function requestRender() {
+    if (pending) return;
+    pending = true;
+    requestAnimationFrame(draw);
+  }
+
+  function lowerNozzle() {
+    pieces.condenser.group.updateMatrixWorld(true);
+    var a = pieces.condenser.group.localToWorld(nozzleLocal.nozzleA.clone());
+    var b = pieces.condenser.group.localToWorld(nozzleLocal.nozzleB.clone());
+    return a.y <= b.y ? 'nozzleA' : 'nozzleB';
+  }
+
+  function adaptorMouthWorld() {
+    pieces.adaptor.group.updateMatrixWorld(true);
+    return pieces.adaptor.group.localToWorld(MOUTH.clone());
+  }
+
+  function positionReceiver() {
+    var mouth = adaptorMouthWorld();
+    var h = 2.36;
+    scene.attach(pieces.receiver.group);
+    pieces.receiver.group.position.set(mouth.x, Math.max(0, mouth.y - h - 0.06), mouth.z);
+    pieces.receiver.group.quaternion.identity();
+    pieces.receiver.group.visible = true;
+  }
+
+  function setWorldQuat(obj, worldQ) {
+    obj.parent.updateMatrixWorld(true);
+    var parentQ = new THREE.Quaternion();
+    obj.parent.getWorldQuaternion(parentQ);
+    obj.quaternion.copy(parentQ.invert().multiply(worldQ));
+  }
+
+  function axisQuat(dir) {
+    var x = dir.clone().normalize();
+    var z = new THREE.Vector3().crossVectors(x, UP);
+    if (z.lengthSq() < 1e-8) z.set(0, 0, 1);
+    z.normalize();
+    var y = new THREE.Vector3().crossVectors(z, x).normalize();
+    return new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(x, y, z));
+  }
+
+  function orientFree(id) {
+    var g = pieces[id].group;
+    if (id === 'condenser') g.quaternion.copy(axisQuat(new THREE.Vector3(1, -0.15, 0)));
+    else g.quaternion.identity();
+  }
+
+  function placeOnBench(id, world) {
+    var p = pieces[id];
+    if (id !== 'receiver' && pieces.receiver.socket === 'under' && (id === 'adaptor' || id === 'condenser' || id === 'still' || id === 'flask')) {
+      var rw = new THREE.Vector3();
+      pieces.receiver.group.getWorldPosition(rw);
+      scene.attach(pieces.receiver.group);
+      pieces.receiver.group.position.set(Math.max(-5, Math.min(11, rw.x)), 0, Math.max(-4, Math.min(4, rw.z)));
+      pieces.receiver.group.quaternion.identity();
+      pieces.receiver.place = 'bench';
+      pieces.receiver.socket = null;
+    }
+    scene.attach(p.group);
+    p.group.position.set(
+      Math.max(-5, Math.min(11, world.x)),
+      REST_Y[id],
+      Math.max(-4, Math.min(4, world.z))
+    );
+    orientFree(id);
+    p.place = 'bench';
+    p.socket = null;
+    p.group.visible = true;
+    if (id === 'condenser') p.slopeUp = false;
+    if (id === 'adaptor') p.pointUp = false;
+  }
+
+  function attachFlask() {
+    scene.attach(pieces.flask.group);
+    pieces.flask.group.position.set(0, GAUZE_Y, 0);
+    pieces.flask.group.quaternion.identity();
+    pieces.flask.place = 'socket';
+    pieces.flask.socket = 'stand';
+    pieces.flask.group.visible = true;
+    if (pieces.heat.socket === 'under') {
+      pieces.flask.group.attach(pieces.heat.group);
+      pieces.heat.group.position.set(0, -GAUZE_Y, 0);
+      pieces.heat.group.quaternion.identity();
+      pieces.heat.place = 'socket';
+      pieces.heat.group.visible = true;
+    }
+  }
+
+  function attachGranules() {
+    pieces.flask.group.attach(pieces.granules.group);
+    pieces.granules.group.position.set(0, 1.35, 0);
+    pieces.granules.group.quaternion.identity();
+    pieces.granules.place = 'socket';
+    pieces.granules.socket = 'liquid';
+    pieces.granules.group.visible = true;
+  }
+
+  function attachHeat() {
+    pieces.flask.group.attach(pieces.heat.group);
+    pieces.heat.group.position.set(0, -GAUZE_Y, 0);
+    pieces.heat.group.quaternion.identity();
+    pieces.heat.place = 'socket';
+    pieces.heat.socket = 'under';
+    pieces.heat.group.visible = true;
+  }
+
+  function attachStill() {
+    pieces.flask.group.attach(pieces.still.group);
+    pieces.still.group.position.set(0, NECK_Y, 0);
+    pieces.still.group.quaternion.identity();
+    pieces.still.place = 'socket';
+    pieces.still.socket = 'neck';
+    pieces.still.group.visible = true;
+  }
+
+  function attachThermo(t) {
+    if (t < 0) t = 0;
+    if (t > 1) t = 1;
+    pieces.still.group.attach(pieces.thermo.group);
+    var y = THERM_TOP + t * (THERM_BOT - THERM_TOP);
+    pieces.thermo.group.position.set(0, y, 0);
+    pieces.thermo.group.quaternion.identity();
+    pieces.thermo.place = 'socket';
+    pieces.thermo.socket = 'slot';
+    pieces.thermo.t = t;
+    pieces.thermo.group.visible = true;
+  }
+
+  function attachCondenser(slopeUp) {
+    var dir = slopeUp ? new THREE.Vector3(1, 0.28, 0) : sideDir.clone();
+    var worldDir = dir.clone().normalize().applyQuaternion(pieces.still.group.getWorldQuaternion(new THREE.Quaternion()));
+    pieces.still.group.attach(pieces.condenser.group);
+    pieces.condenser.group.position.copy(sideEnd);
+    setWorldQuat(pieces.condenser.group, axisQuat(worldDir));
+    pieces.condenser.place = 'socket';
+    pieces.condenser.socket = 'side';
+    pieces.condenser.slopeUp = !!slopeUp;
+    pieces.condenser.group.visible = true;
+  }
+
+  function attachHose(id, nozzle) {
+    var g = pieces[id].group;
+    pieces.condenser.group.attach(g);
+    g.position.copy(nozzleLocal[nozzle]);
+    g.quaternion.identity();
+    pieces[id].place = 'socket';
+    pieces[id].socket = nozzle;
+    g.visible = true;
+  }
+
+  function attachAdaptor(pointUp) {
+    if (pieces.receiver.socket === 'under' && pointUp) {
+      var rw = new THREE.Vector3();
+      pieces.receiver.group.getWorldPosition(rw);
+      placeOnBench('receiver', rw);
+    }
+    pieces.condenser.group.attach(pieces.adaptor.group);
+    pieces.adaptor.group.position.set(COND_LEN, 0, 0);
+    pieces.adaptor.group.rotation.set(pointUp ? Math.PI : 0, 0, 0);
+    pieces.adaptor.place = 'socket';
+    pieces.adaptor.socket = 'end';
+    pieces.adaptor.pointUp = !!pointUp;
+    pieces.adaptor.group.visible = true;
+  }
+
+  function attachReceiver() {
+    pieces.receiver.place = 'socket';
+    pieces.receiver.socket = 'under';
+    positionReceiver();
+  }
+
+  function worldOf(group, local) {
+    group.updateMatrixWorld(true);
+    return group.localToWorld(local.clone());
+  }
+
+  function rayDistTo(point) {
+    var ray = raycaster.ray;
+    var v = point.clone().sub(ray.origin);
+    var t = v.dot(ray.direction);
+    if (t < 0) t = 0;
+    return ray.at(t, new THREE.Vector3()).distanceTo(point);
+  }
+
+  function screenYOf(world) {
+    var v = world.clone().project(camera);
+    var rect = canvas.getBoundingClientRect();
+    return rect.top + (-v.y * 0.5 + 0.5) * rect.height;
+  }
+
+  function pointerAbove(world) {
+    return drag && drag.clientY < screenYOf(world) - 18;
+  }
+
+  function slotFromRay() {
+    var best = { d: 1e9, t: T_SIDE };
+    var i;
+    for (i = 0; i <= 16; i++) {
+      var t = i / 16;
+      var y = THERM_TOP + t * (THERM_BOT - THERM_TOP);
+      var d = rayDistTo(worldOf(pieces.still.group, new THREE.Vector3(0, y, 0)));
+      if (d < best.d) best = { d: d, t: t };
+    }
+    return best;
+  }
+
+  function nearestSocket(id) {
+    var bestD = 1e9;
+    var best = null;
+    function keep(d, radius, fn) {
+      if (d < radius && d < bestD) { bestD = d; best = fn; }
+    }
+    if (id === 'flask') {
+      keep(rayDistTo(new THREE.Vector3(0, GAUZE_Y, 0)), 2.2, attachFlask);
+    } else if (id === 'granules' && pieces.flask.place !== 'tray') {
+      keep(rayDistTo(worldOf(pieces.flask.group, new THREE.Vector3(0, 1.1, 0))), 1.8, attachGranules);
+    } else if (id === 'heat' && pieces.flask.socket === 'stand') {
+      keep(rayDistTo(worldOf(pieces.flask.group, new THREE.Vector3(0, -0.2, 0))), 1.8, attachHeat);
+    } else if (id === 'still' && pieces.flask.place !== 'tray') {
+      keep(rayDistTo(worldOf(pieces.flask.group, new THREE.Vector3(0, NECK_Y, 0))), 1.8, attachStill);
+    } else if (id === 'thermo' && pieces.still.place !== 'tray') {
+      var slot = slotFromRay();
+      keep(slot.d, 1.35, function () { attachThermo(slot.t); });
+    } else if (id === 'condenser' && pieces.still.place !== 'tray') {
+      var joint = worldOf(pieces.still.group, sideEnd);
+      keep(rayDistTo(joint), 1.9, function () { attachCondenser(pointerAbove(joint)); });
+    } else if ((id === 'win' || id === 'wout') && pieces.condenser.place !== 'tray') {
+      var other = id === 'win' ? 'wout' : 'win';
+      ['nozzleA', 'nozzleB'].forEach(function (name) {
+        if (pieces[other].socket === name) return;
+        var nozzle = worldOf(pieces.condenser.group, nozzleLocal[name]);
+        keep(rayDistTo(nozzle), 1.45, function () { attachHose(id, name); });
+      });
+    } else if (id === 'adaptor' && pieces.condenser.place !== 'tray') {
+      var end = worldOf(pieces.condenser.group, new THREE.Vector3(COND_LEN, 0, 0));
+      keep(rayDistTo(end), 2, function () { attachAdaptor(pointerAbove(end)); });
+    } else if (id === 'receiver' && pieces.adaptor.socket === 'end' && !pieces.adaptor.pointUp) {
+      var mouth = adaptorMouthWorld();
+      var aim = mouth.clone();
+      aim.y -= 1.1;
+      keep(Math.min(rayDistTo(mouth), rayDistTo(aim)), 2.1, attachReceiver);
+    }
+    return best;
+  }
+
+  function applyPreview(id, point) {
+    var snap = nearestSocket(id);
+    if (snap) {
+      snap();
+      return;
+    }
+    scene.attach(pieces[id].group);
+    pieces[id].group.position.copy(point);
+    orientFree(id);
+    pieces[id].place = 'drag';
+    pieces[id].socket = null;
+    pieces[id].group.visible = true;
+  }
+
+  function glow(id, hex) {
+    pieces[id].group.traverse(function (o) {
+      if (o.isMesh && o.userData.mark && o.material && o.material.emissive) o.material.emissive.setHex(hex);
+    });
+  }
+  function clearGlow() {
+    Object.keys(pieces).forEach(function (id) { glow(id, 0x000000); });
+  }
+
+  function firstGap() {
+    if (pieces.flask.socket !== 'stand') return 'flask';
+    if (pieces.still.socket !== 'neck') return 'still';
+    if (pieces.condenser.socket !== 'side') return 'cond';
+    if (pieces.condenser.slopeUp) return 'slope';
+    if (pieces.adaptor.socket !== 'end') return 'adaptor';
+    if (pieces.adaptor.pointUp) return 'point';
+    if (pieces.receiver.socket !== 'under') return 'receiver';
+    return null;
+  }
+
+  function thermoState() {
+    if (pieces.thermo.socket !== 'slot') return 'missing';
+    if (Math.abs(pieces.thermo.t - T_SIDE) <= T_BAND) return 'ok';
+    return pieces.thermo.t > T_SIDE ? 'low' : 'high';
+  }
+
+  function waterState() {
+    if (pieces.condenser.place === 'tray') return 'missing';
+    if (!pieces.win.socket || !pieces.wout.socket) return 'missing';
+    var lower = lowerNozzle();
+    var upper = lower === 'nozzleA' ? 'nozzleB' : 'nozzleA';
+    if (pieces.win.socket === lower && pieces.wout.socket === upper) return 'ok';
+    return 'reverse';
+  }
+
+  function granulesIn() { return pieces.granules.socket === 'liquid'; }
+  function heatUnder() { return pieces.heat.socket === 'under' && pieces.flask.socket === 'stand'; }
+
+  function allCorrect() {
+    return !firstGap() && thermoState() === 'ok' && waterState() === 'ok' && granulesIn() && heatUnder();
+  }
+
+  function markHtml(i) {
+    if (i === 0) {
+      var gap = firstGap();
+      if (!gap) return 'Vapour passes from the flask through the still head and condenser to the <span class="hl-joint">receiver</span>.';
+      if (gap === 'flask') return 'The <span class="hl-bad">flask</span> is not on the stand.';
+      if (gap === 'still') return 'The <span class="hl-bad">still head</span> is not on the flask.';
+      if (gap === 'cond') return 'The <span class="hl-bad">condenser</span> is not joined to the still head.';
+      if (gap === 'slope') return 'The condenser <span class="hl-bad">slopes upwards</span>.';
+      if (gap === 'adaptor') return 'The <span class="hl-bad">receiver adaptor</span> is not on the condenser.';
+      if (gap === 'point') return 'The receiver adaptor <span class="hl-bad">does not point down</span>.';
+      return 'The <span class="hl-bad">receiver</span> is not under the adaptor.';
+    }
+    if (i === 1) {
+      var th = thermoState();
+      if (th === 'ok') return 'The thermometer bulb is <span class="hl-pos">level with the side arm</span>.';
+      if (th === 'low') return 'The thermometer bulb is <span class="hl-bad">too low</span>.';
+      if (th === 'high') return 'The thermometer bulb is <span class="hl-bad">too high</span>.';
+      return 'The <span class="hl-bad">thermometer</span> is not in the still head.';
+    }
+    if (i === 2) {
+      var w = waterState();
+      if (w === 'ok') return 'Water enters at the <span class="hl-water">lower end</span> and leaves at the <span class="hl-water">upper end</span>.';
+      if (w === 'reverse') return 'Water enters at the <span class="hl-bad">upper end</span>.';
+      return 'Water in and water out are <span class="hl-bad">not both connected</span>.';
+    }
+    if (i === 3) {
+      if (granulesIn()) return 'Anti-bumping granules <span class="hl-gran">in the flask</span> prevent bumping.';
+      return 'Anti-bumping granules are <span class="hl-bad">not in the flask</span>.';
+    }
+    if (heatUnder()) return 'Heat is <span class="hl-heat">under the flask</span>.';
+    return 'Heat is <span class="hl-bad">not under the flask</span>.';
+  }
+
+  function verdictHtml() {
+    if (allCorrect()) return 'The quick-fit distillation apparatus is <span class="hl-gran">correctly set up</span>.';
+    return 'The quick-fit distillation apparatus is <span class="hl-bad">not yet correct</span>.';
+  }
+
+  function paint() {
+    clearGlow();
+    if (step < 0 || step > 4) return;
+    if (step === 0) {
+      var chain = [
+        ['flask', pieces.flask.socket === 'stand'],
+        ['still', pieces.still.socket === 'neck'],
+        ['condenser', pieces.condenser.socket === 'side' && !pieces.condenser.slopeUp],
+        ['adaptor', pieces.adaptor.socket === 'end' && !pieces.adaptor.pointUp],
+        ['receiver', pieces.receiver.socket === 'under']
+      ];
+      var failed = false;
+      chain.forEach(function (row) {
+        if (failed) return;
+        if (row[1]) glow(row[0], OK);
+        else { glow(row[0], BAD); failed = true; }
+      });
+    } else if (step === 1) {
+      glow('thermo', thermoState() === 'ok' ? OK : BAD);
+      glow('still', thermoState() === 'ok' ? OK : BAD);
+    } else if (step === 2) {
+      var good = waterState() === 'ok';
+      glow('condenser', good ? OK : BAD);
+      glow('win', good ? OK : BAD);
+      glow('wout', good ? OK : BAD);
+    } else if (step === 3) {
+      glow('granules', granulesIn() ? OK : BAD);
+      glow('flask', granulesIn() ? OK : BAD);
+    } else if (step === 4) {
+      glow('heat', heatUnder() ? OK : BAD);
+      glow('flask', heatUnder() ? OK : BAD);
+    }
+  }
+
+  function fitAnswer() {
+    answerInner.style.transform = 'none';
+    var room = answer.clientWidth - 8;
+    if (room <= 0 || !answerInner.scrollWidth) return;
+    var scale = Math.min(1, room / answerInner.scrollWidth);
+    if (scale < 0.99) answerInner.style.transform = 'scale(' + scale + ')';
+  }
+
+  function updateChips() {
+    Object.keys(pieces).forEach(function (id) {
+      var on = pieces[id].place !== 'tray';
+      pieces[id].chip.classList.toggle('on', on);
+      pieces[id].chip.classList.toggle('hot', drag && drag.id === id && drag.active);
+      pieces[id].chip.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+
+  function showStep() {
+    checkBtn.setAttribute('aria-pressed', step >= 0 ? 'true' : 'false');
+    if (step < 0) {
+      stageName.textContent = 'Join the quick-fit apparatus.';
+      answer.setAttribute('aria-hidden', 'true');
+      answerInner.innerHTML = '';
+      stepLabel.textContent = 'Build';
+      backBtn.disabled = true;
+      nextBtn.disabled = true;
+    } else if (step < 5) {
+      stageName.innerHTML = markHtml(step);
+      answer.setAttribute('aria-hidden', 'true');
+      answerInner.innerHTML = '';
+      stepLabel.textContent = (step + 1) + ' / 6';
+      backBtn.disabled = false;
+      nextBtn.disabled = false;
+    } else {
+      var verdict = verdictHtml();
+      stageName.innerHTML = verdict;
+      answerInner.innerHTML = verdict;
+      answer.setAttribute('aria-hidden', 'false');
+      stepLabel.textContent = '6 / 6';
+      backBtn.disabled = false;
+      nextBtn.disabled = true;
+    }
+    paint();
+    updateChips();
+    fitAnswer();
+    requestRender();
+  }
+
+  function leaveCheck() {
+    if (step < 0) return;
+    step = -1;
+    showStep();
+  }
+
+  function labelAnchor(id) {
+    var local = new THREE.Vector3(0, 0.7, 0);
+    if (id === 'thermo') local.set(0.85, 3.7, 0.2);
+    else if (id === 'flask') local.set(-1.6, 1.2, 1.7);
+    else if (id === 'granules') local.set(-0.2, 0.5, 2);
+    else if (id === 'heat') local.set(0.5, 0.15, 1.9);
+    else if (id === 'win' || id === 'wout') local.set(0, 0.45, 2.05);
+    else if (id === 'condenser') local.set(COND_LEN * 0.5, 1.05, 0.2);
+    else if (id === 'still') local.set(-1.15, 2.6, 0.5);
+    else if (id === 'adaptor') local.set(1.6, -0.6, 0.8);
+    else if (id === 'receiver') local.set(1.2, 1.1, 0.4);
+    pieces[id].group.updateMatrixWorld(true);
+    return pieces[id].group.localToWorld(local);
+  }
+
+  function updateLabels() {
+    var w = view.clientWidth;
+    var h = view.clientHeight;
+    var items = [];
+    Object.keys(pieces).forEach(function (id) {
+      var p = pieces[id];
+      if (p.place === 'tray' || !p.group.visible) {
+        p.labelEl.style.display = 'none';
+        return;
+      }
+      var pos = labelAnchor(id);
+      pos.project(camera);
+      if (pos.z > 1) {
+        p.labelEl.style.display = 'none';
+        return;
+      }
+      items.push({
+        el: p.labelEl,
+        x: (pos.x * 0.5 + 0.5) * w,
+        y: (-pos.y * 0.5 + 0.5) * h
+      });
+    });
+    items.sort(function (a, b) { return a.y - b.y || a.x - b.x; });
+    for (var i = 1; i < items.length; i++) {
+      if (Math.abs(items[i].x - items[i - 1].x) < 72 && items[i].y - items[i - 1].y < 18) {
+        items[i].y = items[i - 1].y + 18;
+      }
+    }
+    items.forEach(function (it) {
+      var x = Math.max(44, Math.min(w - 44, it.x));
+      var y = Math.max(26, Math.min(h - 8, it.y));
+      it.el.style.display = 'block';
+      it.el.style.transform = 'translate(' + x + 'px,' + y + 'px) translate(-50%, -100%)';
+    });
+  }
+
+  function draw() {
+    pending = false;
+    if (pieces.receiver.socket === 'under') {
+      if (pieces.adaptor.socket === 'end' && !pieces.adaptor.pointUp) positionReceiver();
+      else {
+        var rw = new THREE.Vector3();
+        pieces.receiver.group.getWorldPosition(rw);
+        pieces.receiver.socket = null;
+        placeOnBench('receiver', rw);
+      }
+    }
+    renderer.render(scene, camera);
+    updateLabels();
+  }
+
+  function resize() {
+    var w = view.clientWidth;
+    var h = view.clientHeight;
+    if (!w || !h) return;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    requestRender();
+  }
+
+  function setPointer(e) {
+    var rect = canvas.getBoundingClientRect();
+    pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+  }
+
+  function planeThrough(point) {
+    var dir = new THREE.Vector3();
+    camera.getWorldDirection(dir);
+    return new THREE.Plane().setFromNormalAndCoplanarPoint(dir, point);
+  }
+
+  function hitPlane(plane) {
+    var hit = new THREE.Vector3();
+    if (!raycaster.ray.intersectPlane(plane, hit)) return null;
+    return hit;
+  }
+
+  function pickPiece() {
+    raycaster.setFromCamera(pointer, camera);
+    var meshes = [];
+    Object.keys(pieces).forEach(function (id) {
+      if (pieces[id].place === 'tray') return;
+      pieces[id].group.traverse(function (o) {
+        if (o.isMesh) meshes.push(o);
+      });
+    });
+    var hits = raycaster.intersectObjects(meshes, false);
+    if (!hits.length) return null;
+    return hits[0].object.userData.pieceId;
+  }
+
+  function startActiveDrag(e) {
+    var id = drag.id;
+    var p = pieces[id];
+    if (id === 'flask' && pieces.heat.socket === 'under') {
+      scene.attach(pieces.heat.group);
+      pieces.heat.group.position.set(0, 0, 0);
+      pieces.heat.group.quaternion.identity();
+    }
+    if (p.place === 'tray') {
+      p.group.visible = true;
+      p.group.position.copy(target);
+      p.group.quaternion.identity();
+    }
+    var world = new THREE.Vector3();
+    p.group.getWorldPosition(world);
+    if (p.group.parent !== scene) scene.attach(p.group);
+    p.group.getWorldPosition(world);
+    setPointer(e);
+    raycaster.setFromCamera(pointer, camera);
+    var plane = planeThrough(world);
+    var hit = hitPlane(plane) || world.clone();
+    drag.plane = plane;
+    drag.offset = world.clone().sub(hit);
+    drag.active = true;
+    p.place = 'drag';
+    p.socket = null;
+    leaveCheck();
+    updateChips();
+    requestRender();
+  }
+
+  function moveDrag(e) {
+    drag.clientY = e.clientY;
+    setPointer(e);
+    raycaster.setFromCamera(pointer, camera);
+    var hit = hitPlane(drag.plane);
+    if (!hit) return;
+    applyPreview(drag.id, hit.add(drag.offset));
+    requestRender();
+  }
+
+  function finishDrag(id) {
+    var p = pieces[id];
+    if (p.socket === 'stand' || (id === 'flask' && p.socket === 'stand')) attachFlask();
+    if (p.place !== 'socket') {
+      var w = new THREE.Vector3();
+      p.group.getWorldPosition(w);
+      placeOnBench(id, w);
+    } else if (id === 'flask') {
+      attachFlask();
+    }
+    if (pieces.heat.socket === 'under' && pieces.flask.socket !== 'stand') {
+      var hw = new THREE.Vector3();
+      pieces.heat.group.getWorldPosition(hw);
+      hw.z += 1.6;
+      placeOnBench('heat', hw);
+    }
+    updateChips();
+    requestRender();
+  }
+
+  function toTray(id) {
+    (CHILD_OF[id] || []).forEach(function (cid) {
+      if (pieces[cid].place === 'socket' || pieces[cid].place === 'bench' && pieces[cid].group.parent === pieces[id].group) {
+        var w = new THREE.Vector3();
+        pieces[cid].group.getWorldPosition(w);
+        placeOnBench(cid, w);
+      }
+    });
+    (CHILD_OF[id] || []).forEach(function (cid) {
+      if (pieces[cid].group.parent === pieces[id].group) {
+        var w2 = new THREE.Vector3();
+        pieces[cid].group.getWorldPosition(w2);
+        placeOnBench(cid, w2);
+      }
+    });
+    var p = pieces[id];
+    scene.attach(p.group);
+    p.group.visible = false;
+    p.place = 'tray';
+    p.socket = null;
+    leaveCheck();
+    updateChips();
+    requestRender();
+  }
+
+  tray.addEventListener('pointerdown', function (e) {
+    var chip = e.target.closest('.chip');
+    if (!chip || turnOn || penOn || laserOn) return;
+    e.preventDefault();
+    drag = {
+      id: chip.dataset.id,
+      pointerId: e.pointerId,
+      sx: e.clientX,
+      sy: e.clientY,
+      active: false,
+      fromTray: pieces[chip.dataset.id].place === 'tray'
+    };
+  });
+
+  canvas.addEventListener('pointerdown', function (e) {
+    if (penOn || laserOn) return;
+    if (turnOn) {
+      turning = { pointerId: e.pointerId, x: e.clientX, y: e.clientY };
+      return;
+    }
+    setPointer(e);
+    var id = pickPiece();
+    if (!id) return;
+    e.preventDefault();
+    drag = {
+      id: id,
+      pointerId: e.pointerId,
+      sx: e.clientX,
+      sy: e.clientY,
+      active: false,
+      fromTray: false
+    };
+  });
+
+  window.addEventListener('pointermove', function (e) {
+    if (turning && e.pointerId === turning.pointerId) {
+      azimuth += (e.clientX - turning.x) * 0.008;
+      polar += (e.clientY - turning.y) * 0.008;
+      if (azimuth < -0.85) azimuth = -0.85;
+      if (azimuth > 1.55) azimuth = 1.55;
+      if (polar < 0.55) polar = 0.55;
+      if (polar > 1.4) polar = 1.4;
+      turning.x = e.clientX;
+      turning.y = e.clientY;
+      applyCamera();
+      requestRender();
+      return;
+    }
+    if (!drag || e.pointerId !== drag.pointerId) return;
+    if (!drag.active) {
+      var dx = e.clientX - drag.sx;
+      var dy = e.clientY - drag.sy;
+      if (dx * dx + dy * dy < 36) return;
+      startActiveDrag(e);
+    }
+    moveDrag(e);
+  });
+
+  window.addEventListener('pointerup', endPointer);
+  window.addEventListener('pointercancel', endPointer);
+  function endPointer(e) {
+    if (turning && e.pointerId === turning.pointerId) turning = null;
+    if (!drag || e.pointerId !== drag.pointerId) return;
+    var d = drag;
+    drag = null;
+    if (!d.active) {
+      if (!d.fromTray) toTray(d.id);
+      updateChips();
+      return;
+    }
+    finishDrag(d.id);
+  }
+
+  function setCorrect() {
+    attachFlask();
+    attachGranules();
+    attachHeat();
+    attachStill();
+    attachThermo(T_SIDE);
+    attachCondenser(false);
+    attachHose('wout', 'nozzleA');
+    attachHose('win', 'nozzleB');
+    attachAdaptor(false);
+    attachReceiver();
+    step = -1;
+    showStep();
+  }
+
+  function setWrong() {
+    setCorrect();
+    attachThermo(0.92);
+    attachHose('win', 'nozzleA');
+    attachHose('wout', 'nozzleB');
+    step = -1;
+    showStep();
+  }
+
+  function screenOf(world) {
+    var v = world.clone().project(camera);
+    var rect = canvas.getBoundingClientRect();
+    return {
+      x: rect.left + (v.x * 0.5 + 0.5) * rect.width,
+      y: rect.top + (-v.y * 0.5 + 0.5) * rect.height
+    };
+  }
+
+  function dragPiece(id, world, dy) {
+    var chip = pieces[id].chip;
+    var r = chip.getBoundingClientRect();
+    var s = screenOf(world);
+    var pid = 7;
+    chip.dispatchEvent(new PointerEvent('pointerdown', {
+      bubbles: true, cancelable: true, clientX: r.x + 8, clientY: r.y + 10, pointerId: pid, pointerType: 'mouse'
+    }));
+    window.dispatchEvent(new PointerEvent('pointermove', {
+      bubbles: true, cancelable: true, clientX: s.x, clientY: s.y + (dy || 0), pointerId: pid, pointerType: 'mouse'
+    }));
+    window.dispatchEvent(new PointerEvent('pointerup', {
+      bubbles: true, cancelable: true, clientX: s.x, clientY: s.y + (dy || 0), pointerId: pid, pointerType: 'mouse'
+    }));
+  }
+
+  window.__lab = {
+    correct: setCorrect,
+    wrong: setWrong,
+    mark: function () { return stageName.innerHTML; },
+    answer: function () { return answerInner.innerHTML; },
+    go: function (n) { step = n; showStep(); },
+    gap: firstGap,
+    thermo: thermoState,
+    water: waterState,
+    all: allCorrect,
+    pieces: pieces,
+    dragAll: function () {
+      dragPiece('flask', new THREE.Vector3(0, GAUZE_Y, 0));
+      dragPiece('granules', worldOf(pieces.flask.group, new THREE.Vector3(0, 1.1, 0)));
+      dragPiece('heat', worldOf(pieces.flask.group, new THREE.Vector3(0, -0.2, 0)));
+      dragPiece('still', worldOf(pieces.flask.group, new THREE.Vector3(0, NECK_Y, 0)));
+      dragPiece('thermo', worldOf(pieces.still.group, new THREE.Vector3(0, SIDE_Y, 0)));
+      dragPiece('condenser', worldOf(pieces.still.group, sideEnd));
+      dragPiece('wout', worldOf(pieces.condenser.group, nozzleLocal.nozzleA));
+      dragPiece('win', worldOf(pieces.condenser.group, nozzleLocal.nozzleB));
+      dragPiece('adaptor', worldOf(pieces.condenser.group, new THREE.Vector3(COND_LEN, 0, 0)));
+      var mouth = adaptorMouthWorld();
+      dragPiece('receiver', mouth);
+      return {
+        all: allCorrect(),
+        gap: firstGap(),
+        thermo: thermoState(),
+        water: waterState(),
+        sockets: Object.keys(pieces).map(function (id) {
+          return id + ':' + pieces[id].socket + (id === 'thermo' ? '@' + pieces[id].t.toFixed(2) : '');
+        }).join(' ')
+      };
+    }
+  };
+
+  backBtn.addEventListener('click', function () {
+    if (step === 0) step = -1;
+    else if (step > 0) step -= 1;
+    showStep();
+  });
+  nextBtn.addEventListener('click', function () {
+    if (step >= 0 && step < 5) {
+      step += 1;
+      showStep();
+    }
+  });
+  checkBtn.addEventListener('click', function () {
+    step = 0;
+    showStep();
+  });
+  turnBtn.addEventListener('click', function () {
+    turnOn = !turnOn;
+    turnBtn.setAttribute('aria-pressed', turnOn ? 'true' : 'false');
+  });
+  hideBtn.addEventListener('click', function () { setDesc(descHidden); });
+  zoomBtn.addEventListener('click', function () {
+    zoomed = !zoomed;
+    document.body.classList.toggle('zoomed', zoomed);
+    zoomBtn.setAttribute('aria-pressed', zoomed ? 'true' : 'false');
+    placeZoom();
+    requestAnimationFrame(function () {
+      fitZoom();
+      resize();
+      fitAnswer();
+    });
+  });
+
+  function setDesc(show) {
+    descHidden = !show;
+    desc.classList.toggle('hidden', descHidden);
+    hideBtn.textContent = descHidden ? 'Show' : 'Hide';
+    hideBtn.setAttribute('aria-pressed', descHidden ? 'true' : 'false');
+  }
+  function placeZoom() {
+    if (!zoomed) {
+      stage.style.top = '';
+      stage.style.left = '';
+      stage.style.right = '';
+      stage.style.bottom = '';
+      return;
+    }
+    stage.style.top = document.querySelector('.topbar').offsetHeight + 'px';
+    stage.style.left = '8px';
+    stage.style.right = '72px';
+    stage.style.bottom = '8px';
+  }
+  function fitZoom() {
+    zoomFit.style.transform = '';
+    if (!zoomed) return;
+    var haveH = zoomFit.clientHeight;
+    var needH = zoomFit.scrollHeight;
+    var haveW = zoomFit.clientWidth;
+    var needW = zoomFit.scrollWidth;
+    if (!needH || !needW) return;
+    var scale = Math.min(1, haveH / needH, haveW / needW);
+    if (scale < 0.99) {
+      zoomFit.style.transformOrigin = 'top center';
+      zoomFit.style.transform = 'scale(' + scale + ')';
+    }
+  }
+
+  function resizeCanvas(c) {
+    var dpr = window.devicePixelRatio || 1;
+    var cssW = window.innerWidth;
+    var cssH = window.innerHeight;
+    var w = Math.round(cssW * dpr);
+    var h = Math.round(cssH * dpr);
+    c.style.width = cssW + 'px';
+    c.style.height = cssH + 'px';
+    if (c.width === w && c.height === h) return;
+    c.width = w;
+    c.height = h;
+    c.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function wipe(c) {
+    var ctx = c.getContext('2d');
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, c.width, c.height);
+    ctx.restore();
+  }
+  function setPen(on) {
+    if (on) {
+      laserOn = false;
+      document.body.classList.remove('laser-on');
+      document.getElementById('dkLaser').classList.remove('active');
+      laserDot.classList.add('hidden');
+    }
+    penOn = on;
+    document.body.classList.toggle('pen-on', on);
+    document.getElementById('dkPen').classList.toggle('active', on);
+    document.getElementById('dkColors').classList.toggle('hidden', !on);
+    if (!on) {
+      erasing = false;
+      document.getElementById('dkErase').classList.remove('active');
+    }
+  }
+  function setLaser(on) {
+    if (on) setPen(false);
+    laserOn = on;
+    document.body.classList.toggle('laser-on', on);
+    document.getElementById('dkLaser').classList.toggle('active', on);
+    if (!on) laserDot.classList.add('hidden');
+    else if (hasPointer) laserDot.classList.remove('hidden');
+  }
+  document.getElementById('dkPen').addEventListener('click', function () { setPen(!penOn); });
+  document.getElementById('dkLaser').addEventListener('click', function () { setLaser(!laserOn); });
+  document.getElementById('dkErase').addEventListener('click', function () {
+    erasing = !erasing;
+    document.getElementById('dkErase').classList.toggle('active', erasing);
+  });
+  document.getElementById('dkColors').addEventListener('click', function (e) {
+    var btn = e.target.closest('.dcolor');
+    if (!btn) return;
+    ink = btn.dataset.c;
+    erasing = false;
+    document.getElementById('dkErase').classList.remove('active');
+    document.querySelectorAll('.dcolor').forEach(function (el) {
+      el.classList.toggle('active', el === btn);
+    });
+  });
+  document.getElementById('dkClear').addEventListener('click', function () {
+    wipe(penCanvas);
+    wipe(laserCanvas);
+  });
+  function stroke(a, b) {
+    penCtx.lineCap = 'round';
+    penCtx.lineJoin = 'round';
+    if (erasing) {
+      penCtx.globalCompositeOperation = 'destination-out';
+      penCtx.strokeStyle = 'rgba(0,0,0,1)';
+      penCtx.lineWidth = 26;
+    } else {
+      penCtx.globalCompositeOperation = 'source-over';
+      penCtx.strokeStyle = ink;
+      penCtx.lineWidth = 3.6;
+    }
+    penCtx.beginPath();
+    penCtx.moveTo(a.x, a.y);
+    penCtx.lineTo(b.x, b.y);
+    penCtx.stroke();
+  }
+  penCanvas.addEventListener('pointerdown', function (e) {
+    if (!penOn) return;
+    penCanvas.setPointerCapture(e.pointerId);
+    drawing = true;
+    lastPt = { x: e.clientX, y: e.clientY };
+    stroke(lastPt, lastPt);
+  });
+  penCanvas.addEventListener('pointermove', function (e) {
+    if (!drawing) return;
+    var p = { x: e.clientX, y: e.clientY };
+    stroke(lastPt, p);
+    lastPt = p;
+  });
+  function endDraw() { drawing = false; }
+  penCanvas.addEventListener('pointerup', endDraw);
+  penCanvas.addEventListener('pointercancel', endDraw);
+  document.addEventListener('pointermove', function (e) {
+    laserX = e.clientX;
+    laserY = e.clientY;
+    hasPointer = true;
+    if (!laserOn) return;
+    laserDot.style.left = laserX + 'px';
+    laserDot.style.top = laserY + 'px';
+    laserDot.classList.remove('hidden');
+  });
+  document.addEventListener('pointerleave', function () {
+    hasPointer = false;
+    laserDot.classList.add('hidden');
+  });
+  function laserFrame(now) {
+    var dt = lastFrame ? Math.min(40, now - lastFrame) : 16;
+    lastFrame = now;
+    laserCtx.save();
+    laserCtx.setTransform(1, 0, 0, 1, 0, 0);
+    laserCtx.globalCompositeOperation = 'destination-out';
+    laserCtx.fillStyle = 'rgba(0,0,0,' + (dt / 1600) + ')';
+    laserCtx.fillRect(0, 0, laserCanvas.width, laserCanvas.height);
+    laserCtx.restore();
+    if (laserOn && hasPointer) {
+      laserCtx.globalCompositeOperation = 'source-over';
+      laserCtx.fillStyle = 'rgba(255,40,40,0.7)';
+      laserCtx.beginPath();
+      laserCtx.arc(laserX, laserY, 5, 0, Math.PI * 2);
+      laserCtx.fill();
+    }
+    requestAnimationFrame(laserFrame);
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { setPen(false); setLaser(false); }
+  });
+
+  window.addEventListener('resize', function () {
+    resizeCanvas(penCanvas);
+    resizeCanvas(laserCanvas);
+    placeZoom();
+    fitZoom();
+    resize();
+    fitAnswer();
+  });
+  if (window.ResizeObserver) {
+    new ResizeObserver(function () {
+      resize();
+      fitAnswer();
+    }).observe(view);
+  }
+
+  setDesc(!window.matchMedia('(max-width: 800px)').matches);
+  resizeCanvas(penCanvas);
+  resizeCanvas(laserCanvas);
+  applyCamera();
+  showStep();
+  requestAnimationFrame(laserFrame);
+  requestAnimationFrame(resize);
+})();
+</script>
+</body>
+</html>

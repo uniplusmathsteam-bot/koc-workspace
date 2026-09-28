@@ -1,6 +1,39 @@
 /* James · Chem KOC lead — submissions. */
 KOC.works('chem', 'james', [
   {
+    id: 'earth3a-crystallisation',
+    title: 'Earth3A_Physical separation_(notes)',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Ocean Earth3 Earth3A Physical separation',
+    submitted: '2026-09-28',
+    tags: ['Interactive', 'S3', 'Physical separation'],
+    src: 'content/chem/james/physical-separation/Earth3A_Physical%20separation_(notes).html?v=20260928a',
+    notes: 'Slow crystallisation of sodium chloride. One page, with hide, zoom, and the pen.'
+  },
+  {
+    id: 'earth3a-distillation',
+    title: 'Earth3A_Physical separation_(ex)',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Ocean Earth3 Earth3A Physical separation',
+    submitted: '2026-09-28',
+    tags: ['Interactive', 'S3', 'Physical separation'],
+    src: 'content/chem/james/physical-separation/Earth3A_Physical%20separation_(ex).html?v=20260928a',
+    notes: 'Join the quick-fit distillation apparatus, then turn and check the set-up.'
+  },
+  {
+    id: 'earth3b-chemical-tests',
+    title: 'Earth3B_Chemical tests and electrolysis_(PPT)',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Ocean Earth3 Earth3B Chemical tests and electrolysis',
+    submitted: '2026-09-28',
+    tags: ['Interactive', 'S3', 'Chemical tests'],
+    src: 'content/chem/james/chemical-tests-electrolysis/index.html?v=20260928a',
+    notes: 'Tests for oxygen, hydrogen, and carbon dioxide. Keys 1–3, Space to play, H to hide the description, pen on P.'
+  },
+  {
     id: 'build-the-bench',
     title: 'Earth1A_Laboratory apparatus_(ex)',
     type: 'interactive',
