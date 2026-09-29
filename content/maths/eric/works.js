@@ -1,6 +1,18 @@
 /* Eric · Maths KOC — submissions. */
 KOC.works('maths', 'eric', [
   {
+    id: 'jm24-law-of-indices-concept',
+    title: 'JM24 · Law of Indices Concept',
+    type: 'interactive',
+    chapter: 'S3 JM24',
+    submitted: '2026-09-29',
+    status: 'pending',
+    tags: ['Interactive', 'Indices', 'Concept', 'S3'],
+    cover: 'content/maths/eric/covers/jm24.svg',
+    src: 'https://unikoc5.github.io/s3-maths/topics/law_of_indices/concept-only.html',
+    notes: 'Law of Indices concept page.'
+  },
+  {
     id: 'jm24-law-of-indices',
     title: 'JM24 Law of Indices — interactive tools',
     type: 'interactive',

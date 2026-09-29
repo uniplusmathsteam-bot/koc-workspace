@@ -6,11 +6,11 @@
  * so two teams submitting on the same day never touch the same file.
  */
 KOC.manifest([
-  'content/maths/eric/works.js',
+  'content/maths/eric/works.js?v=20260929',
   'content/maths/hugo/works.js',
   'content/maths/rachel/works.js',
-  'content/maths/tracy/works.js',
-  'content/maths/bobby/works.js',
+  'content/maths/tracy/works.js?v=20260929',
+  'content/maths/bobby/works.js?v=20260929',
 
   'content/chem/keith/works.js',
   'content/chem/james/works.js?v=20260928b',

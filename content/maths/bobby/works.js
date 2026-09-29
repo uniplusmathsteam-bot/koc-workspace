@@ -1,6 +1,18 @@
 /* Bobby · Maths KOC — submissions. */
 KOC.works('maths', 'bobby', [
   {
+    id: 'jm25-factorization-game',
+    title: 'JM25 · Factorization Game',
+    type: 'interactive',
+    chapter: 'JM25',
+    submitted: '2026-09-29',
+    status: 'pending',
+    tags: ['Interactive', 'Game', 'Factorization'],
+    cover: 'content/maths/bobby/comics/jm25/factorization-chapter-1-color.png',
+    src: 'https://uniunipluskoc-blip.github.io/comics/lessons/jm25/index.html#game',
+    notes: 'JM25 lesson page, opened on the game section.'
+  },
+  {
     id: 'jm24-law-of-indices',
     title: 'JM24 · Law of Indices',
     type: 'gallery',
