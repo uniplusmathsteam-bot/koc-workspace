@@ -862,15 +862,27 @@
 const GALLERY = "https://uniplusmathsteam-bot.github.io/koc-workspace/#/";
 
 const KOCS = [
-  { id: "eric",   name: "Eric",   team: "Maths",    lead: "Kinny",            accent: "#3b6fd4", sample: "", performance: 7, attitude: 7, hours: 6, overall: null, markedBy: "Kinny",
-    comment: "Eric is performing at a modest level. The quality of his work is fine, and his working hours are moderate.",
-    next: "" },
-  { id: "tracy",  name: "Tracy",  team: "Maths",    lead: "Kinny",            accent: "#3b6fd4", sample: "", performance: 7, attitude: 8, hours: 7, overall: null, markedBy: "Kinny",
-    comment: "Tracy is very dedicated. She is willing to take on tedious debugging work and keeps learning as she goes.",
-    next: "" },
-  { id: "bobby",  name: "Bobby",  team: "Maths",    lead: "Kinny",            accent: "#3b6fd4", sample: "", performance: 6, attitude: 5, hours: 7, overall: null, markedBy: "Kinny",
-    comment: "Bobby's work is of modest quality, but it takes him a long time to finish. He strongly prefers working from home rather than coming in to the centres.",
-    next: "",
+  { id: "eric",   name: "Eric",   team: "Maths",    lead: "Kinny",            accent: "#3b6fd4", sample: "", performance: 7, attitude: 7, hours: 6, overall: null, loggedHours: 28, markedBy: "Kinny",
+    notes: {
+      performance: "Eric is performing at a modest level. The quality of his work is fine.",
+      hours: "He worked 28 hours this month, which is a modest amount.",
+      attitude: "His attitude is steady, and he completes the work he takes on."
+    },
+    comment: "", next: "" },
+  { id: "tracy",  name: "Tracy",  team: "Maths",    lead: "Kinny",            accent: "#3b6fd4", sample: "", performance: 7, attitude: 8, hours: 7, overall: null, loggedHours: 51, markedBy: "Kinny",
+    notes: {
+      performance: "Tracy is willing to take on tedious debugging work and sees it through.",
+      hours: "She worked 51 hours this month.",
+      attitude: "She is very dedicated and keeps learning as she goes."
+    },
+    comment: "", next: "" },
+  { id: "bobby",  name: "Bobby",  team: "Maths",    lead: "Kinny",            accent: "#3b6fd4", sample: "", performance: 6, attitude: 5, hours: 7, overall: null, loggedHours: 129, markedBy: "Kinny",
+    notes: {
+      performance: "Bobby's work is of modest quality, and it takes him a long time to finish.",
+      hours: "He worked 129 hours, the third highest in the group, but the output does not match that amount of time.",
+      attitude: "He strongly prefers working from home rather than coming in to the centres."
+    },
+    comment: "", next: "",
     interview: "He logs long hours, but his work is not showing much progress for that time." },
 
   { id: "james",  name: "James",  team: "Chem",     lead: "Jeffery · Chris",  accent: "#d97706", sample: "", performance: null, attitude: null, hours: null, overall: 7.5, loggedHours: 169, markedBy: "", leader: true,
@@ -896,7 +908,7 @@ const KOCS = [
     },
     comment: "", next: "" },
 
-  { id: "winnie", name: "Winnie", team: "Phy",      lead: "Chris",            accent: "#7c3aed", sample: "", performance: 7, attitude: 7, hours: 6, overall: null, markedBy: "Chris", leader: true,
+  { id: "winnie", name: "Winnie", team: "Phy",      lead: "Chris",            accent: "#7c3aed", sample: "", performance: 7, attitude: 7, hours: 6, overall: null, loggedHours: 40, markedBy: "Chris", leader: true,
     hoursFlag: "Limited by school commitments, and part of her time went to supporting other teams",
     notes: {
       performance: "Winnie is able to develop web apps independently, although some refinements are still needed. Her main area for development is teaching: she should focus more on guiding students through the problem-solving process rather than providing answers directly.",
@@ -905,7 +917,7 @@ const KOCS = [
       overall: "Both Jerry and Winnie are performing well in web app development. Their hours are limited mainly by school commitments, and some of their time has gone to helping other teams. The key area to develop for both is teaching and student guidance."
     },
     comment: "", next: "" },
-  { id: "jerry",  name: "Jerry",  team: "Phy",      lead: "Chris",            accent: "#7c3aed", sample: "", performance: 7, attitude: 7, hours: 6, overall: null, markedBy: "Chris",
+  { id: "jerry",  name: "Jerry",  team: "Phy",      lead: "Chris",            accent: "#7c3aed", sample: "", performance: 7, attitude: 7, hours: 6, overall: null, loggedHours: 33, markedBy: "Chris",
     hoursFlag: "Limited by school commitments, and part of his time went to supporting other teams",
     notes: {
       performance: "Jerry has shown significant improvement in web app development and is making good progress technically. Further training would help strengthen his teaching skills, particularly in explaining concepts clearly and guiding students effectively.",
