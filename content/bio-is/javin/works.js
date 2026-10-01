@@ -1,6 +1,17 @@
 /* Javin · Bio + IS KOC — submissions. */
 KOC.works('bio-is', 'javin', [
   {
+    id: 'comics-food-nutrition-diseases-biotech',
+    title: 'Comics — SB01 Food and humans, SB02 Nutrition, BB06 Diseases, SB34 Biotechnology',
+    type: 'interactive',
+    subject: 'Bio',
+    chapter: 'SB01 Food and humans · SB01.1.1 Food requirements of humans · SB01.1.2 Summary of food tests · SB01.1.3 Balanced diet · SB02 Nutrition in humans · BB06.6.2 Non-infectious diseases · BB06.6.3 Infectious diseases · SB34.34.1 Introduction to biotechnology',
+    submitted: '2026-10-01',
+    tags: ['Comics', 'PDF'],
+    src: 'content/bio-is/javin/comics/index.html',
+    notes: 'One box, 16 files. Topic name first, then the original filename. The duplicate Petalino balanced-diet file was left out.'
+  },
+  {
     id: 'chapter-2-flashcards',
     title: 'S3 Basic Biology BB03 Cellular organization (CellOrg)',
     type: 'interactive',
