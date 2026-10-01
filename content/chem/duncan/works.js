@@ -3,7 +3,8 @@
 KOC.works('chem', 'duncan', [
   {
     id: 'calcarius',
-    title: 'S3 Rocks (Earth4)',
+    title: 'Earth4B_Limecycle',
+    original: 'Calcarius',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Rocks Earth4 Earth4B Limecycle',
@@ -14,7 +15,8 @@ KOC.works('chem', 'duncan', [
   },
   {
     id: 'gut-shot',
-    title: 'S3/S4 Senior Biology SB02 Nutrition in humans (HumanNutri)',
+    title: 'SB02.2.4_Digestion',
+    original: 'Gut shot',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3/S4 Senior Biology SB02 2.4 Digestion',
@@ -25,7 +27,8 @@ KOC.works('chem', 'duncan', [
   },
   {
     id: 'structure-breach',
-    title: 'S3 Structures and properties of substances (MWI5)',
+    title: 'MWI5_Structures and properties of substances',
+    original: 'Structure breach',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Structures and properties of substances MWI5 MWI5A Giant metallic structure, MWI5B Giant ionic structure, MWI5C Simple molecular structure, MWI5D Giant covalent structure',
@@ -36,7 +39,8 @@ KOC.works('chem', 'duncan', [
   },
   {
     id: 'chem-topic-00-flashcards',
-    title: 'S3 Fundamentals of chemistry (Earth1)',
+    title: 'Earth1_Fundamentals of chemistry',
+    original: 'Topic 00 flashcards',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Fundamentals of chemistry Earth1 Earth1A Laboratory apparatus, Earth1B Laboratory safety',
@@ -47,7 +51,8 @@ KOC.works('chem', 'duncan', [
   },
   {
     id: 'chem-topic-01-flashcards',
-    title: 'S3 Atmosphere (Earth2)',
+    title: 'Earth2A_Matters',
+    original: 'Topic 01 flashcards',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Atmosphere Earth2 Earth2A Matters',
@@ -58,7 +63,8 @@ KOC.works('chem', 'duncan', [
   },
   {
     id: 'heat-energy-comic-panels',
-    title: 'S4 - S5 Energy changes in chemical reactions (Heat1)',
+    title: 'Heat1_Energy changes in chemical reactions',
+    original: 'Heat and energy comic',
     type: 'pdf',
     subject: 'Chem',
     chapter: 'S4 - S5 Energy changes in chemical reactions Heat1',

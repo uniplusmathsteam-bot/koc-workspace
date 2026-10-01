@@ -2,7 +2,8 @@
 KOC.works('bio-is', 'issac', [
   {
     id: 'cell-code-comic',
-    title: 'S3 Basic Biology BB03 Cellular organization (CellOrg)',
+    title: 'BB03_Cellular organization',
+    original: 'Cell code comic',
     type: 'pdf',
     subject: 'Bio',
     chapter: 'S3 Basic Biology BB03 3.1 Cells as the Basic Unit of Life, 3.2 Introduction to Microscopes, 3.3 Structures of Animal and Plant Cells, 3.4 Prokaryotic and Eukaryotic Cells',
@@ -13,7 +14,8 @@ KOC.works('bio-is', 'issac', [
   },
   {
     id: 'food-substance-functions',
-    title: 'S3/S4 Senior Biology SB01 Food and humans (FoodHuman)',
+    title: 'SB01.1.1_Food requirements of humans',
+    original: 'Food substance functions',
     type: 'interactive',
     subject: 'Bio',
     chapter: 'S3/S4 Senior Biology SB01 1.1 Food requirements of humans',
@@ -24,7 +26,8 @@ KOC.works('bio-is', 'issac', [
   },
   {
     id: 'food-deficit',
-    title: 'S3/S4 Senior Biology SB01 Food and humans (FoodHuman)',
+    title: 'SB01.1.1_Food requirements of humans + SB01.1.3_Balanced diet',
+    original: 'Food deficit',
     type: 'interactive',
     subject: 'Bio',
     chapter: 'S3/S4 Senior Biology SB01 1.1 Food requirements of humans, 1.3 Balanced diet',
@@ -35,7 +38,8 @@ KOC.works('bio-is', 'issac', [
   },
   {
     id: 'who-needs-more-race',
-    title: 'S3/S4 Senior Biology SB01 Food and humans (FoodHuman)',
+    title: 'SB01.1.1_Food requirements of humans',
+    original: 'Who needs more',
     type: 'interactive',
     subject: 'Bio',
     chapter: 'S3/S4 Senior Biology SB01 1.1 Food requirements of humans',
@@ -46,7 +50,8 @@ KOC.works('bio-is', 'issac', [
   },
   {
     id: 'food-test-lab',
-    title: 'S3/S4 Senior Biology SB01 Food and humans (FoodHuman)',
+    title: 'SB01.1.2_Summary of food tests',
+    original: 'Food test lab',
     type: 'interactive',
     subject: 'Bio',
     chapter: 'S3/S4 Senior Biology SB01 1.2 Summary of food tests',
@@ -57,7 +62,8 @@ KOC.works('bio-is', 'issac', [
   },
   {
     id: 'energy-calories-calculator',
-    title: 'S3/S4 Senior Biology SB01 Food and humans (FoodHuman)',
+    title: 'SB01.1.1_Food requirements of humans',
+    original: 'Energy calories calculator',
     type: 'interactive',
     subject: 'Bio',
     chapter: 'S3/S4 Senior Biology SB01 1.1 Food requirements of humans',

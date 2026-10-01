@@ -178,6 +178,7 @@ h1.page-title {
   margin-bottom: 20px;
 }
 .toolbar .spacer { flex: 1; }
+.toolbar .hint { font-size: 12.5px; color: var(--text-faint); }
 
 .chip {
   padding: 4px 10px;

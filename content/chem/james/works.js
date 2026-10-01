@@ -3,6 +3,7 @@ KOC.works('chem', 'james', [
   {
     id: 'earth3a-crystallisation',
     title: 'Earth3A_Physical separation_(notes)',
+    original: 'Slow crystallisation',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Ocean Earth3 Earth3A Physical separation',
@@ -14,6 +15,7 @@ KOC.works('chem', 'james', [
   {
     id: 'earth3a-distillation',
     title: 'Earth3A_Physical separation_(ex)',
+    original: 'Distillation apparatus',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Ocean Earth3 Earth3A Physical separation',
@@ -25,6 +27,7 @@ KOC.works('chem', 'james', [
   {
     id: 'earth3b-chemical-tests',
     title: 'Earth3B_Chemical tests and electrolysis_(PPT)',
+    original: 'Chemical tests',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Ocean Earth3 Earth3B Chemical tests and electrolysis',
@@ -36,6 +39,7 @@ KOC.works('chem', 'james', [
   {
     id: 'build-the-bench',
     title: 'Earth1A_Laboratory apparatus_(ex)',
+    original: 'Build the bench',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Fundamentals of chemistry Earth1 Earth1A Laboratory apparatus',
@@ -46,7 +50,8 @@ KOC.works('chem', 'james', [
   },
   {
     id: 'classification-of-matter',
-    title: 'S3 Atmosphere (Earth2)',
+    title: 'Earth2A_Matters',
+    original: 'Classification of matter',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Atmosphere Earth2 Earth2A Matters',
@@ -57,7 +62,8 @@ KOC.works('chem', 'james', [
   },
   {
     id: 'chem-lab-hq-scramble',
-    title: 'S3 Fundamentals of chemistry (Earth1)',
+    title: 'Earth1_Fundamentals of chemistry',
+    original: 'Chem Lab HQ scramble',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Fundamentals of chemistry Earth1 Earth1A Laboratory apparatus, Earth1B Laboratory safety',
@@ -98,7 +104,8 @@ KOC.works('chem', 'james', [
   },
   {
     id: 'whats-it-for',
-    title: 'S3 Fundamentals of chemistry (Earth1)',
+    title: 'Earth1A_Laboratory apparatus',
+    original: 'What\'s it for',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Fundamentals of chemistry Earth1 Earth1A Laboratory apparatus',
@@ -109,7 +116,8 @@ KOC.works('chem', 'james', [
   },
   {
     id: 'meet-the-kit',
-    title: 'S3 Fundamentals of chemistry (Earth1)',
+    title: 'Earth1A_Laboratory apparatus',
+    original: 'Meet the kit',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Fundamentals of chemistry Earth1 Earth1A Laboratory apparatus',
@@ -120,7 +128,8 @@ KOC.works('chem', 'james', [
   },
   {
     id: 'notes-wall',
-    title: 'S3 Fundamentals of chemistry (Earth1)',
+    title: 'Earth1A_Laboratory apparatus',
+    original: 'Notes wall',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Fundamentals of chemistry Earth1 Earth1A Laboratory apparatus',
@@ -131,7 +140,8 @@ KOC.works('chem', 'james', [
   },
   {
     id: 'name-that-piece',
-    title: 'S3 Fundamentals of chemistry (Earth1)',
+    title: 'Earth1A_Laboratory apparatus',
+    original: 'Name that piece',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Fundamentals of chemistry Earth1 Earth1A Laboratory apparatus',
@@ -142,7 +152,8 @@ KOC.works('chem', 'james', [
   },
   {
     id: 'spot-it',
-    title: 'S3 Fundamentals of chemistry (Earth1)',
+    title: 'Earth1A_Laboratory apparatus',
+    original: 'Spot it',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Fundamentals of chemistry Earth1 Earth1A Laboratory apparatus',
@@ -153,7 +164,8 @@ KOC.works('chem', 'james', [
   },
   {
     id: 'physical-chemical-separation',
-    title: 'S3 Atmosphere (Earth2)',
+    title: 'Earth2B_Physical and chemical change',
+    original: 'Physical and chemical separation',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Atmosphere Earth2 Earth2B Physical and chemical change',
@@ -164,7 +176,8 @@ KOC.works('chem', 'james', [
   },
   {
     id: 'liquid-air-fractional-distillation',
-    title: 'S3 Atmosphere (Earth2)',
+    title: 'Earth2C_Air',
+    original: 'Liquid air fractional distillation',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Atmosphere Earth2 Earth2C Air',
@@ -175,7 +188,8 @@ KOC.works('chem', 'james', [
   },
   {
     id: 'ram-calculator',
-    title: 'S3 Atom (MWI1)',
+    title: 'MWI1B_Isotope',
+    original: 'RAM calculator',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Atom MWI1 MWI1B Isotope',
@@ -186,7 +200,8 @@ KOC.works('chem', 'james', [
   },
   {
     id: 'atom-builder',
-    title: 'S3 Atom (MWI1)',
+    title: 'MWI1_Atom',
+    original: 'Atom builder',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Atom MWI1 MWI1A Atomic structure, MWI1B Isotope',
@@ -197,7 +212,8 @@ KOC.works('chem', 'james', [
   },
   {
     id: 'pick-your-tool',
-    title: 'S3 Fundamentals of chemistry (Earth1)',
+    title: 'Earth1A_Laboratory apparatus',
+    original: 'Pick your tool',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Fundamentals of chemistry Earth1 Earth1A Laboratory apparatus',

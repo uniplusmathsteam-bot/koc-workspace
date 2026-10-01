@@ -468,6 +468,83 @@ window.KOC = (function () {
 
   var route = { subject: null, koc: null, workSubject: null, work: null };
   var query = '';
+  var RANGE_KEY = 'koc-date-range';
+  var range = 'all';
+
+  function loadRange() {
+    try { range = sessionStorage.getItem(RANGE_KEY) || 'all'; } catch (e) { range = 'all'; }
+    if (['all', 'day', 'week', 'month'].indexOf(range) < 0) range = 'all';
+  }
+
+  function setRange(next) {
+    range = next;
+    try { sessionStorage.setItem(RANGE_KEY, range); } catch (e) { /* ignore */ }
+    render();
+  }
+
+  function parseSubmitted(value) {
+    var match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value || '');
+    if (!match) return null;
+    return new Date(+match[1], +match[2] - 1, +match[3]);
+  }
+
+  function startOfWeek(date) {
+    var day = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    var weekday = day.getDay();
+    day.setDate(day.getDate() - (weekday === 0 ? 6 : weekday - 1));
+    return day;
+  }
+
+  function inRange(work, mode, now) {
+    if (mode === 'all') return true;
+    var submitted = parseSubmitted(work.submitted);
+    if (!submitted) return false;
+    if (mode === 'day') {
+      return submitted.getFullYear() === now.getFullYear() &&
+        submitted.getMonth() === now.getMonth() &&
+        submitted.getDate() === now.getDate();
+    }
+    if (mode === 'week') return startOfWeek(submitted).getTime() === startOfWeek(now).getTime();
+    if (mode === 'month') {
+      return submitted.getFullYear() === now.getFullYear() && submitted.getMonth() === now.getMonth();
+    }
+    return true;
+  }
+
+  function sortByDate(list) {
+    return list.slice().sort(function (a, b) {
+      return String(b.submitted || '').localeCompare(String(a.submitted || ''));
+    });
+  }
+
+  function applyRange(list) {
+    var now = new Date();
+    return sortByDate(list.filter(function (work) { return inRange(work, range, now); }));
+  }
+
+  function rangeBar(list) {
+    var now = new Date();
+    var modes = [['all', 'All'], ['day', 'Day'], ['week', 'Week'], ['month', 'Month']];
+    return '<div class="toolbar" role="toolbar" aria-label="Sort by date">' +
+      '<span class="section-label" style="margin:0">Date</span>' +
+      modes.map(function (mode) {
+        var count = list.filter(function (work) { return inRange(work, mode[0], now); }).length;
+        return '<button type="button" class="chip" data-range="' + mode[0] + '" aria-pressed="' +
+          (range === mode[0] ? 'true' : 'false') + '">' + mode[1] + ' ' + count + '</button>';
+      }).join('') +
+      '<span class="hint">Newest first</span></div>';
+  }
+
+  function emptyRange() {
+    var copy = {
+      day: 'Nothing submitted today.',
+      week: 'Nothing submitted this week.',
+      month: 'Nothing submitted this month.'
+    };
+    return '<div class="empty"><strong>No submissions in this range</strong>' +
+      (copy[range] || 'Nothing matches this date range.') + '</div>';
+  }
+
 
   function parseHash() {
     var raw = (location.hash || '').replace(/^#\/?/, '');
@@ -599,9 +676,7 @@ window.KOC = (function () {
     var cards = allKocProfiles().map(function (k) {
       var list = worksOfKoc(k.id);
       var r = rollup(list);
-      var latest = list.slice().sort(function (a, b) {
-        return String(b.submitted || '').localeCompare(String(a.submitted || ''));
-      })[0];
+      var latest = sortByDate(list)[0];
       var accent = k.memberships[0] ? k.memberships[0].subject.accent : '#3b6fd4';
 
       return '<button class="card" data-hash="#/koc/' + k.id + '">' +
@@ -611,7 +686,7 @@ window.KOC = (function () {
         '<div class="card-body">' +
           '<div class="card-title"><span class="emoji">' + esc(k.icon) + '</span><span>' + esc(k.name) +
             (k.leader ? ' <span class="tag blue">KOC lead</span>' : '') + '</span></div>' +
-          '<div class="card-sub">' + (latest ? 'Latest: ' + esc(latest.title) : 'No submissions yet') + '</div>' +
+          '<div class="card-sub">' + (latest ? 'Latest: ' + esc(latest.original ? latest.title + ' — ' + latest.original : latest.title) : 'No submissions yet') + '</div>' +
         '</div>' +
       '</button>';
     }).join('');
@@ -625,6 +700,9 @@ window.KOC = (function () {
       kocChart() +
       '<div class="toolbar"><span class="section-label" style="margin:0">KOCs</span></div>' +
       '<div class="grid">' + cards + '</div>' +
+      '<div class="section-label">Submissions</div>' +
+      rangeBar(allWorks()) +
+      submissionGrid(allWorks(), true) +
       (missingFiles.length ? warnBox() : '');
   }
 
@@ -691,9 +769,7 @@ window.KOC = (function () {
     var cards = s.kocs.map(function (k) {
       var list = worksOf(s.id, k.id);
       var r = rollup(list);
-      var latest = list.slice().sort(function (a, b) {
-        return String(b.submitted || '').localeCompare(String(a.submitted || ''));
-      })[0];
+      var latest = sortByDate(list)[0];
       var cover = latest && latest.cover
         ? '<img src="' + esc(latest.cover) + '" alt="" loading="lazy" onerror="KOC.coverFail(this)">'
         : fallbackCover(k.icon, k.name, s.accent);
@@ -705,7 +781,7 @@ window.KOC = (function () {
         '<div class="card-body">' +
           '<div class="card-title"><span class="emoji">' + esc(k.icon) + '</span><span>' + esc(k.name) +
             (k.leader ? ' <span class="tag blue">KOC lead</span>' : '') + '</span></div>' +
-          '<div class="card-sub">' + (latest ? 'Latest: ' + esc(latest.title) : 'No submissions yet') + '</div>' +
+          '<div class="card-sub">' + (latest ? 'Latest: ' + esc(latest.original ? latest.title + ' — ' + latest.original : latest.title) : 'No submissions yet') + '</div>' +
           '<div class="props">' +
             (r.pending ? '<span class="tag amber">' + r.pending + ' pending</span>' : '') +
             (r.approved ? '<span class="tag green">' + r.approved + ' approved</span>' : '') +
@@ -790,21 +866,37 @@ window.KOC = (function () {
 
   /* ----- level 3: one KOC's works ----- */
 
+  function submissionGrid(list, withName) {
+    var shown = applyRange(list);
+    if (!list.length) return '';
+    if (!shown.length) return emptyRange();
+    return '<div class="grid">' + shown.map(function (w) {
+      var card = workCard(w, findSubject(w.subjectId));
+      if (!withName) return card;
+      var k = findKocProfile(w.kocId);
+      return card.replace('<div class="card-sub">',
+        '<div class="card-sub">' + esc((k ? k.name : w.kocId) + ' · '));
+    }).join('') + '</div>';
+  }
+
   function renderKoc(k) {
     var list = worksOfKoc(k.id);
     var r = rollup(list);
+    var shown = applyRange(list);
 
-    var body = list.length
-      ? '<div class="grid">' + list.map(function (w) {
-          return workCard(w, findSubject(w.subjectId));
-        }).join('') + '</div>'
-      : '<div class="empty"><strong>No submissions yet</strong>' +
+    var body = !list.length
+      ? '<div class="empty"><strong>No submissions yet</strong>' +
           'Work appears here once ' + esc(k.name) + ' adds a card to their <code>works.js</code> file.' +
-        '</div>';
+        '</div>'
+      : rangeBar(list) + (shown.length
+          ? '<div class="grid">' + shown.map(function (w) {
+              return workCard(w, findSubject(w.subjectId));
+            }).join('') + '</div>'
+          : emptyRange());
 
     el('view').innerHTML =
-      head(k.icon, k.name, 'All work claimed by this KOC, regardless of subject.', [
-        '<span>' + plural(r.total, 'submission') + '</span>'
+      head(k.icon, k.name, 'All work claimed by this KOC, regardless of subject. Sorted by date.', [
+        '<span>' + plural(shown.length, 'submission') + '</span>'
       ]) + body;
   }
 
@@ -821,7 +913,7 @@ window.KOC = (function () {
       '</div>' +
       '<div class="card-body">' +
         '<div class="card-title"><span>' + esc(w.title) + '</span></div>' +
-        '<div class="card-sub">' + esc([w.chapter, prettyDate(w.submitted)].filter(Boolean).join(' · ')) + '</div>' +
+        '<div class="card-sub">' + esc((w.original ? [w.original, prettyDate(w.submitted)] : [w.chapter, prettyDate(w.submitted)]).filter(Boolean).join(' · ')) + '</div>' +
         '<div class="props"><span class="tag blue">Subject: ' + esc(taskSubject(w)) + '</span>' +
           w.tags.slice(0, 3).map(function (tg) { return '<span class="tag">' + esc(tg) + '</span>'; }).join('') +
         '</div>' +
@@ -835,21 +927,24 @@ window.KOC = (function () {
     var q = query.toLowerCase();
     var hits = allWorks().filter(function (w) {
       var s = findSubject(w.subjectId), k = findKocProfile(w.kocId);
-      var hay = [w.title, w.chapter, w.notes, w.tags.join(' '), k && k.name,
+      var hay = [w.title, w.original, w.chapter, w.notes, w.tags.join(' '), k && k.name,
         taskSubject(w), s && s.name, w.type].join(' ').toLowerCase();
       return hay.indexOf(q) > -1;
     });
 
-    var body = hits.length
-      ? '<div class="grid">' + hits.map(function (w) {
-          var s = findSubject(w.subjectId), k = findKocProfile(w.kocId);
-          return workCard(w, s).replace('<div class="card-sub">',
-            '<div class="card-sub">' + esc(k.name + ' · ' + taskSubject(w)) + ' — ');
-        }).join('') + '</div>'
-      : '<div class="empty"><strong>No matches</strong>Nothing found for “' + esc(query) + '”.</div>';
+    var shown = applyRange(hits);
+    var body = !hits.length
+      ? '<div class="empty"><strong>No matches</strong>Nothing found for “' + esc(query) + '”.</div>'
+      : rangeBar(hits) + (shown.length
+          ? '<div class="grid">' + shown.map(function (w) {
+              var s = findSubject(w.subjectId), k = findKocProfile(w.kocId);
+              return workCard(w, s).replace('<div class="card-sub">',
+                '<div class="card-sub">' + esc(k.name + ' · ' + taskSubject(w)) + ' — ');
+            }).join('') + '</div>'
+          : emptyRange());
 
     el('view').innerHTML =
-      head('🔍', 'Search', plural(hits.length, 'result') + ' for “' + query + '” across all teams.', []) + body;
+      head('🔍', 'Search', plural(shown.length, 'result') + ' for “' + query + '” across all teams.', []) + body;
   }
 
   /* ---------------- detail overlay ---------------- */
@@ -861,7 +956,7 @@ window.KOC = (function () {
     var t = TYPES[w.type];
 
     el('ov-icon').textContent = t.icon;
-    el('ov-name').textContent = w.title;
+    el('ov-name').textContent = w.original ? w.title + ' — ' + w.original : w.title;
     el('ov-sub').textContent = [k.name, taskSubject(w), w.chapter, prettyDate(w.submitted)].filter(Boolean).join(' · ');
 
     var open = el('ov-open');
@@ -963,6 +1058,9 @@ window.KOC = (function () {
 
   function bind() {
     document.addEventListener('click', function (e) {
+      var rangeBtn = e.target.closest('[data-range]');
+      if (rangeBtn) { setRange(rangeBtn.getAttribute('data-range')); return; }
+
       var card = e.target.closest('[data-hash]');
       if (card) { go(card.getAttribute('data-hash')); return; }
 
@@ -1070,6 +1168,7 @@ window.KOC = (function () {
 
     loadReview();
     loadDraft();
+    loadRange();
     bind();
     route = parseHash();
     loadDataFiles(function () {

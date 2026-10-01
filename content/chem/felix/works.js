@@ -2,7 +2,8 @@
 KOC.works('chem', 'felix', [
   {
     id: 'topic-01-part-2-lq-set-2',
-    title: 'S3 Atmosphere (Earth2)',
+    title: 'Earth2_Atmosphere',
+    original: 'Topic 01 Part 2 LQ set 2',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Atmosphere Earth2 Earth2A Matters, Earth2B Physical and chemical change, Earth2C Air',
@@ -13,7 +14,8 @@ KOC.works('chem', 'felix', [
   },
   {
     id: 'earth3a-physical-separation-mc',
-    title: 'S3 Ocean (Earth3)',
+    title: 'Earth3A_Physical separation_(ex)',
+    original: 'MC sets',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Ocean Earth3 Earth3A Physical separation',
@@ -24,7 +26,8 @@ KOC.works('chem', 'felix', [
   },
   {
     id: 'earth3b-chemical-tests-electrolysis-mc',
-    title: 'S3 Ocean (Earth3)',
+    title: 'Earth3B_Chemical tests and electrolysis_(ex)',
+    original: 'MC sets',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Ocean Earth3 Earth3B Chemical tests and electrolysis',
@@ -35,7 +38,8 @@ KOC.works('chem', 'felix', [
   },
   {
     id: 'earth2c-air-mc',
-    title: 'S3 Atmosphere (Earth2)',
+    title: 'Earth2C_Air_(ex)',
+    original: 'MC sets',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Atmosphere Earth2 Earth2C Air',
@@ -46,7 +50,8 @@ KOC.works('chem', 'felix', [
   },
   {
     id: 'earth2b-physical-chemical-change-mc',
-    title: 'S3 Atmosphere (Earth2)',
+    title: 'Earth2B_Physical and chemical change_(ex)',
+    original: 'MC sets',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Atmosphere Earth2 Earth2B Physical and chemical change',
@@ -57,7 +62,8 @@ KOC.works('chem', 'felix', [
   },
   {
     id: 'earth2a-matters-mc',
-    title: 'S3 Atmosphere (Earth2)',
+    title: 'Earth2A_Matters_(ex)',
+    original: 'MC sets',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Atmosphere Earth2 Earth2A Matters',
@@ -68,7 +74,8 @@ KOC.works('chem', 'felix', [
   },
   {
     id: 'topic-01-parts-2-3',
-    title: 'S3 Atmosphere (Earth2), S3 Ocean (Earth3)',
+    title: 'Earth2_Atmosphere + Earth3_Ocean',
+    original: 'Topic 01 Parts 2 and 3',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Atmosphere Earth2 Earth2A Matters, Earth2B Physical and chemical change, Earth2C Air, S3 Ocean Earth3 Earth3A Physical separation, Earth3B Chemical tests and electrolysis',
@@ -79,7 +86,8 @@ KOC.works('chem', 'felix', [
   },
   {
     id: 'earth1b-laboratory-safety-mc',
-    title: 'S3 Fundamentals of chemistry (Earth1)',
+    title: 'Earth1B_Laboratory safety_(ex)',
+    original: 'MC sets',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Fundamentals of chemistry Earth1 Earth1B Laboratory safety',
@@ -92,7 +100,8 @@ KOC.works('chem', 'felix', [
 
   {
     id: 'earth1a-laboratory-apparatus-mc',
-    title: 'S3 Fundamentals of chemistry (Earth1)',
+    title: 'Earth1A_Laboratory apparatus_(ex)',
+    original: 'MC sets',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Fundamentals of chemistry Earth1 Earth1A Laboratory apparatus',
@@ -103,7 +112,8 @@ KOC.works('chem', 'felix', [
   },
   {
     id: 'metal-extraction-arcade',
-    title: 'S3 Rocks (Earth4)',
+    title: 'Earth4A_Extraction of metals',
+    original: 'Metal extraction arcade',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Rocks Earth4 Earth4A Extraction of metals',
@@ -114,7 +124,8 @@ KOC.works('chem', 'felix', [
   },
   {
     id: 'word-equation-worksheet',
-    title: 'S3 Rocks (Earth4), S3 Atmosphere (Earth2), S3 Ocean (Earth3)',
+    title: 'Earth4B_Limecycle + Earth2C_Air + Earth4A_Extraction of metals + Earth3B_Chemical tests and electrolysis',
+    original: 'Word equation worksheet',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Rocks Earth4 Earth4B Limecycle, S3 Atmosphere Earth2 Earth2C Air, S3 Rocks Earth4 Earth4A Extraction of metals, S3 Ocean Earth3 Earth3B Chemical tests and electrolysis',
@@ -125,7 +136,8 @@ KOC.works('chem', 'felix', [
   },
   {
     id: 'flame-test-sim',
-    title: 'S3 Ionic bond and metallic bond (MWI3)',
+    title: 'MWI3E_Color of ions',
+    original: 'Flame test',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Ionic bond and metallic bond MWI3 MWI3E Color of ions',
@@ -137,7 +149,8 @@ KOC.works('chem', 'felix', [
 
   {
     id: 'lab-safety-flashcard',
-    title: 'S3 Fundamentals of chemistry (Earth1)',
+    title: 'Earth1_Fundamentals of chemistry',
+    original: 'Lab safety flashcards',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Fundamentals of chemistry Earth1 Earth1A Laboratory apparatus, Earth1B Laboratory safety',
@@ -149,7 +162,8 @@ KOC.works('chem', 'felix', [
 
   {
     id: 'atom-interactive-lab',
-    title: 'S3 Atom (MWI1)',
+    title: 'MWI1_Atom',
+    original: 'Atom interactive lab',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Atom MWI1 MWI1A Atomic structure, MWI1B Isotope',

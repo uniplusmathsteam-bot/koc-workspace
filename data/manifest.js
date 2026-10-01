@@ -13,15 +13,15 @@ KOC.manifest([
   'content/maths/bobby/works.js?v=20261001b',
 
   'content/chem/keith/works.js?v=20261001c',
-  'content/chem/james/works.js?v=20260928b',
-  'content/chem/felix/works.js?v=20261001d',
+  'content/chem/james/works.js?v=20261001h',
+  'content/chem/felix/works.js?v=20261001h',
   'content/chem/adrain/works.js',
-  'content/chem/duncan/works.js',
+  'content/chem/duncan/works.js?v=20261001h',
 
   'content/phy/winnie/works.js',
   'content/phy/jerry/works.js',
 
   'content/bio-is/jeff/works.js',
-  'content/bio-is/issac/works.js',
-  'content/bio-is/javin/works.js?v=20261001comics'
+  'content/bio-is/issac/works.js?v=20261001h',
+  'content/bio-is/javin/works.js?v=20261001h'
 ]);
