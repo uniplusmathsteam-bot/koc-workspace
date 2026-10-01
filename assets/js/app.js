@@ -622,6 +622,7 @@ window.KOC = (function () {
         '<span>' + plural(all.total, 'submission') + '</span>',
         '<span>Updated ' + prettyDate(latestDate()) + '</span>'
       ]) +
+      monthChart() +
       '<div class="toolbar"><span class="section-label" style="margin:0">KOCs</span></div>' +
       '<div class="grid">' + cards + '</div>' +
       (missingFiles.length ? warnBox() : '');
@@ -631,6 +632,83 @@ window.KOC = (function () {
     var best = '';
     allWorks().forEach(function (w) { if (w.submitted && w.submitted > best) best = w.submitted; });
     return best;
+  }
+
+  var MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  function monthKey(iso) {
+    return /^\d{4}-\d{2}/.test(iso || '') ? iso.slice(0, 7) : '';
+  }
+
+  function nextMonth(key) {
+    var year = +key.slice(0, 4);
+    var month = +key.slice(5, 7) + 1;
+    if (month > 12) { month = 1; year += 1; }
+    return year + '-' + String(month).padStart(2, '0');
+  }
+
+  /* One bar per month, from the earliest submission through this month.
+     Counts come from each work's submitted date, so a new card updates the chart. */
+  function monthlySeries() {
+    var counts = {};
+    var min = '';
+    var max = '';
+    var undated = 0;
+    allWorks().forEach(function (w) {
+      var key = monthKey(w.submitted);
+      if (!key) { undated += 1; return; }
+      counts[key] = (counts[key] || 0) + 1;
+      if (!min || key < min) min = key;
+      if (!max || key > max) max = key;
+    });
+    var today = new Date();
+    var now = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
+    if (now && (!max || now > max)) max = now;
+    if (!min) min = max;
+    if (!min) return { months: [], undated: undated };
+    var months = [];
+    var cursor = min;
+    var guard = 0;
+    while (cursor <= max && guard < 120) {
+      var month = +cursor.slice(5, 7);
+      months.push({
+        key: cursor,
+        name: MONTH_NAMES[month - 1],
+        year: cursor.slice(0, 4),
+        count: counts[cursor] || 0
+      });
+      cursor = nextMonth(cursor);
+      guard += 1;
+    }
+    return { months: months, undated: undated };
+  }
+
+  function monthChart() {
+    var series = monthlySeries();
+    var months = series.months;
+    if (!months.length) return '';
+    var peak = 1;
+    months.forEach(function (m) { if (m.count > peak) peak = m.count; });
+    var spoken = months.map(function (m) {
+      return m.name + ' ' + m.year + ': ' + plural(m.count, 'work');
+    }).join(', ');
+    var cols = months.map(function (m) {
+      var height = m.count ? Math.max(6, Math.round(m.count / peak * 100)) : 0;
+      return '<div class="month-col' + (m.count ? '' : ' is-empty') + '">' +
+        '<span class="month-count">' + m.count + '</span>' +
+        '<div class="month-track"><div class="month-bar" style="height:' + height + '%"></div></div>' +
+        '<span class="month-name">' + esc(m.name) + '<span class="yr">' + esc(m.year) + '</span></span>' +
+      '</div>';
+    }).join('');
+    var note = 'Counted from each work’s submitted date, so this updates when work is added.';
+    if (series.undated) note += ' ' + plural(series.undated, 'work') + ' with no date ' + (series.undated === 1 ? 'is' : 'are') + ' left out.';
+    return '<section class="month-chart" aria-label="Submissions by month. ' + esc(spoken) + '">' +
+      '<div class="month-chart-head">' +
+        '<h2>Submissions by month</h2>' +
+        '<span class="hint">' + esc(note) + '</span>' +
+      '</div>' +
+      '<div class="month-bars">' + cols + '</div>' +
+    '</section>';
   }
 
   function warnBox() {
