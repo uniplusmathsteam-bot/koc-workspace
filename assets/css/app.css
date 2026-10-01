@@ -802,8 +802,35 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .month-bar {
   width: 100%;
   height: 0;
-  background: var(--blue-fg);
+  display: flex;
+  flex-direction: column-reverse;
   border-radius: 4px 4px 0 0;
+  overflow: hidden;
+}
+
+.month-seg { display: block; width: 100%; }
+
+.month-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 14px;
+  padding: 2px 16px 14px;
+}
+
+.month-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--text-soft);
+}
+
+.month-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex: none;
 }
 
 .month-col.is-empty .month-count { color: var(--text-faint); font-weight: 500; }
