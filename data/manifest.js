@@ -8,7 +8,7 @@
 KOC.manifest([
   'content/maths/eric/works.js?v=20260929',
   'content/maths/hugo/works.js',
-  'content/maths/rachel/works.js',
+  'content/maths/rachel/works.js?v=20261001',
   'content/maths/tracy/works.js?v=20260929',
   'content/maths/bobby/works.js?v=20260929',
 
