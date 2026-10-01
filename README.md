@@ -111,11 +111,11 @@ Data files are plain `<script>` files rather than JSON on purpose: browsers bloc
 Any static host works — GitHub Pages from the repo root needs no configuration. Points worth knowing:
 
 - Paths are relative, so serving from a subdirectory is fine.
-- Deep links work: `#/bio-is/jeff/chapter-1-comics` opens straight into that work.
+- Deep links work: `#/maths/hugo/balance-quest-inequalities` opens straight into that work.
 - `tools/serve.mjs` is for local use only — do not run it as the public host. On a static host the boards stay readable, and Save falls back to downloading `state.js`.
 - Interactive tools are embedded in an iframe, so a tool that breaks cannot break the gallery.
 - Suggest a `CODEOWNERS` entry per KOC folder so each team's push only needs their own lead's approval.
 
 ## Sample content
 
-Everything currently in `content/` is placeholder artwork generated for this review — SVG posters, one short MP4, and four working interactive tools (quadratic transformer, projectile playground, titration curve lab, cell organelle explorer). Delete a KOC's samples as they land real work.
+Placeholder review assets (posters, the sample reel, and the demo interactive tools) have been removed. Cards in `content/` are real submissions. A KOC with nothing submitted yet has an empty list in their `works.js`.

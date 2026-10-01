@@ -157,17 +157,5 @@ KOC.works('chem', 'felix', [
     tags: ['Interactive', 'Atomic structure', 'Shells'],
     src: 'content/chem/felix/atom-interactive-lab/index.html',
     notes: 'Build atoms from the first 20 elements; adjust protons, neutrons and electrons. Stability follows octet/duplet outer-shell rules.'
-  },
-  {
-    id: 'rate-of-reaction-cheatsheet',
-    title: 'S4 - S5 Factors affecting rate of reaction (Rate2)',
-    type: 'image',
-    chapter: 'S4 - S5 Factors affecting rate of reaction Rate2',
-    submitted: '2026-08-07',
-    status: 'approved',
-    tags: ['One-pager', 'Kinetics'],
-    cover: 'content/chem/felix/rate-graph.svg',
-    src: 'content/chem/felix/rate-graph.svg',
-    notes: 'Single-page summary of the four factors affecting rate, with the graph shapes students keep mixing up.'
   }
 ]);

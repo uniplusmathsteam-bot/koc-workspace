@@ -65,21 +65,5 @@ KOC.works('bio-is', 'issac', [
     tags: ['Interactive', 'Energy', 'Calculator'],
     src: 'content/bio-is/issac/food-nutrition/energy-calories.html',
     notes: 'Pick a food, then energy amount, nutrient, or top-5 ranking with exam-style working.'
-  },
-  {
-    id: 'enzyme-lab-set',
-    title: 'Enzyme Practical Photo Set',
-    type: 'gallery',
-    chapter: 'Bio Ch. 3',
-    submitted: '2026-08-13',
-    status: 'pending',
-    tags: ['Photos', 'Practical', 'Enzymes'],
-    cover: 'content/bio-is/issac/enzyme-1.svg',
-    srcs: [
-      'content/bio-is/issac/enzyme-1.svg',
-      'content/bio-is/issac/enzyme-2.svg',
-      'content/bio-is/issac/enzyme-3.svg'
-    ],
-    notes: 'Three step-by-step shots from the catalase practical for the worksheet header images.'
   }
 ]);

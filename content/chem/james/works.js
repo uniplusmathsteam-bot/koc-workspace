@@ -205,20 +205,5 @@ KOC.works('chem', 'james', [
     tags: ['Interactive', 'S3', 'Lab apparatus'],
     src: 'content/chem/james/pick-your-tool/index.html',
     notes: 'S3 Topic 01 kit-then-quiz: look at the apparatus, then pick the right tool for the job. Seven questions per mix from a larger pool.'
-  },
-  {
-    id: 'organic-board-shots',
-    title: 'S4 - S5 Alkanes and alkenes (OrgI3)',
-    type: 'gallery',
-    chapter: 'S4 - S5 Alkanes and alkenes OrgI3',
-    submitted: '2026-08-14',
-    status: 'approved',
-    tags: ['Photos', 'Organic', 'Whiteboard'],
-    cover: 'content/chem/james/organic-1.svg',
-    srcs: [
-      'content/chem/james/organic-1.svg',
-      'content/chem/james/organic-2.svg'
-    ],
-    notes: 'Whiteboard captures from the IAL alkane naming session, cleaned up for the notes appendix.'
   }
 ]);
