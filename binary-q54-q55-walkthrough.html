@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Binary Numbers — Marbles Question (Step-by-Step)</title>
+<style>
+  :root {
+    --bg: #f6f7fb;
+    --card: #ffffff;
+    --ink: #1d2433;
+    --muted: #5b6475;
+    --line: #e2e6ef;
+    --accent: #3b6ef5;
+    --accent-soft: #e8efff;
+    --good: #14915f;
+    --good-soft: #e3f6ee;
+    --bad: #c8434b;
+    --bad-soft: #fbe9ea;
+    --hl: #fff2c4;
+    --shadow: 0 1px 2px rgba(20, 30, 60, .06), 0 6px 20px rgba(20, 30, 60, .06);
+  }
+  [data-theme="dark"] {
+    --bg: #12151c;
+    --card: #1b1f29;
+    --ink: #e8ebf2;
+    --muted: #9aa3b5;
+    --line: #2c3240;
+    --accent: #7a9cff;
+    --accent-soft: #232d48;
+    --good: #4fd19a;
+    --good-soft: #17352a;
+    --bad: #ff7b83;
+    --bad-soft: #3a1f23;
+    --hl: #4a3f17;
+    --shadow: none;
+  }
+  * { box-sizing: border-box; }
+  body {
+    position: relative;
+    margin: 0;
+    font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  header {
+    position: sticky; top: 0; z-index: 5;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 24px;
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+  }
+  header h1 { margin: 0; font-size: 18px; }
+  main { max-width: 960px; margin: 0 auto; padding: 24px 16px 120px; }
+
+  .btn {
+    font: inherit; font-size: 14px;
+    padding: 6px 14px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--card);
+    color: var(--ink);
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .btn:hover { border-color: var(--accent); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn:disabled { opacity: .45; cursor: default; }
+  .btn.small { padding: 3px 10px; font-size: 13px; }
+
+  .question {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .q-head { padding: 20px 24px; border-bottom: 1px solid var(--line); }
+  .q-num {
+    display: inline-block;
+    font-size: 13px; font-weight: 600;
+    color: var(--accent); background: var(--accent-soft);
+    padding: 2px 10px; border-radius: 99px;
+    margin-bottom: 8px;
+  }
+  .q-text { margin: 0; font-size: 18px; }
+
+  .steps { list-style: none; margin: 0; padding: 16px 24px 4px; counter-reset: step; }
+  .step {
+    position: relative;
+    padding: 14px 16px 14px 56px;
+    margin-bottom: 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    counter-increment: step;
+    animation: pop .25s ease-out;
+  }
+  .step::before {
+    content: counter(step);
+    position: absolute; left: 14px; top: 14px;
+    width: 28px; height: 28px; line-height: 28px;
+    text-align: center; font-weight: 700; font-size: 14px;
+    border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent);
+  }
+  .step.hidden { display: none; }
+  .step.latest { border-color: var(--accent); }
+  .step h3 { margin: 2px 0 6px; font-size: 16px; }
+  .step p { margin: 6px 0; }
+  .why { color: var(--muted); font-size: 14.5px; }
+  .todo { font-size: 14px; font-weight: 600; color: var(--accent); }
+  @keyframes pop { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  .controls {
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+    padding: 8px 24px 20px;
+  }
+  .progress { margin-left: auto; font-size: 14px; color: var(--muted); }
+
+  .math {
+    font-family: "Cambria Math", Cambria, "Times New Roman", serif;
+    font-size: 17px;
+  }
+  .calc { margin: 8px 0; padding: 10px 14px; background: var(--bg); border-radius: 8px; overflow-x: auto; }
+  .calc div { white-space: nowrap; }
+
+  .answer {
+    display: inline-block;
+    margin-top: 6px; padding: 4px 12px;
+    background: var(--good-soft); color: var(--good);
+    border-radius: 8px; font-weight: 700;
+  }
+  .tick { color: var(--good); font-weight: 700; }
+  .cross { color: var(--bad); font-weight: 700; }
+
+  .tip {
+    margin: 10px 0 0; padding: 10px 14px;
+    border-left: 4px solid var(--accent);
+    background: var(--accent-soft);
+    border-radius: 0 8px 8px 0;
+    font-size: 14.5px;
+  }
+
+  [data-after] { display: none; }
+  [data-after].shown { display: block; animation: pop .25s ease-out; }
+
+  /* ── All-1s table ── */
+  .scroll { overflow-x: auto; }
+  table.ones { border-collapse: collapse; margin: 10px 0; font-size: 17px; }
+  table.ones th, table.ones td { border: 1px solid var(--line); padding: 6px 14px; }
+  table.ones th { background: var(--bg); font-weight: 700; text-align: center; }
+  table.ones td.bin { text-align: right; min-width: 130px; }
+  table.ones td.den { min-width: 300px; }
+  table.ones td.mul { min-width: 150px; text-align: center; }
+  table.ones tr.win td { background: var(--good-soft); }
+  table.ones td.dots { text-align: center; color: var(--muted); }
+
+  /* ── Tap to reveal ── */
+  .reveal {
+    font: inherit; cursor: pointer;
+    border: 1px dashed var(--accent); border-radius: 6px;
+    background: var(--accent-soft); color: var(--accent);
+    padding: 0 10px; margin: 0 2px;
+  }
+  .reveal:hover { background: var(--card); }
+  .reveal.open { border-style: solid; border-color: transparent; background: transparent; color: var(--ink); cursor: default; padding: 0; animation: pop .25s ease-out; }
+  .reveal.open.mark { background: var(--hl); padding: 0 8px; font-weight: 700; }
+  .reveal:disabled:not(.open) { opacity: .45; cursor: default; }
+  .row-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+
+  /* ── Quick-check inputs ── */
+  .ask { display: inline-flex; align-items: center; gap: 4px; vertical-align: middle; }
+  .ask input {
+    width: 4.2em; font: inherit; font-size: 16px; text-align: center;
+    padding: 1px 4px; border: 2px solid var(--line); border-radius: 6px;
+    background: var(--card); color: var(--ink);
+  }
+  .ask input.ok { border-color: var(--good); background: var(--good-soft); }
+  .ask input.no { border-color: var(--bad); background: var(--bad-soft); animation: shake .3s; }
+  .ask-msg { display: block; font-size: 14px; color: var(--bad); margin-top: 4px; }
+  @keyframes shake { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+
+  /* ── Multiple choice ── */
+  .mcq { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+  .mcq button { min-width: 64px; }
+  .mcq button.ok { background: var(--good-soft); border-color: var(--good); color: var(--good); font-weight: 700; }
+  .mcq button.no { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+
+  /* ── Pen overlay ── */
+  #ink { position: absolute; top: 0; left: 0; z-index: 10; pointer-events: none; touch-action: none; }
+  #ink.active { pointer-events: auto; cursor: crosshair; }
+  #ink.erasing { cursor: cell; }
+  .pen-bar {
+    position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 20;
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center;
+    padding: 8px 10px; max-width: calc(100vw - 24px);
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    box-shadow: 0 6px 24px rgba(20, 30, 60, .18);
+  }
+  .pen-bar .sep { width: 1px; height: 24px; background: var(--line); margin: 0 2px; }
+  .pen-bar .btn { padding: 4px 10px; font-size: 13px; display: inline-flex; align-items: center; gap: 5px; }
+  .pen-bar .btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .pen-bar .btn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .swatch {
+    width: 22px; height: 22px; border-radius: 50%; cursor: pointer; padding: 0;
+    border: 2px solid var(--card); box-shadow: 0 0 0 1px var(--line);
+  }
+  .swatch.on { box-shadow: 0 0 0 2px var(--accent); }
+  .size { width: 28px; height: 28px; padding: 0; justify-content: center; }
+  .size i { display: block; border-radius: 50%; background: currentColor; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Binary Numbers — Step-by-Step</h1>
+  <button class="btn" id="theme">Dark</button>
+</header>
+
+<main>
+<section class="question" id="q55" data-question>
+  <div class="q-head">
+    <span class="q-num">Question 55</span>
+    <p class="q-text">David and Alice have some marbles. The number of marbles that David has is 8 times that of Alice.
+      The total number of their marbles can be represented by a binary number such that each of its digits is 1.
+      Find the least possible number of marbles that David has.</p>
+  </div>
+
+  <ol class="steps">
+    <li class="step">
+      <h3>Introduce a variable</h3>
+      <p class="why">Alice has the smaller amount, so let her amount be the unknown.</p>
+      <div class="calc math">
+        <div>Let Alice have <i>n</i> marbles.</div>
+        <div>Then David has 8<i>n</i> marbles.</div>
+      </div>
+    </li>
+    <li class="step">
+      <h3>Find the total</h3>
+      <p class="todo">Fill in the box, then press Enter.</p>
+      <div class="calc math">
+        <div>Total = <i>n</i> + 8<i>n</i> = <span class="ask" data-answer="9" data-hints='{"8":"Don&apos;t forget Alice&apos;s n: n + 8n = (1 + 8)n."}'></span><i>n</i></div>
+      </div>
+      <p class="why" data-after>Key fact: <i>n</i> is a whole number, so the total must be a <b>multiple of 9</b>.</p>
+    </li>
+    <li class="step">
+      <h3>List binary numbers made only of 1s</h3>
+      <p class="why">The total is a binary number where every digit is 1, so it can be 1<sub>2</sub>, 11<sub>2</sub>, 111<sub>2</sub>, 1111<sub>2</sub>, …</p>
+      <p class="todo">Click each "?" to show its denary value one at a time. Then click "Check" to test whether it is a multiple of 9.</p>
+      <div data-widget="ones" data-rows="6"></div>
+      <p class="tip" data-after>Pattern: each new value is (previous × 2) + 1. A string of <i>k</i> ones equals 2<sup><i>k</i></sup> − 1.</p>
+    </li>
+    <li class="step">
+      <h3>Pick the least possible total</h3>
+      <p class="todo">Which is the smallest possible total of marbles?</p>
+      <div class="mcq" data-answer="63" data-hints='{"9":"9 is a multiple of 9, but 9 = 1001₂. That has 0s in it.","31":"31 = 11111₂ is all 1s, but 31 ÷ 9 is not a whole number.","126":"126 = 1111110₂ ends in a 0, so it is not all 1s."}'>
+        <button class="btn" data-v="9">9</button>
+        <button class="btn" data-v="31">31</button>
+        <button class="btn" data-v="63">63</button>
+        <button class="btn" data-v="126">126</button>
+      </div>
+      <p data-after>From the table, 63 = 111111<sub>2</sub> is the smallest number that is all 1s in binary <b>and</b> a multiple of 9.</p>
+    </li>
+    <li class="step">
+      <h3>Solve for <i>n</i></h3>
+      <p class="todo">Fill in the box, then press Enter.</p>
+      <div class="calc math">
+        <div>9<i>n</i> = 63</div>
+        <div>&ensp;<i>n</i> = <span class="ask" data-answer="7"></span></div>
+      </div>
+      <p class="why" data-after>So Alice has 7 marbles.</p>
+    </li>
+    <li class="step">
+      <h3>Answer the question asked: David's marbles</h3>
+      <p class="why">Careful: the question asks for David, not Alice and not the total.</p>
+      <div class="calc math">
+        <div>David = 8<i>n</i> = 8 × 7 = <span class="ask" data-answer="56" data-hints='{"7":"7 is Alice&apos;s amount. David has 8 times as many.","63":"63 is the total of both. The question asks for David only."}'></span></div>
+      </div>
+      <div data-after><span class="answer">The least possible number of marbles David has is 56.</span></div>
+    </li>
+    <li class="step">
+      <h3>Check</h3>
+      <p class="todo">Tap each box to check.</p>
+      <div class="calc math">
+        <div>Is David 8 times Alice? 56 = 8 × 7 <button class="reveal" data-reveal="✓">?</button></div>
+        <div>Is the total all 1s in binary? 56 + 7 = 63 = <button class="reveal" data-reveal="32 + 16 + 8 + 4 + 2 + 1 = 111111<sub>2</sub> ✓">?</button></div>
+      </div>
+    </li>
+  </ol>
+  <div class="controls">
+    <button class="btn primary" data-next>Next step</button>
+    <button class="btn" data-all>Show all</button>
+    <button class="btn" data-reset>Reset</button>
+    <span class="progress" data-progress></span>
+  </div>
+</section>
+</main>
+
+<div class="pen-bar" id="pen-bar" aria-label="Drawing tools">
+  <button class="btn on" data-tool="off" title="Pointer: use the page normally (Esc)">
+    <svg viewBox="0 0 24 24"><path d="M5 3l14 8-6 2-3 6z"/></svg>Pointer</button>
+  <button class="btn" data-tool="pen" title="Pen (P)">
+    <svg viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16z"/></svg>Pen</button>
+  <button class="btn" data-tool="hl" title="Highlighter (H)">
+    <svg viewBox="0 0 24 24"><path d="M9 15l-3 3h5l1-1M9 15l7-11 4 3-8 10z"/></svg>Highlight</button>
+  <button class="btn" data-tool="eraser" title="Eraser: removes whole strokes (E)">
+    <svg viewBox="0 0 24 24"><path d="M8 20h12M5 15l9-9 5 5-8 8H8z"/></svg>Eraser</button>
+  <span class="sep"></span>
+  <button class="swatch on" data-color="#e11d48" style="background:#e11d48" title="Red"></button>
+  <button class="swatch" data-color="#2563eb" style="background:#2563eb" title="Blue"></button>
+  <button class="swatch" data-color="#16a34a" style="background:#16a34a" title="Green"></button>
+  <button class="swatch" data-color="#f59e0b" style="background:#f59e0b" title="Orange"></button>
+  <button class="swatch" data-color="#111827" style="background:#111827" title="Black"></button>
+  <span class="sep"></span>
+  <button class="btn size" data-size="2" title="Thin"><i style="width:4px;height:4px"></i></button>
+  <button class="btn size on" data-size="4" title="Medium"><i style="width:7px;height:7px"></i></button>
+  <button class="btn size" data-size="8" title="Thick"><i style="width:11px;height:11px"></i></button>
+  <span class="sep"></span>
+  <button class="btn" id="ink-undo" title="Undo (Ctrl+Z)">
+    <svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5M4 9h10a6 6 0 010 12h-3"/></svg>Undo</button>
+  <button class="btn" id="ink-clear" title="Clear all drawing">
+    <svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>Clear</button>
+</div>
+
+<script>
+(function () {
+  function el(tag, cls, html) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (html != null) e.innerHTML = html;
+    return e;
+  }
+  function completeStep(node) {
+    var step = node.closest('.step');
+    if (step) step.querySelectorAll('[data-after]').forEach(function (a) { a.classList.add('shown'); });
+  }
+  function revealButton(html, mark) {
+    var b = el('button', 'reveal', '?');
+    b.type = 'button';
+    b.dataset.reveal = html;
+    if (mark) b.dataset.mark = '';
+    return b;
+  }
+  function open(b) {
+    if (b.classList.contains('open')) return false;
+    b.classList.add('open');
+    if (b.hasAttribute('data-mark')) b.classList.add('mark');
+    b.innerHTML = b.dataset.reveal;
+    return true;
+  }
+
+  /* Table of all-1s binary numbers: denary values hidden, revealed one by one */
+  function onesWidget(root) {
+    var rows = +root.dataset.rows;
+    var wrap = el('div', 'scroll');
+    var table = el('table', 'ones math');
+    table.innerHTML = '<tr><th>Binary number</th><th>Denary number</th><th>Multiple of 9?</th></tr>';
+    var denBtns = [], mulBtns = [];
+    for (var k = 1; k <= rows; k++) {
+      var v = Math.pow(2, k) - 1, terms = [];
+      for (var p = k - 1; p >= 0; p--) terms.push('2<sup>' + p + '</sup>');
+      var ok = v % 9 === 0;
+      var tr = el('tr');
+      var tdBin = el('td', 'bin', '1'.repeat(k) + '<sub>2</sub>');
+      var tdDen = el('td', 'den');
+      var tdMul = el('td', 'mul');
+      var den = revealButton(terms.join(' + ') + ' = <b>' + v + '</b>');
+      var mul = revealButton(ok
+        ? '<span class="tick">✓</span> 63 = 9 × 7'
+        : '<span class="cross">✗</span> ' + v + ' ÷ 9 = ' + Math.floor(v / 9) + ' r ' + (v % 9));
+      mul.textContent = 'Check';
+      mul.disabled = true;
+      (function (den, mul, tr, ok) {
+        den.addEventListener('click', function () { if (open(den)) mul.disabled = false; });
+        mul.addEventListener('click', function () {
+          if (!open(mul)) return;
+          if (ok) { tr.classList.add('win'); completeStep(root); }
+        });
+      })(den, mul, tr, ok);
+      denBtns.push(den); mulBtns.push(mul);
+      tdDen.append(den); tdMul.append(mul);
+      tr.append(tdBin, tdDen, tdMul);
+      table.append(tr);
+    }
+    table.append(el('tr', '', '<td class="dots">⋮</td><td class="dots">⋮</td><td class="dots">⋮</td>'));
+    wrap.append(table);
+
+    var acts = el('div', 'row-actions');
+    var next = el('button', 'btn small', 'Reveal next value');
+    next.addEventListener('click', function () {
+      var b = denBtns.filter(function (x) { return !x.classList.contains('open'); })[0];
+      if (b) b.click();
+      next.disabled = denBtns.every(function (x) { return x.classList.contains('open'); });
+    });
+    acts.append(next);
+    root.append(wrap, acts);
+  }
+
+  document.querySelectorAll('[data-widget="ones"]').forEach(onesWidget);
+
+  /* Tap-to-reveal buttons in the static markup */
+  document.querySelectorAll('.reveal[data-reveal]').forEach(function (b) {
+    if (b.closest('[data-widget]')) return;
+    b.dataset.mark = '';
+    b.addEventListener('click', function () {
+      open(b);
+      var step = b.closest('.step');
+      if (step && !step.querySelector('.reveal:not(.open)')) completeStep(b);
+    });
+  });
+
+  /* Type-the-answer boxes */
+  document.querySelectorAll('.ask').forEach(function (a) {
+    var input = el('input');
+    input.inputMode = 'numeric';
+    input.setAttribute('aria-label', 'Your answer');
+    var hints = a.dataset.hints ? JSON.parse(a.dataset.hints) : {};
+    var msg = el('span', 'ask-msg');
+    a.append(input);
+    a.closest('div').after(msg);
+    function check() {
+      var v = input.value.trim();
+      if (!v) return;
+      input.classList.remove('no');
+      if (v === a.dataset.answer) {
+        input.className = 'ok';
+        input.readOnly = true;
+        msg.textContent = '';
+        var step = a.closest('.step');
+        if (!step.querySelector('.ask input:not(.ok)')) completeStep(a);
+      } else {
+        void input.offsetWidth;
+        input.classList.add('no');
+        msg.textContent = hints[v] || 'Not quite. Try again.';
+      }
+    }
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    input.addEventListener('change', check);
+  });
+
+  /* Multiple choice */
+  document.querySelectorAll('.mcq').forEach(function (m) {
+    var hints = m.dataset.hints ? JSON.parse(m.dataset.hints) : {};
+    var msg = el('p', 'ask-msg');
+    m.after(msg);
+    m.querySelectorAll('button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        if (b.dataset.v === m.dataset.answer) {
+          b.classList.add('ok');
+          msg.textContent = '';
+          m.querySelectorAll('button').forEach(function (x) { x.disabled = x !== b; });
+          completeStep(m);
+        } else {
+          b.classList.add('no');
+          msg.textContent = hints[b.dataset.v] || 'Not quite.';
+        }
+      });
+    });
+  });
+
+  /* Step-by-step reveal */
+  document.querySelectorAll('[data-question]').forEach(function (q) {
+    var steps = Array.prototype.slice.call(q.querySelectorAll('.step'));
+    var next = q.querySelector('[data-next]');
+    var all = q.querySelector('[data-all]');
+    var progress = q.querySelector('[data-progress]');
+    var shown = 1;
+
+    function render(scroll) {
+      steps.forEach(function (s, i) {
+        s.classList.toggle('hidden', i >= shown);
+        s.classList.toggle('latest', i === shown - 1 && shown < steps.length);
+      });
+      next.disabled = shown >= steps.length;
+      all.disabled = shown >= steps.length;
+      progress.textContent = 'Step ' + shown + ' of ' + steps.length;
+      if (scroll) steps[shown - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    next.addEventListener('click', function () { if (shown < steps.length) { shown++; render(true); } });
+    all.addEventListener('click', function () { shown = steps.length; render(false); });
+    q.querySelector('[data-reset]').addEventListener('click', function () { location.reload(); });
+    render(false);
+  });
+
+  /* ── Pen overlay ── */
+  var canvas = el('canvas');
+  canvas.id = 'ink';
+  document.body.append(canvas);
+  var ctx = canvas.getContext('2d');
+  var bar = document.getElementById('pen-bar');
+  var tool = 'off', color = '#e11d48', size = 4;
+  var strokes = [], history = [], current = null, erasing = false;
+
+  function fit() {
+    var w = document.documentElement.clientWidth;
+    canvas.style.height = '0px';
+    var h = Math.max(document.documentElement.scrollHeight, window.innerHeight);
+    var dpr = window.devicePixelRatio || 1;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+    }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    redraw();
+  }
+  function drawStroke(s) {
+    var pts = s.points;
+    ctx.globalAlpha = s.hl ? 0.35 : 1;
+    ctx.strokeStyle = s.color;
+    ctx.fillStyle = s.color;
+    ctx.lineWidth = s.width;
+    ctx.lineCap = s.hl ? 'butt' : 'round';
+    ctx.lineJoin = 'round';
+    if (pts.length === 1) {
+      ctx.beginPath();
+      ctx.arc(pts[0].x, pts[0].y, s.width / 2, 0, Math.PI * 2);
+      ctx.fill();
+      return;
+    }
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (var i = 1; i < pts.length - 1; i++) {
+      var mx = (pts[i].x + pts[i + 1].x) / 2, my = (pts[i].y + pts[i + 1].y) / 2;
+      ctx.quadraticCurveTo(pts[i].x, pts[i].y, mx, my);
+    }
+    ctx.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
+    ctx.stroke();
+  }
+  function redraw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    strokes.forEach(drawStroke);
+    if (current) drawStroke(current);
+    ctx.globalAlpha = 1;
+  }
+  function snapshot() { history.push(strokes.slice()); if (history.length > 100) history.shift(); }
+  function point(e) { return { x: e.pageX, y: e.pageY }; }
+  function eraseAt(p) {
+    var r = 10;
+    var keep = strokes.filter(function (s) {
+      var reach = r + s.width / 2;
+      return !s.points.some(function (q) { return Math.abs(q.x - p.x) < reach && Math.abs(q.y - p.y) < reach; });
+    });
+    if (keep.length !== strokes.length) { strokes = keep; redraw(); }
+  }
+
+  canvas.addEventListener('pointerdown', function (e) {
+    if (tool === 'off' || e.button > 0) return;
+    e.preventDefault();
+    canvas.setPointerCapture(e.pointerId);
+    snapshot();
+    if (tool === 'eraser') { erasing = true; eraseAt(point(e)); return; }
+    current = {
+      color: color,
+      width: tool === 'hl' ? size * 5 : size,
+      hl: tool === 'hl',
+      points: [point(e)]
+    };
+    redraw();
+  });
+  canvas.addEventListener('pointermove', function (e) {
+    if (erasing) { eraseAt(point(e)); return; }
+    if (!current) return;
+    (e.getCoalescedEvents ? e.getCoalescedEvents() : [e]).forEach(function (ev) { current.points.push(point(ev)); });
+    redraw();
+  });
+  function endStroke() {
+    if (current) { strokes.push(current); current = null; redraw(); }
+    erasing = false;
+  }
+  canvas.addEventListener('pointerup', endStroke);
+  canvas.addEventListener('pointercancel', endStroke);
+
+  function setTool(t) {
+    tool = t;
+    canvas.classList.toggle('active', t !== 'off');
+    canvas.classList.toggle('erasing', t === 'eraser');
+    bar.querySelectorAll('[data-tool]').forEach(function (b) { b.classList.toggle('on', b.dataset.tool === t); });
+  }
+  function undo() {
+    if (!history.length) return;
+    strokes = history.pop();
+    redraw();
+  }
+  bar.querySelectorAll('[data-tool]').forEach(function (b) {
+    b.addEventListener('click', function () { setTool(b.dataset.tool); });
+  });
+  bar.querySelectorAll('[data-color]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      color = b.dataset.color;
+      bar.querySelectorAll('[data-color]').forEach(function (x) { x.classList.toggle('on', x === b); });
+      if (tool === 'off' || tool === 'eraser') setTool('pen');
+    });
+  });
+  bar.querySelectorAll('[data-size]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      size = +b.dataset.size;
+      bar.querySelectorAll('[data-size]').forEach(function (x) { x.classList.toggle('on', x === b); });
+    });
+  });
+  document.getElementById('ink-undo').addEventListener('click', undo);
+  document.getElementById('ink-clear').addEventListener('click', function () {
+    if (!strokes.length) return;
+    snapshot();
+    strokes = [];
+    redraw();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.target.matches('input, textarea')) return;
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); return; }
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var keys = { p: 'pen', h: 'hl', e: 'eraser', Escape: 'off' };
+    var t = keys[e.key.length === 1 ? e.key.toLowerCase() : e.key];
+    if (t) setTool(t);
+  });
+
+  window.addEventListener('resize', fit);
+  if (window.ResizeObserver) new ResizeObserver(fit).observe(document.querySelector('main'));
+  fit();
+
+  var themeBtn = document.getElementById('theme');
+  function setTheme(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    themeBtn.textContent = t === 'dark' ? 'Light' : 'Dark';
+    try { localStorage.setItem('walkthrough-theme', t); } catch (e) {}
+  }
+  themeBtn.addEventListener('click', function () {
+    setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+  try { setTheme(localStorage.getItem('walkthrough-theme') || 'light'); } catch (e) { setTheme('light'); }
+})();
+</script>
+</body>
+</html>
