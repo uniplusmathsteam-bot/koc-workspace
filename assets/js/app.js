@@ -622,7 +622,6 @@ window.KOC = (function () {
         '<span>' + plural(all.total, 'submission') + '</span>',
         '<span>Updated ' + prettyDate(latestDate()) + '</span>'
       ]) +
-      boardCard('all', 'All-team board', 'Seen by every KOC and reviewer.') +
       '<div class="toolbar"><span class="section-label" style="margin:0">KOCs</span></div>' +
       '<div class="grid">' + cards + '</div>' +
       (missingFiles.length ? warnBox() : '');
