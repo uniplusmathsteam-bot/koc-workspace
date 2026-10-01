@@ -367,6 +367,21 @@
     flex-direction: column;
   }
   .opt.pick { box-shadow: inset 0 0 0 2px var(--ink); }
+  .opt-list { margin: 0 0 14px; padding-left: 18px; color: var(--text); font-size: 16px; line-height: 1.5; }
+  .opt-list li + li { margin-top: 6px; }
+  .opt-list b { color: var(--red); }
+  .opt .blank { margin-top: auto; }
+  .both {
+    margin-top: 16px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 18px;
+  }
+  .both-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .both-row div { display: flex; flex-direction: column; gap: 2px; font-size: 16px; }
+  .both-row div > b { font-size: 17px; color: var(--ink); }
+  .both-row span { color: var(--soft); }
   .opt h3 { margin: 8px 0; font-size: 28px; letter-spacing: -0.03em; }
   .opt .who { color: var(--soft); font-size: 14px; }
   table.costs {
@@ -584,7 +599,7 @@
       <article class="check">
         <span class="tag wait">Friday morning</span>
         <h3>Budget plan</h3>
-        <p>Jeffery merges this with the existing budget plan before the meeting. Pro Plus versus one Ultra.</p>
+        <p>Both options are on the slide: everyone moves to Pro Plus, or no upgrades plus one Ultra. Monthly costs and current usage are still needed.</p>
       </article>
       <article class="check">
         <span class="tag wait">Waiting</span>
@@ -603,7 +618,7 @@
       <div class="ag"><time>15:05–15:20</time><div><strong>Bobby and Javin interviews</strong><p>Use the work just shown. Agree questions, interviewers and timing.</p></div></div>
       <div class="ag"><time>15:20–15:40</time><div><strong>Monthly performance tracking</strong><p>KOC Gallery for the work, plus a monthly Notion check-in listing items, hours and a self-evaluation.</p></div></div>
       <div class="ag"><time>15:40–16:00</time><div><strong>Invoice issues and check</strong><p>Incident summary, the outstanding 8,000, then a random date for last month’s invoices.</p></div></div>
-      <div class="ag"><time>16:00–16:25</time><div><strong>Tool costs and budget</strong><p>YouMind and Cursor. Pro Plus setup versus one Ultra plan.</p></div></div>
+      <div class="ag"><time>16:00–16:25</time><div><strong>Tool costs and budget</strong><p>Everyone on Pro Plus, or no upgrades plus one Ultra. YouMind and most GPAI accounts are cut either way.</p></div></div>
       <div class="ag"><time>16:25–16:30</time><div><strong>Wrap-up</strong><p>Decisions, owners and deadlines.</p></div></div>
     </div>
   </section>
@@ -616,7 +631,7 @@
       <div class="decision"><div class="num">2</div><div><h3>Bobby and Javin</h3><p>Interview questions, who interviews, and when.</p></div></div>
       <div class="decision"><div class="num">3</div><div><h3>Monthly tracking</h3><p>How the Gallery is used, the monthly Notion check-in, a deadline, and who reviews it.</p></div></div>
       <div class="decision"><div class="num">4</div><div><h3>Invoices</h3><p>Owner and next step for open incidents, including the 8,000. A random date, and how last month’s invoices get uploaded.</p></div></div>
-      <div class="decision"><div class="num">5</div><div><h3>Tools budget</h3><p>Preferred option for YouMind and Cursor, and the budget to go with it.</p></div></div>
+      <div class="decision"><div class="num">5</div><div><h3>Tools budget</h3><p>Pro Plus for everyone, or one Ultra, and the budget to go with it.</p></div></div>
     </div>
   </section>
 
@@ -799,7 +814,7 @@
     <div class="when">16:00–16:25</div>
     <p class="kicker">25 minutes · after invoices</p>
     <h1>Tool costs<br>and budget</h1>
-    <p class="lede">YouMind and Cursor. Jeffery’s Pro Plus setup, set against one Ultra plan.</p>
+    <p class="lede">Everyone on Pro Plus, or no upgrades plus one Ultra. YouMind and most of GPAI are cut either way.</p>
   </section>
 
   <section class="slide" data-id="costs" data-title="Current tool costs">
@@ -812,6 +827,7 @@
       <tbody>
         <tr><td>YouMind</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td></tr>
         <tr><td>Cursor</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td></tr>
+        <tr><td>GPAI</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td></tr>
       </tbody>
     </table>
     <div class="block" style="margin-top:16px">
@@ -824,17 +840,33 @@
   <section class="slide" data-id="options" data-title="Pro Plus vs Ultra">
     <p class="kicker">16:00–16:25 · Decide the option and the budget</p>
     <h2>Two options</h2>
-    <div class="compare">
+    <div class="compare" style="flex:0">
       <article class="opt">
-        <p class="who">Jeffery’s proposal · to merge with the old budget plan</p>
-        <h3>Pro Plus setup</h3>
-        <div class="blank">Who is on Pro Plus, what it costs, what it covers.</div>
+        <p class="who">Option A</p>
+        <h3>Everyone upgrades to Pro Plus</h3>
+        <ul class="opt-list">
+          <li>Every current account moves up to Pro Plus.</li>
+          <li>No new accounts are needed.</li>
+        </ul>
+        <div class="blank">Monthly cost</div>
       </article>
       <article class="opt">
-        <p class="who">The other option on the table</p>
-        <h3>One Ultra plan</h3>
-        <div class="blank">Who shares it, what it costs, what it covers.</div>
+        <p class="who">Option B</p>
+        <h3>No upgrades, buy one Ultra</h3>
+        <ul class="opt-list">
+          <li>Current accounts stay on their present plan.</li>
+          <li>One Ultra plan is added on top.</li>
+          <li><b>Ultra cannot be bought on a Gmail account.</b> We would need to open one more account on a company domain for it.</li>
+        </ul>
+        <div class="blank">Monthly cost</div>
       </article>
+    </div>
+    <div class="both">
+      <p class="label">Under either option</p>
+      <div class="both-row">
+        <div><b>YouMind</b><span>All remaining YouMind subscriptions are cut.</span></div>
+        <div><b>GPAI</b><span>All GPAI accounts are cut, except <b>act.koc.01</b>, which is kept.</span></div>
+      </div>
     </div>
     <div class="callout" style="background: var(--sunken); color: var(--ink);">
       <div>
@@ -859,7 +891,7 @@
         <tr><td>Gallery and monthly Notion check-in</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td></tr>
         <tr><td>Invoice incidents, including 8,000</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td></tr>
         <tr><td>Random invoice-check date</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td></tr>
-        <tr><td>YouMind and Cursor budget</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td></tr>
+        <tr><td>Pro Plus or Ultra, and the budget</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td></tr>
       </tbody>
     </table>
   </section>
