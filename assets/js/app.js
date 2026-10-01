@@ -622,7 +622,7 @@ window.KOC = (function () {
         '<span>' + plural(all.total, 'submission') + '</span>',
         '<span>Updated ' + prettyDate(latestDate()) + '</span>'
       ]) +
-      monthChart() +
+      kocChart() +
       '<div class="toolbar"><span class="section-label" style="margin:0">KOCs</span></div>' +
       '<div class="grid">' + cards + '</div>' +
       (missingFiles.length ? warnBox() : '');
@@ -634,121 +634,47 @@ window.KOC = (function () {
     return best;
   }
 
-  var MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-  function monthKey(iso) {
-    return /^\d{4}-\d{2}/.test(iso || '') ? iso.slice(0, 7) : '';
-  }
-
-  function nextMonth(key) {
-    var year = +key.slice(0, 4);
-    var month = +key.slice(5, 7) + 1;
-    if (month > 12) { month = 1; year += 1; }
-    return year + '-' + String(month).padStart(2, '0');
-  }
-
-  var KOC_COLORS = [
-    '#3b6fd4', '#1f9d55', '#d97706', '#c2414a', '#7c3aed',
-    '#0e7490', '#b45309', '#4d7c0f', '#be185d', '#1d4ed8',
-    '#0f766e', '#a16207', '#6d28d9', '#0369a1', '#9a3412'
-  ];
-
-  function kocLabel(kocId) {
-    var profile = findKocProfile(kocId);
-    return profile ? profile.name : (kocId || 'Unknown');
-  }
-
-  /* One bar per month, from the earliest submission through this month.
-     Each bar is stacked by KOC name. Counts come from submitted dates. */
-  function monthlySeries() {
+  /* One bar per KOC who has submitted something, alphabetical.
+     The count is their works, so a new card updates the chart. */
+  function activeKocSeries() {
     var counts = {};
-    var seen = {};
-    var min = '';
-    var max = '';
-    var undated = 0;
     allWorks().forEach(function (w) {
-      var key = monthKey(w.submitted);
-      if (!key) { undated += 1; return; }
       var id = w.kocId || 'unknown';
-      if (!counts[key]) counts[key] = {};
-      counts[key][id] = (counts[key][id] || 0) + 1;
-      seen[id] = true;
-      if (!min || key < min) min = key;
-      if (!max || key > max) max = key;
+      counts[id] = (counts[id] || 0) + 1;
     });
-    var today = new Date();
-    var now = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
-    if (now && (!max || now > max)) max = now;
-    if (!min) min = max;
-    if (!min) return { months: [], kocs: [], undated: undated };
-    var kocs = Object.keys(seen).map(function (id) {
-      return { id: id, name: kocLabel(id) };
+    return Object.keys(counts).filter(function (id) {
+      return counts[id] > 0;
+    }).map(function (id) {
+      var profile = findKocProfile(id);
+      return { id: id, name: profile ? profile.name : id, count: counts[id] };
     }).sort(function (a, b) {
       return a.name.localeCompare(b.name);
     });
-    var colorOf = {};
-    kocs.forEach(function (k, i) { colorOf[k.id] = KOC_COLORS[i % KOC_COLORS.length]; });
-    var months = [];
-    var cursor = min;
-    var guard = 0;
-    while (cursor <= max && guard < 120) {
-      var month = +cursor.slice(5, 7);
-      var byKoc = counts[cursor] || {};
-      var parts = kocs.map(function (k) {
-        return { id: k.id, name: k.name, count: byKoc[k.id] || 0, color: colorOf[k.id] };
-      }).filter(function (part) { return part.count > 0; });
-      var total = 0;
-      parts.forEach(function (part) { total += part.count; });
-      months.push({
-        key: cursor,
-        name: MONTH_NAMES[month - 1],
-        year: cursor.slice(0, 4),
-        count: total,
-        parts: parts
-      });
-      cursor = nextMonth(cursor);
-      guard += 1;
-    }
-    return { months: months, kocs: kocs, colors: colorOf, undated: undated };
   }
 
-  function monthChart() {
-    var series = monthlySeries();
-    var months = series.months;
-    if (!months.length) return '';
+  function kocChart() {
+    var kocs = activeKocSeries();
+    if (!kocs.length) return '';
     var peak = 1;
-    months.forEach(function (m) { if (m.count > peak) peak = m.count; });
-    var spoken = months.map(function (m) {
-      var who = m.parts.map(function (part) {
-        return part.name + ' ' + part.count;
-      }).join(', ');
-      return m.name + ' ' + m.year + ': ' + plural(m.count, 'work') + (who ? ' (' + who + ')' : '');
-    }).join('. ');
-    var cols = months.map(function (m) {
-      var height = m.count ? Math.max(6, Math.round(m.count / peak * 100)) : 0;
-      var segs = m.parts.map(function (part) {
-        return '<i class="month-seg" style="flex:' + part.count + ';background:' + part.color +
-          '" title="' + esc(part.name + ' · ' + m.name + ' ' + m.year + ' · ' + plural(part.count, 'work')) + '"></i>';
-      }).join('');
-      return '<div class="month-col' + (m.count ? '' : ' is-empty') + '">' +
-        '<span class="month-count">' + m.count + '</span>' +
-        '<div class="month-track"><div class="month-bar" style="height:' + height + '%">' + segs + '</div></div>' +
-        '<span class="month-name">' + esc(m.name) + '<span class="yr">' + esc(m.year) + '</span></span>' +
+    kocs.forEach(function (k) { if (k.count > peak) peak = k.count; });
+    var spoken = kocs.map(function (k) {
+      return k.name + ': ' + plural(k.count, 'work');
+    }).join(', ');
+    var cols = kocs.map(function (k) {
+      var height = Math.max(6, Math.round(k.count / peak * 100));
+      return '<div class="month-col">' +
+        '<span class="month-count">' + k.count + '</span>' +
+        '<div class="month-track"><div class="month-bar" style="height:' + height + '%" title="' +
+          esc(k.name + ' · ' + plural(k.count, 'work')) + '"></div></div>' +
+        '<span class="month-name">' + esc(k.name) + '</span>' +
       '</div>';
     }).join('');
-    var legend = series.kocs.map(function (k) {
-      return '<span class="month-key"><i class="month-swatch" style="background:' + series.colors[k.id] + '"></i>' +
-        esc(k.name) + '</span>';
-    }).join('');
-    var note = 'Each block is one KOC, alphabetical from the bottom. Counted from submitted dates, so this updates when work is added.';
-    if (series.undated) note += ' ' + plural(series.undated, 'work') + ' with no date ' + (series.undated === 1 ? 'is' : 'are') + ' left out.';
-    return '<section class="month-chart" aria-label="Submissions by month and KOC. ' + esc(spoken) + '">' +
+    return '<section class="month-chart" aria-label="Submissions by active KOC. ' + esc(spoken) + '">' +
       '<div class="month-chart-head">' +
-        '<h2>Submissions by month</h2>' +
-        '<span class="hint">' + esc(note) + '</span>' +
+        '<h2>Submissions by KOC</h2>' +
+        '<span class="hint">Active KOCs only, alphabetical. Updates when work is added.</span>' +
       '</div>' +
       '<div class="month-bars">' + cols + '</div>' +
-      (legend ? '<div class="month-legend">' + legend + '</div>' : '') +
     '</section>';
   }
 
