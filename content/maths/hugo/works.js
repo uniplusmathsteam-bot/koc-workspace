@@ -27,17 +27,5 @@ KOC.works('maths', 'hugo', [
            'Page 6 Budget Day applies everything to a word problem and ends with a five-step solving checklist. ' +
            'Read in order — each page assumes the one before. Panels are sized for both slide decks and IG carousels. ' +
            'Pages are the full-resolution originals; happy to export web-sized copies if you want them on the revision site.'
-  },
-  {
-    id: 'titration-curve-lab',
-    title: 'Titration Curve Lab',
-    type: 'interactive',
-    chapter: 'Chem Ch. 7',
-    submitted: '2026-08-15',
-    status: 'pending',
-    tags: ['Interactive', 'Titration', 'Indicators'],
-    cover: 'content/maths/hugo/titration-cover.svg',
-    src: 'content/maths/hugo/titration-lab.html',
-    notes: 'Strong and weak acid curves against 0.100 M NaOH, with three indicators so students can see why the choice matters. Carried over from my time on the Chem team.'
   }
 ]);
