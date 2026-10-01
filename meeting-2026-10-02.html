@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KOC Team Meeting · 2 Oct 2026</title>
+<style>
+  :root {
+    --ink: #1c1b19;
+    --text: #37352f;
+    --soft: #6f6e69;
+    --faint: #9b9a97;
+    --line: #e4e2dc;
+    --paper: #f7f6f3;
+    --card: #ffffff;
+    --sunken: #efeee9;
+    --dark: #1c1b19;
+    --dark-2: #2a2926;
+    --gold: #8a5a12;
+    --gold-bg: #f8ecd9;
+    --green: #1c6b5b;
+    --green-bg: #ddedea;
+    --red: #a83f37;
+    --red-bg: #ffe2dd;
+    --blue: #2b5c9b;
+    --blue-bg: #e0eefc;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: #d9d6ce;
+    color: var(--text);
+    font-family: Aptos, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  button, a { font: inherit; }
+
+  .deck { height: 100%; position: relative; }
+  .slide {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: var(--paper);
+    overflow: auto;
+    padding: 54px 72px 78px;
+  }
+  .slide.on { display: flex; flex-direction: column; }
+  .slide.dark {
+    background: var(--dark);
+    color: #f4f1ea;
+  }
+
+  .kicker {
+    margin: 0 0 10px;
+    font-size: 13px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--soft);
+    font-weight: 650;
+  }
+  .dark .kicker { color: #c8b48a; }
+  h1 {
+    margin: 0;
+    font-size: 64px;
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    font-weight: 650;
+    color: var(--ink);
+  }
+  .dark h1 { color: #f7f4ee; }
+  h2 {
+    margin: 0;
+    font-size: 40px;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    font-weight: 650;
+    color: var(--ink);
+  }
+  .lede {
+    margin: 16px 0 0;
+    max-width: 820px;
+    font-size: 20px;
+    line-height: 1.45;
+    color: var(--soft);
+  }
+  .dark .lede { color: #c9c4ba; }
+
+  .grow { flex: 1; }
+
+  /* title */
+  .title-slide { justify-content: center; }
+  .title-meta {
+    display: flex;
+    gap: 28px;
+    margin-top: 36px;
+    padding-top: 22px;
+    border-top: 1px solid rgba(255,255,255,.14);
+    font-size: 18px;
+    color: #e7e2d8;
+  }
+  .title-meta span { color: #a39e94; margin-right: 8px; }
+
+  /* agenda */
+  .agenda { margin-top: 28px; display: flex; flex-direction: column; gap: 0; }
+  .ag {
+    display: grid;
+    grid-template-columns: 148px 1fr;
+    gap: 18px;
+    padding: 11px 0;
+    border-top: 1px solid var(--line);
+    align-items: baseline;
+  }
+  .ag time {
+    font-variant-numeric: tabular-nums;
+    font-weight: 650;
+    color: var(--ink);
+    font-size: 16px;
+  }
+  .ag strong { display: block; font-size: 18px; color: var(--ink); font-weight: 650; }
+  .ag p { margin: 2px 0 0; color: var(--soft); font-size: 14.5px; line-height: 1.4; }
+
+  /* decisions */
+  .decisions { margin-top: 28px; display: flex; flex-direction: column; gap: 10px; }
+  .decision {
+    display: grid;
+    grid-template-columns: 42px 1fr;
+    gap: 14px;
+    align-items: start;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .num {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    background: var(--ink);
+    color: #fff;
+    display: grid; place-items: center;
+    font-weight: 650;
+  }
+  .decision h3 { margin: 2px 0 4px; font-size: 18px; }
+  .decision p { margin: 0; color: var(--soft); font-size: 15px; }
+
+  /* checklist */
+  .checks { margin-top: 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .check {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 16px 14px;
+  }
+  .check .tag {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 999px;
+    margin-bottom: 8px;
+  }
+  .tag.wait { background: var(--gold-bg); color: var(--gold); }
+  .tag.done { background: var(--green-bg); color: var(--green); }
+  .check h3 { margin: 0 0 6px; font-size: 17px; }
+  .check p { margin: 0; color: var(--soft); font-size: 14.5px; line-height: 1.4; }
+
+  /* glance */
+  .glance {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+  .gcard {
+    text-align: left;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 12px 10px;
+    cursor: pointer;
+    color: inherit;
+    border-top: 4px solid var(--accent, var(--ink));
+  }
+  .gcard:hover { border-color: #cfcbc2; }
+  .gcard .who { font-weight: 700; font-size: 16px; color: var(--ink); }
+  .gcard .meta { color: var(--soft); font-size: 12.5px; margin-top: 2px; }
+  .gcard .score {
+    margin-top: 10px;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+  }
+  .gcard .score em { font-style: normal; color: var(--faint); font-weight: 600; font-size: 14px; }
+  .pill {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--blue);
+    background: var(--blue-bg);
+    border-radius: 999px;
+    padding: 2px 7px;
+  }
+
+  /* person */
+  .person { border-left: 0; }
+  .person-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+  }
+  .person-top h1 { font-size: 56px; }
+  .team-chip {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #fff;
+    background: var(--accent);
+    padding: 6px 10px;
+    border-radius: 999px;
+  }
+  .person-grid {
+    margin-top: 22px;
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 22px;
+    flex: 1;
+    min-height: 0;
+  }
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px 18px;
+  }
+  .panel + .panel { margin-top: 12px; }
+  .label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 6px;
+  }
+  .big-score {
+    font-size: 64px;
+    line-height: .9;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+  }
+  .big-score span { font-size: 22px; color: var(--faint); font-weight: 600; letter-spacing: 0; }
+  .empty-score { color: var(--faint); }
+  .subrows { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+  .subrow {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 8px;
+    border-top: 1px solid var(--line);
+    font-size: 15px;
+  }
+  .subrow b { font-weight: 650; }
+  .slot-empty, .comment-empty {
+    color: var(--gold);
+    background: var(--gold-bg);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 14.5px;
+  }
+  .sample-link {
+    display: inline-flex;
+    margin-top: 4px;
+    color: var(--blue);
+    font-weight: 650;
+    text-decoration: none;
+    border-bottom: 1px solid #b9d0ee;
+  }
+  .comment {
+    font-size: 20px;
+    line-height: 1.45;
+    color: var(--ink);
+    margin: 0;
+  }
+  .by { margin-top: 12px; color: var(--soft); font-size: 14px; }
+  .notes-grid { display: flex; flex-direction: column; gap: 12px; }
+  .note-row {
+    display: grid;
+    grid-template-columns: 128px 1fr;
+    gap: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+  .note-row:first-child { padding-top: 0; border-top: 0; }
+  .note-row b {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent, var(--ink));
+    padding-top: 3px;
+  }
+  .note-row p { margin: 0; font-size: 16.5px; line-height: 1.5; color: var(--ink); }
+  .flag {
+    margin-top: 12px;
+    background: var(--blue-bg);
+    color: var(--blue);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-weight: 650;
+  }
+
+  /* two col */
+  .split { margin-top: 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; flex: 1; }
+  .split.three { grid-template-columns: 1fr 1fr 1fr; }
+  .block {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 18px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .block h3 { margin: 0; font-size: 20px; }
+  .block p, .block li { color: var(--soft); font-size: 15.5px; line-height: 1.45; }
+  .block ul { margin: 0; padding-left: 18px; }
+  .blank {
+    margin-top: auto;
+    border: 1.5px dashed #d7c7a6;
+    background: #fbf7ef;
+    color: var(--gold);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 15px;
+    min-height: 52px;
+  }
+  .callout {
+    margin-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    background: var(--red-bg);
+    color: var(--red);
+    border-radius: 14px;
+    padding: 16px 18px;
+  }
+  .callout strong { font-size: 28px; letter-spacing: -0.03em; display: block; }
+  .callout span { font-size: 15px; }
+
+  .compare { margin-top: 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; flex: 1; }
+  .opt {
+    border-radius: 16px;
+    padding: 22px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+  }
+  .opt.pick { box-shadow: inset 0 0 0 2px var(--ink); }
+  .opt h3 { margin: 8px 0; font-size: 28px; letter-spacing: -0.03em; }
+  .opt .who { color: var(--soft); font-size: 14px; }
+  table.costs {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    font-size: 16px;
+  }
+  table.costs th, table.costs td {
+    text-align: left;
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--line);
+  }
+  table.costs th { color: var(--faint); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; }
+
+  .embed-slide { padding-bottom: 64px; }
+  .embed-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+  }
+  .embed {
+    margin-top: 16px;
+    flex: 1;
+    width: 100%;
+    min-height: 420px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+  }
+
+  .shots {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+  .shot {
+    margin: 0;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 10px;
+  }
+  .shot img {
+    display: block;
+    width: 100%;
+    max-height: 420px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: #191919;
+  }
+  .shot figcaption { margin: 10px 4px 2px; color: var(--soft); font-size: 14.5px; }
+  .shot figcaption b { color: var(--ink); }
+  .facts { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .facts span {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 14px;
+    color: var(--soft);
+  }
+  .facts b { color: var(--ink); }
+
+  .divider { justify-content: flex-end; }
+  .divider .when {
+    font-size: 22px;
+    color: #c8b48a;
+    margin-bottom: 8px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .note-bar {
+    display: none;
+    position: absolute;
+    left: 16px; right: 16px; bottom: 58px;
+    background: #fff8e8;
+    color: #5c4010;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 14px;
+    z-index: 5;
+    box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  }
+  .note-bar.on { display: block; }
+
+  .chrome {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 16px;
+    background: rgba(28,27,25,.92);
+    color: #f4f1ea;
+    z-index: 6;
+    font-size: 13px;
+  }
+  .chrome button {
+    background: transparent;
+    color: inherit;
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 8px;
+    padding: 4px 10px;
+    cursor: pointer;
+  }
+  .chrome button:hover { background: rgba(255,255,255,.08); }
+  .chrome .title {
+    flex: 1;
+    text-align: center;
+    color: #c9c4ba;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .draft-badge {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    z-index: 4;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .14em;
+    color: var(--gold);
+    border: 1px solid #e4d0aa;
+    background: var(--gold-bg);
+    border-radius: 999px;
+    padding: 4px 8px;
+  }
+  .dark .draft-badge {
+    background: transparent;
+    border-color: #c8b48a;
+    color: #c8b48a;
+  }
+  .jump {
+    display: none;
+    position: absolute;
+    inset: 48px 24px 64px;
+    background: #fff;
+    border-radius: 16px;
+    z-index: 7;
+    overflow: auto;
+    padding: 18px;
+    box-shadow: 0 16px 50px rgba(0,0,0,.2);
+  }
+  .jump.on { display: block; }
+  .jump button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    border: 0;
+    background: transparent;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--text);
+  }
+  .jump button:hover { background: var(--sunken); }
+  .hint { color: #a39e94; margin-left: 8px; }
+
+  @media print {
+    body { background: white; }
+    .chrome, .jump, .note-bar, .draft-badge { display: none !important; }
+    .slide { display: flex !important; position: relative; inset: auto; page-break-after: always; min-height: 100vh; }
+  }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+  <section class="slide dark title-slide" data-id="title" data-title="KOC Team Meeting" data-notes="Draft for Kinny to fill. Arrow keys move. Press O for the slide list. Delete the Draft status slide before showing this.">
+    <p class="kicker">UniPlus · KOC team</p>
+    <h1>KOC Team Meeting</h1>
+    <p class="lede">Friday, 2 October 2026<br>14:15–16:30</p>
+    <div class="title-meta">
+      <div><span>With</span>Kinny · Jeffery · Chris</div>
+      <div><span>Decide</span>People, tracking, invoices, tools</div>
+    </div>
+  </section>
+
+  <section class="slide" data-id="draft" data-title="Still to fill in" data-notes="Delete this slide once the blanks are filled. Edit the KOCS list at the bottom of this file to drop in links, marks and comments.">
+    <p class="kicker">Draft · delete before the meeting</p>
+    <h2>Still to fill in</h2>
+    <div class="checks">
+      <article class="check">
+        <span class="tag wait">Waiting</span>
+        <h3>One work link per active KOC</h3>
+        <p>Paste a single sample URL on each person slide. Gallery pages are already linked.</p>
+      </article>
+      <article class="check">
+        <span class="tag done">In</span>
+        <h3>Marks for all 11 active KOCs</h3>
+        <p>Maths: Tracy 7.3, Eric 6.7, Bobby 6.0. Phy: Jerry and Winnie 6.7 (7, 6, 7). Chem and Bio + IS: Jeff 8.5, James, Felix and Issac 7.5, Duncan 7, Javin 6.5. Hugo, Rachel, Keith and Adrian are not active and are left out.</p>
+      </article>
+      <article class="check">
+        <span class="tag done">In</span>
+        <h3>Interview reasons</h3>
+        <p>Only Bobby and Javin are interviewed. Bobby: long hours, little progress. Javin: work quality fluctuates. Bobby still needs a written mark reason.</p>
+      </article>
+      <article class="check">
+        <span class="tag done">In</span>
+        <h3>Tracking setup</h3>
+        <p>The gallery is embedded live, and the Notion monthly check-in screenshots are on the tracking slides.</p>
+      </article>
+      <article class="check">
+        <span class="tag wait">Waiting</span>
+        <h3>Invoice summary</h3>
+        <p>Incident list, plus the outstanding 8,000 invoice.</p>
+      </article>
+      <article class="check">
+        <span class="tag wait">Friday morning</span>
+        <h3>Budget plan</h3>
+        <p>Jeffery merges this with the existing budget plan before the meeting. Pro Plus versus one Ultra.</p>
+      </article>
+      <article class="check">
+        <span class="tag wait">Waiting</span>
+        <h3>Account-banning emails</h3>
+        <p>Screenshots, if any, go on the tool-cost slides.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="slide" data-id="agenda" data-title="Agenda">
+    <p class="kicker">Friday 2 October 2026</p>
+    <h2>Agenda</h2>
+    <div class="agenda">
+      <div class="ag"><time>14:15–14:20</time><div><strong>Opening</strong><p>Confirm the decisions this meeting will make.</p></div></div>
+      <div class="ag"><time>14:20–15:05</time><div><strong>Active KOC performance review</strong><p>One work sample and link each, including Bobby and Javin. Comments, marks, next steps.</p></div></div>
+      <div class="ag"><time>15:05–15:20</time><div><strong>Bobby and Javin interviews</strong><p>Use the work just shown. Agree questions, interviewers and timing.</p></div></div>
+      <div class="ag"><time>15:20–15:40</time><div><strong>Monthly performance tracking</strong><p>KOC Gallery for the work, plus a monthly Notion check-in listing items, hours and a self-evaluation.</p></div></div>
+      <div class="ag"><time>15:40–16:00</time><div><strong>Invoice issues and check</strong><p>Incident summary, the outstanding 8,000, then a random date for last month’s invoices.</p></div></div>
+      <div class="ag"><time>16:00–16:25</time><div><strong>Tool costs and budget</strong><p>YouMind and Cursor. Pro Plus setup versus one Ultra plan.</p></div></div>
+      <div class="ag"><time>16:25–16:30</time><div><strong>Wrap-up</strong><p>Decisions, owners and deadlines.</p></div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-id="opening" data-title="Opening">
+    <p class="kicker">14:15–14:20 · Opening</p>
+    <h2>Decisions to leave with</h2>
+    <div class="decisions">
+      <div class="decision"><div class="num">1</div><div><h3>Each active KOC</h3><p>Mark, comment and next step, from one work sample.</p></div></div>
+      <div class="decision"><div class="num">2</div><div><h3>Bobby and Javin</h3><p>Interview questions, who interviews, and when.</p></div></div>
+      <div class="decision"><div class="num">3</div><div><h3>Monthly tracking</h3><p>How the Gallery is used, the monthly Notion check-in, a deadline, and who reviews it.</p></div></div>
+      <div class="decision"><div class="num">4</div><div><h3>Invoices</h3><p>Owner and next step for open incidents, including the 8,000. A random date, and how last month’s invoices get uploaded.</p></div></div>
+      <div class="decision"><div class="num">5</div><div><h3>Tools budget</h3><p>Preferred option for YouMind and Cursor, and the budget to go with it.</p></div></div>
+    </div>
+  </section>
+
+  <section class="slide dark divider" data-id="div-review" data-title="Performance review">
+    <div class="when">14:20–15:05</div>
+    <p class="kicker">45 minutes</p>
+    <h1>Active KOC<br>performance review</h1>
+    <p class="lede">One sample each. Then marks, comments and a next step.</p>
+  </section>
+
+  <section class="slide" data-id="method" data-title="How we review">
+    <p class="kicker">14:20–15:05 · Review</p>
+    <h2>How we take each person</h2>
+    <div class="split three">
+      <article class="block">
+        <h3>1 · Show the work</h3>
+        <p>One sample and one link for each of the 11 active KOCs. Bobby and Javin are included here, before their interview slot.</p>
+      </article>
+      <article class="block">
+        <h3>2 · Mark it</h3>
+        <p>Score performance, attitude and hours worked, each from 1 to 10.</p>
+        <div class="blank" style="background:var(--card);border-style:solid;border-color:var(--line);color:var(--ink)">Overall = (performance + attitude + hours worked) ÷ 3</div>
+      </article>
+      <article class="block">
+        <h3>3 · Record the point</h3>
+        <p>Comment, reason, and the next step for that person. Write it on the slide while we talk.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="slide" data-id="glance" data-title="All active KOCs">
+    <p class="kicker">Click a name to open their slide</p>
+    <h2>Active KOCs</h2>
+    <div class="glance" id="glance"></div>
+  </section>
+
+  <div id="koc-mount"></div>
+
+  <section class="slide dark divider" data-id="div-interview" data-title="Interviews">
+    <div class="when">15:05–15:20</div>
+    <p class="kicker">15 minutes</p>
+    <h1>Bobby and Javin<br>interviews</h1>
+    <p class="lede">Only these two are interviewed. Their work was just on screen, and each has a specific concern to follow up.</p>
+  </section>
+
+  <section class="slide" data-id="interviews" data-title="Interview plan">
+    <p class="kicker">15:05–15:20 · Interviews</p>
+    <h2>Why these two</h2>
+    <div class="split" style="flex:0">
+      <article class="block">
+        <p class="label">Maths · Kinny · 6.0 / 10</p>
+        <h3>Bobby</h3>
+        <div class="flag" style="margin:0">Long hours, but not much progress for that time.</div>
+        <p>Find out where the time goes, and what is slowing the output down.</p>
+        <button class="sample-link" type="button" data-goto="koc-bobby" style="background:none;border:0;padding:0;cursor:pointer">Open Bobby’s review slide</button>
+        <div class="blank">Questions<br>Interviewer<br>Timing</div>
+      </article>
+      <article class="block">
+        <p class="label">Bio + IS · Jeffery · 6.5 / 10</p>
+        <h3>Javin</h3>
+        <div class="flag" style="margin:0">Work quality fluctuates from task to task.</div>
+        <p>Find out what is different between his stronger and weaker pieces, and what guidance keeps the standard steady.</p>
+        <button class="sample-link" type="button" data-goto="koc-javin" style="background:none;border:0;padding:0;cursor:pointer">Open Javin’s review slide</button>
+        <div class="blank">Questions<br>Interviewer<br>Timing</div>
+      </article>
+    </div>
+  </section>
+
+  <section class="slide dark divider" data-id="div-track" data-title="Monthly tracking">
+    <div class="when">15:20–15:40</div>
+    <p class="kicker">20 minutes</p>
+    <h1>Monthly KOC<br>performance tracking</h1>
+    <p class="lede">The gallery holds the work. Every month, each KOC also fills in a Notion check-in.</p>
+  </section>
+
+  <section class="slide" data-id="tracking" data-title="Two records every month">
+    <p class="kicker">15:20–15:40 · Tracking</p>
+    <h2>Two records, every month</h2>
+    <div class="split" style="flex:0">
+
+      <article class="block">
+        <p class="label">The work</p>
+        <h3>KOC Work Gallery</h3>
+        <p>Each KOC posts what they made to their own page in the gallery. Every piece gets its own review link, and the matching Notion task can be attached to it.</p>
+        <button class="sample-link" type="button" data-goto="gallery-live" style="background:none;border:0;padding:0;cursor:pointer;align-self:flex-start">See the live gallery</button>
+      </article>
+      <article class="block">
+        <p class="label">The effort</p>
+        <h3>Monthly KOC Progress Check-In</h3>
+        <p>Every month, each KOC fills in one Notion entry. It has one row per item they worked on, with a brief description, approximate hours and a self-evaluation out of 10.</p>
+        <button class="sample-link" type="button" data-goto="notion-form" style="background:none;border:0;padding:0;cursor:pointer;align-self:flex-start">See the Notion form</button>
+      </article>
+    </div>
+    <div class="callout" style="background: var(--sunken); color: var(--ink);">
+      <div>
+        <span style="color:var(--soft)">Agree in the room</span>
+        <strong style="font-size:22px">Monthly deadline, and who reviews the entries</strong>
+      </div>
+      <div class="blank" style="margin:0; min-width: 280px;">Deadline<br>Reviewer</div>
+    </div>
+  </section>
+
+  <section class="slide embed-slide" data-id="gallery-live" data-title="KOC Work Gallery (live)">
+    <div class="embed-head">
+      <div>
+        <p class="kicker">15:20–15:40 · Tracking · live</p>
+        <h2>KOC Work Gallery</h2>
+      </div>
+      <a class="sample-link" href="https://uniplusmathsteam-bot.github.io/koc-workspace/#/" target="_blank" rel="noopener">Open in a new tab</a>
+    </div>
+    <iframe class="embed" src="https://uniplusmathsteam-bot.github.io/koc-workspace/#/" title="UniPlus KOC Work Gallery" loading="lazy"></iframe>
+  </section>
+
+  <section class="slide" data-id="notion-form" data-title="Notion monthly check-in">
+    <p class="kicker">15:20–15:40 · Tracking · Notion</p>
+    <h2>Monthly KOC Progress Check-In</h2>
+    <p class="lede">Every KOC from the KOC Working Schedule is set up. New entries open with this template by default.</p>
+    <div class="shots">
+      <figure class="shot">
+        <img src="assets/meeting/notion-template-properties.png" alt="Notion template properties: approximate hours, brief description, items completed, KOC name, month, self-evaluation">
+        <figcaption><b>Entry properties</b> · KOC name, month, total approximate hours and overall self-evaluation.</figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="assets/meeting/notion-template-table.png" alt="Notion monthly work items table with item, brief description, approximate hours and self-evaluation columns">
+        <figcaption><b>Work items table</b> · one row per item, for example “Special Lines in Triangles”, 5 hours, 8 / 10.</figcaption>
+      </figure>
+    </div>
+    <div class="facts">
+      <span>Gallery view grouped <b>By Month</b></span>
+      <span>Gallery view grouped <b>By KOC</b>, newest first</span>
+      <span>Same template for new entries, pages and form submissions</span>
+    </div>
+  </section>
+
+  <section class="slide dark divider" data-id="div-invoice" data-title="Invoices">
+    <div class="when">15:40–16:00</div>
+    <p class="kicker">20 minutes</p>
+    <h1>Invoice issues<br>and this month’s check</h1>
+    <p class="lede">Close the open incidents, then pick a date for last month’s invoices.</p>
+  </section>
+
+  <section class="slide" data-id="incidents" data-title="Invoice incidents">
+    <p class="kicker">15:40–16:00 · Invoices</p>
+    <h2>Open invoice issues</h2>
+    <div class="block" style="margin-top:18px; min-height: 240px;">
+      <h3>Incident summary</h3>
+      <p>Paste the prepared summary here before the meeting.</p>
+      <div class="blank" style="min-height:140px">Incident list, what happened, and what is still open.</div>
+    </div>
+    <div class="callout">
+      <div>
+        <span>Outstanding invoice</span>
+        <strong>8,000</strong>
+      </div>
+      <div class="blank" style="margin:0; min-width: 280px;">Owner and next step</div>
+    </div>
+  </section>
+
+  <section class="slide" data-id="invoice-check" data-title="This month’s invoice check">
+    <p class="kicker">15:40–16:00 · Invoices</p>
+    <h2>Last month’s invoices</h2>
+    <p class="lede">Pick a random date in the room. Each person uploads their invoice from last month.</p>
+    <div class="split three" style="margin-top:28px">
+      <article class="block">
+        <h3>Date</h3>
+        <div class="blank" style="font-size:22px; min-height:88px">Pick in the meeting</div>
+      </article>
+      <article class="block">
+        <h3>Who uploads</h3>
+        <p>Kinny, Jeffery and Chris. One upload each for last month.</p>
+      </article>
+      <article class="block">
+        <h3>How</h3>
+        <div class="blank">Where the file goes, and the deadline on that date.</div>
+      </article>
+    </div>
+  </section>
+
+  <section class="slide dark divider" data-id="div-tools" data-title="Tool costs">
+    <div class="when">16:00–16:25</div>
+    <p class="kicker">25 minutes · after invoices</p>
+    <h1>Tool costs<br>and budget</h1>
+    <p class="lede">YouMind and Cursor. Jeffery’s Pro Plus setup, set against one Ultra plan.</p>
+  </section>
+
+  <section class="slide" data-id="costs" data-title="Current tool costs">
+    <p class="kicker">16:00–16:25 · Tools · Jeffery updates Friday morning</p>
+    <h2>Current cost and usage</h2>
+    <table class="costs">
+      <thead>
+        <tr><th>Tool</th><th>Plan now</th><th>Monthly cost</th><th>Who uses it</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>YouMind</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td></tr>
+        <tr><td>Cursor</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td></tr>
+      </tbody>
+    </table>
+    <div class="block" style="margin-top:16px">
+      <h3>Account-banning emails</h3>
+      <p>Drop screenshots here if an account was banned. Leave this box if there are none.</p>
+      <div class="blank">Screenshot or a one-line note.</div>
+    </div>
+  </section>
+
+  <section class="slide" data-id="options" data-title="Pro Plus vs Ultra">
+    <p class="kicker">16:00–16:25 · Decide the option and the budget</p>
+    <h2>Two options</h2>
+    <div class="compare">
+      <article class="opt">
+        <p class="who">Jeffery’s proposal · to merge with the old budget plan</p>
+        <h3>Pro Plus setup</h3>
+        <div class="blank">Who is on Pro Plus, what it costs, what it covers.</div>
+      </article>
+      <article class="opt">
+        <p class="who">The other option on the table</p>
+        <h3>One Ultra plan</h3>
+        <div class="blank">Who shares it, what it costs, what it covers.</div>
+      </article>
+    </div>
+    <div class="callout" style="background: var(--sunken); color: var(--ink);">
+      <div>
+        <span style="color:var(--soft)">Leave the room with</span>
+        <strong style="font-size:22px">Preferred option and agreed budget</strong>
+      </div>
+      <div class="blank" style="margin:0; min-width: 280px;">Write the decision</div>
+    </div>
+  </section>
+
+  <section class="slide" data-id="wrap" data-title="Wrap-up">
+    <p class="kicker">16:25–16:30 · Wrap-up</p>
+    <h2>Decisions, owners, deadlines</h2>
+    <table class="costs">
+      <thead>
+        <tr><th>Decision</th><th>Outcome</th><th>Owner</th><th>Deadline</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>KOC marks and next steps</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td></tr>
+        <tr><td>Bobby interview</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td></tr>
+        <tr><td>Javin interview</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td></tr>
+        <tr><td>Gallery and monthly Notion check-in</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td></tr>
+        <tr><td>Invoice incidents, including 8,000</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td></tr>
+        <tr><td>Random invoice-check date</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td></tr>
+        <tr><td>YouMind and Cursor budget</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td><td class="slot-empty">Add</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+</div>
+
+<div class="note-bar" id="notes"></div>
+<div class="jump" id="jump"></div>
+<div class="chrome">
+  <button type="button" id="prev">Back</button>
+  <button type="button" id="next">Next</button>
+  <div class="title" id="chrome-title"></div>
+  <span id="count"></span>
+  <button type="button" id="list">Slides</button>
+  <span class="hint">← → · O list · N notes · F full screen</span>
+</div>
+
+<script>
+/* ============================================================
+   EDIT HERE — one block per active KOC.
+   sample       one work URL for the quick show (leave "" until you have it)
+   performance  1–10, or null
+   attitude     1–10, or null
+   hours        hours worked, scored 1–10, or null
+   overall      leave null: it is the average of the three scores above.
+                Only set it when a lead gave a single mark with no breakdown.
+   comment      the reason that goes on the slide
+   next         fill during the meeting, or leave ""
+   ============================================================ */
+const GALLERY = "https://uniplusmathsteam-bot.github.io/koc-workspace/#/";
+
+const KOCS = [
+  { id: "eric",   name: "Eric",   team: "Maths",    lead: "Kinny",            accent: "#3b6fd4", sample: "", performance: 7, attitude: 7, hours: 6, overall: null, markedBy: "Kinny",
+    comment: "Eric is performing at a modest level. The quality of his work is fine, and his working hours are moderate.",
+    next: "" },
+  { id: "tracy",  name: "Tracy",  team: "Maths",    lead: "Kinny",            accent: "#3b6fd4", sample: "", performance: 7, attitude: 8, hours: 7, overall: null, markedBy: "Kinny",
+    comment: "Tracy is very dedicated. She is willing to take on tedious debugging work and keeps learning as she goes.",
+    next: "" },
+  { id: "bobby",  name: "Bobby",  team: "Maths",    lead: "Kinny",            accent: "#3b6fd4", sample: "", performance: 6, attitude: 5, hours: 7, overall: null, markedBy: "Kinny",
+    comment: "", next: "",
+    interview: "He logs long hours, but his work is not showing much progress for that time." },
+
+  { id: "james",  name: "James",  team: "Chem",     lead: "Jeffery · Chris",  accent: "#d97706", sample: "", performance: null, attitude: null, hours: null, overall: 7.5, loggedHours: 169, markedBy: "", leader: true,
+    notes: {
+      performance: "James has shown clear improvement in game design. After guidance, his games became more fun and more playable. He is responsible for both Chinese and Chemistry work, and he can build web apps that are usable in class. He is also creative in how he approaches these tasks.",
+      hours: "He worked 169 hours, the highest number in this group. He carried a large share of the work across two subjects.",
+      attitude: "He is an active worker. He takes guidance on board and brings new ideas when planning the work."
+    },
+    comment: "", next: "" },
+  { id: "felix",  name: "Felix",  team: "Chem",     lead: "Jeffery · Chris",  accent: "#d97706", sample: "", performance: null, attitude: null, hours: null, overall: 7.5, loggedHours: 36.5, markedBy: "",
+    notes: {
+      performance: "Felix is good at preparing exercises with Cursor, and he can work independently. His experiment-demo web apps are of good quality and are suitable for class use. He sometimes overestimates what S3 students can do, so some tasks need to be adjusted to the students' level.",
+      hours: "He worked 36.5 hours and used that time to produce usable exercises and demo apps.",
+      attitude: "He is active and works in a steady, willing way."
+    },
+    comment: "", next: "" },
+  { id: "duncan", name: "Duncan", team: "Chem",     lead: "Jeffery · Chris",  accent: "#d97706", sample: "", performance: null, attitude: null, hours: null, overall: 7, loggedHours: 10, markedBy: "",
+    hoursFlag: "Low because of a payment issue",
+    notes: {
+      performance: "Duncan's PowerPoint skill is fair. His stronger area is building games that students can actually play. This score is based mostly on last month's performance, not on a full month of work.",
+      hours: "He worked only 10 hours this month because of a payment issue, so his hours do not reflect his usual contribution.",
+      attitude: "His attitude is active. The low hours this month came from the payment issue, not from a lack of willingness to work."
+    },
+    comment: "", next: "" },
+
+  { id: "winnie", name: "Winnie", team: "Phy",      lead: "Chris",            accent: "#7c3aed", sample: "", performance: 7, attitude: 7, hours: 6, overall: null, markedBy: "Chris", leader: true,
+    hoursFlag: "Limited by school commitments, and part of her time went to supporting other teams",
+    notes: {
+      performance: "Winnie is able to develop web apps independently, although some refinements are still needed. Her main area for development is teaching: she should focus more on guiding students through the problem-solving process rather than providing answers directly.",
+      hours: "Her working hours are somewhat limited due to school commitments. She has also contributed time to supporting other teams, which should be taken into consideration when assessing her overall involvement.",
+      attitude: "Winnie has shown a positive and cooperative attitude. She works independently and is willing to contribute, but could further develop her approach to student guidance and teaching.",
+      overall: "Both Jerry and Winnie are performing well in web app development. Their hours are limited mainly by school commitments, and some of their time has gone to helping other teams. The key area to develop for both is teaching and student guidance."
+    },
+    comment: "", next: "" },
+  { id: "jerry",  name: "Jerry",  team: "Phy",      lead: "Chris",            accent: "#7c3aed", sample: "", performance: 7, attitude: 7, hours: 6, overall: null, markedBy: "Chris",
+    hoursFlag: "Limited by school commitments, and part of his time went to supporting other teams",
+    notes: {
+      performance: "Jerry has shown significant improvement in web app development and is making good progress technically. Further training would help strengthen his teaching skills, particularly in explaining concepts clearly and guiding students effectively.",
+      hours: "His working hours are somewhat limited due to school commitments. However, he has also spent time supporting other teams, so his recorded hours do not fully reflect his overall contribution.",
+      attitude: "Jerry has shown a positive attitude and willingness to improve. He is cooperative and has demonstrated continued development in his work.",
+      overall: "Both Jerry and Winnie are performing well in web app development. Their hours are limited mainly by school commitments, and some of their time has gone to helping other teams. The key area to develop for both is teaching and student guidance."
+    },
+    comment: "", next: "" },
+
+  { id: "jeff",   name: "Jeff",   team: "Bio + IS", lead: "Jeffery",          accent: "#1f9d55", sample: "", performance: null, attitude: null, hours: null, overall: 8.5, loggedHours: 150, markedBy: "", leader: true,
+    notes: {
+      performance: "Jeff is very helpful and the quality of his work is consistently high. He is particularly strong in PowerPoint design: the slides are detailed, carefully checked, and he is good at catching mistakes before the work is used. He is also able to use AI to complete different tasks, including comics and web apps, and these are above the usual standard. One area for further development is teaching. He sometimes does not see why a student cannot follow a question that seems simple, and he would benefit from more guidance on how to explain ideas at the student's level.",
+      hours: "He worked 150 hours. This is a high number of hours, and the amount of finished work matches that time.",
+      attitude: "His attitude is positive and proactive. He works actively, looks for ways to improve, and often brings new ideas."
+    },
+    comment: "", next: "" },
+  { id: "issac",  name: "Issac",  team: "Bio + IS", lead: "Jeffery",          accent: "#1f9d55", sample: "", performance: null, attitude: null, hours: null, overall: 7.5, loggedHours: 39.5, markedBy: "",
+    notes: {
+      performance: "Issac is good at developing web apps, and his PowerPoint work meets the required standard. At his best, he can produce a strong web app and work independently. The work is not fully steady yet. Some apps still contain bugs, and he needs a reminder before they are corrected.",
+      hours: "He worked 39.5 hours. The output is reasonable for this time, with room to become more consistent.",
+      attitude: "He is helpful and active, and he is willing to take on development work."
+    },
+    comment: "", next: "" },
+  { id: "javin",  name: "Javin",  team: "Bio + IS", lead: "Jeffery",          accent: "#1f9d55", sample: "", performance: null, attitude: null, hours: null, overall: 6.5, loggedHours: 33.5, markedBy: "",
+    interview: "The quality of his work fluctuates from task to task.",
+    notes: {
+      performance: "Javin is willing to try new tasks, which is a good sign. At this stage he still needs more guidance, especially on comic production and on the visual design of PowerPoint slides. With clearer direction, he should be able to raise the standard of this work.",
+      hours: "He worked 33.5 hours. The time was spent learning and trying the tasks, but the finished work still needs closer checking.",
+      attitude: "His attitude is active. He is willing to attempt new work rather than avoid it."
+    },
+    comment: "", next: "" }
+];
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  });
+}
+function scoreText(n) {
+  if (n == null || n === "") return "—";
+  return Number.isInteger(n) ? String(n) : n.toFixed(1);
+}
+function overallOf(k) {
+  const parts = [k.performance, k.attitude, k.hours];
+  if (parts.every(function (n) { return typeof n === "number"; })) {
+    return (parts[0] + parts[1] + parts[2]) / 3;
+  }
+  return typeof k.overall === "number" ? k.overall : null;
+}
+function overallNote(k) {
+  const parts = [k.performance, k.attitude, k.hours];
+  if (parts.every(function (n) { return typeof n === "number"; })) {
+    return "Average of " + parts.join(", ");
+  }
+  if (typeof k.overall !== "number") return "";
+  return k.notes ? "Overall mark from the lead, with written notes" : "Single mark, no breakdown yet";
+}
+function hoursText(h) {
+  return (Number.isInteger(h) ? String(h) : h.toFixed(1)) + " h";
+}
+
+const mount = document.getElementById("koc-mount");
+const glance = document.getElementById("glance");
+
+KOCS.forEach(function (k) {
+  const overall = overallOf(k);
+  const g = document.createElement("button");
+  g.type = "button";
+  g.className = "gcard";
+  g.style.setProperty("--accent", k.accent);
+  g.setAttribute("data-goto", "koc-" + k.id);
+  g.innerHTML =
+    '<div class="who">' + esc(k.name) + "</div>" +
+    '<div class="meta">' + esc(k.team) + " · " + esc(k.lead) + "</div>" +
+    '<div class="score">' + scoreText(overall) + ' <em>/ 10</em></div>' +
+    (typeof k.loggedHours === "number" ? '<div class="meta">' + hoursText(k.loggedHours) + " this month</div>" : "") +
+    (k.interview ? '<div class="pill">Interview</div>' : "");
+  glance.appendChild(g);
+
+  const slide = document.createElement("section");
+  slide.className = "slide person";
+  slide.dataset.id = "koc-" + k.id;
+  slide.dataset.title = k.name;
+  slide.style.setProperty("--accent", k.accent);
+  const sample = k.sample
+    ? '<a class="sample-link" href="' + esc(k.sample) + '" target="_blank" rel="noopener">Open work sample</a>'
+    : '<div class="slot-empty">Paste one work link in the KOCS list</div>';
+  const comment = k.notes
+    ? '<div class="notes-grid">' +
+        [["Performance", k.notes.performance], ["Working hours", k.notes.hours], ["Attitude", k.notes.attitude], ["Overall", k.notes.overall]]
+          .filter(function (r) { return r[1]; })
+          .map(function (r) { return '<div class="note-row"><b>' + r[0] + "</b><p>" + esc(r[1]) + "</p></div>"; })
+          .join("") +
+      "</div>" +
+      (k.markedBy ? '<div class="by">Marked by ' + esc(k.markedBy) + "</div>" : "")
+    : k.comment
+    ? '<p class="comment">' + esc(k.comment) + "</p>" +
+      (k.markedBy ? '<div class="by">Marked by ' + esc(k.markedBy) + "</div>" : "")
+    : '<div class="comment-empty">Add the mark reason here.</div>' +
+      (k.markedBy ? '<div class="by">Marked by ' + esc(k.markedBy) + "</div>" : "");
+  const next = k.next
+    ? '<p class="comment">' + esc(k.next) + "</p>"
+    : '<div class="comment-empty">Next step — write it in the meeting.</div>';
+  slide.innerHTML =
+    '<div class="person-top">' +
+      "<div><p class=\"kicker\">" + esc(k.team) + " · " + esc(k.lead) + (k.leader ? " · KOC leader" : "") + "</p>" +
+      "<h1>" + esc(k.name) + "</h1></div>" +
+      '<div class="team-chip">' + esc(k.team) + "</div>" +
+    "</div>" +
+    '<div class="person-grid">' +
+      "<div>" +
+        '<div class="panel"><div class="label">Overall</div><div class="big-score' + (overall == null ? " empty-score" : "") + '">' +
+          scoreText(overall) + " <span>/ 10</span></div>" +
+          (overallNote(k) ? '<div class="by" style="margin-top:6px">' + esc(overallNote(k)) + "</div>" : "") +
+          '<div class="subrows">' +
+            (k.notes && [k.performance, k.attitude, k.hours].every(function (n) { return typeof n !== "number"; })
+              ? ""
+              : '<div class="subrow"><span>Performance</span><b>' + scoreText(k.performance) + "</b></div>" +
+                '<div class="subrow"><span>Attitude</span><b>' + scoreText(k.attitude) + "</b></div>" +
+                '<div class="subrow"><span>Hours worked</span><b>' + scoreText(k.hours) + "</b></div>") +
+            (typeof k.loggedHours === "number"
+              ? '<div class="subrow"><span>Hours logged this month</span><b>' + hoursText(k.loggedHours) + "</b></div>"
+              : "") +
+          "</div>" +
+          (k.hoursFlag ? '<div class="flag" style="background:var(--gold-bg);color:var(--gold)">' + esc(k.hoursFlag) + "</div>" : "") +
+          "</div>" +
+        '<div class="panel"><div class="label">Work sample</div>' + sample +
+          '<div style="margin-top:10px"><a class="sample-link" href="' + GALLERY + "koc/" + esc(k.id) + '" target="_blank" rel="noopener">Gallery page</a></div>' +
+        (k.interview ? '<div class="flag">Interview at 15:05. Reason: ' + esc(k.interview) + "</div>" : "") +
+        "</div>" +
+      "</div>" +
+      "<div>" +
+        '<div class="panel" style="min-height:180px"><div class="label">Comment</div>' + comment + "</div>" +
+        '<div class="panel"><div class="label">Next step</div>' + next + "</div>" +
+      "</div>" +
+    "</div>";
+  mount.appendChild(slide);
+});
+
+const slides = Array.from(document.querySelectorAll(".slide"));
+let index = 0;
+
+function show(i) {
+  index = (i + slides.length) % slides.length;
+  slides.forEach(function (s, n) { s.classList.toggle("on", n === index); });
+  const s = slides[index];
+  document.getElementById("chrome-title").textContent = s.dataset.title || "";
+  document.getElementById("count").textContent = (index + 1) + " / " + slides.length;
+  const hash = "#" + (s.dataset.id || "");
+  if (location.hash !== hash) history.replaceState(null, "", hash);
+  const notes = document.getElementById("notes");
+  notes.textContent = s.dataset.notes || "";
+  if (!s.dataset.notes) notes.classList.remove("on");
+  document.getElementById("jump").classList.remove("on");
+  s.scrollTop = 0;
+}
+function showId(id) {
+  const i = slides.findIndex(function (s) { return s.dataset.id === id; });
+  if (i >= 0) show(i);
+}
+
+document.getElementById("prev").onclick = function () { show(index - 1); };
+document.getElementById("next").onclick = function () { show(index + 1); };
+document.getElementById("list").onclick = function () {
+  const jump = document.getElementById("jump");
+  jump.classList.toggle("on");
+};
+document.getElementById("jump").innerHTML = slides.map(function (s, n) {
+  return '<button type="button" data-i="' + n + '">' + (n + 1) + "  ·  " + esc(s.dataset.title || "Slide") + "</button>";
+}).join("");
+document.getElementById("jump").onclick = function (e) {
+  const b = e.target.closest("button");
+  if (b) show(Number(b.dataset.i));
+};
+document.body.addEventListener("click", function (e) {
+  const go = e.target.closest("[data-goto]");
+  if (go) showId(go.getAttribute("data-goto"));
+});
+
+document.addEventListener("keydown", function (e) {
+  if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") { e.preventDefault(); show(index + 1); }
+  else if (e.key === "ArrowLeft" || e.key === "PageUp" || e.key === "Backspace") { e.preventDefault(); show(index - 1); }
+  else if (e.key === "Home") show(0);
+  else if (e.key === "End") show(slides.length - 1);
+  else if (e.key === "o" || e.key === "O") document.getElementById("jump").classList.toggle("on");
+  else if (e.key === "n" || e.key === "N") document.getElementById("notes").classList.toggle("on");
+  else if (e.key === "f" || e.key === "F") {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  } else if (e.key === "Escape") document.getElementById("jump").classList.remove("on");
+});
+
+slides.forEach(function (s) {
+  const b = document.createElement("div");
+  b.className = "draft-badge";
+  b.textContent = "DRAFT";
+  s.appendChild(b);
+});
+
+const startId = location.hash.replace(/^#/, "");
+const start = slides.findIndex(function (s) { return s.dataset.id === startId; });
+show(start >= 0 ? start : 0);
+</script>
+</body>
+</html>
