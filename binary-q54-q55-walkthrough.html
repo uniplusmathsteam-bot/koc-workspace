@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Binary Numbers — Marbles Question (Step-by-Step)</title>
+<title>Binary Numbers — Short Division &amp; Marbles</title>
 <style>
   :root {
     --bg: #f6f7fb;
@@ -51,7 +51,9 @@
     border-bottom: 1px solid var(--line);
   }
   header h1 { margin: 0; font-size: 18px; }
+  header nav { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
   main { max-width: 960px; margin: 0 auto; padding: 24px 16px 120px; }
+  .question + .question { margin-top: 28px; }
 
   .btn {
     font: inherit; font-size: 14px;
@@ -208,16 +210,183 @@
   .swatch.on { box-shadow: 0 0 0 2px var(--accent); }
   .size { width: 28px; height: 28px; padding: 0; justify-content: center; }
   .size i { display: block; border-radius: 50%; background: currentColor; }
+
+  /* ── Short division ladder ── */
+  .rules { margin: 8px 0 0; padding: 0 0 0 22px; }
+  .rules li { margin: 6px 0; }
+  .rules .dir { background: var(--hl); padding: 0 6px; border-radius: 6px; font-weight: 700; }
+  .ladders { display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-start; }
+  .ladder-wrap { min-width: 260px; }
+  .ladder-title { font-weight: 700; margin-bottom: 4px; }
+  .ladder-frame {
+    display: flex;
+    align-items: stretch;
+    width: max-content;
+  }
+  .ladder {
+    display: grid;
+    grid-template-columns: 28px auto 28px 40px;
+    column-gap: 6px;
+    align-items: stretch;
+    font-family: "Cambria Math", Cambria, "Times New Roman", serif;
+    font-size: 20px;
+    width: max-content;
+  }
+  .ladder .lab { grid-column: 4; font-size: 13px; color: var(--muted); font-family: "Segoe UI", system-ui, sans-serif; padding-bottom: 2px; }
+  .ladder .div2 { grid-column: 1; text-align: right; color: var(--muted); align-self: end; padding-bottom: 2px; }
+  .ladder .qty {
+    grid-column: 2;
+    min-width: 52px;
+    padding: 2px 10px 2px 8px;
+    border-left: 2px solid var(--ink);
+    border-bottom: 2px solid var(--ink);
+    text-align: right;
+  }
+  .ladder .qty.last {
+    border-left: none;
+    border-bottom: 2px solid var(--ink);
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .ladder .dots { grid-column: 3; color: var(--muted); align-self: center; letter-spacing: -1px; }
+  .ladder .rem {
+    grid-column: 4;
+    align-self: center;
+    text-align: center;
+    font-weight: 700;
+    min-height: 32px;
+  }
+  .ladder .rem .reveal { min-width: 28px; }
+  .arrow-col {
+    display: flex; flex-direction: column; align-items: center;
+    margin-left: 36px;
+    padding: 22px 4px 4px;
+    color: #c8434b;
+    min-width: 22px;
+  }
+  .arrow-shaft {
+    flex: 1; width: 3px; background: #c8434b; min-height: 48px; border-radius: 2px;
+  }
+  .arrow-head { font-size: 20px; line-height: 1; }
+  .arrow-label {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font: 700 12px/1.2 "Segoe UI", system-ui, sans-serif;
+    letter-spacing: .06em;
+    margin-top: 8px;
+  }
+  .ladder .qty.lit, .ladder .rem.lit .reveal.open {
+    background: var(--hl);
+    box-shadow: 0 0 0 3px var(--hl);
+    border-radius: 6px;
+  }
+  .readout-bits {
+    display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+    margin: 12px 0 4px; font-size: 22px;
+    font-family: "Cambria Math", Cambria, "Times New Roman", serif;
+  }
+  .bit-chip {
+    min-width: 36px; height: 40px; padding: 0 8px;
+    border: 2px dashed var(--line); border-radius: 8px;
+    background: var(--bg); color: var(--muted);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 700;
+  }
+  .bit-chip.on { border-style: solid; border-color: #c8434b; background: var(--hl); color: var(--ink); animation: pop .25s ease-out; }
+  .bit-chip .sub { font-size: 12px; color: var(--muted); font-weight: 600; margin-left: 2px; }
+  .warn {
+    margin-top: 10px; padding: 10px 14px;
+    border-left: 4px solid var(--bad);
+    background: var(--bad-soft);
+    border-radius: 0 8px 8px 0;
+    font-size: 14.5px;
+  }
+  .status { margin-top: 6px; font-size: 14px; min-height: 22px; }
+  .status.good { color: var(--good); font-weight: 600; }
 </style>
 </head>
 <body>
 
 <header>
   <h1>Binary Numbers — Step-by-Step</h1>
-  <button class="btn" id="theme">Dark</button>
+  <nav>
+    <a class="btn" href="#q-div">Short division</a>
+    <a class="btn" href="#q55">Marbles</a>
+    <button class="btn" id="theme">Dark</button>
+  </nav>
 </header>
 
 <main>
+<section class="question" id="q-div" data-question>
+  <div class="q-head">
+    <span class="q-num">Denary → Binary</span>
+    <p class="q-text">Convert a denary number into a binary number by short division. Keep dividing by 2 and record every remainder. Then read the last quotient together with the remainders <b>from the bottom to the top</b>.</p>
+  </div>
+
+  <ol class="steps">
+    <li class="step">
+      <h3>The two rules</h3>
+      <ol class="rules">
+        <li>Keep dividing by 2 until the quotient is less than 2. Write down the remainder at every step (it is always 0 or 1).</li>
+        <li>The binary number is the <b>last quotient</b> followed by the remainders you already wrote, read in this order: <span class="dir">bottom → top</span>.</li>
+      </ol>
+      <p class="tip">The first remainder you write is the last binary digit (the 2<sup>0</sup> place). The last quotient at the bottom is the first binary digit.</p>
+    </li>
+
+    <li class="step">
+      <h3>Example 1 — divide 38 by 2, one row at a time</h3>
+      <p class="why">Even numbers give remainder 0. Odd numbers give remainder 1.</p>
+      <p class="todo">Click “Next row” after each division. Then click each “?” to reveal that remainder.</p>
+      <div data-widget="ladder" data-n="38"></div>
+    </li>
+
+    <li class="step">
+      <h3>Example 1 — read from the bottom</h3>
+      <p class="why">Do <b>not</b> read the remainders from the top. Start at the last quotient on the last line, then walk <b>up</b> the remainder column.</p>
+      <p class="todo">Click “Read next digit” to collect the bits from bottom to top.</p>
+      <div data-widget="readup" data-n="38"></div>
+      <div data-after>
+        <span class="answer">∴ 38<sub>10</sub> = 100110<sub>2</sub></span>
+        <p class="tip">Check: 1×32 + 0×16 + 0×8 + 1×4 + 1×2 + 0×1 = 32 + 4 + 2 = 38.</p>
+      </div>
+    </li>
+
+    <li class="step">
+      <h3>Example 2 — divide 26 by 2</h3>
+      <p class="todo">Same process: next row, then click each remainder.</p>
+      <div data-widget="ladder" data-n="26"></div>
+    </li>
+
+    <li class="step">
+      <h3>Example 2 — read from the bottom</h3>
+      <p class="todo">Click “Read next digit”. The arrow on the right shows the reading direction.</p>
+      <div data-widget="readup" data-n="26"></div>
+      <div data-after>
+        <span class="answer">∴ 26<sub>10</sub> = 11010<sub>2</sub></span>
+        <p class="tip">Check: 1×16 + 1×8 + 0×4 + 1×2 + 0×1 = 16 + 8 + 2 = 26.</p>
+      </div>
+    </li>
+
+    <li class="step">
+      <h3>The common mistake</h3>
+      <p class="todo">Someone reads 38’s remainders from the <b>top</b>. Which binary number do they get, and which one is correct?</p>
+      <div class="mcq" data-answer="100110" data-hints='{"011001":"That is top → bottom: first remainder 0, then 1, 1, 0, 0, and last quotient 1 at the end. That is the reverse of the binary number.","10011":"Too few digits — you dropped a 0.","38":"38 is the denary number we started with, not the binary answer."}'>
+        <button class="btn" data-v="011001">011001<sub>2</sub> (top → bottom)</button>
+        <button class="btn" data-v="100110">100110<sub>2</sub> (bottom → top)</button>
+        <button class="btn" data-v="10011">10011<sub>2</sub></button>
+        <button class="btn" data-v="38">38<sub>2</sub></button>
+      </div>
+      <p class="warn" data-after>Reading top → bottom gives 011001<sub>2</sub> = 25, which is not 38. Always start at the bottom.</p>
+    </li>
+  </ol>
+  <div class="controls">
+    <button class="btn primary" data-next>Next step</button>
+    <button class="btn" data-all>Show all</button>
+    <button class="btn" data-reset>Reset</button>
+    <span class="progress" data-progress></span>
+  </div>
+</section>
+
 <section class="question" id="q55" data-question>
   <div class="q-head">
     <span class="q-num">Question 55</span>
@@ -349,6 +518,161 @@
     return true;
   }
 
+  function shortDiv(n) {
+    var steps = [], cur = n;
+    while (cur >= 2) {
+      steps.push({ from: cur, to: Math.floor(cur / 2), rem: cur % 2 });
+      cur = Math.floor(cur / 2);
+    }
+    return {
+      steps: steps,
+      last: cur,
+      bits: String(cur) + steps.map(function (s) { return s.rem; }).reverse().join('')
+    };
+  }
+
+  function buildLadderGrid(data, mode) {
+    var grid = el('div', 'ladder');
+    grid.append(el('div', 'lab', 'remainder'));
+    var remCells = [];
+    var qtyCells = [];
+
+    data.steps.forEach(function (s, i) {
+      grid.append(el('div', 'div2', '2'));
+      var qty = el('div', 'qty', String(i === 0 ? s.from : data.steps[i - 1].to));
+      qtyCells.push(qty);
+      grid.append(qty);
+      if (i === 0) {
+        grid.append(el('div', 'dots', ''));
+        grid.append(el('div', 'rem', ''));
+        remCells.push(null);
+      } else {
+        grid.append(el('div', 'dots', '……'));
+        var rem = el('div', 'rem');
+        var btn = revealButton(String(data.steps[i - 1].rem));
+        if (mode === 'open') { open(btn); btn.classList.add('mark'); }
+        rem.append(btn);
+        remCells.push(rem);
+        grid.append(rem);
+      }
+    });
+
+    grid.append(el('div', 'div2', ''));
+    var lastQty = el('div', 'qty last', String(data.last));
+    qtyCells.push(lastQty);
+    grid.append(lastQty);
+    grid.append(el('div', 'dots', '……'));
+    var lastRem = el('div', 'rem');
+    var lastBtn = revealButton(String(data.steps[data.steps.length - 1].rem));
+    if (mode === 'open') { open(lastBtn); lastBtn.classList.add('mark'); }
+    lastRem.append(lastBtn);
+    remCells.push(lastRem);
+    grid.append(lastRem);
+
+    var frame = el('div', 'ladder-frame');
+    var arrow = el('div', 'arrow-col');
+    arrow.innerHTML = '<span class="arrow-head">▲</span><span class="arrow-shaft"></span><span class="arrow-label">read this way</span>';
+    frame.append(grid, arrow);
+
+    return { frame: frame, grid: grid, remCells: remCells, qtyCells: qtyCells, lastQty: lastQty, arrow: arrow };
+  }
+
+  /* Short-division ladder: reveal one row, then one remainder, at a time */
+  function ladderWidget(root) {
+    var n = +root.dataset.n;
+    var data = shortDiv(n);
+    var built = buildLadderGrid(data, 'closed');
+    var wrap = el('div', 'ladder-wrap');
+    wrap.append(el('div', 'ladder-title math', 'E.g. &nbsp;' + n + '<sub>10</sub>'));
+    wrap.append(built.frame);
+
+    var groups = [], g;
+    Array.prototype.forEach.call(built.grid.children, function (c) {
+      if (c.classList.contains('lab')) return;
+      if (c.classList.contains('div2')) { g = []; groups.push(g); }
+      if (g) g.push(c);
+    });
+    groups.forEach(function (group, idx) {
+      if (idx > 0) group.forEach(function (c) { c.style.display = 'none'; });
+    });
+
+    var shown = 1;
+    var acts = el('div', 'row-actions');
+    var next = el('button', 'btn small primary', 'Next row');
+    var status = el('div', 'status', 'Start here: ' + n + ' ÷ 2. Click Next row, then click “?” to show the remainder.');
+    next.addEventListener('click', function () {
+      if (shown >= groups.length) return;
+      groups[shown].forEach(function (c) { c.style.display = ''; });
+      var s = data.steps[shown - 1];
+      shown++;
+      status.className = 'status';
+      status.textContent = s.from + ' is ' + (s.rem ? 'odd' : 'even') + ', so the remainder is 0 or 1. Click “?”.';
+      if (shown === groups.length) {
+        next.disabled = true;
+      }
+    });
+    built.grid.addEventListener('click', function (e) {
+      var b = e.target.closest('.reveal');
+      if (!b || !open(b)) return;
+      var all = built.grid.querySelectorAll('.reveal');
+      var opened = built.grid.querySelectorAll('.reveal.open').length;
+      if (opened === all.length) {
+        status.className = 'status good';
+        status.textContent = 'Last quotient is ' + data.last + ' (< 2), so stop. Next we read from the bottom.';
+      }
+    });
+    acts.append(next);
+    wrap.append(acts, status);
+    root.append(wrap);
+  }
+
+  /* Read remainders bottom → top and assemble the binary number */
+  function readupWidget(root) {
+    var n = +root.dataset.n;
+    var data = shortDiv(n);
+    var built = buildLadderGrid(data, 'open');
+    var wrap = el('div', 'ladder-wrap');
+    wrap.append(el('div', 'ladder-title math', n + '<sub>10</sub>'));
+    wrap.append(built.frame);
+
+    var digits = [data.last].concat(data.steps.map(function (s) { return s.rem; }).reverse());
+    var highlight = [built.lastQty].concat(built.remCells.filter(Boolean).reverse());
+
+    var bits = el('div', 'readout-bits');
+    bits.append(el('span', '', n + '<sub>10</sub> = '));
+    digits.forEach(function (_, i) {
+      var chip = el('span', 'bit-chip', '?');
+      chip.dataset.i = i;
+      bits.append(chip);
+    });
+    bits.append(el('span', '', '<sub>2</sub>'));
+
+    var k = 0;
+    var acts = el('div', 'row-actions');
+    var go = el('button', 'btn small primary', 'Read next digit');
+    var status = el('div', 'status', 'Start at the bottom: the last quotient is the first binary digit.');
+    go.addEventListener('click', function () {
+      if (k >= digits.length) return;
+      highlight.forEach(function (c) { if (c) c.classList.remove('lit'); });
+      if (highlight[k]) highlight[k].classList.add('lit');
+      var chip = bits.querySelectorAll('.bit-chip')[k];
+      chip.textContent = digits[k];
+      chip.classList.add('on');
+      k++;
+      if (k < digits.length) {
+        status.textContent = 'Now move UP. Digit ' + (k + 1) + ' is the next remainder above.';
+      } else {
+        go.disabled = true;
+        status.className = 'status good';
+        status.textContent = 'Bottom → top: ' + data.bits + '₂. Reading top → bottom would reverse this.';
+        completeStep(root);
+      }
+    });
+    acts.append(go);
+    wrap.append(bits, acts, status);
+    root.append(wrap);
+  }
+
   /* Table of all-1s binary numbers: denary values hidden, revealed one by one */
   function onesWidget(root) {
     var rows = +root.dataset.rows;
@@ -396,6 +720,8 @@
     root.append(wrap, acts);
   }
 
+  document.querySelectorAll('[data-widget="ladder"]').forEach(ladderWidget);
+  document.querySelectorAll('[data-widget="readup"]').forEach(readupWidget);
   document.querySelectorAll('[data-widget="ones"]').forEach(onesWidget);
 
   /* Tap-to-reveal buttons in the static markup */
