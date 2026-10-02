@@ -6,6 +6,10 @@
   const AR_SEP = -185;
   const PURIFY_T = -80;
   const LIQUID_T = -200;
+  // Column 1 may warm past N₂'s boiling point, but not to −185 °C or Ar boils there too.
+  const COL1_WARM_LIMIT = -190;
+  // Column 2 may warm past Ar's boiling point, but not to −183 °C or O₂ boils.
+  const COL2_WARM_LIMIT = -184;
 
   const STRINGS = {
     en: {
@@ -198,7 +202,7 @@
     } else {
       stage = 3;
       local = (clamped - 2 / 3) / (1 / 3);
-      temperature = lerp(LIQUID_T, -175, easeInOut(local));
+      temperature = lerp(LIQUID_T, COL2_WARM_LIMIT, easeInOut(local));
       phaseKey = "phaseWarming";
     }
 
@@ -239,7 +243,7 @@
     pipeMols: [],
     inletMols: [],
     transferMols: [],
-    scraperY: 130,
+    scraperY: 210,
     scraperDir: 1,
     tankN2: 0,
     tankAr: 0,
@@ -318,11 +322,11 @@
 
   function seedParticles() {
     state.flow = Array.from({ length: 90 }, () =>
-      makeFlowParticle(45, 200, 175, 265, 1.8)
+      makeFlowParticle(242, 258, 32, 78, 1.8)
     );
     state.dust = Array.from({ length: 42 }, () => ({
-      x: 50 + Math.random() * 160,
-      y: 170 + Math.random() * 110,
+      x: 244 + Math.random() * 12,
+      y: 32 + Math.random() * 48,
       r: 2 + Math.random() * 3.2,
       vx: 0.9 + Math.random() * 1.1,
       phase: Math.random() * Math.PI * 2,
@@ -330,8 +334,8 @@
       pileY: 0,
     }));
     state.frost = Array.from({ length: 55 }, () => ({
-      x: 318 + Math.random() * 200,
-      y: 130 + Math.random() * 180,
+      x: 186 + Math.random() * 128,
+      y: 188 + Math.random() * 150,
       size: 2.5 + Math.random() * 5,
       kind: Math.random() < 0.55 ? "h2o" : "co2",
       birth: Math.random(),
@@ -346,10 +350,10 @@
       life: Math.random(),
     }));
     state.droplets = Array.from({ length: 48 }, () => ({
-      x: 570 + Math.random() * 80,
-      y: 140 + Math.random() * 100,
-      r: 1.8 + Math.random() * 3,
-      vy: 0.8 + Math.random() * 1.6,
+      x: 592 + Math.random() * 40,
+      y: 270 + Math.random() * 70,
+      r: 1.8 + Math.random() * 2.2,
+      vy: 0.8 + Math.random() * 1.2,
       active: false,
     }));
     state.vapor = Array.from({ length: 50 }, (_, i) => ({
@@ -400,7 +404,7 @@
       t: Math.random(),
       r: 1.8 + Math.random() * 2,
     }));
-    state.scraperY = 130;
+    state.scraperY = 210;
     state.scraperDir = 1;
     state.tankN2 = 0;
     state.tankAr = 0;
@@ -524,8 +528,8 @@
       const temp = view.temperature;
       const n2Out = temp >= N2_SEP;
       const arOut = temp >= AR_SEP;
-      const o2Collecting = temp >= N2_SEP && temp < BP.O2;
-      const o2Done = temp >= BP.O2;
+      const o2Collecting = temp >= N2_SEP && temp < COL2_WARM_LIMIT;
+      const o2Done = temp >= COL2_WARM_LIMIT;
 
       chips.push(chip("n2Out", n2Out ? "active" : "pending"));
       chips.push(chip("arOut", arOut ? "active" : "pending"));
@@ -533,7 +537,7 @@
 
       if (temp < N2_SEP) caption = t("caption3a");
       else if (temp < AR_SEP) caption = t("caption3b");
-      else if (temp < BP.O2) caption = t("caption3c");
+      else if (temp < COL2_WARM_LIMIT) caption = t("caption3c");
       else caption = t("caption3d");
     }
 
@@ -606,13 +610,33 @@
   }
 
   function drawPipe(ctx, x1, y1, x2, y2, width, color) {
-    ctx.strokeStyle = color;
-    ctx.lineWidth = width;
     ctx.lineCap = "round";
+    ctx.strokeStyle = mixHex(color, "#1a3a5c", 0.4);
+    ctx.lineWidth = width + 4;
     ctx.beginPath();
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
     ctx.stroke();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+  }
+
+  function drawFlowArrow(ctx, x, y, angle, color) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(9, 0);
+    ctx.lineTo(-6, 5);
+    ctx.lineTo(-6, -5);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
   }
 
   function drawFlowDashes(ctx, x1, y1, x2, y2, now, color) {
@@ -836,11 +860,24 @@
   }
 
   function drawEquipmentBox(ctx, x, y, w, h, fill, stroke) {
-    roundedRect(ctx, x, y, w, h, 14);
-    ctx.fillStyle = fill;
+    const radius = Math.min(22, w * 0.2, h * 0.45);
+    const g = ctx.createLinearGradient(x, y, x, y + h);
+    g.addColorStop(0, "#f7fbfe");
+    g.addColorStop(0.4, "#c5ddf2");
+    g.addColorStop(1, "#3d74ae");
+    roundedRect(ctx, x, y, w, h, radius);
+    ctx.fillStyle = g;
     ctx.fill();
+    ctx.save();
+    roundedRect(ctx, x, y, w, h, radius);
+    ctx.clip();
+    ctx.globalAlpha = 0.2;
+    ctx.fillStyle = fill;
+    ctx.fillRect(x, y, w, h);
+    ctx.restore();
     ctx.strokeStyle = stroke;
-    ctx.lineWidth = 2.5;
+    ctx.lineWidth = 2;
+    roundedRect(ctx, x, y, w, h, radius);
     ctx.stroke();
   }
 
@@ -882,82 +919,103 @@
     const local = view.stage === 1 ? view.local : 1;
     const cold = Math.max(0, Math.min(1, (25 - view.temperature) / (25 - PURIFY_T)));
 
-    // equipment
-    drawEquipmentBox(ctx, 36, 155, 150, 130, "rgba(255,255,255,0.88)", "#8fa9c4");
-    drawLabel(ctx, state.lang === "zh" ? "入口空氣" : "Inlet air", 62, 145);
+    // upright stage-1 plant: air falls through the filter into the cooler
+    const pipeX = 250;
+    const filter = { x: pipeX - 22, y: 86, w: 44, h: 40 };
+    const cooler = { x: 168, y: 168, w: 164, h: 200 };
+    const outletY = cooler.y + 86;
+    const clean = { x: 500, y: outletY - 48, w: 130, h: 96 };
+    const bin = { x: 168, y: 392, w: 180, h: 50 };
 
-    // filter with mesh
-    roundedRect(ctx, 210, 135, 58, 170, 10);
-    ctx.fillStyle = "#7f98b4";
+    drawPipe(ctx, pipeX, 28, pipeX, filter.y, 16, "#b7d2ea");
+    drawPipe(ctx, pipeX, filter.y + filter.h, pipeX, cooler.y + 10, 16, "#b7d2ea");
+    drawFlowDashes(ctx, pipeX, 36, pipeX, filter.y, now, "rgba(210,59,59,0.85)");
+    drawFlowArrow(ctx, pipeX, 58, Math.PI / 2, "#d23b3b");
+    drawLabel(ctx, state.lang === "zh" ? "入口空氣" : "Inlet air", pipeX + 18, 46);
+
+    roundedRect(ctx, filter.x, filter.y, filter.w, filter.h, 4);
+    ctx.fillStyle = "#f7f4ef";
     ctx.fill();
-    for (let i = 0; i < 10; i++) {
-      ctx.strokeStyle = "rgba(255,255,255,0.55)";
-      ctx.lineWidth = 2;
+    ctx.strokeStyle = "#5d5148";
+    ctx.lineWidth = 1.4;
+    ctx.stroke();
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 5; i++) {
       ctx.beginPath();
-      ctx.moveTo(218, 150 + i * 15);
-      ctx.lineTo(260, 150 + i * 15);
+      ctx.moveTo(filter.x + 3, filter.y + 6 + i * 7);
+      ctx.lineTo(filter.x + filter.w - 3, filter.y + 6 + i * 7);
       ctx.stroke();
     }
     for (let i = 0; i < 4; i++) {
       ctx.beginPath();
-      ctx.moveTo(220 + i * 12, 148);
-      ctx.lineTo(220 + i * 12, 290);
+      ctx.moveTo(filter.x + 8 + i * 9, filter.y + 3);
+      ctx.lineTo(filter.x + 8 + i * 9, filter.y + filter.h - 3);
       ctx.stroke();
     }
-    drawLabel(ctx, state.lang === "zh" ? "過濾器" : "Filter", 212, 325);
+    drawLabel(ctx, state.lang === "zh" ? "過濾器" : "Filter", filter.x - 62, filter.y + 24);
 
-    // cooler with frost tint
     const coolerFill = `rgba(${Math.round(200 - cold * 50)}, ${Math.round(225 - cold * 20)}, ${Math.round(240)}, ${0.45 + cold * 0.25})`;
-    drawEquipmentBox(ctx, 300, 105, 230, 230, coolerFill, "#6f9bbd");
-    // frost bloom on walls
+    drawEquipmentBox(ctx, cooler.x, cooler.y, cooler.w, cooler.h, coolerFill, "#6f9bbd");
     if (cold > 0.35) {
       ctx.fillStyle = `rgba(230,245,255,${0.15 + cold * 0.35})`;
-      roundedRect(ctx, 308, 113, 18, 214, 8);
+      roundedRect(ctx, cooler.x + 8, cooler.y + 16, 14, cooler.h - 32, 8);
       ctx.fill();
-      roundedRect(ctx, 504, 113, 18, 214, 8);
+      roundedRect(ctx, cooler.x + cooler.w - 22, cooler.y + 16, 14, cooler.h - 32, 8);
       ctx.fill();
-      roundedRect(ctx, 308, 113, 214, 16, 8);
+      roundedRect(ctx, cooler.x + 8, cooler.y + 10, cooler.w - 16, 14, 8);
       ctx.fill();
     }
     drawLabel(
       ctx,
       state.lang === "zh" ? "冷卻室 (−80 °C)" : "Cooler (−80 °C)",
-      345,
-      95
+      18,
+      cooler.y + 36
     );
 
-    drawEquipmentBox(ctx, 560, 165, 100, 110, "rgba(255,255,255,0.9)", "#8fa9c4");
-    drawLabel(ctx, state.lang === "zh" ? "淨化空氣" : "Clean air", 568, 155);
+    drawPipe(ctx, cooler.x + cooler.w, outletY, clean.x, outletY, 14, "#b7c9dc");
+    drawFlowDashes(ctx, cooler.x + cooler.w, outletY, clean.x, outletY, now, "rgba(90,170,140,0.75)");
+    drawFlowArrow(ctx, clean.x - 6, outletY, 0, "#3d9a6a");
+    drawEquipmentBox(ctx, clean.x, clean.y, clean.w, clean.h, "rgba(255,255,255,0.9)", "#8fa9c4");
+    drawLabel(ctx, state.lang === "zh" ? "淨化空氣" : "Clean air", clean.x + 8, clean.y - 10);
+    drawPipe(ctx, clean.x + clean.w, outletY, 712, outletY, 12, "#9bb3cc");
+    drawFlowDashes(ctx, clean.x + clean.w, outletY, 712, outletY, now, "rgba(210,59,59,0.85)");
+    drawFlowArrow(ctx, 696, outletY, 0, "#d23b3b");
+    drawLabel(
+      ctx,
+      state.lang === "zh" ? "至壓縮機" : "To compressor",
+      clean.x + clean.w - 4,
+      outletY + 18,
+      "#174684",
+      11
+    );
 
-    // waste bin
-    drawEquipmentBox(ctx, 340, 370, 150, 55, "rgba(240,246,252,0.95)", "#9bb0c6");
+    drawEquipmentBox(ctx, bin.x, bin.y, bin.w, bin.h, "rgba(240,246,252,0.95)", "#9bb0c6");
     drawLabel(
       ctx,
       state.lang === "zh" ? "除去固體（防堵塞）" : "Solids removed (anti-block)",
-      348,
-      402,
+      bin.x + 8,
+      bin.y + 30,
       "#0f6a4a",
       11
     );
 
-    drawPipe(ctx, 186, 220, 210, 220, 14, "#b7c9dc");
-    drawPipe(ctx, 268, 220, 300, 220, 14, "#b7c9dc");
-    drawPipe(ctx, 530, 220, 560, 220, 14, "#b7c9dc");
-    drawFlowDashes(ctx, 186, 220, 210, 220, now, "rgba(74,127,212,0.7)");
-    drawFlowDashes(ctx, 268, 220, 300, 220, now, "rgba(74,127,212,0.7)");
-    drawFlowDashes(ctx, 530, 220, 560, 220, now, "rgba(90,170,140,0.75)");
-
-    // air stream particles (always visible)
     state.flow.forEach((p) => {
-      p.x += p.vx * s;
-      p.y += Math.sin(now / 280 + p.phase) * 0.55 * s;
-      // skip through filter gap visually
-      if (p.x > 660) {
-        p.x = 45;
-        p.y = 175 + Math.random() * 90;
+      const inColumn = p.x < cooler.x + cooler.w - 8;
+      if (inColumn) {
+        p.y += p.vx * s;
+        p.x += Math.sin(now / 280 + p.phase) * 0.25 * s;
+        p.x = Math.max(pipeX - 8, Math.min(pipeX + 8, p.x));
+        if (p.y > outletY - 6) p.x = cooler.x + cooler.w - 4;
+      } else {
+        p.x += p.vx * s;
+        p.y += (outletY - p.y) * 0.25 * s;
       }
-      const clean = p.x > 268;
-      ctx.fillStyle = clean
+      if (p.x > 700 || p.y > cooler.y + cooler.h) {
+        p.x = pipeX + (Math.random() - 0.5) * 8;
+        p.y = 34 + Math.random() * 28;
+      }
+      const cleanAir = p.y > filter.y + filter.h || p.x > cooler.x + cooler.w;
+      ctx.fillStyle = cleanAir
         ? `rgba(110, 180, 150, ${p.alpha})`
         : `rgba(120, 160, 210, ${p.alpha})`;
       ctx.beginPath();
@@ -965,20 +1023,19 @@
       ctx.fill();
     });
 
-    // dust — catch on filter
     let caughtCount = 0;
     state.dust.forEach((d, i) => {
       if (!d.caught) {
-        d.x += d.vx * s;
-        d.y += Math.sin(now / 220 + d.phase) * 0.7 * s;
-        if (d.x >= 215 && d.x <= 262) {
+        d.y += d.vx * s;
+        d.x += (pipeX - d.x) * 0.12 * s;
+        if (d.y >= filter.y && d.y <= filter.y + filter.h) {
           d.caught = true;
-          d.x = 218 + (i % 5) * 8;
-          d.pileY = 155 + Math.floor(i / 5) * 14 + (i % 3);
+          d.x = filter.x + 6 + (i % 5) * 7;
+          d.pileY = filter.y + 7 + (Math.floor(i / 5) % 4) * 8;
         }
-        if (d.x > 270 && !d.caught) {
-          d.x = 50;
-          d.y = 170 + Math.random() * 100;
+        if (d.y > filter.y + filter.h + 8 && !d.caught) {
+          d.x = pipeX + (Math.random() - 0.5) * 8;
+          d.y = 34 + Math.random() * 24;
         }
       }
       if (d.caught) {
@@ -995,29 +1052,26 @@
       }
     });
 
-    // respawn some free dust early so stream stays dusty until filtered
     if (local < 0.4 && caughtCount > 30) {
       state.dust.filter((d) => d.caught).slice(0, 8).forEach((d) => {
         d.caught = false;
-        d.x = 50 + Math.random() * 40;
-        d.y = 175 + Math.random() * 90;
+        d.x = pipeX + (Math.random() - 0.5) * 8;
+        d.y = 34 + Math.random() * 24;
       });
     }
 
-    // frost nucleation + scraper
     const freeze = Math.max(0, Math.min(1, (PURIFY_T + 35 - view.temperature) / 55));
     if (freeze > 0.15) {
       state.scraperY += state.scraperDir * (0.6 + freeze) * s;
-      if (state.scraperY > 300) state.scraperDir = -1;
-      if (state.scraperY < 125) state.scraperDir = 1;
+      if (state.scraperY > cooler.y + cooler.h - 28) state.scraperDir = -1;
+      if (state.scraperY < cooler.y + 20) state.scraperDir = 1;
 
-      // scraper blade
       if (local > 0.55) {
         ctx.fillStyle = "rgba(90,110,130,0.85)";
-        roundedRect(ctx, 315, state.scraperY, 200, 8, 3);
+        roundedRect(ctx, cooler.x + 14, state.scraperY, cooler.w - 28, 8, 3);
         ctx.fill();
         ctx.fillStyle = "#5a7088";
-        ctx.fillRect(505, state.scraperY - 6, 10, 20);
+        ctx.fillRect(cooler.x + cooler.w - 18, state.scraperY - 6, 10, 20);
       }
 
       state.frost.forEach((f) => {
@@ -1062,44 +1116,43 @@
       // falling removed solids into bin
       if (local > 0.72) {
         for (let i = 0; i < 8; i++) {
-          const fy = 320 + ((now / 25 + i * 18) % 60);
+          const fy = cooler.y + cooler.h + ((now / 25 + i * 18) % 28);
           ctx.fillStyle = i % 2 ? "rgba(210,235,255,0.85)" : "rgba(230,240,250,0.9)";
           ctx.beginPath();
-          ctx.arc(360 + i * 14, fy, 3, 0, Math.PI * 2);
+          ctx.arc(bin.x + 18 + i * 18, fy, 3, 0, Math.PI * 2);
           ctx.fill();
         }
       }
     }
 
-    // legend
-    roundedRect(ctx, 36, 430, 300, 60, 10);
+    roundedRect(ctx, 400, 430, 300, 60, 10);
     ctx.fillStyle = "rgba(255,255,255,0.82)";
     ctx.fill();
     ctx.fillStyle = "#4a5568";
     ctx.beginPath();
-    ctx.arc(56, 460, 4, 0, Math.PI * 2);
+    ctx.arc(420, 460, 4, 0, Math.PI * 2);
     ctx.fill();
-    drawLabel(ctx, state.lang === "zh" ? "灰塵" : "Dust", 66, 464, "#17345a", 12);
+    drawLabel(ctx, state.lang === "zh" ? "灰塵" : "Dust", 430, 464, "#17345a", 12);
     ctx.fillStyle = "rgba(120,160,210,0.8)";
     ctx.beginPath();
-    ctx.arc(125, 460, 4, 0, Math.PI * 2);
+    ctx.arc(489, 460, 4, 0, Math.PI * 2);
     ctx.fill();
-    drawLabel(ctx, state.lang === "zh" ? "氣流" : "Air flow", 135, 464, "#17345a", 12);
+    drawLabel(ctx, state.lang === "zh" ? "氣流" : "Air flow", 499, 464, "#17345a", 12);
     ctx.fillStyle = "rgba(210,235,255,0.95)";
     ctx.beginPath();
-    ctx.arc(210, 460, 5, 0, Math.PI * 2);
+    ctx.arc(574, 460, 5, 0, Math.PI * 2);
     ctx.fill();
-    drawLabel(ctx, "H₂O(s)", 220, 464, "#17345a", 12);
+    drawLabel(ctx, "H₂O(s)", 584, 464, "#17345a", 12);
     ctx.fillStyle = "rgba(235,242,250,0.95)";
-    roundedRect(ctx, 275, 454, 10, 10, 2);
+    roundedRect(ctx, 639, 454, 10, 10, 2);
     ctx.fill();
-    drawLabel(ctx, "CO₂(s)", 290, 464, "#17345a", 12);
+    drawLabel(ctx, "CO₂(s)", 654, 464, "#17345a", 12);
   }
 
 
   /** Stage 2 layout — liquid air vessel aligned with process line */
   const STAGE2_LAYOUT = {
-    liquidTank: { x: 560, y: 115, w: 100, h: 220 },
+    liquidTank: { x: 586, y: 250, w: 50, h: 72 },
   };
 
   function liquidTankInner() {
@@ -1117,10 +1170,10 @@
   function stage2Zones() {
     const tank = STAGE2_LAYOUT.liquidTank;
     return [
-      { id: 0, x: 70, y: 175, w: 84, h: 100, name: "compress" },
-      { id: 1, x: 222, y: 130, w: 126, h: 190, name: "cooler" },
-      { id: 2, x: 402, y: 192, w: 44, h: 78, name: "highP" },
-      { id: 3, x: 472, y: 192, w: 48, h: 78, name: "lowP" },
+      { id: 0, x: 116, y: 252, w: 60, h: 56, name: "compress" },
+      { id: 1, x: 112, y: 30, w: 310, h: 190, name: "cooler" },
+      { id: 2, x: 286, y: 180, w: 72, h: 130, name: "highP" },
+      { id: 3, x: 418, y: 180, w: 78, h: 130, name: "lowP" },
       { id: 4, x: tank.x + 6, y: tank.y + 28, w: tank.w - 12, h: tank.h - 40, name: "liquid" },
     ];
   }
@@ -1152,106 +1205,95 @@
     m.dwell = 25 + Math.random() * 55;
   }
 
+  function stage2Routes() {
+    const bend = 16;
+    const leftX = 128;
+    const rightX = 408;
+    const topY = 42;
+    const leftEnd = 215;
+    const rightEnd = 136;
+    const loop = [[rightX, rightEnd], [rightX, topY + bend]];
+    const rightCorner = [rightX - bend, topY + bend];
+    for (let i = 1; i <= 8; i++) {
+      const a = (-Math.PI / 2) * (i / 8);
+      loop.push([
+        rightCorner[0] + Math.cos(a) * bend,
+        rightCorner[1] + Math.sin(a) * bend,
+      ]);
+    }
+    loop.push([leftX + bend, topY]);
+    const leftCorner = [leftX + bend, topY + bend];
+    for (let i = 1; i <= 8; i++) {
+      const a = -Math.PI / 2 - (Math.PI / 2) * (i / 8);
+      loop.push([
+        leftCorner[0] + Math.cos(a) * bend,
+        leftCorner[1] + Math.sin(a) * bend,
+      ]);
+    }
+    loop.push([leftX, leftEnd]);
+    return {
+      inlet: { pts: [[14, 254], [108, 254], [200, 254]], next: "feed" },
+      feed: { pts: [[200, 254], [268, 254]], next: null },
+      toLoop: { pts: [[268, 254], [408, 254], [408, rightEnd]], next: "loop" },
+      loop: { pts: loop, next: "throughComp" },
+      throughComp: { pts: [[leftX, leftEnd], [leftX, 254], [200, 254]], next: "feed" },
+      toTank: { pts: [[518, 245], [575, 245], [590, 262]], next: "toTank" },
+    };
+  }
+
+  function polyLength(pts) {
+    let total = 0;
+    for (let i = 1; i < pts.length; i++) {
+      total += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+    }
+    return total;
+  }
+
+  function pointAlong(pts, dist) {
+    let left = Math.max(0, dist);
+    for (let i = 1; i < pts.length; i++) {
+      const dx = pts[i][0] - pts[i - 1][0];
+      const dy = pts[i][1] - pts[i - 1][1];
+      const len = Math.hypot(dx, dy) || 1;
+      if (left <= len) {
+        const u = left / len;
+        return [pts[i - 1][0] + dx * u, pts[i - 1][1] + dy * u];
+      }
+      left -= len;
+    }
+    const end = pts[pts.length - 1];
+    return [end[0], end[1]];
+  }
+
   function drawPipeMols(ctx, now, local, s) {
-    const zones = stage2Zones();
-    const maxZone = 4;
+    const routes = stage2Routes();
+    const names = Object.keys(routes);
 
     state.pipeMols.forEach((m) => {
-      if (m.zone > maxZone) placeMolInZone(m, 0);
+      if (!routes[m.route]) {
+        m.route = names[Math.floor(Math.random() * names.length)];
+        m.dist = Math.random() * polyLength(routes[m.route].pts);
+        m.speed = 0.55 + Math.random() * 0.45;
+      }
+      const route = routes[m.route];
+      const len = polyLength(route.pts);
+      m.dist += m.speed * s;
+      if (m.dist >= len) {
+        const extra = m.dist - len;
+        let next = route.next;
+        if (m.route === "feed") next = "toLoop";
+        m.route = next;
+        m.dist = Math.min(extra, 6);
+      }
+      const p = pointAlong(routes[m.route].pts, m.dist);
+      m.x = p[0];
+      m.y = p[1];
 
-      const z = zones[m.zone];
-      // Brownian jitter
-      m.vx += (Math.random() - 0.5) * 0.35 * s;
-      m.vy += (Math.random() - 0.5) * 0.35 * s;
-
-      // zone-specific drift / damping
-      if (m.zone === 0) {
-        // compressor: mill, slight right bias toward cooler outlet
-        m.vx += 0.02 * s;
-        m.vx *= Math.pow(0.92, s);
-        m.vy *= Math.pow(0.92, s);
-      } else if (m.zone === 1) {
-        // cooler: fill the box, slow rightward drift
-        m.vx += 0.035 * s;
-        m.vx *= Math.pow(0.94, s);
-        m.vy *= Math.pow(0.94, s);
-      } else if (m.zone === 2) {
-        // high P: packed / slower, drift to orifice (right)
-        m.vx += 0.05 * s;
-        m.vx *= Math.pow(0.9, s);
-        m.vy *= Math.pow(0.88, s);
-      } else if (m.zone === 3) {
-        // low P: expand — faster, more spread
-        m.vx += 0.08 * s;
-        m.vx *= Math.pow(0.96, s);
-        m.vy *= Math.pow(0.97, s);
-      } else if (m.zone === 4) {
-        // liquid tank: sink bias
-        m.vy += 0.04 * s;
-        m.vx += 0.015 * s;
-        m.vx *= Math.pow(0.9, s);
-        m.vy *= Math.pow(0.92, s);
-      }
-
-      // clamp speed
-      const maxSp = m.zone === 3 ? 2.4 : m.zone === 2 ? 1.2 : 1.8;
-      const sp = Math.hypot(m.vx, m.vy);
-      if (sp > maxSp) {
-        m.vx = (m.vx / sp) * maxSp;
-        m.vy = (m.vy / sp) * maxSp;
-      }
-
-      m.x += m.vx * s;
-      m.y += m.vy * s;
-      m.dwell -= s;
-
-      // bounce inside zone
-      const pad = 4;
-      if (m.x < z.x + pad) {
-        m.x = z.x + pad;
-        m.vx = Math.abs(m.vx) * 0.8;
-      }
-      if (m.x > z.x + z.w - pad) {
-        m.x = z.x + z.w - pad;
-        m.vx = -Math.abs(m.vx) * 0.5;
-      }
-      if (m.y < z.y + pad) {
-        m.y = z.y + pad;
-        m.vy = Math.abs(m.vy) * 0.8;
-      }
-      if (m.y > z.y + z.h - pad) {
-        m.y = z.y + z.h - pad;
-        m.vy = -Math.abs(m.vy) * 0.6;
-      }
-
-      // advance to next zone when dwell done and near exit (right side), or randomly
-      const nearExit = m.zone === 4
-        ? m.y > z.y + z.h * 0.72
-        : m.x > z.x + z.w * 0.72;
-      const ready = m.dwell <= 0 && (nearExit || Math.random() < 0.02 * s);
-      if (ready) {
-        let next = m.zone + 1;
-        if (next > maxZone) next = 0;
-        placeMolInZone(m, next);
-      }
-
-      // draw
-      let color = "rgba(90,150,210,0.85)";
-      let r = m.r;
-      if (m.zone === 1) color = "rgba(70,160,210,0.88)";
-      if (m.zone === 2) {
-        color = "rgba(34,100,222,0.9)";
-        r = m.r * 0.9;
-      }
-      if (m.zone === 3) {
-        color = "rgba(100,190,230,0.85)";
-        r = m.r * (1.15 + Math.sin(now / 200 + m.phase) * 0.15);
-      }
-      if (m.zone === 4) color = "rgba(80,150,220,0.95)";
-
-      ctx.fillStyle = color;
+      ctx.fillStyle = m.route === "loop" || m.route === "toLoop"
+        ? "rgba(70,160,210,0.9)"
+        : "rgba(90,150,210,0.9)";
       ctx.beginPath();
-      ctx.arc(m.x, m.y, r, 0, Math.PI * 2);
+      ctx.arc(m.x, m.y, Math.min(m.r, 2.4), 0, Math.PI * 2);
       ctx.fill();
     });
   }
@@ -1263,18 +1305,19 @@
     const local = view.stage === 2 ? view.local : 1;
     const pulse = 0.5 + 0.5 * Math.sin(now / 280);
 
-    // ——— Compressor: piston packing molecules ———
-    const compX = 40;
-    const compY = 130;
-    const compW = 145;
-    const compH = 200;
+    // ——— Small compressor. Air arrives from stage 1. ———
+    const compX = 108;
+    const compY = 209;
+    const compW = 92;
+    const compH = 118;
+    const feedY = 254;
     drawEquipmentBox(ctx, compX, compY, compW, compH, "#eef3f9", "#7f98b4");
-    drawLabel(ctx, state.lang === "zh" ? "壓縮機" : "Compressor", 58, 120);
+    drawLabel(ctx, state.lang === "zh" ? "壓縮機" : "Compressor", compX, compY + compH + 22, "#17345a", 12);
 
-    const cylX = 62;
-    const cylY = 155;
-    const cylW = 100;
-    const cylH = 130;
+    const cylX = 120;
+    const cylY = 228;
+    const cylW = 68;
+    const cylH = 64;
     roundedRect(ctx, cylX, cylY, cylW, cylH, 8);
     ctx.fillStyle = "rgba(210, 225, 240, 0.55)";
     ctx.fill();
@@ -1283,16 +1326,16 @@
     ctx.stroke();
 
     const pistonPhase = (Math.sin(now / 320) + 1) / 2;
-    const pistonTravel = 70;
-    const pistonTop = cylY + 8 + pistonPhase * pistonTravel;
-    const chamberTop = pistonTop + 18;
-    const chamberBottom = cylY + cylH - 6;
+    const pistonTravel = 28;
+    const pistonTop = cylY + 6 + pistonPhase * pistonTravel;
+    const chamberTop = pistonTop + 14;
+    const chamberBottom = cylY + cylH - 4;
     const chamberH = Math.max(12, chamberBottom - chamberTop);
     const pack = pistonPhase;
 
     ctx.fillStyle = "#5a6f88";
-    ctx.fillRect(cylX + cylW / 2 - 5, cylY + 4, 10, pistonTop - cylY);
-    roundedRect(ctx, cylX + 6, pistonTop, cylW - 12, 16, 4);
+    ctx.fillRect(cylX + cylW / 2 - 4, cylY + 3, 8, pistonTop - cylY);
+    roundedRect(ctx, cylX + 5, pistonTop, cylW - 10, 12, 3);
     ctx.fillStyle = pack > 0.65
       ? `rgba(34,100,222,${0.55 + 0.3 * pulse})`
       : "rgba(70,110,170,0.75)";
@@ -1305,8 +1348,8 @@
       const jitterY = Math.cos(now / 200 + m.phase) * (1 - pack) * 0.05;
       const nx = lerp(m.nx, 0.2 + (i % 7) * 0.09, pack * 0.55) + jitterX;
       const ny = lerp(m.ny, 0.25 + Math.floor(i / 7) * 0.18, pack * 0.7) + jitterY;
-      const px = cylX + 10 + Math.max(0.05, Math.min(0.95, nx)) * (cylW - 20);
-      const py = chamberTop + 4 + Math.max(0.05, Math.min(0.95, ny)) * (chamberH - 10);
+      const px = cylX + 8 + Math.max(0.05, Math.min(0.95, nx)) * (cylW - 16);
+      const py = chamberTop + 3 + Math.max(0.05, Math.min(0.95, ny)) * (chamberH - 8);
       const r = m.r * (1 - pack * 0.25);
       ctx.fillStyle = pack > 0.6
         ? `rgba(34,100,222,${0.55 + pack * 0.35})`
@@ -1316,58 +1359,33 @@
       ctx.fill();
     });
 
-    roundedRect(ctx, cylX + 8, chamberBottom - 10, (cylW - 16) * (0.35 + pack * 0.65), 6, 3);
-    ctx.fillStyle = `rgba(34,100,222,${0.25 + pack * 0.55})`;
-    ctx.fill();
+    drawLabel(ctx, "P↑", cylX + 22, cylY + cylH + 16, "#174ca8", 14);
 
-    drawLabel(ctx, "P↑", 100, 310, "#174ca8", 16);
-    roundedRect(ctx, 55, 318, 120, 26, 8);
-    ctx.fillStyle = pack > 0.7
-      ? `rgba(34,100,222,${0.2 + 0.15 * pulse})`
-      : "rgba(34,100,222,0.12)";
-    ctx.fill();
+    drawPipe(ctx, 8, feedY, compX, feedY, 12, "#9bb3cc");
+    drawFlowDashes(ctx, 8, feedY, compX, feedY, now, "rgba(210,59,59,0.85)");
+    drawFlowArrow(ctx, compX - 16, feedY, 0, "#d23b3b");
     drawLabel(
       ctx,
-      pack > 0.7
-        ? (state.lang === "zh" ? "分子被壓縮" : "Molecules packed")
-        : (state.lang === "zh" ? "壓縮中" : "Compressing"),
-      62,
-      336,
-      "#174ca8",
+      state.lang === "zh" ? "上一階段" : "From stage 1",
+      8,
+      feedY - 14,
+      "#174684",
       11
     );
 
-    ctx.fillStyle = "rgba(74,127,212,0.7)";
-    ctx.beginPath();
-    ctx.moveTo(28, 220);
-    ctx.lineTo(42, 212);
-    ctx.lineTo(42, 228);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(185, 212);
-    ctx.lineTo(200, 220);
-    ctx.lineTo(185, 228);
-    ctx.fill();
-
-    // ——— Cooler coils ———
-    drawEquipmentBox(ctx, 210, 115, 150, 220, "rgba(170,210,235,0.55)", "#6f98b8");
-    drawLabel(ctx, state.lang === "zh" ? "冷卻器" : "Cooler", 250, 105);
-    for (let i = 0; i < 6; i++) {
-      const y = 150 + i * 28;
-      ctx.strokeStyle = "rgba(80,140,190,0.55)";
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.moveTo(228, y);
-      ctx.bezierCurveTo(255, y - 10, 315, y + 10, 342, y);
-      ctx.stroke();
-      drawFlowDashes(ctx, 228, y, 342, y, now + i * 40, "rgba(60,140,200,0.65)");
-    }
-
-    // ——— Expansion valve: high-P → orifice → low-P spread ———
-    const exX = 390;
-    const exY = 155;
-    const exW = 145;
-    const exH = 145;
+    // ——— Large expansion area. Bigger than the compressor and the cooling loop. ———
+    const exX = 268;
+    const exY = 128;
+    const exW = 250;
+    const exH = 250;
+    const highX = exX + 18;
+    const highY = exY + 52;
+    const highW = 72;
+    const highH = 130;
+    const lowX = exX + 150;
+    const lowY = exY + 52;
+    const lowW = 78;
+    const lowH = 130;
     drawEquipmentBox(
       ctx,
       exX,
@@ -1377,83 +1395,85 @@
       local >= 0.25 ? `rgba(255,244,230,${0.75 + 0.1 * pulse})` : "#f4f7fb",
       "#c49a55"
     );
-    drawLabel(ctx, state.lang === "zh" ? "膨脹閥" : "Expand", 425, 145);
+    drawLabel(ctx, state.lang === "zh" ? "膨脹閥" : "Expand", exX + 8, exY - 8);
 
-    roundedRect(ctx, exX + 10, exY + 35, 48, 85, 8);
+    roundedRect(ctx, highX, highY, highW, highH, 8);
     ctx.fillStyle = "rgba(34,100,222,0.18)";
     ctx.fill();
     ctx.strokeStyle = "#4a7fd4";
     ctx.lineWidth = 2;
     ctx.stroke();
-    drawLabel(ctx, "High P", exX + 14, exY + 30, "#174ca8", 10);
+    drawLabel(ctx, "High P", highX + 8, highY - 6, "#174ca8", 10);
 
     ctx.fillStyle = "#8a7048";
-    ctx.fillRect(exX + 58, exY + 68, 18, 18);
+    ctx.fillRect(exX + 108, highY + 52, 22, 22);
     ctx.fillStyle = "#f0e6d4";
-    ctx.fillRect(exX + 62, exY + 74, 10, 6);
+    ctx.fillRect(exX + 113, highY + 60, 12, 7);
     for (let i = 0; i < 3; i++) {
       ctx.fillStyle = "#5a4a30";
       ctx.beginPath();
-      ctx.arc(exX + 67, exY + 72 + i * 5, 1.2, 0, Math.PI * 2);
+      ctx.arc(exX + 119, highY + 58 + i * 6, 1.2, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    roundedRect(ctx, exX + 80, exY + 35, 52, 85, 8);
+    roundedRect(ctx, lowX, lowY, lowW, lowH, 8);
     ctx.fillStyle = "rgba(120,190,230,0.2)";
     ctx.fill();
     ctx.strokeStyle = "#6a9ab8";
     ctx.lineWidth = 2;
     ctx.stroke();
-    drawLabel(ctx, "Low P", exX + 88, exY + 30, "#2a6a8a", 10);
+    drawLabel(ctx, "Low P", lowX + 10, lowY - 6, "#2a6a8a", 10);
 
+    const orificeY = highY + 63;
     state.expMols.forEach((m) => {
-      if (m.reset) {
-        if (m.side === "high") {
-          m.x = exX + 18 + Math.random() * 32;
-          m.y = exY + 45 + Math.random() * 65;
-          m.vx = 0.6 + Math.random() * 0.5;
-          m.vy = (Math.random() - 0.5) * 0.4;
-        } else {
-          m.x = exX + 78;
-          m.y = exY + 72 + (Math.random() - 0.5) * 8;
-          const ang = (Math.random() - 0.5) * 1.4;
-          m.vx = 1.4 + Math.random() * 1.6;
-          m.vy = Math.sin(ang) * 2.2;
-        }
+      if (m.reset || m.side === "low" && m.x === 0) {
+        m.side = "high";
+        m.x = highX + 8 + Math.random() * (highW - 20);
+        m.y = highY + 8 + Math.random() * (highH - 16);
+        m.vx = 0.7 + Math.random() * 0.5;
         m.life = 0;
         m.reset = false;
       }
 
-      m.x += m.vx * s;
-      m.y += m.vy * s;
-      m.life += 0.016 * s;
-
       if (m.side === "high") {
-        m.y += (exY + 77 - m.y) * (1 - Math.pow(0.98, s));
-        if (m.x >= exX + 58) {
+        m.x += m.vx * s;
+        m.y += (orificeY - m.y) * 0.12 * s;
+        if (m.x < highX + 6) m.x = highX + 6;
+        if (m.y < highY + 6) m.y = highY + 6;
+        if (m.y > highY + highH - 6) m.y = highY + highH - 6;
+        if (m.x >= highX + highW - 2) {
+          m.side = "valve";
+          m.x = highX + highW - 2;
+          m.y = orificeY;
+        }
+      } else if (m.side === "valve") {
+        m.x += 2.2 * s;
+        m.y = orificeY;
+        if (m.x >= lowX + 6) {
           m.side = "low";
-          m.x = exX + 78;
-          const ang = (Math.random() - 0.5) * 1.5;
-          m.vx = 1.5 + Math.random() * 1.8;
-          m.vy = Math.sin(ang) * 2.4;
-          m.life = 0;
+          m.x = lowX + 6;
+          m.vx = 0.8 + Math.random() * 0.6;
+          m.vy = (Math.random() - 0.5) * 0.8;
         }
-        ctx.fillStyle = "rgba(34,100,222,0.85)";
-        ctx.beginPath();
-        ctx.arc(m.x, m.y, m.r * 0.85, 0, Math.PI * 2);
-        ctx.fill();
       } else {
-        m.vx *= Math.pow(0.995, s);
-        if (m.x > exX + exW - 8 || m.life > 1.1 || m.y < exY + 38 || m.y > exY + 118) {
-          m.side = Math.random() < 0.5 ? "high" : "low";
-          m.reset = true;
+        m.x += m.vx * s;
+        m.y += m.vy * s;
+        if (m.y < lowY + 6) {
+          m.y = lowY + 6;
+          m.vy = Math.abs(m.vy);
         }
-        const a = Math.max(0.15, 0.75 - m.life * 0.45);
-        ctx.fillStyle = `rgba(90,180,220,${a})`;
-        ctx.beginPath();
-        ctx.arc(m.x, m.y, m.r * (1 + m.life * 0.6), 0, Math.PI * 2);
-        ctx.fill();
+        if (m.y > lowY + lowH - 6) {
+          m.y = lowY + lowH - 6;
+          m.vy = -Math.abs(m.vy);
+        }
+        if (m.x < lowX + 4) m.x = lowX + 4;
+        if (m.x > lowX + lowW - 6) m.reset = true;
       }
+
+      ctx.fillStyle = m.side === "high" ? "rgba(34,100,222,0.85)" : "rgba(90,180,220,0.8)";
+      ctx.beginPath();
+      ctx.arc(m.x, m.y, Math.min(m.r, 2.6), 0, Math.PI * 2);
+      ctx.fill();
     });
 
     if (local > 0.15) {
@@ -1461,17 +1481,19 @@
         mist.life += 0.025 * s;
         if (mist.life > 1) {
           mist.life = 0;
-          mist.x = exX + 85 + Math.random() * 40;
-          mist.y = exY + 50 + Math.random() * 50;
+          mist.x = lowX + 8 + Math.random() * (lowW - 16);
+          mist.y = lowY + 10 + Math.random() * (lowH - 24);
           mist.r = 3 + Math.random() * 7;
         }
+        mist.x = Math.max(lowX + 8, Math.min(lowX + lowW - 8, mist.x));
+        mist.y = Math.max(lowY + 8, Math.min(lowY + lowH - 8, mist.y));
         const a = (1 - mist.life) * 0.4;
         ctx.fillStyle = `rgba(180,220,240,${a})`;
         ctx.beginPath();
         ctx.arc(
-          mist.x + mist.life * 18,
-          mist.y + Math.sin(now / 200 + i) * 3,
-          mist.r * (1 + mist.life),
+          mist.x,
+          mist.y + Math.sin(now / 200 + i) * 2,
+          Math.min(mist.r, lowW * 0.22),
           0,
           Math.PI * 2
         );
@@ -1479,55 +1501,77 @@
       });
     }
 
-    drawLabel(ctx, "T↓", exX + 55, exY + 138, "#9a5b00", 15);
+    drawLabel(ctx, "T↓", exX + 112, highY + highH + 8, "#9a5b00", 15);
     drawLabel(
       ctx,
-      state.lang === "zh" ? "分子膨脹冷卻" : "Molecules expand → cool",
+      state.lang === "zh" ? "控制膨脹，溫度下降" : "Controlled expansion",
       exX + 8,
-      exY + exH + 18,
+      exY + exH + 16,
       "#9a5b00",
       11
     );
 
-    // ——— Liquid air tank ———
+    // Liquid leaves the right side of the expansion vessel, then enters
+    // column 1 the same way stage 3 does. Nothing crosses the vessel.
+    const outCol = { x: 575, y: 135, w: 72, h: 200 };
+    const colInletY = outCol.y + Math.round(outCol.h * 0.55);
+    const fill = Math.max(0, Math.min(1, (local - 0.5) / 0.45));
+    drawFractionatingColumn(ctx, outCol, {
+      title: state.lang === "zh" ? "第一分餾塔 (N₂)" : "Column 1 (N₂)",
+      poolHeight: 24 + fill * 62,
+      tempLabel: "−196 °C",
+      tempActive: fill > 0.15,
+    });
+    drawPipe(ctx, exX + exW, colInletY, outCol.x, colInletY, 10, "#9bb3cc");
+    drawFlowDashes(ctx, exX + exW, colInletY, outCol.x, colInletY, now, "rgba(74,127,212,0.8)");
+    drawFlowArrow(ctx, outCol.x - 8, colInletY, 0, "#4a7fd4");
+    drawLabel(
+      ctx,
+      state.lang === "zh" ? "液態空氣入口" : "Liquid air inlet",
+      exX + exW + 4,
+      colInletY - 12,
+      "#174684",
+      11
+    );
+    drawLabel(ctx, "≈ −200 °C", outCol.x + 2, outCol.y + outCol.h + 16, "#174ca8", 11);
+
     const tank = STAGE2_LAYOUT.liquidTank;
     const inner = liquidTankInner();
-    drawEquipmentBox(ctx, tank.x, tank.y, tank.w, tank.h, "#e8eef6", "#7a96b3");
-    drawLabel(ctx, state.lang === "zh" ? "液態空氣" : "Liquid air", tank.x + 8, tank.y - 10);
 
-    const fill = Math.max(0, Math.min(1, (local - 0.5) / 0.45));
-    if (fill > 0) {
-      const lh = (inner.h - 8) * fill;
-      const liquidTop = inner.bottom - lh;
-      const g = ctx.createLinearGradient(inner.x, liquidTop, inner.x, inner.bottom);
-      g.addColorStop(0, "rgba(150,200,235,0.55)");
-      g.addColorStop(1, "rgba(70,140,210,0.85)");
-      ctx.fillStyle = g;
-      roundedRect(ctx, inner.x, liquidTop, inner.w, lh, 10);
-      ctx.fill();
-
-      ctx.strokeStyle = "rgba(255,255,255,0.55)";
-      ctx.lineWidth = 2;
+    // Textbook loop: down into the compressor, across into the vessel,
+    // and back up off the top of the vessel.
+    const leftX = 128;
+    const rightX = 408;
+    const topY = 42;
+    const leftEnd = 215;
+    const rightEnd = 136;
+    const bend = 16;
+    function strokeOpenLoop(width, color) {
+      ctx.lineCap = "butt";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
       ctx.beginPath();
-      ctx.moveTo(inner.x + 2, liquidTop + 4);
-      ctx.quadraticCurveTo(
-        inner.x + inner.w / 2,
-        liquidTop - 3 + Math.sin(now / 200) * 2,
-        inner.x + inner.w - 2,
-        liquidTop + 4
-      );
+      ctx.moveTo(leftX, leftEnd);
+      ctx.lineTo(leftX, topY + bend);
+      ctx.arcTo(leftX, topY, leftX + bend, topY, bend);
+      ctx.lineTo(rightX - bend, topY);
+      ctx.arcTo(rightX, topY, rightX, topY + bend, bend);
+      ctx.lineTo(rightX, rightEnd);
       ctx.stroke();
     }
-    if (fill > 0.4) {
-      drawLabel(ctx, "≈ −200 °C", tank.x + 8, tank.y + tank.h + 16, "#174ca8", 11);
-    }
+    strokeOpenLoop(16, mixHex("#b7d2ea", "#1a3a5c", 0.4));
+    strokeOpenLoop(12, "#b7d2ea");
+    drawFlowDashes(ctx, rightX, rightEnd - 4, rightX, topY + bend, now, "rgba(210,59,59,0.85)");
+    drawFlowDashes(ctx, rightX - bend, topY, leftX + bend, topY, now + 40, "rgba(210,59,59,0.85)");
+    drawFlowDashes(ctx, leftX, topY + bend, leftX, leftEnd - 4, now + 80, "rgba(210,59,59,0.85)");
+    drawFlowArrow(ctx, rightX, (topY + rightEnd) / 2, -Math.PI / 2, "#d23b3b");
+    drawFlowArrow(ctx, (leftX + rightX) / 2, topY, Math.PI, "#d23b3b");
+    drawFlowArrow(ctx, leftX, (topY + leftEnd) / 2, Math.PI / 2, "#d23b3b");
 
-    drawPipe(ctx, 185, 230, 210, 230, 12, "#9bb3cc");
-    drawPipe(ctx, 360, 230, 390, 230, 12, "#9bb3cc");
-    drawPipe(ctx, 500, 230, tank.x, 230, 12, "#9bb3cc");
-    drawFlowDashes(ctx, 185, 230, 210, 230, now, "rgba(74,127,212,0.75)");
-    drawFlowDashes(ctx, 360, 230, 390, 230, now, "rgba(74,127,212,0.75)");
-    drawFlowDashes(ctx, 500, 230, tank.x, 230, now, "rgba(74,127,212,0.75)");
+    drawPipe(ctx, compX + compW, feedY, exX, feedY, 12, "#9bb3cc");
+    drawFlowDashes(ctx, compX + compW, feedY, exX, feedY, now, "rgba(210,59,59,0.85)");
+    drawFlowArrow(ctx, exX - 18, feedY, 0, "#d23b3b");
 
     drawPipeMols(ctx, now, local, s);
 
@@ -1535,11 +1579,15 @@
       state.droplets.forEach((d) => {
         d.active = true;
         d.y += d.vy * s;
-        d.x += Math.sin((now + d.x * 10) / 400) * 0.35 * s;
+        d.x += Math.sin((now + d.x * 10) / 400) * 0.2 * s;
+        const minX = outCol.x + 16;
+        const maxX = outCol.x + outCol.w - 16;
+        const topY = outCol.y + 36;
+        d.x = Math.max(minX, Math.min(maxX, d.x));
         const surfaceY = inner.bottom - (inner.h - 8) * fill;
-        if (d.y > surfaceY) {
-          d.y = tank.y + 40 + Math.random() * 60;
-          d.x = inner.x + Math.random() * inner.w;
+        if (d.y < topY || d.y > surfaceY) {
+          d.y = topY + Math.random() * 16;
+          d.x = minX + Math.random() * (maxX - minX);
         }
         ctx.fillStyle = "rgba(120,185,235,0.9)";
         ctx.beginPath();
@@ -1551,8 +1599,8 @@
     drawLabel(
       ctx,
       state.lang === "zh"
-        ? "壓縮 → 冷卻 → 膨脹 → 液態空氣"
-        : "Compress → Cool → Expand → Liquid air",
+        ? "加壓冷卻 → 控制膨脹 → 液態空氣（−200 °C）"
+        : "Cool under pressure → Expand → Liquid air (−200 °C)",
       80,
       470,
       "#174684",
@@ -1575,10 +1623,16 @@
     const y = col.y;
     const w = col.w;
     const h = col.h;
-    drawEquipmentBox(ctx, x, y, w, h, "rgba(236,244,252,0.95)", "#6f8fad");
-    if (opts.title) {
-      drawLabel(ctx, opts.title, x + 2, y - 8, "#17345a", 11);
-    }
+    ctx.save();
+    roundedRect(ctx, x, y, w, h, w / 2);
+    ctx.clip();
+    const body = ctx.createLinearGradient(x, y, x, y + h);
+    body.addColorStop(0, "#f4f9fd");
+    body.addColorStop(0.32, "#d5e7f6");
+    body.addColorStop(0.7, "#6fa0cf");
+    body.addColorStop(1, "#24598f");
+    ctx.fillStyle = body;
+    ctx.fillRect(x, y, w, h);
     const trayCount = opts.trayCount || 5;
     for (let i = 0; i < trayCount; i++) {
       const ty = y + 38 + i * ((h - 70) / trayCount);
@@ -1599,6 +1653,14 @@
       ctx.fillStyle = g;
       roundedRect(ctx, x + 10, poolTop, w - 20, poolH, 6);
       ctx.fill();
+    }
+    ctx.restore();
+    roundedRect(ctx, x, y, w, h, w / 2);
+    ctx.strokeStyle = "#6d97bf";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    if (opts.title) {
+      drawLabel(ctx, opts.title, x + 2, y - 8, "#17345a", 11);
     }
     if (opts.tempLabel) {
       roundedRect(ctx, x + w + 6, y + h * 0.35, 52, 22, 6);
@@ -1623,13 +1685,18 @@
     const col1Bottom = col1.y + col1.h;
     const col2Bottom = col2.y + col2.h;
 
-    const n2Frac = temp >= N2_SEP ? Math.min(1, (temp - N2_SEP) / 6) : 0;
-    const arFrac = temp >= AR_SEP ? Math.min(1, (temp - AR_SEP) / 5) : 0;
-    const o2Frac = temp >= BP.O2 ? Math.min(1, (temp - BP.O2) / 6) : 0;
+    const col1Temp = Math.min(temp, COL1_WARM_LIMIT);
+    const col2Temp = Math.min(temp, COL2_WARM_LIMIT);
+    const n2Frac = col1Temp >= N2_SEP
+      ? Math.min(1, (col1Temp - N2_SEP) / (COL1_WARM_LIMIT - N2_SEP))
+      : 0;
+    const arFrac = col2Temp >= AR_SEP
+      ? Math.min(1, (col2Temp - AR_SEP) / (COL2_WARM_LIMIT - AR_SEP))
+      : 0;
 
     const targetN2 = n2Frac;
     const targetAr = arFrac;
-    const targetO2 = temp < AR_SEP ? 0 : Math.min(1, 0.12 + o2Frac * 0.88);
+    const targetO2 = col2Temp < AR_SEP ? 0 : Math.min(1, 0.12 + arFrac * 0.88);
     const fillN2 = 1 - Math.exp(-2.45 * dt);
     const fillAr = 1 - Math.exp(-2.45 * dt);
     const fillO2 = 1 - Math.exp(-1.85 * dt);
@@ -1644,7 +1711,7 @@
     const heaterH = 56;
     drawEquipmentBox(ctx, heaterX, heaterY, heaterW, heaterH, "rgba(255,244,230,0.95)", "#d4a36a");
     drawLabel(ctx, state.lang === "zh" ? "緩慢加熱" : "Slow warming", heaterX + 8, heaterY + 20, "#9a5b00", 11);
-    drawLabel(ctx, formatTemp(temp), heaterX + 12, heaterY + 40, "#174ca8", 12);
+    drawLabel(ctx, formatTemp(col1Temp), heaterX + 12, heaterY + 40, "#174ca8", 12);
     ctx.fillStyle = `rgba(255,160,60,${0.15 + 0.1 * Math.sin(now / 250)})`;
     roundedRect(ctx, heaterX + 10, heaterY + 44, heaterW - 20, 8, 4);
     ctx.fill();
@@ -1685,18 +1752,18 @@
       title: state.lang === "zh" ? "第一分餾塔 (N₂)" : "Column 1 (N₂)",
       poolHeight: col1Pool,
       tempLabel: "−196 °C",
-      tempActive: temp >= N2_SEP && temp < AR_SEP,
+      tempActive: col1Temp >= N2_SEP,
     });
 
-    const col2Pool = temp < AR_SEP ? 0 : Math.max(20, 35 + o2Frac * 55);
+    const col2Pool = col2Temp < AR_SEP ? 0 : Math.max(20, 35 + arFrac * 55);
     drawFractionatingColumn(ctx, col2, {
       title: state.lang === "zh" ? "第二分餾塔 (Ar/O₂)" : "Column 2 (Ar/O₂)",
       poolHeight: col2Pool,
       poolTopColor: "rgba(139,107,199,0.35)",
-      poolBottomColor: temp >= BP.O2 ? "rgba(232,93,76,0.85)" : "rgba(70,140,210,0.75)",
+      poolBottomColor: arFrac > 0.45 ? "rgba(232,93,76,0.85)" : "rgba(70,140,210,0.75)",
       tempLabel: "−185 °C",
-      tempActive: temp >= AR_SEP && temp < BP.O2,
-      bottomLabel: temp >= AR_SEP
+      tempActive: col2Temp >= AR_SEP,
+      bottomLabel: col2Temp >= AR_SEP
         ? (state.lang === "zh" ? "液態 O₂" : "Liquid O₂")
         : "",
       bottomColor: "#e85d4c",
@@ -1875,8 +1942,12 @@
   }
 
   function drawCollectionTank(ctx, x, y, w, h, fill, color, label, active, now) {
-    roundedRect(ctx, x, y, w, h, 12);
-    ctx.fillStyle = "rgba(255,255,255,0.75)";
+    const tankRadius = Math.min(18, w * 0.28, h * 0.28);
+    roundedRect(ctx, x, y, w, h, tankRadius);
+    const shell = ctx.createLinearGradient(x, y, x, y + h);
+    shell.addColorStop(0, "#f7fbfe");
+    shell.addColorStop(1, active ? hexToRgba(color, 0.28) : "#d5e3f0");
+    ctx.fillStyle = shell;
     ctx.fill();
     ctx.strokeStyle = active ? color : "#a8bfd6";
     ctx.lineWidth = active ? 2.5 : 1.5;

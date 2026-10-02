@@ -183,7 +183,7 @@ KOC.works('chem', 'james', [
     chapter: 'S3 Atmosphere Earth2 Earth2C Air',
     submitted: '2026-09-05',
     tags: ['Interactive', 'Industrial', 'Distillation'],
-    src: 'content/chem/james/liquid-air-fractional-distillation/index.html',
+    src: 'content/chem/james/liquid-air-fractional-distillation/index.html?v=20261002a',
     notes: 'Interactive process lab: purify, liquefy, and fractionally distill liquid air. Auto, step, and bilingual EN/中.'
   },
   {
