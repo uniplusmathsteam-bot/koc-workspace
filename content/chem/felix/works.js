@@ -26,7 +26,7 @@ KOC.works('chem', 'felix', [
   },
   {
     id: 'topic-01-part-4-lq-set-2',
-    title: 'Earth4_Rocks',
+    title: 'Topic 01 Part 4 LQ',
     original: 'Topic 01 Part 4 LQ set 2',
     type: 'interactive',
     subject: 'Chem',
@@ -38,7 +38,7 @@ KOC.works('chem', 'felix', [
   },
   {
     id: 'topic-01-part-3-lq-set-2',
-    title: 'Earth3_Ocean',
+    title: 'Topic 01 part 3 LQ',
     original: 'Topic 01 Part 3 LQ set 2',
     type: 'interactive',
     subject: 'Chem',
