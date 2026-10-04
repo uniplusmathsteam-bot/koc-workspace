@@ -1,6 +1,18 @@
 /* James · Chem KOC lead — submissions. */
 KOC.works('chem', 'james', [
   {
+    id: 'earth3a-distillation',
+    title: 'Earth3A_Physical separation_(ex)',
+    original: 'Fractional distillation',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Ocean Earth3 Earth3A Physical separation',
+    submitted: '2026-10-04',
+    tags: ['Interactive', 'S3', 'Physical separation'],
+    src: 'content/chem/james/physical-separation/Earth3A_Physical%20separation_(ex).html?v=20261004b',
+    notes: 'Join the quick-fit fractional distillation apparatus, then check the set-up. Obtain pure water from sea water.'
+  },
+  {
     id: 'earth3a-crystallisation',
     title: 'Earth3A_Physical separation_(notes)',
     original: 'Slow crystallisation',
@@ -11,18 +23,6 @@ KOC.works('chem', 'james', [
     tags: ['Interactive', 'S3', 'Physical separation'],
     src: 'content/chem/james/physical-separation/Earth3A_Physical%20separation_(notes).html?v=20260928a',
     notes: 'Slow crystallisation of sodium chloride. One page, with hide, zoom, and the pen.'
-  },
-  {
-    id: 'earth3a-distillation',
-    title: 'Earth3A_Physical separation_(ex)',
-    original: 'Fractional distillation',
-    type: 'interactive',
-    subject: 'Chem',
-    chapter: 'S3 Ocean Earth3 Earth3A Physical separation',
-    submitted: '2026-10-04',
-    tags: ['Interactive', 'S3', 'Physical separation'],
-    src: 'content/chem/james/physical-separation/Earth3A_Physical%20separation_(ex).html?v=20261004',
-    notes: 'Join the quick-fit fractional distillation apparatus, then check the set-up. Obtain pure water from sea water.'
   },
   {
     id: 'earth3b-chemical-tests',
