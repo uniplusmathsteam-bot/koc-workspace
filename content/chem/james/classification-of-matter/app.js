@@ -138,6 +138,10 @@
     paused: false,
     moveRaf: null,
     keys: { left: false, right: false, up: false, down: false },
+    mobileMode: false,
+    touchFiring: false,
+    aimPointer: null,
+    padPointers: {},
     mouse: { x: 0, y: 0 },
     player: null,
     bullets: [],
@@ -345,8 +349,12 @@
     return shuffle(same.concat(rest));
   }
 
+  function nativeFullscreenEl() {
+    return document.fullscreenElement || document.webkitFullscreenElement || null;
+  }
+
   function playIsFullscreen() {
-    return document.fullscreenElement === playEl || document.webkitFullscreenElement === playEl;
+    return nativeFullscreenEl() === playEl || playEl.classList.contains("phone-fs");
   }
 
   function syncFsBtn() {
@@ -355,10 +363,42 @@
     btn.textContent = playIsFullscreen() ? COPY.fullscreenExit : COPY.fullscreen;
   }
 
+  function syncPhoneViewport() {
+    const vv = window.visualViewport;
+    const phoneFs = playEl.classList.contains("phone-fs");
+    if (!vv || (window.innerWidth > 800 && !phoneFs)) {
+      document.documentElement.style.removeProperty("--app-vh");
+      document.documentElement.style.removeProperty("--app-top");
+      return;
+    }
+    const nextH = Math.round(vv.height) + "px";
+    const nextTop = Math.round(vv.offsetTop) + "px";
+    const root = document.documentElement;
+    if (root.style.getPropertyValue("--app-vh") !== nextH) root.style.setProperty("--app-vh", nextH);
+    if (root.style.getPropertyValue("--app-top") !== nextTop) root.style.setProperty("--app-top", nextTop);
+  }
+
+  function enterPhoneFullscreen() {
+    playEl.classList.add("phone-fs");
+    document.documentElement.classList.add("phone-fs");
+    syncPhoneViewport();
+    syncFsBtn();
+    onPlayfieldResize();
+  }
+
   function exitPlayFullscreen() {
+    const wasPhone = playEl.classList.contains("phone-fs");
+    playEl.classList.remove("phone-fs");
+    document.documentElement.classList.remove("phone-fs");
     const exit = document.exitFullscreen || document.webkitExitFullscreen;
-    if (exit && (document.fullscreenElement || document.webkitFullscreenElement)) {
-      exit.call(document);
+    if (exit && nativeFullscreenEl()) {
+      const result = exit.call(document);
+      if (result && result.catch) result.catch(function () {});
+    }
+    if (wasPhone) {
+      syncPhoneViewport();
+      syncFsBtn();
+      onPlayfieldResize();
     }
   }
 
@@ -368,13 +408,28 @@
       return;
     }
     const req = playEl.requestFullscreen || playEl.webkitRequestFullscreen;
-    if (!req) return;
-    const result = req.call(playEl);
-    if (result && result.catch) {
-      result.catch(function () {
-        syncFsBtn();
-      });
+    if (!req) {
+      enterPhoneFullscreen();
+      return;
     }
+    let result;
+    try {
+      result = req.call(playEl);
+    } catch (err) {
+      enterPhoneFullscreen();
+      return;
+    }
+    if (result && result.then) {
+      result.then(function () {
+        syncFsBtn();
+      }, function () {
+        enterPhoneFullscreen();
+      });
+      return;
+    }
+    requestAnimationFrame(function () {
+      if (nativeFullscreenEl() !== playEl) enterPhoneFullscreen();
+    });
   }
 
   function overlayOpen() {
@@ -474,6 +529,37 @@
     state.keys.right = false;
     state.keys.up = false;
     state.keys.down = false;
+    state.padPointers = {};
+    state.aimPointer = null;
+    state.touchFiring = false;
+  }
+
+  function releasePadDirs() {
+    const held = state.padPointers;
+    state.padPointers = {};
+    for (const id in held) state.keys[held[id]] = false;
+  }
+
+  function syncMobileUi() {
+    const btn = document.getElementById("btn-mobile");
+    const hud = playEl.querySelector(".mobile-hud");
+    const field = state.field || playEl.querySelector(".playfield");
+    if (btn) {
+      btn.textContent = state.mobileMode ? COPY.mobileOff : COPY.mobileOn;
+      btn.setAttribute("aria-pressed", state.mobileMode ? "true" : "false");
+    }
+    if (hud) hud.hidden = !state.mobileMode;
+    if (field) field.classList.toggle("mobile-touch", state.mobileMode);
+  }
+
+  function setMobileMode(on) {
+    state.mobileMode = on;
+    if (!on) {
+      state.touchFiring = false;
+      state.aimPointer = null;
+      releasePadDirs();
+    }
+    syncMobileUi();
   }
 
   function keyDir(e) {
@@ -579,12 +665,6 @@
     });
   }
 
-  function poolCountHtml() {
-    const n = poolForRound(false).length;
-    const emptyMsg = n === 0 ? `<p class="empty-pool">${COPY.emptyPool}</p>` : "";
-    return `<p class="pool-count">${COPY.poolCount} ${n} ${COPY.poolUnit}</p>${emptyMsg}`;
-  }
-
   function chipRowHtml(label, buttons, labelId) {
     const id = labelId || "chip-label";
     return (
@@ -606,13 +686,12 @@
     if (state.setupStep === 0) {
       return `
           <p class="track">${COPY.howtoTitle}</p>
-          <p class="pick-cat">${COPY.pickHint}</p>
-          <p class="learn-goal">${COPY.learnGoal}</p>
           <ol class="howto-list">
             <li>${COPY.howto1}</li>
             <li>${COPY.howto2}</li>
-            <li>${COPY.howtoBoss}</li>
+            <li>${COPY.howto3}</li>
             <li>${COPY.howto4}</li>
+            <li>${COPY.howtoBoss}</li>
             <li>${COPY.howto5}</li>
           </ol>
           <div class="hub-actions">
@@ -647,7 +726,7 @@
             COPY.pickTip,
             chipButtons([COPY.tipOff, COPY.tipOn], "data-tip", state.tipHunt ? COPY.tipOn : COPY.tipOff),
             "chip-tip"
-          ) + `<p class="pick-cat">${COPY.tipLead}</p>`;
+          );
       }
       extra +=
         chipRowHtml(
@@ -669,7 +748,6 @@
             "chip-speed"
           )}
           ${speedNoteHtml()}
-          ${poolCountHtml()}
           ${extra}
           <div class="hub-actions">
             <button type="button" class="btn" data-setup-start="1"${empty ? " disabled" : ""}>${COPY.setupStart}</button>
@@ -2232,6 +2310,7 @@
     const step = Math.min(32, now - lastTick) / FRAME;
     lastTick = now;
     movePlayer(state.fieldW, state.fieldH, step);
+    if (state.mobileMode && state.touchFiring) fireShot();
     maybeRoom0Drain(now);
     maybeSealBossRoom();
     syncBossArena();
@@ -2424,6 +2503,7 @@
   }
 
   function onPlayfieldResize() {
+    syncPhoneViewport();
     syncFsBtn();
     cacheFieldMetrics();
     clampArenaToField();
@@ -3280,11 +3360,13 @@
     playEl.innerHTML = `
       <div class="stage">
         <div class="meta-row">
-          <span class="cat-pill rule-pill">1 same atom · 2 joined, no + · 3 plus sign</span>
           ${isHitType() ? `<span class="cat-pill" id="ammo-label">1 ${state.ammo}</span>` : ""}
           <span class="hearts" id="play-hearts"></span>
           <span id="remain-count">${fragmentLabel()}</span>
-          <button type="button" class="fs-btn" id="btn-fs" data-fullscreen="1">${COPY.fullscreen}</button>
+          <span class="meta-actions">
+            <button type="button" class="fs-btn" id="btn-mobile" data-mobile="1" aria-pressed="false">${COPY.mobileOn}</button>
+            <button type="button" class="fs-btn" id="btn-fs" data-fullscreen="1">${COPY.fullscreen}</button>
+          </span>
         </div>
         <p class="prompt-arrow">${playKeys()}</p>
         ${isHitType() ? "" : `<div class="prompt-top">${promptHtml(item)}</div>`}
@@ -3305,6 +3387,15 @@
           <div class="buff-toast" id="buff-toast" hidden></div>
           <div class="pause-banner"><div>${COPY.paused} · ${COPY.pauseHint}</div><p class="pause-fb" id="pause-fb"></p></div>
           <div id="teach" class="clear-card" hidden></div>
+          <div class="mobile-hud" hidden>
+            <div class="dpad">
+              <button type="button" data-dir="up" aria-label="Up">▲</button>
+              <button type="button" data-dir="left" aria-label="Left">◀</button>
+              <button type="button" data-dir="down" aria-label="Down">▼</button>
+              <button type="button" data-dir="right" aria-label="Right">▶</button>
+            </div>
+            <button type="button" class="mobile-pause" data-pause="1">${COPY.mobilePause}</button>
+          </div>
         </div>
         <p class="key-hint">${COPY.keysHint}</p>
         <p class="feedback" id="feedback"></p>
@@ -3312,6 +3403,7 @@
     `;
     updateHud();
     syncFsBtn();
+    syncMobileUi();
     startArenaLoop();
   }
 
@@ -3880,15 +3972,86 @@
   });
 
   playEl.addEventListener("mousemove", function (e) {
+    if (state.mobileMode) return;
     if (state.mode !== "shoot" || !e.target.closest(".playfield")) return;
     if (overlayOpen()) return;
     setMouseFromEvent(e);
     if (!state.paused && !state.locked) aimPlayerCannon();
   });
 
+  function padDirStillHeld(dir) {
+    for (const id in state.padPointers) {
+      if (state.padPointers[id] === dir) return true;
+    }
+    return false;
+  }
+
+  function endPlayPointer(e) {
+    const dir = state.padPointers[e.pointerId];
+    if (dir) {
+      delete state.padPointers[e.pointerId];
+      if (!padDirStillHeld(dir)) state.keys[dir] = false;
+    }
+    if (e.pointerId === state.aimPointer) {
+      state.aimPointer = null;
+      state.touchFiring = false;
+    }
+  }
+
+  playEl.addEventListener("pointerdown", function (e) {
+    if (state.view !== "play" || (e.pointerType === "mouse" && e.button !== 0)) return;
+    const dirBtn = e.target.closest("[data-dir]");
+    if (dirBtn && state.mobileMode) {
+      const dir = dirBtn.getAttribute("data-dir");
+      if (!dir || !Object.prototype.hasOwnProperty.call(state.keys, dir)) return;
+      e.preventDefault();
+      state.padPointers[e.pointerId] = dir;
+      state.keys[dir] = true;
+      try {
+        dirBtn.setPointerCapture(e.pointerId);
+      } catch (err) {}
+      return;
+    }
+    if (e.target.closest("[data-pause]") && state.mobileMode) {
+      e.preventDefault();
+      togglePause();
+      return;
+    }
+    if (!state.mobileMode || state.mode !== "shoot" || state.aimPointer != null) return;
+    if (e.target.closest(".mobile-hud")) return;
+    const field = e.target.closest(".playfield");
+    if (!field || overlayOpen()) return;
+    e.preventDefault();
+    state.aimPointer = e.pointerId;
+    state.touchFiring = true;
+    setMouseFromEvent(e);
+    if (!state.paused && !state.locked) aimPlayerCannon();
+    fireShot();
+    try {
+      field.setPointerCapture(e.pointerId);
+    } catch (err) {}
+  });
+
+  playEl.addEventListener("contextmenu", function (e) {
+    if (state.mobileMode && e.target.closest(".playfield")) e.preventDefault();
+  });
+
+  playEl.addEventListener("pointermove", function (e) {
+    if (!state.mobileMode || e.pointerId !== state.aimPointer) return;
+    setMouseFromEvent(e);
+    if (!state.paused && !state.locked) aimPlayerCannon();
+  });
+
+  document.addEventListener("pointerup", endPlayPointer);
+  document.addEventListener("pointercancel", endPlayPointer);
+
   playEl.addEventListener("click", function (e) {
     if (e.target.closest("[data-fullscreen]")) {
       togglePlayFullscreen();
+      return;
+    }
+    if (e.target.closest("[data-mobile]")) {
+      setMobileMode(!state.mobileMode);
       return;
     }
     if (overlayOpen()) return;
@@ -3913,7 +4076,7 @@
       advance();
       return;
     }
-    if (state.mode === "shoot" && e.target.closest(".playfield")) {
+    if (state.mode === "shoot" && !state.mobileMode && e.target.closest(".playfield")) {
       setMouseFromEvent(e);
       aimPlayerCannon();
       fireShot();
@@ -3936,6 +4099,15 @@
   document.addEventListener("fullscreenchange", onPlayfieldResize);
   document.addEventListener("webkitfullscreenchange", onPlayfieldResize);
   window.addEventListener("resize", onPlayfieldResize);
+  if (window.visualViewport) {
+    visualViewport.addEventListener("resize", function () {
+      if (window.innerWidth <= 800 || playEl.classList.contains("phone-fs")) onPlayfieldResize();
+    });
+    visualViewport.addEventListener("scroll", function () {
+      if (window.innerWidth <= 800 || playEl.classList.contains("phone-fs")) onPlayfieldResize();
+    });
+  }
+  syncPhoneViewport();
 
   homeBtn.addEventListener("click", requestLeave);
   leaveStay.addEventListener("click", hideOverlay);
@@ -3943,7 +4115,7 @@
 
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") {
-      if (document.fullscreenElement || document.webkitFullscreenElement) {
+      if (playIsFullscreen()) {
         e.preventDefault();
         exitPlayFullscreen();
         return;

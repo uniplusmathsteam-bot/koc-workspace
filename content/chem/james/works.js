@@ -1,6 +1,18 @@
 /* James · Chem KOC lead — submissions. */
 KOC.works('chem', 'james', [
   {
+    id: 'classification-of-matter',
+    title: 'Earth2A_Matters',
+    original: 'Classification of matter',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Atmosphere Earth2 Earth2A Matters',
+    submitted: '2026-10-04',
+    tags: ['Interactive', 'Classification', 'Matter'],
+    src: 'content/chem/james/classification-of-matter/index.html?v=20261004c',
+    notes: 'Choose a class and a difficulty. Each floor names one class. Shoot formulas of that class. Easy 1, Normal 3, Hard 5. WASD to move, mouse to aim, click to shoot. Space pauses.'
+  },
+  {
     id: 'earth3a-distillation',
     title: 'Earth3A_Physical separation_(ex)',
     original: 'Fractional distillation',
@@ -47,18 +59,6 @@ KOC.works('chem', 'james', [
     tags: ['Interactive', 'S3', 'Lab apparatus'],
     src: 'content/chem/james/build-the-bench/Earth1A_Laboratory%20apparatus_(ex).html?v=20260927d',
     notes: 'Six set-ups in lesson order, from a few cm³ of water to filtration. Match each name and 2D diagram. Light or dark follows the computer theme.'
-  },
-  {
-    id: 'classification-of-matter',
-    title: 'Earth2A_Matters',
-    original: 'Classification of matter',
-    type: 'interactive',
-    subject: 'Chem',
-    chapter: 'S3 Atmosphere Earth2 Earth2A Matters',
-    submitted: '2026-09-23',
-    tags: ['Interactive', 'Classification', 'Matter'],
-    src: 'content/chem/james/classification-of-matter/index.html?v=20260925',
-    notes: 'Shoot each formula with the matching ammo: 1 pure element, 2 pure compound, 3 mixture of elements. WASD to move, mouse to aim, click to shoot.'
   },
   {
     id: 'chem-lab-hq-scramble',
