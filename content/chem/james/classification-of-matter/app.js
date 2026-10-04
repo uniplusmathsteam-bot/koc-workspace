@@ -141,7 +141,8 @@
     mobileMode: false,
     touchFiring: false,
     aimPointer: null,
-    padPointers: {},
+    stickPointer: null,
+    stick: { x: 0, y: 0 },
     mouse: { x: 0, y: 0 },
     player: null,
     bullets: [],
@@ -529,15 +530,42 @@
     state.keys.right = false;
     state.keys.up = false;
     state.keys.down = false;
-    state.padPointers = {};
     state.aimPointer = null;
     state.touchFiring = false;
+    resetStick();
   }
 
-  function releasePadDirs() {
-    const held = state.padPointers;
-    state.padPointers = {};
-    for (const id in held) state.keys[held[id]] = false;
+  function resetStick() {
+    state.stickPointer = null;
+    state.stick.x = 0;
+    state.stick.y = 0;
+    const knob = playEl.querySelector(".joystick-knob");
+    if (knob) knob.style.transform = "";
+  }
+
+  function applyStick(base, clientX, clientY) {
+    const rect = base.getBoundingClientRect();
+    const radius = rect.width / 2;
+    const dx = clientX - (rect.left + radius);
+    const dy = clientY - (rect.top + radius);
+    const dist = Math.hypot(dx, dy);
+    const reach = dist > radius ? radius : dist;
+    const knob = base.querySelector(".joystick-knob");
+    if (knob) {
+      const knobX = dist ? (dx / dist) * reach : 0;
+      const knobY = dist ? (dy / dist) * reach : 0;
+      knob.style.transform = "translate(" + knobX + "px, " + knobY + "px)";
+    }
+    const mag = radius ? reach / radius : 0;
+    const dead = 0.2;
+    if (mag <= dead || !dist) {
+      state.stick.x = 0;
+      state.stick.y = 0;
+      return;
+    }
+    const scaled = (mag - dead) / (1 - dead);
+    state.stick.x = (dx / dist) * scaled;
+    state.stick.y = (dy / dist) * scaled;
   }
 
   function syncMobileUi() {
@@ -557,7 +585,7 @@
     if (!on) {
       state.touchFiring = false;
       state.aimPointer = null;
-      releasePadDirs();
+      resetStick();
     }
     syncMobileUi();
   }
@@ -2426,10 +2454,15 @@
     if (!p) return;
     let dx = 0;
     let dy = 0;
-    if (state.keys.left) dx -= PLAYER_SPEED;
-    if (state.keys.right) dx += PLAYER_SPEED;
-    if (state.keys.up) dy -= PLAYER_SPEED;
-    if (state.keys.down) dy += PLAYER_SPEED;
+    if (state.stick.x || state.stick.y) {
+      dx = state.stick.x * PLAYER_SPEED;
+      dy = state.stick.y * PLAYER_SPEED;
+    } else {
+      if (state.keys.left) dx -= PLAYER_SPEED;
+      if (state.keys.right) dx += PLAYER_SPEED;
+      if (state.keys.up) dy -= PLAYER_SPEED;
+      if (state.keys.down) dy += PLAYER_SPEED;
+    }
     slideMove(p, dx * step, dy * step, TANK_HALF);
     const maxX = Math.max(PLAYER_PAD, fieldW - PLAYER_PAD);
     const maxY = Math.max(PLAYER_PAD, fieldH - PLAYER_PAD);
@@ -3388,11 +3421,8 @@
           <div class="pause-banner"><div>${COPY.paused} · ${COPY.pauseHint}</div><p class="pause-fb" id="pause-fb"></p></div>
           <div id="teach" class="clear-card" hidden></div>
           <div class="mobile-hud" hidden>
-            <div class="dpad">
-              <button type="button" data-dir="up" aria-label="Up">▲</button>
-              <button type="button" data-dir="left" aria-label="Left">◀</button>
-              <button type="button" data-dir="down" aria-label="Down">▼</button>
-              <button type="button" data-dir="right" aria-label="Right">▶</button>
+            <div class="joystick" id="joystick" aria-label="Move">
+              <div class="joystick-knob"></div>
             </div>
             <button type="button" class="mobile-pause" data-pause="1">${COPY.mobilePause}</button>
           </div>
@@ -3979,19 +4009,8 @@
     if (!state.paused && !state.locked) aimPlayerCannon();
   });
 
-  function padDirStillHeld(dir) {
-    for (const id in state.padPointers) {
-      if (state.padPointers[id] === dir) return true;
-    }
-    return false;
-  }
-
   function endPlayPointer(e) {
-    const dir = state.padPointers[e.pointerId];
-    if (dir) {
-      delete state.padPointers[e.pointerId];
-      if (!padDirStillHeld(dir)) state.keys[dir] = false;
-    }
+    if (e.pointerId === state.stickPointer) resetStick();
     if (e.pointerId === state.aimPointer) {
       state.aimPointer = null;
       state.touchFiring = false;
@@ -4000,15 +4019,13 @@
 
   playEl.addEventListener("pointerdown", function (e) {
     if (state.view !== "play" || (e.pointerType === "mouse" && e.button !== 0)) return;
-    const dirBtn = e.target.closest("[data-dir]");
-    if (dirBtn && state.mobileMode) {
-      const dir = dirBtn.getAttribute("data-dir");
-      if (!dir || !Object.prototype.hasOwnProperty.call(state.keys, dir)) return;
+    const stickBase = e.target.closest(".joystick");
+    if (stickBase && state.mobileMode) {
       e.preventDefault();
-      state.padPointers[e.pointerId] = dir;
-      state.keys[dir] = true;
+      state.stickPointer = e.pointerId;
+      applyStick(stickBase, e.clientX, e.clientY);
       try {
-        dirBtn.setPointerCapture(e.pointerId);
+        stickBase.setPointerCapture(e.pointerId);
       } catch (err) {}
       return;
     }
@@ -4037,6 +4054,11 @@
   });
 
   playEl.addEventListener("pointermove", function (e) {
+    if (state.mobileMode && e.pointerId === state.stickPointer) {
+      const base = playEl.querySelector(".joystick");
+      if (base) applyStick(base, e.clientX, e.clientY);
+      return;
+    }
     if (!state.mobileMode || e.pointerId !== state.aimPointer) return;
     setMouseFromEvent(e);
     if (!state.paused && !state.locked) aimPlayerCannon();
