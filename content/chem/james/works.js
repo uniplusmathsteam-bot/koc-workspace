@@ -1,6 +1,16 @@
 /* James · Chem KOC lead — submissions. */
 KOC.works('chem', 'james', [
   {
+    id: 'sheji',
+    title: '射擊 / 寫作地牢',
+    type: 'interactive',
+    chapter: '寫作手法',
+    submitted: '2026-10-05',
+    tags: ['Interactive', '射擊', '寫作', '修辭'],
+    src: 'content/chem/james/sheji/index.html?v=20261005a',
+    notes: '先選類別、題型和難度。每一題是一層。簡單打 1 個正確、普通 3 個、困難 5 個。題型：認作用、辨句子、辨一對。WASD 走動、滑鼠瞄準、點擊攻擊。空白鍵暫停。手機模式用搖桿走動、觸控射擊。'
+  },
+  {
     id: 'classification-of-matter',
     title: 'Earth2A_Matters',
     original: 'Classification of matter',
@@ -81,16 +91,6 @@ KOC.works('chem', 'james', [
     tags: ['Interactive', '背書', '李白', '送友人'],
     src: 'content/chem/james/tiaogao-song-youren/index.html',
     notes: '①溫書 ②跳高高 ③默寫 ④貪吃蛇。粵語／普通話逐句朗讀。Esc 回主頁。'
-  },
-  {
-    id: 'sheji',
-    title: '射擊 / 寫作地牢',
-    type: 'interactive',
-    chapter: '寫作手法',
-    submitted: '2026-10-04',
-    tags: ['Interactive', '射擊', '寫作', '修辭'],
-    src: 'content/chem/james/sheji/index.html?v=20261004f',
-    notes: '先選類別、題型和難度。每一題是一層。簡單打 1 個正確、普通 3 個、困難 5 個。題型：認作用、辨句子、辨一對。WASD 走動、滑鼠瞄準、點擊攻擊。空白鍵暫停。手機模式用搖桿走動、觸控射擊。'
   },
   {
     id: 'taiko',
