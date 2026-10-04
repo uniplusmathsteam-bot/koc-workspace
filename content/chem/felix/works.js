@@ -1,6 +1,18 @@
 ﻿/* Felix - Chem KOC - submissions. */
 KOC.works('chem', 'felix', [
   {
+    id: 'topic-02-part-2-lq',
+    title: 'Topic 02 Part 2 LQ',
+    original: 'Topic 02 Part 2 LQ set 2',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Microscopic world I Periodic Table groups metals and non-metals',
+    submitted: '2026-10-04',
+    tags: ['LQ', 'Long questions', 'Word worksheet', 'Microscopic world I', 'Topic 02'],
+    src: 'content/chem/felix/topic-02-part-2-lq/index.html',
+    notes: 'Long-question practice Set 2 for Topic 02 Part 2 (Microscopic world I). Download the .docx to use in Word — questions with writing space, diagrams, and an answer key.'
+  },
+  {
     id: 'topic-02-part-1-lq',
     title: 'Topic 02 Part 1 LQ',
     original: 'Topic 02 Part 1 LQ set 2',
