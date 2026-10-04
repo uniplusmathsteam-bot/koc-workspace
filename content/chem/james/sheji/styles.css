@@ -455,6 +455,13 @@ main {
   font-weight: 700;
 }
 
+.meta-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
 .cat-pill,
 #remain-count {
   display: inline-block;
@@ -755,6 +762,61 @@ main {
 
 .playfield.paused {
   cursor: default;
+}
+
+.playfield.mobile-touch {
+  touch-action: none;
+}
+
+.mobile-hud {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  pointer-events: none;
+}
+
+.mobile-hud[hidden] {
+  display: none;
+}
+
+.dpad {
+  position: absolute;
+  left: max(10px, env(safe-area-inset-left));
+  bottom: max(10px, env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: 64px 64px 64px;
+  grid-template-rows: 64px 64px 64px;
+}
+
+.dpad [data-dir="up"] { grid-column: 2; grid-row: 1; }
+.dpad [data-dir="left"] { grid-column: 1; grid-row: 2; }
+.dpad [data-dir="down"] { grid-column: 2; grid-row: 3; }
+.dpad [data-dir="right"] { grid-column: 3; grid-row: 2; }
+
+.dpad button,
+.mobile-pause {
+  pointer-events: auto;
+  touch-action: none;
+  appearance: none;
+  border: 2px solid #c9a227;
+  background: rgba(20, 14, 12, 0.82);
+  color: #f2ebe3;
+  font: inherit;
+  font-size: 22px;
+  font-weight: 800;
+  border-radius: 12px;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+}
+
+.mobile-pause {
+  position: absolute;
+  right: max(10px, env(safe-area-inset-right));
+  bottom: max(10px, env(safe-area-inset-bottom));
+  width: auto;
+  min-width: 64px;
+  padding: 0 12px;
 }
 
 .pause-banner {
@@ -1432,8 +1494,7 @@ main {
   cursor: pointer;
 }
 
-#play:fullscreen,
-#play:-webkit-full-screen {
+#play:is(:fullscreen, :-webkit-full-screen, .phone-fs) {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -1445,13 +1506,28 @@ main {
   box-sizing: border-box;
 }
 
+#play.phone-fs {
+  position: fixed;
+  z-index: 15;
+  top: var(--app-top, 0px);
+  left: 0;
+  right: 0;
+  height: var(--app-vh, 100dvh);
+  max-height: var(--app-vh, 100dvh);
+  touch-action: none;
+}
+
+html.phone-fs,
+body.phone-fs {
+  overflow: hidden;
+}
+
 #play:fullscreen::backdrop,
 #play:-webkit-full-screen::backdrop {
   background: #140e0c;
 }
 
-#play:fullscreen .stage,
-#play:-webkit-full-screen .stage {
+#play:is(:fullscreen, :-webkit-full-screen, .phone-fs) .stage {
   flex: 1;
   min-height: 0;
   display: flex;
@@ -1461,8 +1537,7 @@ main {
   padding: 8px;
 }
 
-#play:fullscreen .meta-row,
-#play:-webkit-full-screen .meta-row {
+#play:is(:fullscreen, :-webkit-full-screen, .phone-fs) .meta-row {
   position: absolute;
   top: 16px;
   left: 16px;
@@ -1472,13 +1547,11 @@ main {
   pointer-events: none;
 }
 
-#play:fullscreen .meta-row .fs-btn,
-#play:-webkit-full-screen .meta-row .fs-btn {
+#play:is(:fullscreen, :-webkit-full-screen, .phone-fs) .meta-row .fs-btn {
   pointer-events: auto;
 }
 
-#play:fullscreen .prompt-top,
-#play:-webkit-full-screen .prompt-top {
+#play:is(:fullscreen, :-webkit-full-screen, .phone-fs) .prompt-top {
   position: absolute;
   top: 56px;
   left: 16px;
@@ -1488,40 +1561,33 @@ main {
   pointer-events: none;
 }
 
-#play:fullscreen .prompt-top .prompt-box,
-#play:-webkit-full-screen .prompt-top .prompt-box {
+#play:is(:fullscreen, :-webkit-full-screen, .phone-fs) .prompt-top .prompt-box {
   font-size: 1rem;
   padding: 8px 14px;
 }
 
-#play:fullscreen .passage-box,
-#play:-webkit-full-screen .passage-box {
+#play:is(:fullscreen, :-webkit-full-screen, .phone-fs) .passage-box {
   padding: 8px 12px;
   font-size: 14px;
 }
 
-#play:fullscreen .pair-q,
-#play:-webkit-full-screen .pair-q {
+#play:is(:fullscreen, :-webkit-full-screen, .phone-fs) .pair-q {
   font-size: 1rem;
 }
 
-#play:fullscreen .pair-cols,
-#play:-webkit-full-screen .pair-cols {
+#play:is(:fullscreen, :-webkit-full-screen, .phone-fs) .pair-cols {
   gap: 6px;
 }
 
-#play:fullscreen .pair-card,
-#play:-webkit-full-screen .pair-card {
+#play:is(:fullscreen, :-webkit-full-screen, .phone-fs) .pair-card {
   padding: 6px 8px;
 }
 
-#play:fullscreen .pair-card p,
-#play:-webkit-full-screen .pair-card p {
+#play:is(:fullscreen, :-webkit-full-screen, .phone-fs) .pair-card p {
   font-size: 13px;
 }
 
-#play:fullscreen .playfield,
-#play:-webkit-full-screen .playfield {
+#play:is(:fullscreen, :-webkit-full-screen, .phone-fs) .playfield {
   flex: 1;
   min-height: 0;
   height: auto;
@@ -1529,8 +1595,7 @@ main {
   border-width: 4px;
 }
 
-#play:fullscreen .tip-line,
-#play:-webkit-full-screen .tip-line {
+#play:is(:fullscreen, :-webkit-full-screen, .phone-fs) .tip-line {
   position: absolute;
   left: 16px;
   right: 16px;
@@ -1540,8 +1605,7 @@ main {
   pointer-events: none;
 }
 
-#play:fullscreen .feedback,
-#play:-webkit-full-screen .feedback {
+#play:is(:fullscreen, :-webkit-full-screen, .phone-fs) .feedback {
   position: absolute;
   left: 16px;
   right: 16px;
@@ -1551,10 +1615,8 @@ main {
   pointer-events: none;
 }
 
-#play:fullscreen .prompt-arrow,
-#play:fullscreen .key-hint,
-#play:-webkit-full-screen .prompt-arrow,
-#play:-webkit-full-screen .key-hint {
+#play:is(:fullscreen, :-webkit-full-screen, .phone-fs) .prompt-arrow,
+#play:is(:fullscreen, :-webkit-full-screen, .phone-fs) .key-hint {
   display: none;
 }
 
@@ -1680,6 +1742,15 @@ body.play-fill #play .feedback {
 body.play-fill #play .prompt-arrow,
 body.play-fill #play .key-hint {
   display: none;
+}
+
+@media (max-width: 800px) {
+  html.play-fill,
+  body.play-fill {
+    min-height: 0;
+    height: var(--app-vh, 100dvh);
+    max-height: var(--app-vh, 100dvh);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -15,14 +15,14 @@ KOC.works('chem', 'james', [
   {
     id: 'earth3a-distillation',
     title: 'Earth3A_Physical separation_(ex)',
-    original: 'Distillation apparatus',
+    original: 'Fractional distillation',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Ocean Earth3 Earth3A Physical separation',
-    submitted: '2026-09-28',
+    submitted: '2026-10-04',
     tags: ['Interactive', 'S3', 'Physical separation'],
-    src: 'content/chem/james/physical-separation/Earth3A_Physical%20separation_(ex).html?v=20260928a',
-    notes: 'Join the quick-fit distillation apparatus, then turn and check the set-up.'
+    src: 'content/chem/james/physical-separation/Earth3A_Physical%20separation_(ex).html?v=20261004',
+    notes: 'Join the quick-fit fractional distillation apparatus, then check the set-up. Obtain pure water from sea water.'
   },
   {
     id: 'earth3b-chemical-tests',
@@ -87,10 +87,10 @@ KOC.works('chem', 'james', [
     title: '射擊 / 寫作地牢',
     type: 'interactive',
     chapter: '寫作手法',
-    submitted: '2026-09-23',
+    submitted: '2026-10-04',
     tags: ['Interactive', '射擊', '寫作', '修辭'],
-    src: 'content/chem/james/sheji/index.html?v=20260923',
-    notes: '先選類別、題型和難度。每一題是一層。簡單打 1 個正確、普通 3 個、困難 5 個。題型：認作用、辨句子、辨一對。WASD 走動、滑鼠瞄準、點擊攻擊。空白鍵暫停。'
+    src: 'content/chem/james/sheji/index.html?v=20261004',
+    notes: '先選類別、題型和難度。每一題是一層。簡單打 1 個正確、普通 3 個、困難 5 個。題型：認作用、辨句子、辨一對。WASD 走動、滑鼠瞄準、點擊攻擊。空白鍵暫停。手機模式用方向鍵和觸控射擊。'
   },
   {
     id: 'taiko',

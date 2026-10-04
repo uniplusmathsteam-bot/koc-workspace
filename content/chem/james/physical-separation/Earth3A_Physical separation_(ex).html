@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Earth3A Physical separation — distillation</title>
+<title>Earth3A Physical separation — fractional distillation</title>
 <style>
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
@@ -51,7 +51,7 @@
     font-size: 16px;
   }
   .nav:disabled { opacity: 0.35; cursor: default; }
-  #turnBtn[aria-pressed="true"], #checkBtn[aria-pressed="true"] { background: #163a86; color: #fff; }
+  #checkBtn[aria-pressed="true"] { background: #163a86; color: #fff; }
   main {
     flex: 1;
     min-height: 0;
@@ -229,9 +229,8 @@
 <body>
 <header class="topbar">
   <button type="button" class="nav" id="backBtn">Back</button>
-  <h1>Distillation — quick-fit apparatus</h1>
+  <h1>Fractional distillation</h1>
   <span id="stepLabel">Build</span>
-  <button type="button" class="nav" id="turnBtn" aria-pressed="false">Turn</button>
   <button type="button" class="nav" id="checkBtn" aria-pressed="false">Check</button>
   <button type="button" class="nav" id="hideBtn" aria-pressed="false">Hide</button>
   <button type="button" class="nav" id="nextBtn">Next</button>
@@ -244,14 +243,14 @@
     </div>
     <div id="zoomFit">
       <div id="view">
-        <canvas id="c" aria-label="Quick-fit distillation bench"></canvas>
+        <canvas id="c" aria-label="Quick-fit fractional distillation bench"></canvas>
         <div id="labels"></div>
       </div>
       <p id="answer" class="answer" aria-hidden="true"><span id="answerInner"></span></p>
       <div id="tray" class="tray"></div>
     </div>
   </section>
-  <p id="desc">Distillation is a method to obtain <span class="hl-water">pure water</span> from sea water. (Obtain solvent from solution)</p>
+  <p id="desc">Fractional distillation is a method to obtain <span class="hl-water">pure water</span> from sea water. (Obtain solvent from solution)</p>
 </main>
 
 <canvas id="penCanvas" class="pen-canvas"></canvas>
@@ -283,12 +282,16 @@
 (function () {
   var GAUZE_Y = 1.18;
   var NECK_Y = 4.05;
-  var SIDE_Y = 1.62;
+  var SIDE_Y = 1.2;
   var SIDE_LEN = 1.7;
   var COND_LEN = 6.2;
-  var THERM_TOP = 3.7;
-  var THERM_BOT = -2.3;
+  var THERM_TOP = 1.75;
+  var THERM_BOT = -0.6;
   var T_SIDE = (THERM_TOP - SIDE_Y) / (THERM_TOP - THERM_BOT);
+  var INNER_R = 0.15;
+  var JACKET_R = 0.62;
+  var NOZZLE_H = 0.5;
+  var JACKET_INSET = 0.95;
   var T_BAND = 0.08;
   var MOUTH = new THREE.Vector3(1.15, -2.2, 0);
   var UP = new THREE.Vector3(0, 1, 0);
@@ -297,8 +300,8 @@
   var sideDir = new THREE.Vector3(1, -0.28, 0).normalize();
   var sideEnd = new THREE.Vector3(0, SIDE_Y, 0).addScaledVector(sideDir, SIDE_LEN);
   var nozzleLocal = {
-    nozzleA: new THREE.Vector3(1.25, 0, 1.05),
-    nozzleB: new THREE.Vector3(4.95, 0, 1.05)
+    nozzleA: new THREE.Vector3(1.2, JACKET_R + NOZZLE_H, 0),
+    nozzleB: new THREE.Vector3(COND_LEN - 1.2, -(JACKET_R + NOZZLE_H), 0)
   };
   var REST_Y = {
     flask: 0, granules: 0.15, heat: 0, still: 0, thermo: 0.3,
@@ -314,7 +317,6 @@
   var backBtn = document.getElementById('backBtn');
   var nextBtn = document.getElementById('nextBtn');
   var hideBtn = document.getElementById('hideBtn');
-  var turnBtn = document.getElementById('turnBtn');
   var checkBtn = document.getElementById('checkBtn');
   var stepLabel = document.getElementById('stepLabel');
   var stage = document.getElementById('stage');
@@ -335,7 +337,6 @@
   var step = -1;
   var zoomed = false;
   var descHidden = false;
-  var turnOn = false;
   var penOn = false;
   var laserOn = false;
   var erasing = false;
@@ -346,15 +347,40 @@
   var laserY = 0;
   var hasPointer = false;
   var lastFrame = 0;
+  var laserRunning = false;
+  var inkStrokes = [];
+  var openStroke = null;
+  var undoStack = [];
   var penCtx = penCanvas.getContext('2d');
   var laserCtx = laserCanvas.getContext('2d');
   var drag = null;
-  var turning = null;
   var pending = false;
   var azimuth = 0.62;
   var polar = 1.08;
   var radius = 18;
   var target = new THREE.Vector3(4.1, 3.6, 0);
+  var camRight = new THREE.Vector3();
+  var camUp = new THREE.Vector3();
+  var camPts = {};
+  var orbitPtr = null;
+  var panPtr = null;
+  var pinchPrev = null;
+  var flameMesh = null;
+  var procT = 0;
+  var lastDrawAt = 0;
+  var labelsDirty = true;
+  var rigMoved = true;
+  var runningCached = null;
+  var procShown = false;
+  var viewW = 0;
+  var viewH = 0;
+  var viewDpr = 0;
+  var cachedLower = null;
+  var labelLocal = new THREE.Vector3();
+  var nozzleAWorld = new THREE.Vector3();
+  var nozzleBWorld = new THREE.Vector3();
+  var mouthScratch = new THREE.Vector3();
+  var lastMouth = new THREE.Vector3(NaN, NaN, NaN);
 
   var META = [
     ['flask', 'flask', 'Pear-shaped flask of sea water'],
@@ -410,7 +436,12 @@
     mesh.position.x = length / 2;
   }
 
-  var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+  var renderer = new THREE.WebGLRenderer({
+    canvas: canvas,
+    antialias: true,
+    powerPreference: 'high-performance',
+    stencil: false
+  });
   if (THREE.SRGBColorSpace) renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.setClearColor(0xf8fafc, 1);
   var scene = new THREE.Scene();
@@ -428,18 +459,24 @@
     solidMat(0xe7e5e4)
   );
   bench.position.set(4, -0.14, 0);
+  bench.matrixAutoUpdate = false;
+  bench.updateMatrix();
   scene.add(bench);
   var gauze = new THREE.Mesh(
     new THREE.CylinderGeometry(1.65, 1.65, 0.06, 24),
     solidMat(0x94a3b8)
   );
   gauze.position.y = GAUZE_Y;
+  gauze.matrixAutoUpdate = false;
+  gauze.updateMatrix();
   scene.add(gauze);
   var legMat = solidMat(0x475569);
   for (var li = 0; li < 3; li++) {
     var leg = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, GAUZE_Y, 8), legMat);
     var ang = li * Math.PI * 2 / 3;
     leg.position.set(Math.cos(ang) * 1.15, GAUZE_Y / 2, Math.sin(ang) * 1.15);
+    leg.matrixAutoUpdate = false;
+    leg.updateMatrix();
     scene.add(leg);
   }
 
@@ -495,22 +532,27 @@
     addPart(g, new THREE.CylinderGeometry(0.16, 0.2, 0.72, 12), solidMat(0x1f2937), 'heat', true).position.y = 0.52;
     var flame = addPart(g, new THREE.CylinderGeometry(0.02, 0.36, 0.7, 12), solidMat(0xfde047, { emissive: new THREE.Color(0xf97316) }), 'heat', false);
     flame.position.set(0, 0.86, 0.45);
+    flameMesh = flame;
   })();
 
   (function buildStill() {
     var g = makePiece('still');
-    var joint = addPart(g, new THREE.CylinderGeometry(0.34, 0.55, 0.42, 16), glassMat(), 'still', true);
-    joint.position.y = 0.21;
-    var neck = addPart(g, new THREE.CylinderGeometry(0.32, 0.32, 3.35, 16), glassMat(), 'still', true);
-    neck.position.y = 1.95;
-    var lip = addPart(g, new THREE.CylinderGeometry(0.48, 0.34, 0.16, 16), glassMat(), 'still', true);
-    lip.position.y = 3.68;
-    var arm = addPart(g, new THREE.CylinderGeometry(0.26, 0.26, SIDE_LEN, 12), glassMat(), 'still', true);
-    arm.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), sideDir);
-    arm.position.copy(sideEnd).addScaledVector(sideDir, -SIDE_LEN / 2);
-    var cuff = addPart(g, new THREE.CylinderGeometry(0.34, 0.28, 0.22, 12), glassMat(), 'still', true);
+    var cone = addPart(g, new THREE.CylinderGeometry(0.4, 0.26, 0.5, 16), glassMat(), 'still', true);
+    cone.position.y = 0.25;
+    var neck = addPart(g, new THREE.CylinderGeometry(0.28, 0.28, 0.9, 16), glassMat(), 'still', true);
+    neck.position.y = 0.95;
+    var socket = addPart(g, new THREE.CylinderGeometry(0.24, 0.28, 0.42, 16), glassMat(), 'still', true);
+    socket.position.y = SIDE_Y + 0.16;
+    var lip = addPart(g, new THREE.CylinderGeometry(0.38, 0.26, 0.14, 16), glassMat(), 'still', true);
+    lip.position.y = SIDE_Y + 0.46;
+    var armLen = SIDE_LEN - 0.42;
+    var arm = addPart(g, new THREE.CylinderGeometry(0.2, 0.2, armLen, 14), glassMat(), 'still', true);
+    arm.quaternion.setFromUnitVectors(UP, sideDir);
+    arm.position.copy(sideDir.clone().multiplyScalar(armLen / 2));
+    arm.position.y += SIDE_Y;
+    var cuff = addPart(g, new THREE.CylinderGeometry(0.18, 0.32, 0.42, 14), glassMat(), 'still', true);
     cuff.quaternion.copy(arm.quaternion);
-    cuff.position.copy(sideEnd);
+    cuff.position.copy(sideEnd).addScaledVector(sideDir, -0.21);
   })();
 
   (function buildThermo() {
@@ -524,23 +566,29 @@
 
   (function buildCondenser() {
     var g = makePiece('condenser');
-    var outer = addPart(g, new THREE.CylinderGeometry(0.58, 0.58, COND_LEN, 18), glassMat(), 'condenser', true);
-    alongX(outer, COND_LEN);
-    var inner = addPart(g, new THREE.CylinderGeometry(0.22, 0.22, COND_LEN + 0.3, 12), solidMat(0xf8fafc, { transparent: true, opacity: 0.55 }), 'condenser', true);
+    var inner = addPart(g, new THREE.CylinderGeometry(INNER_R, INNER_R, COND_LEN, 16), glassMat(), 'condenser', true);
     alongX(inner, COND_LEN);
+    var jacketLen = COND_LEN - JACKET_INSET * 2;
+    var jacket = addPart(g, new THREE.CylinderGeometry(JACKET_R, JACKET_R, jacketLen, 20), glassMat(), 'condenser', true);
+    alongX(jacket, jacketLen);
+    jacket.position.x = COND_LEN / 2;
+    var inlet = addPart(g, new THREE.CylinderGeometry(0.26, 0.3, 0.5, 16), glassMat(), 'condenser', true);
+    inlet.rotation.z = -Math.PI / 2;
+    inlet.position.x = 0.1;
+    var outlet = addPart(g, new THREE.CylinderGeometry(0.18, 0.28, 0.48, 16), glassMat(), 'condenser', true);
+    outlet.rotation.z = -Math.PI / 2;
+    outlet.position.x = COND_LEN - 0.04;
     ['nozzleA', 'nozzleB'].forEach(function (name) {
-      var n = addPart(g, new THREE.CylinderGeometry(0.12, 0.12, 0.7, 10), glassMat(), 'condenser', true);
-      n.rotation.x = Math.PI / 2;
+      var n = addPart(g, new THREE.CylinderGeometry(0.1, 0.13, NOZZLE_H, 12), glassMat(), 'condenser', true);
       n.position.copy(nozzleLocal[name]);
-      n.position.z -= 0.28;
+      n.position.y -= Math.sign(nozzleLocal[name].y) * (NOZZLE_H / 2);
     });
   })();
 
   function buildHose(id) {
     var g = makePiece(id);
-    var hose = addPart(g, new THREE.CylinderGeometry(0.14, 0.14, 1.7, 12), solidMat(id === 'win' ? 0x2563eb : 0x0369a1), id, true);
-    hose.rotation.x = Math.PI / 2;
-    hose.position.z = 0.85;
+    var hose = addPart(g, new THREE.CylinderGeometry(0.11, 0.11, 1.7, 12), solidMat(id === 'win' ? 0x2563eb : 0x0369a1), id, true);
+    hose.position.y = 0.85;
   }
   buildHose('win');
   buildHose('wout');
@@ -562,6 +610,74 @@
     lip.position.y = 2.28;
   })();
 
+  var BUBBLES = [];
+  var VAPOUR = [];
+  var DROPS = [];
+  var JACKET = [];
+  var COLD_WATER = new THREE.Color(0x2563eb);
+  var WARM_WATER = new THREE.Color(0xfdba74);
+  var distillate = null;
+
+  (function buildProcess() {
+    var bubbleGeo = new THREE.SphereGeometry(0.11, 10, 8);
+    var bubbleMat = solidMat(0xecfeff, { transparent: true, opacity: 0.72, depthWrite: false });
+    var i;
+    for (i = 0; i < 8; i++) {
+      var b = addPart(pieces.flask.group, bubbleGeo, bubbleMat, 'flask', false);
+      b.name = 'proc-bubble';
+      b.visible = false;
+      b.userData.ang = i * 2.399;
+      b.userData.rad = 0.28 + (i % 3) * 0.28;
+      BUBBLES.push(b);
+    }
+    var vapourGeo = new THREE.SphereGeometry(0.08, 10, 8);
+    var vapourMat = solidMat(0xdbeafe, { transparent: true, opacity: 0.9, depthWrite: false });
+    function vapourRun(parentId, a, b, count) {
+      var k;
+      for (k = 0; k < count; k++) {
+        var m = addPart(pieces[parentId].group, vapourGeo, vapourMat, parentId, false);
+        m.name = 'proc-vapour';
+        m.visible = false;
+        VAPOUR.push({ mesh: m, a: a.clone(), b: b.clone() });
+      }
+    }
+    vapourRun('flask', new THREE.Vector3(0, 2.25, 0), new THREE.Vector3(0, 3.92, 0), 5);
+    vapourRun('still', new THREE.Vector3(0, 0.15, 0), new THREE.Vector3(0, SIDE_Y, 0), 3);
+    vapourRun('still', new THREE.Vector3(0, SIDE_Y, 0).addScaledVector(sideDir, 0.2), sideEnd.clone().addScaledVector(sideDir, -0.15), 4);
+    vapourRun('condenser', new THREE.Vector3(0.35, 0, 0), new THREE.Vector3(COND_LEN - 0.2, 0, 0), 5);
+    var dropGeo = new THREE.SphereGeometry(0.07, 10, 8);
+    var dropMat = solidMat(0xbae6fd, { transparent: true, opacity: 0.95, depthWrite: false });
+    for (i = 0; i < 6; i++) {
+      var d = addPart(pieces.condenser.group, dropGeo, dropMat, 'condenser', false);
+      d.name = 'proc-drop';
+      d.visible = false;
+      DROPS.push(d);
+    }
+    var flowGeo = new THREE.SphereGeometry(0.055, 8, 6);
+    var flowMat = solidMat(0x2563eb, { transparent: true, opacity: 0.95 });
+    for (i = 0; i < 12; i++) {
+      var f = addPart(pieces.condenser.group, flowGeo, flowMat.clone(), 'condenser', false);
+      f.name = 'proc-flow';
+      f.visible = false;
+      f.userData.ang = i * (Math.PI * 2 / 12);
+      f.userData.rad = 0.28 + (i % 3) * 0.1;
+      JACKET.push(f);
+    }
+    var distGeo = new THREE.CylinderGeometry(0.52, 0.52, 1.45, 24);
+    distGeo.translate(0, 0.725, 0);
+    distillate = addPart(
+      pieces.receiver.group,
+      distGeo,
+      solidMat(0x7dd3fc, { transparent: true, opacity: 0.92, depthWrite: false }),
+      'receiver',
+      false
+    );
+    distillate.name = 'proc-distillate';
+    distillate.position.y = 0.15;
+    distillate.scale.y = 0.12;
+    distillate.visible = false;
+  })();
+
   META.forEach(function (row) {
     pieces[row[0]].labelEl.textContent = row[1];
     var chip = document.createElement('button');
@@ -574,6 +690,20 @@
     pieces[row[0]].chip = chip;
   });
 
+  function clampRadius(r) {
+    if (r < 8) return 8;
+    if (r > 36) return 36;
+    return r;
+  }
+
+  function clampPolar(p) {
+    var min = 0.12;
+    var max = Math.PI - 0.12;
+    if (p < min) return min;
+    if (p > max) return max;
+    return p;
+  }
+
   function applyCamera() {
     var sp = Math.sin(polar);
     camera.position.set(
@@ -582,6 +712,44 @@
       target.z + radius * sp * Math.cos(azimuth)
     );
     camera.lookAt(target);
+    labelsDirty = true;
+  }
+
+  function touchView() {
+    labelsDirty = true;
+    cachedLower = null;
+    rigMoved = true;
+    runningCached = null;
+  }
+
+  function panBy(dx, dy) {
+    var el = camera.matrix.elements;
+    camRight.set(el[0], el[1], el[2]);
+    camUp.set(el[4], el[5], el[6]);
+    var scale = radius * 0.0015;
+    target.addScaledVector(camRight, -dx * scale);
+    target.addScaledVector(camUp, dy * scale);
+  }
+
+  function camCount() {
+    var n = 0;
+    var k;
+    for (k in camPts) n += 1;
+    return n;
+  }
+
+  function pinchMeasure() {
+    var list = [];
+    var k;
+    for (k in camPts) list.push(camPts[k]);
+    if (list.length < 2) return null;
+    var dx = list[0].x - list[1].x;
+    var dy = list[0].y - list[1].y;
+    return {
+      dist: Math.max(8, Math.sqrt(dx * dx + dy * dy)),
+      mx: (list[0].x + list[1].x) / 2,
+      my: (list[0].y + list[1].y) / 2
+    };
   }
 
   function requestRender() {
@@ -591,24 +759,29 @@
   }
 
   function lowerNozzle() {
+    if (cachedLower) return cachedLower;
     pieces.condenser.group.updateMatrixWorld(true);
-    var a = pieces.condenser.group.localToWorld(nozzleLocal.nozzleA.clone());
-    var b = pieces.condenser.group.localToWorld(nozzleLocal.nozzleB.clone());
-    return a.y <= b.y ? 'nozzleA' : 'nozzleB';
+    pieces.condenser.group.localToWorld(nozzleAWorld.copy(nozzleLocal.nozzleA));
+    pieces.condenser.group.localToWorld(nozzleBWorld.copy(nozzleLocal.nozzleB));
+    cachedLower = nozzleAWorld.y <= nozzleBWorld.y ? 'nozzleA' : 'nozzleB';
+    return cachedLower;
   }
 
   function adaptorMouthWorld() {
     pieces.adaptor.group.updateMatrixWorld(true);
-    return pieces.adaptor.group.localToWorld(MOUTH.clone());
+    return pieces.adaptor.group.localToWorld(mouthScratch.copy(MOUTH));
   }
 
   function positionReceiver() {
     var mouth = adaptorMouthWorld();
+    if (mouth.distanceToSquared(lastMouth) < 1e-6 && pieces.receiver.group.parent === scene) return;
+    lastMouth.copy(mouth);
     var h = 2.36;
     scene.attach(pieces.receiver.group);
     pieces.receiver.group.position.set(mouth.x, Math.max(0, mouth.y - h - 0.06), mouth.z);
     pieces.receiver.group.quaternion.identity();
     pieces.receiver.group.visible = true;
+    labelsDirty = true;
   }
 
   function setWorldQuat(obj, worldQ) {
@@ -634,6 +807,7 @@
   }
 
   function placeOnBench(id, world) {
+    touchView();
     var p = pieces[id];
     if (id !== 'receiver' && pieces.receiver.socket === 'under' && (id === 'adaptor' || id === 'condenser' || id === 'still' || id === 'flask')) {
       var rw = new THREE.Vector3();
@@ -659,6 +833,7 @@
   }
 
   function attachFlask() {
+    touchView();
     scene.attach(pieces.flask.group);
     pieces.flask.group.position.set(0, GAUZE_Y, 0);
     pieces.flask.group.quaternion.identity();
@@ -675,6 +850,7 @@
   }
 
   function attachGranules() {
+    touchView();
     pieces.flask.group.attach(pieces.granules.group);
     pieces.granules.group.position.set(0, 1.35, 0);
     pieces.granules.group.quaternion.identity();
@@ -684,6 +860,7 @@
   }
 
   function attachHeat() {
+    touchView();
     pieces.flask.group.attach(pieces.heat.group);
     pieces.heat.group.position.set(0, -GAUZE_Y, 0);
     pieces.heat.group.quaternion.identity();
@@ -693,6 +870,7 @@
   }
 
   function attachStill() {
+    touchView();
     pieces.flask.group.attach(pieces.still.group);
     pieces.still.group.position.set(0, NECK_Y, 0);
     pieces.still.group.quaternion.identity();
@@ -702,6 +880,7 @@
   }
 
   function attachThermo(t) {
+    touchView();
     if (t < 0) t = 0;
     if (t > 1) t = 1;
     pieces.still.group.attach(pieces.thermo.group);
@@ -715,6 +894,7 @@
   }
 
   function attachCondenser(slopeUp) {
+    touchView();
     var dir = slopeUp ? new THREE.Vector3(1, 0.28, 0) : sideDir.clone();
     var worldDir = dir.clone().normalize().applyQuaternion(pieces.still.group.getWorldQuaternion(new THREE.Quaternion()));
     pieces.still.group.attach(pieces.condenser.group);
@@ -727,16 +907,19 @@
   }
 
   function attachHose(id, nozzle) {
+    touchView();
     var g = pieces[id].group;
     pieces.condenser.group.attach(g);
     g.position.copy(nozzleLocal[nozzle]);
     g.quaternion.identity();
+    if (nozzleLocal[nozzle].y < 0) g.rotation.z = Math.PI;
     pieces[id].place = 'socket';
     pieces[id].socket = nozzle;
     g.visible = true;
   }
 
   function attachAdaptor(pointUp) {
+    touchView();
     if (pieces.receiver.socket === 'under' && pointUp) {
       var rw = new THREE.Vector3();
       pieces.receiver.group.getWorldPosition(rw);
@@ -832,11 +1015,7 @@
   }
 
   function applyPreview(id, point) {
-    var snap = nearestSocket(id);
-    if (snap) {
-      snap();
-      return;
-    }
+    touchView();
     scene.attach(pieces[id].group);
     pieces[id].group.position.copy(point);
     orientFree(id);
@@ -921,8 +1100,8 @@
   }
 
   function verdictHtml() {
-    if (allCorrect()) return 'The quick-fit distillation apparatus is <span class="hl-gran">correctly set up</span>.';
-    return 'The quick-fit distillation apparatus is <span class="hl-bad">not yet correct</span>.';
+    if (allCorrect()) return 'The quick-fit fractional distillation apparatus is <span class="hl-gran">correctly set up</span>.';
+    return 'The quick-fit fractional distillation apparatus is <span class="hl-bad">not yet correct</span>.';
   }
 
   function paint() {
@@ -1014,18 +1193,18 @@
   }
 
   function labelAnchor(id) {
-    var local = new THREE.Vector3(0, 0.7, 0);
-    if (id === 'thermo') local.set(0.85, 3.7, 0.2);
-    else if (id === 'flask') local.set(-1.6, 1.2, 1.7);
-    else if (id === 'granules') local.set(-0.2, 0.5, 2);
-    else if (id === 'heat') local.set(0.5, 0.15, 1.9);
-    else if (id === 'win' || id === 'wout') local.set(0, 0.45, 2.05);
-    else if (id === 'condenser') local.set(COND_LEN * 0.5, 1.05, 0.2);
-    else if (id === 'still') local.set(-1.15, 2.6, 0.5);
-    else if (id === 'adaptor') local.set(1.6, -0.6, 0.8);
-    else if (id === 'receiver') local.set(1.2, 1.1, 0.4);
+    labelLocal.set(0, 0.7, 0);
+    if (id === 'thermo') labelLocal.set(0.85, 3.7, 0.2);
+    else if (id === 'flask') labelLocal.set(-1.6, 1.2, 1.7);
+    else if (id === 'granules') labelLocal.set(-0.2, 0.5, 2);
+    else if (id === 'heat') labelLocal.set(0.5, 0.15, 1.9);
+    else if (id === 'win' || id === 'wout') labelLocal.set(0, 0.45, 2.05);
+    else if (id === 'condenser') labelLocal.set(COND_LEN * 0.5, 1.05, 0.2);
+    else if (id === 'still') labelLocal.set(-1.15, 2.6, 0.5);
+    else if (id === 'adaptor') labelLocal.set(1.6, -0.6, 0.8);
+    else if (id === 'receiver') labelLocal.set(1.2, 1.1, 0.4);
     pieces[id].group.updateMatrixWorld(true);
-    return pieces[id].group.localToWorld(local);
+    return pieces[id].group.localToWorld(labelLocal);
   }
 
   function updateLabels() {
@@ -1064,9 +1243,75 @@
     });
   }
 
-  function draw() {
+  function showProc(on) {
+    var i;
+    for (i = 0; i < BUBBLES.length; i++) BUBBLES[i].visible = on;
+    for (i = 0; i < VAPOUR.length; i++) VAPOUR[i].mesh.visible = on;
+    for (i = 0; i < DROPS.length; i++) DROPS[i].visible = on;
+    for (i = 0; i < JACKET.length; i++) JACKET[i].visible = on;
+    if (distillate) distillate.visible = on;
+  }
+
+  function stepProcess(on, dt) {
+    var i;
+    var n;
+    var u;
+    if (!on) {
+      if (!procShown) return;
+      procT = 0;
+      procShown = false;
+      showProc(false);
+      if (flameMesh) flameMesh.scale.set(1, 1, 1);
+      if (distillate) distillate.scale.y = 0.12;
+      return;
+    }
+    procT += dt;
+    if (!procShown) {
+      procShown = true;
+      showProc(true);
+    }
+    n = BUBBLES.length;
+    for (i = 0; i < n; i++) {
+      u = (procT * 0.28 + i / n) % 1;
+      var bub = BUBBLES[i];
+      var bang = bub.userData.ang;
+      var brad = bub.userData.rad;
+      var spread = 0.55 + 0.45 * (1 - u);
+      bub.position.set(Math.cos(bang) * brad * spread, 0.4 + u * 1.65, Math.sin(bang) * brad * spread);
+    }
+    n = VAPOUR.length;
+    for (i = 0; i < n; i++) {
+      u = (procT * 0.22 + i / n) % 1;
+      VAPOUR[i].mesh.position.lerpVectors(VAPOUR[i].a, VAPOUR[i].b, u);
+    }
+    n = DROPS.length;
+    for (i = 0; i < n; i++) {
+      u = (procT * 0.16 + i / n) % 1;
+      DROPS[i].position.set(0.4 + u * (COND_LEN - 0.7), 0, 0);
+    }
+    var lowerName = lowerNozzle();
+    var upperName = lowerName === 'nozzleA' ? 'nozzleB' : 'nozzleA';
+    var x0 = nozzleLocal[lowerName].x;
+    var x1 = nozzleLocal[upperName].x;
+    n = JACKET.length;
+    for (i = 0; i < n; i++) {
+      u = (procT * 0.2 + i / n) % 1;
+      var rad = JACKET[i].userData.rad;
+      var ang = JACKET[i].userData.ang + u * Math.PI * 4;
+      JACKET[i].position.set(x0 + (x1 - x0) * u, Math.sin(ang) * rad, Math.cos(ang) * rad);
+      JACKET[i].material.color.copy(COLD_WATER).lerp(WARM_WATER, u);
+    }
+    u = Math.min(1, procT / 4);
+    distillate.scale.y = Math.max(0.12, u * u * (3 - 2 * u));
+    if (flameMesh) {
+      var flick = 0.94 + 0.06 * Math.sin(procT * 7);
+      flameMesh.scale.set(0.96 + 0.04 * Math.sin(procT * 5), flick, 0.96 + 0.04 * Math.cos(procT * 6));
+    }
+  }
+
+  function draw(now) {
     pending = false;
-    if (pieces.receiver.socket === 'under') {
+    if (rigMoved && pieces.receiver.socket === 'under') {
       if (pieces.adaptor.socket === 'end' && !pieces.adaptor.pointUp) positionReceiver();
       else {
         var rw = new THREE.Vector3();
@@ -1075,18 +1320,35 @@
         placeOnBench('receiver', rw);
       }
     }
+    rigMoved = false;
+    var t = typeof now === 'number' ? now : performance.now();
+    var dt = lastDrawAt ? Math.min(0.05, (t - lastDrawAt) / 1000) : 0.016;
+    lastDrawAt = t;
+    if (runningCached === null) runningCached = allCorrect();
+    var running = runningCached;
+    stepProcess(running, dt);
     renderer.render(scene, camera);
-    updateLabels();
+    if (labelsDirty) {
+      updateLabels();
+      labelsDirty = false;
+    }
+    if (running) requestRender();
   }
 
   function resize() {
     var w = view.clientWidth;
     var h = view.clientHeight;
     if (!w || !h) return;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    if (w === viewW && h === viewH && dpr === viewDpr) return;
+    viewW = w;
+    viewH = h;
+    viewDpr = dpr;
+    renderer.setPixelRatio(dpr);
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+    labelsDirty = true;
     requestRender();
   }
 
@@ -1114,7 +1376,7 @@
     Object.keys(pieces).forEach(function (id) {
       if (pieces[id].place === 'tray') return;
       pieces[id].group.traverse(function (o) {
-        if (o.isMesh) meshes.push(o);
+        if (o.isMesh && o.name.indexOf('proc-') !== 0) meshes.push(o);
       });
     });
     var hits = raycaster.intersectObjects(meshes, false);
@@ -1130,24 +1392,39 @@
       pieces.heat.group.position.set(0, 0, 0);
       pieces.heat.group.quaternion.identity();
     }
-    if (p.place === 'tray') {
-      p.group.visible = true;
-      p.group.position.copy(target);
-      p.group.quaternion.identity();
-    }
-    var world = new THREE.Vector3();
-    p.group.getWorldPosition(world);
-    if (p.group.parent !== scene) scene.attach(p.group);
-    p.group.getWorldPosition(world);
     setPointer(e);
     raycaster.setFromCamera(pointer, camera);
-    var plane = planeThrough(world);
-    var hit = hitPlane(plane) || world.clone();
+    var grabbed = null;
+    if (!drag.fromTray) {
+      var meshes = [];
+      p.group.updateMatrixWorld(true);
+      p.group.traverse(function (o) {
+        if (o.isMesh && o.name.indexOf('proc-') !== 0) meshes.push(o);
+      });
+      var hits = raycaster.intersectObjects(meshes, false);
+      if (hits.length) grabbed = hits[0].point.clone();
+    }
+    if (p.group.parent !== scene) scene.attach(p.group);
+    var world = new THREE.Vector3();
+    p.group.getWorldPosition(world);
+    var anchor = grabbed || world;
+    if (drag.fromTray) {
+      p.group.visible = true;
+      p.group.quaternion.identity();
+      anchor = target.clone();
+    }
+    var plane = planeThrough(anchor);
+    var hit = hitPlane(plane) || anchor.clone();
+    if (drag.fromTray) {
+      p.group.position.copy(hit);
+      world.copy(hit);
+    }
     drag.plane = plane;
     drag.offset = world.clone().sub(hit);
     drag.active = true;
     p.place = 'drag';
     p.socket = null;
+    touchView();
     leaveCheck();
     updateChips();
     requestRender();
@@ -1164,8 +1441,9 @@
   }
 
   function finishDrag(id) {
+    var snap = nearestSocket(id);
+    if (snap) snap();
     var p = pieces[id];
-    if (p.socket === 'stand' || (id === 'flask' && p.socket === 'stand')) attachFlask();
     if (p.place !== 'socket') {
       var w = new THREE.Vector3();
       p.group.getWorldPosition(w);
@@ -1184,6 +1462,7 @@
   }
 
   function toTray(id) {
+    touchView();
     (CHILD_OF[id] || []).forEach(function (cid) {
       if (pieces[cid].place === 'socket' || pieces[cid].place === 'bench' && pieces[cid].group.parent === pieces[id].group) {
         var w = new THREE.Vector3();
@@ -1208,9 +1487,36 @@
     requestRender();
   }
 
+  function releaseCam(pointerId) {
+    if (panPtr && String(panPtr.id) === String(pointerId)) panPtr = null;
+    if (!camPts[pointerId]) return;
+    delete camPts[pointerId];
+    if (orbitPtr && String(orbitPtr.id) === String(pointerId)) orbitPtr = null;
+    var leftId = null;
+    var k;
+    var n = 0;
+    for (k in camPts) {
+      n += 1;
+      leftId = k;
+    }
+    if (n === 1) {
+      orbitPtr = { id: leftId, x: camPts[leftId].x, y: camPts[leftId].y };
+      pinchPrev = null;
+    } else if (n >= 2) {
+      armPinch();
+    } else {
+      pinchPrev = null;
+    }
+  }
+
+  function armPinch() {
+    pinchPrev = pinchMeasure();
+    if (pinchPrev) pinchPrev.radius = radius;
+  }
+
   tray.addEventListener('pointerdown', function (e) {
     var chip = e.target.closest('.chip');
-    if (!chip || turnOn || penOn || laserOn) return;
+    if (!chip || penOn || laserOn) return;
     e.preventDefault();
     drag = {
       id: chip.dataset.id,
@@ -1218,42 +1524,95 @@
       sx: e.clientX,
       sy: e.clientY,
       active: false,
-      fromTray: pieces[chip.dataset.id].place === 'tray'
+      fromTray: pieces[chip.dataset.id].place === 'tray',
+      before: rigSnapshot()
     };
   });
 
   canvas.addEventListener('pointerdown', function (e) {
-    if (penOn || laserOn) return;
-    if (turnOn) {
-      turning = { pointerId: e.pointerId, x: e.clientX, y: e.clientY };
+    if (penOn || laserOn || drag) return;
+    if (e.button === 2) {
+      e.preventDefault();
+      panPtr = { id: e.pointerId, x: e.clientX, y: e.clientY };
       return;
     }
+    if (e.button !== 0) return;
     setPointer(e);
-    var id = pickPiece();
-    if (!id) return;
+    if (camCount() === 0) {
+      var id = pickPiece();
+      if (id) {
+        e.preventDefault();
+        drag = {
+          id: id,
+          pointerId: e.pointerId,
+          sx: e.clientX,
+          sy: e.clientY,
+          active: false,
+          fromTray: false,
+          before: rigSnapshot()
+        };
+        return;
+      }
+    }
     e.preventDefault();
-    drag = {
-      id: id,
-      pointerId: e.pointerId,
-      sx: e.clientX,
-      sy: e.clientY,
-      active: false,
-      fromTray: false
-    };
+    camPts[e.pointerId] = { x: e.clientX, y: e.clientY };
+    if (camCount() === 1) {
+      orbitPtr = { id: e.pointerId, x: e.clientX, y: e.clientY };
+      pinchPrev = null;
+    } else {
+      orbitPtr = null;
+      armPinch();
+    }
   });
 
+  canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+  canvas.addEventListener('wheel', function (e) {
+    if (penOn || laserOn) return;
+    e.preventDefault();
+    var dy = e.deltaY;
+    if (e.deltaMode === 1) dy *= 16;
+    if (e.deltaMode === 2) dy *= 120;
+    radius = clampRadius(radius * Math.exp(dy * 0.0011));
+    applyCamera();
+    requestRender();
+  }, { passive: false });
+
   window.addEventListener('pointermove', function (e) {
-    if (turning && e.pointerId === turning.pointerId) {
-      azimuth += (e.clientX - turning.x) * 0.008;
-      polar += (e.clientY - turning.y) * 0.008;
-      if (azimuth < -0.85) azimuth = -0.85;
-      if (azimuth > 1.55) azimuth = 1.55;
-      if (polar < 0.55) polar = 0.55;
-      if (polar > 1.4) polar = 1.4;
-      turning.x = e.clientX;
-      turning.y = e.clientY;
+    if (panPtr && e.pointerId === panPtr.id) {
+      panBy(e.clientX - panPtr.x, e.clientY - panPtr.y);
+      panPtr.x = e.clientX;
+      panPtr.y = e.clientY;
       applyCamera();
       requestRender();
+      return;
+    }
+    if (camPts[e.pointerId]) {
+      camPts[e.pointerId].x = e.clientX;
+      camPts[e.pointerId].y = e.clientY;
+      if (camCount() >= 2) {
+        var now = pinchMeasure();
+        if (pinchPrev && now) {
+          radius = clampRadius(pinchPrev.radius * (pinchPrev.dist / now.dist));
+          panBy(now.mx - pinchPrev.mx, now.my - pinchPrev.my);
+          pinchPrev.dist = now.dist;
+          pinchPrev.mx = now.mx;
+          pinchPrev.my = now.my;
+          pinchPrev.radius = radius;
+        }
+        applyCamera();
+        requestRender();
+        return;
+      }
+      if (orbitPtr && String(orbitPtr.id) === String(e.pointerId)) {
+        azimuth += (e.clientX - orbitPtr.x) * 0.008;
+        azimuth = Math.atan2(Math.sin(azimuth), Math.cos(azimuth));
+        polar = clampPolar(polar + (e.clientY - orbitPtr.y) * 0.008);
+        orbitPtr.x = e.clientX;
+        orbitPtr.y = e.clientY;
+        applyCamera();
+        requestRender();
+      }
       return;
     }
     if (!drag || e.pointerId !== drag.pointerId) return;
@@ -1269,16 +1628,77 @@
   window.addEventListener('pointerup', endPointer);
   window.addEventListener('pointercancel', endPointer);
   function endPointer(e) {
-    if (turning && e.pointerId === turning.pointerId) turning = null;
+    releaseCam(e.pointerId);
     if (!drag || e.pointerId !== drag.pointerId) return;
     var d = drag;
     drag = null;
     if (!d.active) {
-      if (!d.fromTray) toTray(d.id);
+      if (!d.fromTray) {
+        toTray(d.id);
+        pushUndo({ kind: 'rig', snap: d.before });
+      }
       updateChips();
       return;
     }
+    setPointer(e);
+    raycaster.setFromCamera(pointer, camera);
     finishDrag(d.id);
+    pushUndo({ kind: 'rig', snap: d.before });
+  }
+
+  function pieceParentId(id) {
+    var parent = pieces[id].group.parent;
+    var keys;
+    var i;
+    if (!parent || parent === scene) return null;
+    keys = Object.keys(pieces);
+    for (i = 0; i < keys.length; i++) {
+      if (pieces[keys[i]].group === parent) return keys[i];
+    }
+    return null;
+  }
+
+  function rigSnapshot() {
+    return Object.keys(pieces).map(function (id) {
+      var p = pieces[id];
+      return {
+        id: id,
+        parentId: pieceParentId(id),
+        position: p.group.position.clone(),
+        quaternion: p.group.quaternion.clone(),
+        visible: p.group.visible,
+        place: p.place,
+        socket: p.socket,
+        t: p.t,
+        slopeUp: p.slopeUp,
+        pointUp: p.pointUp
+      };
+    });
+  }
+
+  function restoreRig(snap) {
+    snap.forEach(function (row) {
+      var p = pieces[row.id];
+      var parent = row.parentId ? pieces[row.parentId].group : scene;
+      parent.attach(p.group);
+      p.group.position.copy(row.position);
+      p.group.quaternion.copy(row.quaternion);
+      p.group.visible = row.visible;
+      p.place = row.place;
+      p.socket = row.socket;
+      p.t = row.t;
+      p.slopeUp = row.slopeUp;
+      p.pointUp = row.pointUp;
+    });
+    lastMouth.set(NaN, NaN, NaN);
+    touchView();
+    updateChips();
+    requestRender();
+  }
+
+  function pushUndo(action) {
+    undoStack.push(action);
+    if (undoStack.length > 40) undoStack.shift();
   }
 
   function setCorrect() {
@@ -1341,6 +1761,30 @@
     water: waterState,
     all: allCorrect,
     pieces: pieces,
+    cam: function () {
+      return {
+        azimuth: azimuth,
+        polar: polar,
+        radius: radius,
+        x: target.x,
+        y: target.y,
+        z: target.z
+      };
+    },
+    proc: function () {
+      return {
+        t: procT,
+        bubble: BUBBLES[0] ? BUBBLES[0].visible : false,
+        vapour: VAPOUR[0] ? VAPOUR[0].mesh.visible : false,
+        drop: DROPS[0] ? DROPS[0].visible : false,
+        flow: JACKET[0] ? JACKET[0].visible : false,
+        level: distillate ? distillate.scale.y : 0,
+        bubbleY: BUBBLES[0] ? BUBBLES[0].position.y : 0,
+        vapourY: VAPOUR[0] ? VAPOUR[0].mesh.position.y : 0,
+        dropX: DROPS[0] ? DROPS[0].position.x : 0,
+        flowX: JACKET[0] ? JACKET[0].position.x : 0
+      };
+    },
     dragAll: function () {
       dragPiece('flask', new THREE.Vector3(0, GAUZE_Y, 0));
       dragPiece('granules', worldOf(pieces.flask.group, new THREE.Vector3(0, 1.1, 0)));
@@ -1379,10 +1823,6 @@
   checkBtn.addEventListener('click', function () {
     step = 0;
     showStep();
-  });
-  turnBtn.addEventListener('click', function () {
-    turnOn = !turnOn;
-    turnBtn.setAttribute('aria-pressed', turnOn ? 'true' : 'false');
   });
   hideBtn.addEventListener('click', function () { setDesc(descHidden); });
   zoomBtn.addEventListener('click', function () {
@@ -1432,7 +1872,7 @@
   }
 
   function resizeCanvas(c) {
-    var dpr = window.devicePixelRatio || 1;
+    var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     var cssW = window.innerWidth;
     var cssH = window.innerHeight;
     var w = Math.round(cssW * dpr);
@@ -1474,6 +1914,11 @@
     document.getElementById('dkLaser').classList.toggle('active', on);
     if (!on) laserDot.classList.add('hidden');
     else if (hasPointer) laserDot.classList.remove('hidden');
+    if (on && !laserRunning) {
+      laserRunning = true;
+      lastFrame = 0;
+      requestAnimationFrame(laserFrame);
+    }
   }
   document.getElementById('dkPen').addEventListener('click', function () { setPen(!penOn); });
   document.getElementById('dkLaser').addEventListener('click', function () { setLaser(!laserOn); });
@@ -1492,19 +1937,22 @@
     });
   });
   document.getElementById('dkClear').addEventListener('click', function () {
+    if (inkStrokes.length) pushUndo({ kind: 'clear', strokes: inkStrokes });
+    inkStrokes = [];
+    openStroke = null;
     wipe(penCanvas);
     wipe(laserCanvas);
   });
-  function stroke(a, b) {
+  function paintSeg(erase, color, a, b) {
     penCtx.lineCap = 'round';
     penCtx.lineJoin = 'round';
-    if (erasing) {
+    if (erase) {
       penCtx.globalCompositeOperation = 'destination-out';
       penCtx.strokeStyle = 'rgba(0,0,0,1)';
       penCtx.lineWidth = 26;
     } else {
       penCtx.globalCompositeOperation = 'source-over';
-      penCtx.strokeStyle = ink;
+      penCtx.strokeStyle = color;
       penCtx.lineWidth = 3.6;
     }
     penCtx.beginPath();
@@ -1512,20 +1960,43 @@
     penCtx.lineTo(b.x, b.y);
     penCtx.stroke();
   }
+  function stroke(a, b) {
+    paintSeg(erasing, ink, a, b);
+  }
+  function redrawInk() {
+    var s;
+    var i;
+    wipe(penCanvas);
+    for (s = 0; s < inkStrokes.length; s++) {
+      var strokeObj = inkStrokes[s];
+      if (strokeObj.pts.length === 1) paintSeg(strokeObj.erase, strokeObj.color, strokeObj.pts[0], strokeObj.pts[0]);
+      for (i = 1; i < strokeObj.pts.length; i++) {
+        paintSeg(strokeObj.erase, strokeObj.color, strokeObj.pts[i - 1], strokeObj.pts[i]);
+      }
+    }
+  }
   penCanvas.addEventListener('pointerdown', function (e) {
     if (!penOn) return;
-    penCanvas.setPointerCapture(e.pointerId);
+    try { penCanvas.setPointerCapture(e.pointerId); } catch (err) {}
     drawing = true;
     lastPt = { x: e.clientX, y: e.clientY };
+    openStroke = { erase: erasing, color: ink, pts: [lastPt] };
+    inkStrokes.push(openStroke);
     stroke(lastPt, lastPt);
   });
   penCanvas.addEventListener('pointermove', function (e) {
     if (!drawing) return;
     var p = { x: e.clientX, y: e.clientY };
+    if (openStroke) openStroke.pts.push(p);
     stroke(lastPt, p);
     lastPt = p;
   });
-  function endDraw() { drawing = false; }
+  function endDraw() {
+    if (!drawing) return;
+    drawing = false;
+    openStroke = null;
+    pushUndo({ kind: 'ink' });
+  }
   penCanvas.addEventListener('pointerup', endDraw);
   penCanvas.addEventListener('pointercancel', endDraw);
   document.addEventListener('pointermove', function (e) {
@@ -1542,6 +2013,11 @@
     laserDot.classList.add('hidden');
   });
   function laserFrame(now) {
+    if (!laserOn) {
+      laserRunning = false;
+      wipe(laserCanvas);
+      return;
+    }
     var dt = lastFrame ? Math.min(40, now - lastFrame) : 16;
     lastFrame = now;
     laserCtx.save();
@@ -1559,13 +2035,33 @@
     }
     requestAnimationFrame(laserFrame);
   }
+  function undoLast() {
+    var action;
+    if (drag || drawing) return;
+    action = undoStack.pop();
+    if (!action) return;
+    if (action.kind === 'ink') {
+      inkStrokes.pop();
+      redrawInk();
+    } else if (action.kind === 'clear') {
+      inkStrokes = action.strokes;
+      redrawInk();
+    } else if (action.kind === 'rig') {
+      restoreRig(action.snap);
+    }
+  }
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') { setPen(false); setLaser(false); }
+    if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && (e.key === 'z' || e.key === 'Z')) {
+      e.preventDefault();
+      undoLast();
+    }
   });
 
   window.addEventListener('resize', function () {
     resizeCanvas(penCanvas);
     resizeCanvas(laserCanvas);
+    redrawInk();
     placeZoom();
     fitZoom();
     resize();
@@ -1583,7 +2079,6 @@
   resizeCanvas(laserCanvas);
   applyCamera();
   showStep();
-  requestAnimationFrame(laserFrame);
   requestAnimationFrame(resize);
 })();
 </script>
