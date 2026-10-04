@@ -1,6 +1,18 @@
 ﻿/* Felix - Chem KOC - submissions. */
 KOC.works('chem', 'felix', [
   {
+    id: 'topic-02-part-1-lq',
+    title: 'Topic 02 Part 1 LQ',
+    original: 'Topic 02 Part 1 LQ set 2',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Microscopic world I Atoms isotopes relative atomic mass',
+    submitted: '2026-10-04',
+    tags: ['LQ', 'Long questions', 'Word worksheet', 'Microscopic world I', 'Topic 02'],
+    src: 'content/chem/felix/topic-02-part-1-lq/index.html',
+    notes: 'Long-question practice Set 2 for Topic 02 Part 1 (Microscopic world I). Download the .docx to use in Word — questions with writing space, diagrams, and an answer key.'
+  },
+  {
     id: 'topic-01-part-4-lq-set-2',
     title: 'Earth4_Rocks',
     original: 'Topic 01 Part 4 LQ set 2',
