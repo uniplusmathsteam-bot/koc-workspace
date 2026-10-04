@@ -1,5 +1,17 @@
-/* Felix - Chem KOC - submissions. */
+﻿/* Felix - Chem KOC - submissions. */
 KOC.works('chem', 'felix', [
+  {
+    id: 'topic-01-part-3-lq-set-2',
+    title: 'Earth3_Ocean',
+    original: 'Topic 01 Part 3 LQ set 2',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Ocean Earth3 Earth3A Physical separation, Earth3B Chemical tests and electrolysis',
+    submitted: '2026-10-04',
+    tags: ['LQ', 'Long questions', 'Word worksheet', 'Planet Earth', 'Topic 01'],
+    src: 'content/chem/felix/topic-01-part-3-lq-set-2/index.html',
+    notes: 'Long-question practice Set 2 for Topic 01 Part 3 (Planet Earth). Download the .docx to use in Word — questions with writing space, diagrams, and an answer key.'
+  },
   {
     id: 'topic-01-part-2-lq-set-2',
     title: 'Earth2_Atmosphere',
