@@ -9,8 +9,8 @@ KOC.works('chem', 'james', [
     chapter: 'S3 Atmosphere Earth2 Earth2A Matters',
     submitted: '2026-10-04',
     tags: ['Interactive', 'Classification', 'Matter'],
-    src: 'content/chem/james/classification-of-matter/index.html?v=20261004d',
-    notes: 'Choose a class and a difficulty. Each floor names one class. Shoot formulas of that class. Easy 1, Normal 3, Hard 5. WASD to move, mouse to aim, click to shoot. Space pauses. Phone mode uses a joystick to move and touch to shoot.'
+    src: 'content/chem/james/classification-of-matter/index.html?v=20261004e',
+    notes: 'Choose a class and a difficulty. Each floor names one class. Shoot formulas of that class. Easy 1, Normal 3, Hard 5. WASD to move, mouse to aim, click to shoot. Space pauses. Phone mode uses a joystick to move, touch to shoot, and three buttons to switch ammo.'
   },
   {
     id: 'earth3a-distillation',

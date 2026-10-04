@@ -578,6 +578,10 @@
     }
     if (hud) hud.hidden = !state.mobileMode;
     if (field) field.classList.toggle("mobile-touch", state.mobileMode);
+    const rail = playEl.querySelector(".ammo-rail");
+    if (rail) rail.hidden = !state.mobileMode;
+    playEl.classList.toggle("mobile-ammo", !!(rail && state.mobileMode));
+    if (rail && state.mobileMode) markAmmoButtons();
   }
 
   function setMobileMode(on) {
@@ -588,6 +592,7 @@
       resetStick();
     }
     syncMobileUi();
+    if (state.field) onPlayfieldResize();
   }
 
   function keyDir(e) {
@@ -3427,6 +3432,15 @@
             <button type="button" class="mobile-pause" data-pause="1">${COPY.mobilePause}</button>
           </div>
         </div>
+        ${
+          isHitType()
+            ? `<div class="ammo-rail" hidden>
+          <button type="button" data-ammo="0" aria-pressed="${state.ammo === AMMO[0] ? "true" : "false"}">1 Pure element</button>
+          <button type="button" data-ammo="1" aria-pressed="${state.ammo === AMMO[1] ? "true" : "false"}">2 Pure compound</button>
+          <button type="button" data-ammo="2" aria-pressed="false">3 Mixture</button>
+        </div>`
+            : ""
+        }
         <p class="key-hint">${COPY.keysHint}</p>
         <p class="feedback" id="feedback"></p>
       </div>
@@ -3610,8 +3624,17 @@
     return "";
   }
 
+  function markAmmoButtons() {
+    const index = AMMO.indexOf(state.ammo);
+    const buttons = playEl.querySelectorAll("[data-ammo]");
+    for (let i = 0; i < buttons.length; i++) {
+      buttons[i].setAttribute("aria-pressed", i === index ? "true" : "false");
+    }
+  }
+
   function setAmmo(cat) {
     state.ammo = cat;
+    markAmmoButtons();
     const el = document.getElementById("ammo-label");
     if (!el) return;
     const i = AMMO.indexOf(cat);
@@ -4074,6 +4097,12 @@
     }
     if (e.target.closest("[data-mobile]")) {
       setMobileMode(!state.mobileMode);
+      return;
+    }
+    const ammoBtn = e.target.closest("[data-ammo]");
+    if (ammoBtn && state.mobileMode) {
+      const ammoIndex = Number(ammoBtn.getAttribute("data-ammo"));
+      if (AMMO[ammoIndex]) setAmmo(AMMO[ammoIndex]);
       return;
     }
     if (overlayOpen()) return;
