@@ -779,21 +779,32 @@ main {
   display: none;
 }
 
-.dpad {
+.joystick {
   position: absolute;
   left: max(10px, env(safe-area-inset-left));
   bottom: max(10px, env(safe-area-inset-bottom));
-  display: grid;
-  grid-template-columns: 64px 64px 64px;
-  grid-template-rows: 64px 64px 64px;
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  border: 2px solid #c9a227;
+  background: rgba(20, 14, 12, 0.45);
+  pointer-events: auto;
+  touch-action: none;
 }
 
-.dpad [data-dir="up"] { grid-column: 2; grid-row: 1; }
-.dpad [data-dir="left"] { grid-column: 1; grid-row: 2; }
-.dpad [data-dir="down"] { grid-column: 2; grid-row: 3; }
-.dpad [data-dir="right"] { grid-column: 3; grid-row: 2; }
+.joystick-knob {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 56px;
+  height: 56px;
+  margin: -28px 0 0 -28px;
+  border-radius: 50%;
+  border: 2px solid #c9a227;
+  background: rgba(20, 14, 12, 0.82);
+  pointer-events: none;
+}
 
-.dpad button,
 .mobile-pause {
   pointer-events: auto;
   touch-action: none;
