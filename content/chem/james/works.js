@@ -1,6 +1,16 @@
 /* James · Chem KOC lead — submissions. */
 KOC.works('chem', 'james', [
   {
+    id: 'tiaogao-song-youren',
+    title: '跳高高 · 送友人',
+    type: 'interactive',
+    chapter: '李白《送友人》',
+    submitted: '2026-10-05',
+    tags: ['Interactive', '背書', '李白', '送友人'],
+    src: 'content/chem/james/tiaogao-song-youren/index.html?v=20261005c',
+    notes: '①溫書 ②跳高高 ③默寫 ④貪吃蛇。粵語／普通話逐句朗讀。貪吃蛇進行中可按「手機」，用上、左、右、下走。Esc 回主頁。'
+  },
+  {
     id: 'sheji',
     title: '射擊 / 寫作地牢',
     type: 'interactive',
@@ -81,16 +91,6 @@ KOC.works('chem', 'james', [
     tags: ['Interactive', 'S3', 'Lab apparatus'],
     src: 'content/chem/james/chem-lab-hq-scramble/index.html?v=20260923',
     notes: 'HKDSE Topic 01 timed mix: ten questions from apparatus stations and Lab Safety. Press 1–4. 15 minutes. Only the best score is kept.'
-  },
-  {
-    id: 'tiaogao-song-youren',
-    title: '跳高高 · 送友人',
-    type: 'interactive',
-    chapter: '李白《送友人》',
-    submitted: '2026-10-05',
-    tags: ['Interactive', '背書', '李白', '送友人'],
-    src: 'content/chem/james/tiaogao-song-youren/index.html?v=20261005b',
-    notes: '①溫書 ②跳高高 ③默寫 ④貪吃蛇。粵語／普通話逐句朗讀。貪吃蛇進行中可按「手機」，用上、左、右、下走。Esc 回主頁。'
   },
   {
     id: 'taiko',
