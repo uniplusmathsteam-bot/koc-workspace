@@ -55,11 +55,11 @@
       background: #fff;
       color: #16324a;
       font-weight: 650;
+      touch-action: manipulation;
     }
 
     .stage {
       position: relative;
-      z-index: 1;
       flex: 1;
       min-height: 0;
       display: block;
@@ -105,6 +105,8 @@
     }
 
     .actions {
+      position: relative;
+      z-index: 4;
       display: flex;
       gap: 8px;
       flex: none;

@@ -389,8 +389,7 @@
         if (e.key === "1") showPage("oxygen");
         else if (e.key === "2") showPage("hydrogen");
         else if (e.key === "3") showPage("carbon");
-        else if (e.key === " ") {
-          if (e.target.closest && e.target.closest("button")) return;
+        else if (e.key === " " || e.code === "Space") {
           e.preventDefault();
           playPanel(page);
         }
