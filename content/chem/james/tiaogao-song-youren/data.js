@@ -13,6 +13,7 @@ const COPY = {
   snakeName: "貪吃蛇",
   snakeLead: "吃對的字詞，累積成句。吃錯或撞牆要再練。",
   snakeKeys: "方向鍵 · WASD",
+  snakePad: "手機",
   snakeWall: "撞牆了",
   snakeSelf: "咬到自己",
   snakeGotIt: "明白了，再走",

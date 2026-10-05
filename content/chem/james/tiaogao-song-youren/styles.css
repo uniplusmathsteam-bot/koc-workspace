@@ -862,6 +862,50 @@ main {
   width: auto;
 }
 
+.snake-shell .jump-foot {
+  flex-shrink: 0;
+}
+
+.snake-pad-toggle {
+  margin-top: 8px;
+}
+
+.snake-pad {
+  display: grid;
+  grid-template-columns: 64px 64px 64px;
+  grid-template-rows: 64px 64px 64px;
+  gap: 8px;
+  justify-content: center;
+  width: max-content;
+  margin: 12px auto 0;
+  touch-action: manipulation;
+}
+
+.snake-pad[hidden] {
+  display: none;
+}
+
+.snake-pad-btn {
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: 2px solid var(--navy);
+  border-radius: 16px;
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  font-size: 22px;
+  font-weight: 800;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+.snake-pad-btn[data-snake-dir="up"] { grid-column: 2; grid-row: 1; }
+.snake-pad-btn[data-snake-dir="left"] { grid-column: 1; grid-row: 2; }
+.snake-pad-btn[data-snake-dir="right"] { grid-column: 3; grid-row: 2; }
+.snake-pad-btn[data-snake-dir="down"] { grid-column: 2; grid-row: 3; }
+
 .recap-card {
   background: var(--card);
   border: 1px solid var(--line);

@@ -55,6 +55,7 @@
     snake: null,
     snakeRaf: null,
     snakeSetupWeak: false,
+    snakePad: false,
     difficulty: "normal",
   };
 
@@ -1203,12 +1204,27 @@
         <div class="jump-foot">
           <div class="label snake-couplet">${couplet.name} · ${COPY.round}${item.coupletIndex + 1}${COPY.of}${POEM.couplets.length}${COPY.lian}</div>
           <div class="progress-strip">${COPY.snakeKeys} · ${COPY.streak} ${state.streak}</div>
+          <button type="button" class="btn snake-pad-toggle" data-snake-pad="1" aria-pressed="${state.snakePad ? "true" : "false"}">${COPY.snakePad}</button>
+          <div class="snake-pad"${state.snakePad ? "" : " hidden"}>
+            <button type="button" class="snake-pad-btn" data-snake-dir="up">上</button>
+            <button type="button" class="snake-pad-btn" data-snake-dir="left">左</button>
+            <button type="button" class="snake-pad-btn" data-snake-dir="right">右</button>
+            <button type="button" class="snake-pad-btn" data-snake-dir="down">下</button>
+          </div>
         </div>
       </div>
     `;
     paintSnake();
     drawSnakeWorm(performance.now());
     updateHud();
+  }
+
+  function setSnakePad(on) {
+    state.snakePad = on;
+    const btn = playEl.querySelector("[data-snake-pad]");
+    const pad = playEl.querySelector(".snake-pad");
+    if (btn) btn.setAttribute("aria-pressed", on ? "true" : "false");
+    if (pad) pad.hidden = !on;
   }
 
   function startWrite(onlyWeak) {
@@ -1738,7 +1754,19 @@
     const choice = e.target.closest(".choice");
     if (choice && state.mode === "jump") {
       pickJump(Number(choice.getAttribute("data-choice")));
+      return;
     }
+    if (e.target.closest("[data-snake-pad]")) {
+      setSnakePad(!state.snakePad);
+    }
+  });
+
+  playEl.addEventListener("pointerdown", (e) => {
+    const dirBtn = e.target.closest("[data-snake-dir]");
+    if (!dirBtn || !state.snakePad) return;
+    if (state.mode !== "snake" || state.phase !== "blank" || state.locked) return;
+    e.preventDefault();
+    snakeTurn(dirBtn.getAttribute("data-snake-dir"));
   });
 
   playEl.addEventListener("input", (e) => {
