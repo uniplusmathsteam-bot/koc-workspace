@@ -63,9 +63,9 @@ KOC.works('chem', 'james', [
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Ocean Earth3 Earth3B Chemical tests and electrolysis',
-    submitted: '2026-10-05',
+    submitted: '2026-10-06',
     tags: ['Interactive', 'S3', 'Chemical tests'],
-    src: 'content/chem/james/chemical-tests-electrolysis/index.html?v=20261005a',
+    src: 'content/chem/james/chemical-tests-electrolysis/index.html?v=20261006a',
     notes: 'Tests for oxygen, hydrogen, and carbon dioxide. Keys 1–3, Space to play, H to hide the description, pen on P.'
   },
   {

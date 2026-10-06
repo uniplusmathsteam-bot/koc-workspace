@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -7,27 +7,40 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="toolbar">
-    <button type="button" class="page" data-page="oxygen" aria-pressed="true">Oxygen (1)</button>
-    <button type="button" class="page" data-page="hydrogen" aria-pressed="false">Hydrogen (2)</button>
-    <button type="button" class="page" data-page="carbon" aria-pressed="false">Carbon dioxide (3)</button>
-    <button type="button" id="hide" aria-pressed="false"><span class="verb">Hide description</span> (H)</button>
-    <button type="button" id="pen" aria-pressed="false">Pen (P)</button>
-    <button type="button" id="eraser" aria-pressed="false">Eraser (E)</button>
-    <button type="button" id="clear">Clear (Backspace)</button>
-    <button type="button" id="undo">Undo</button>
-    <button type="button" id="redo">Redo</button>
-    <button type="button" id="menu-toggle" aria-pressed="false"><span class="verb">Hide menu</span> (M)</button>
+  <header class="top">
+    <div class="top-inner">
+      <div>
+        <p class="kicker">HKDSE Chemistry · Earth 3B</p>
+        <h1>Chemical tests</h1>
+        <p class="lede">Play the test. The result shows which gas is present.</p>
+      </div>
+      <div class="top-side">
+        <button type="button" id="theme-toggle" class="theme-toggle" aria-pressed="true">Light mode</button>
+        <nav class="nav">
+          <button type="button" class="page" data-page="oxygen" aria-pressed="true">Oxygen</button>
+          <button type="button" class="page" data-page="hydrogen" aria-pressed="false">Hydrogen</button>
+          <button type="button" class="page" data-page="carbon" aria-pressed="false">Carbon dioxide</button>
+        </nav>
+      </div>
+    </div>
   </header>
 
   <main class="stage">
+    <div class="tool-row">
+      <button type="button" id="hide" aria-pressed="false"><span class="verb">Hide description</span> (H)</button>
+      <button type="button" id="play"><span class="verb">Play</span> (Space)</button>
+      <button type="button" id="zoom" aria-pressed="false">Zoom</button>
+      <button type="button" id="pen" aria-pressed="false">Pen (P)</button>
+      <button type="button" id="eraser" aria-pressed="false">Eraser (E)</button>
+      <button type="button" id="clear">Clear (Backspace)</button>
+      <button type="button" id="undo">Undo</button>
+      <button type="button" id="redo">Redo</button>
+      <button type="button" id="menu-toggle" aria-pressed="false"><span class="verb">Hide menu</span> (M)</button>
+    </div>
+
     <section class="panel active" id="oxygen" style="--move: 1700ms">
       <div class="panel-head">
-        <h1>Test for oxygen</h1>
-        <div class="actions">
-          <button type="button" class="play"><span class="verb">Play</span> (Space)</button>
-          <button type="button" class="zoom" aria-pressed="false">Zoom</button>
-        </div>
+        <h2>Test for oxygen</h2>
       </div>
       <div class="desc">
         <p>The presence of <span class="clue">a glowing splint relighting</span> <span class="signal">indicate the presence of</span> <span class="gas">oxygen</span>.</p>
@@ -69,11 +82,7 @@
 
     <section class="panel" id="hydrogen" style="--move: 1500ms">
       <div class="panel-head">
-        <h1>Test for hydrogen</h1>
-        <div class="actions">
-          <button type="button" class="play"><span class="verb">Play</span> (Space)</button>
-          <button type="button" class="zoom" aria-pressed="false">Zoom</button>
-        </div>
+        <h2>Test for hydrogen</h2>
       </div>
       <div class="desc">
         <p>The presence of <span class="clue">a pop sound</span> <span class="signal">indicate the presence of</span> <span class="gas">hydrogen</span>.</p>
@@ -119,11 +128,7 @@
 
     <section class="panel" id="carbon" style="--move: 1400ms">
       <div class="panel-head">
-        <h1>Test for carbon dioxide</h1>
-        <div class="actions">
-          <button type="button" class="play"><span class="verb">Play</span> (Space)</button>
-          <button type="button" class="zoom" aria-pressed="false">Zoom</button>
-        </div>
+        <h2>Test for carbon dioxide</h2>
       </div>
       <div class="desc">
         <p><span class="clue">The colour change from colorless to milky</span> <span class="signal">indicate the presence of</span> <span class="gas">carbon dioxide</span>.</p>

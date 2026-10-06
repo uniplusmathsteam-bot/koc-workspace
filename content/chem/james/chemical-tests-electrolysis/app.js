@@ -1,6 +1,9 @@
     (function () {
       const hideBtn = document.getElementById("hide");
       const menuBtn = document.getElementById("menu-toggle");
+      const playBtn = document.getElementById("play");
+      const zoomBtn = document.getElementById("zoom");
+      const themeBtn = document.getElementById("theme-toggle");
       const penBtn = document.getElementById("pen");
       const eraserBtn = document.getElementById("eraser");
       const clearBtn = document.getElementById("clear");
@@ -113,7 +116,7 @@
         void panel.offsetWidth;
         panel.classList.add("played");
         if (splint) animateSplint(splint, ms);
-        panel.querySelector(".play .verb").textContent = "Replay";
+        playBtn.querySelector(".verb").textContent = "Replay";
         if (panel.id === "hydrogen") {
           const token = (panel._token || 0) + 1;
           panel._token = token;
@@ -124,21 +127,35 @@
         }
       }
 
-      document.querySelectorAll(".panel").forEach(function (panel) {
-        panel.querySelector(".play").addEventListener("click", function () {
-          playPanel(panel);
-        });
+      playBtn.addEventListener("click", function () {
+        playPanel(page);
       });
 
-      document.querySelectorAll(".zoom").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-          const panel = btn.closest(".panel");
-          const on = panel.classList.toggle("zoomed");
-          btn.setAttribute("aria-pressed", String(on));
-        });
+      zoomBtn.addEventListener("click", function () {
+        const on = page.classList.toggle("zoomed");
+        zoomBtn.setAttribute("aria-pressed", String(on));
+      });
+
+      function applyTheme(dark) {
+        document.documentElement.classList.toggle("dark", dark);
+        themeBtn.setAttribute("aria-pressed", dark ? "true" : "false");
+        themeBtn.textContent = dark ? "Light mode" : "Dark mode";
+        themeBtn.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode");
+      }
+
+      applyTheme(document.documentElement.classList.contains("dark"));
+      themeBtn.addEventListener("click", function () {
+        applyTheme(!document.documentElement.classList.contains("dark"));
       });
 
       let page = document.getElementById("oxygen");
+
+      if (window.matchMedia("(max-width: 700px)").matches) {
+        document.querySelectorAll(".panel").forEach(function (panel) {
+          panel.classList.add("hide-desc");
+        });
+        syncHide();
+      }
 
       function syncHide() {
         const hidden = page.classList.contains("hide-desc");
@@ -155,6 +172,8 @@
           btn.setAttribute("aria-pressed", String(btn.dataset.page === id));
         });
         syncHide();
+        playBtn.querySelector(".verb").textContent = page.classList.contains("played") ? "Replay" : "Play";
+        zoomBtn.setAttribute("aria-pressed", String(page.classList.contains("zoomed")));
       }
 
       document.querySelectorAll(".page").forEach(function (btn) {
@@ -365,8 +384,7 @@
 
       function clearZoom() {
         page.classList.remove("zoomed");
-        const zoomBtn = page.querySelector(".zoom");
-        if (zoomBtn) zoomBtn.setAttribute("aria-pressed", "false");
+        zoomBtn.setAttribute("aria-pressed", "false");
       }
 
       document.addEventListener("keydown", function (e) {
