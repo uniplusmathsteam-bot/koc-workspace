@@ -31,8 +31,7 @@ KOC.roster([
       { id: 'james',  name: 'James',  icon: '🧫', leader: true },
       { id: 'felix',  name: 'Felix',  icon: '💧' },
       { id: 'adrain', name: 'Adrain', icon: '🧴' },
-      { id: 'duncan', name: 'Duncan', icon: '⚛️' },
-      { id: 'jeff',   name: 'Jeff',   icon: '🍃' }
+      { id: 'duncan', name: 'Duncan', icon: '⚛️' }
     ]
   },
   {
