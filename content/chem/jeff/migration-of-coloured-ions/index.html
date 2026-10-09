@@ -1,0 +1,1958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HKDSE Chemistry: Migration of Coloured Ions</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            chemistry: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+    onload="if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'$',right:'$',display:false},{left:'$$',right:'$$',display:true}]});}"></script>
+  <style>
+    #utube-canvas {
+      background: radial-gradient(circle at 50% 40%, #ffffff 0%, #f8fafc 100%);
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .glow-anode {
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.45);
+      border-color: #ef4444;
+    }
+    .glow-cathode {
+      box-shadow: 0 0 15px rgba(34, 197, 94, 0.45);
+      border-color: #22c55e;
+    }
+    .select-control {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.6rem center;
+      background-size: 1rem;
+      padding-right: 2.2rem;
+    }
+
+    /* Filter Paper lab — photo assets + microscope-style chrome */
+    .fp-lab-shell {
+      background: #0f172a;
+      border-radius: 1rem;
+      border: 1px solid #1e293b;
+      overflow: hidden;
+      box-shadow: 0 16px 48px rgba(15, 23, 42, 0.45);
+    }
+    .fp-step-pill {
+      padding: 0.4rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      background: rgba(51, 65, 85, 0.85);
+      color: #94a3b8;
+      border: 1px solid #334155;
+    }
+    .fp-step-pill--active {
+      background: #2563eb;
+      color: #fff;
+      border-color: #3b82f6;
+    }
+    .fp-step-pill--done {
+      background: rgba(34, 197, 94, 0.2);
+      color: #86efac;
+      border-color: rgba(34, 197, 94, 0.45);
+    }
+    .fp-instruction {
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid #334155;
+      color: #e2e8f0;
+      border-radius: 0.75rem;
+      padding: 0.65rem 1rem;
+      font-size: 0.875rem;
+      line-height: 1.45;
+      text-align: center;
+    }
+    .fp-stage-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      min-height: 440px;
+      background: #0b1220;
+    }
+    #fp-stage {
+      position: absolute;
+      inset: 0;
+      /* Pin the black bench plane into the interactive band */
+      background: url('./assets/fp-bench-bg.png') center 58% / cover no-repeat;
+      touch-action: none;
+      overflow: hidden;
+      cursor: default;
+    }
+    .fp-prop {
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform: translate(-50%, -50%);
+      user-select: none;
+      cursor: grab;
+      z-index: 5;
+      filter: drop-shadow(0 8px 12px rgba(0,0,0,0.4));
+      transition: filter 0.15s, opacity 0.2s;
+    }
+    .fp-prop img { display: block; pointer-events: none; max-width: none; width: 100%; height: auto; }
+    .fp-dragging { cursor: grabbing; z-index: 40; filter: drop-shadow(0 18px 24px rgba(0,0,0,0.5)); }
+    .fp-dim { opacity: 0.38; pointer-events: none; }
+    .fp-static { cursor: default; z-index: 2; pointer-events: none; }
+    /* Supply captures its own clicks, but stays UNDER tools/clips */
+    .fp-prop.fp-supply,
+    .fp-prop.fp-supply.fp-static {
+      pointer-events: auto !important;
+      z-index: 3;
+    }
+    .fp-supply > img {
+      pointer-events: auto !important;
+      cursor: default;
+    }
+    /* Bench props — realistic relative scale on the black countertop (~55–68% H) */
+    .fp-beaker {
+      width: min(13%, 120px);
+      left: 30%;
+      top: 51%;
+      filter: drop-shadow(0 6px 8px rgba(0,0,0,0.35));
+    }
+    .fp-beaker img { position: relative; z-index: 1; }
+    /* Subtle meniscus only — colourless Na2SO4; dark bench shows through glass */
+    .fp-beaker-liquid {
+      position: absolute;
+      left: 22%;
+      right: 22%;
+      bottom: 14%;
+      height: 38%;
+      z-index: 0;
+      border-radius: 0 0 20% 20% / 0 0 12% 12%;
+      background: linear-gradient(
+        180deg,
+        rgba(148, 163, 184, 0.14) 0%,
+        rgba(30, 41, 59, 0.04) 22%,
+        rgba(15, 23, 42, 0.02) 100%
+      );
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.28);
+      pointer-events: none;
+    }
+    .fp-watch { width: min(5.2%, 48px); left: 51%; top: 55%; }
+    /* Longer than filter paper (paper ≈ 7% / 64px) so the strip sits fully on the glass */
+    .fp-slide-img { width: min(11%, 100px); left: 63%; top: 56%; }
+    .fp-supply {
+      width: min(34%, 330px);
+      left: 84%;
+      top: 53%; /* feet on the black countertop */
+      z-index: 3;
+      pointer-events: auto;
+    }
+    /* Wired photo includes hanging leads — anchor at chassis feet (~66% of asset), not clip tips */
+    .fp-supply.fp-supply--wired {
+      width: min(44%, 440px);
+      left: 78%;
+      top: 54%; /* same bench plane as watch / slide */
+      transform: translate(-50%, -66%);
+      filter: drop-shadow(0 3px 5px rgba(0,0,0,0.4));
+    }
+    /* Unused: leads are baked into fp-dc-supply-wired.png */
+    .fp-supply-leads { display: none !important; }
+    /* Live cables: terminal → clip cable-stub while clips are off the parked photo */
+    .fp-cables {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 12;
+      pointer-events: none;
+      overflow: visible;
+    }
+    .fp-cables path {
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,0.45));
+    }
+    #fp-cable-red {
+      stroke: #b91c1c;
+      stroke-width: 5;
+    }
+    #fp-cable-black {
+      stroke: #171717;
+      stroke-width: 5;
+    }
+    .fp-plug {
+      pointer-events: none;
+    }
+    .fp-cables.fp-cables--hidden path,
+    .fp-cables.fp-cables--hidden .fp-plug {
+      opacity: 0;
+    }
+    .fp-forceps {
+      width: min(12%, 110px);
+      z-index: 6;
+      filter: drop-shadow(0 1px 0 rgba(0,0,0,0.65)) drop-shadow(0 3px 2px rgba(0,0,0,0.35));
+    }
+    .fp-spatula {
+      width: min(11%, 100px);
+      z-index: 5;
+      filter: drop-shadow(0 1px 0 rgba(0,0,0,0.6)) drop-shadow(0 3px 2px rgba(0,0,0,0.3));
+    }
+    .fp-spatula > img {
+      position: relative;
+      z-index: 1;
+    }
+    /* Transfer pipette — tip toward lower-right of the asset */
+    .fp-dropper {
+      width: min(10%, 96px);
+      z-index: 7;
+      filter: drop-shadow(0 1px 0 rgba(0,0,0,0.55)) drop-shadow(0 3px 2px rgba(0,0,0,0.28));
+      cursor: grab;
+    }
+    .fp-dropper.fp-dragging { cursor: grabbing; }
+    .fp-dropper > img {
+      position: relative;
+      z-index: 1;
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    /* Faint liquid slug in the stem when filled from the beaker */
+    .fp-dropper-liquid {
+      position: absolute;
+      left: 42%;
+      top: 48%;
+      width: 22%;
+      height: 10%;
+      border-radius: 40% / 50%;
+      background: linear-gradient(105deg, rgba(186,230,253,0.15), rgba(125,211,252,0.55) 45%, rgba(186,230,253,0.2));
+      transform: translate(-50%, -50%) rotate(38deg);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 2;
+      transition: opacity 0.15s ease;
+      box-shadow: 0 0 4px rgba(125,211,252,0.35);
+    }
+    .fp-dropper.fp-dropper--filled .fp-dropper-liquid {
+      opacity: calc(0.35 + var(--fill, 0) * 0.65);
+    }
+    .fp-drop-splash {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(186,230,253,0.9) 0%, rgba(56,189,248,0.35) 55%, transparent 70%);
+      pointer-events: none;
+      z-index: 12;
+      animation: fp-drop-splash 0.45s ease-out forwards;
+    }
+    @keyframes fp-drop-splash {
+      to { transform: scale(2.2); opacity: 0; }
+    }
+    /* Photoreal KMnO4 pile resting on the left blade tip (above the metal) */
+    .fp-spatula-crystals {
+      position: absolute;
+      left: 15%;
+      top: 64%;
+      width: 28%;
+      z-index: 4;
+      pointer-events: none;
+      transform-origin: 50% 85%;
+      transform: translate(-50%, -50%) rotate(-6deg) scale(calc(0.4 + var(--load, 0) * 0.8));
+      opacity: var(--load-opacity, 0);
+      transition: opacity 0.12s ease, transform 0.12s ease;
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5));
+    }
+    .fp-spatula-crystals img {
+      display: block;
+      width: 100%;
+      height: auto;
+      pointer-events: none;
+    }
+    .fp-clip {
+      width: min(10%, 90px);
+      z-index: 14; /* above supply so clips stay draggable */
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4));
+      pointer-events: auto;
+    }
+    /* Dim look only — never block dragging (unlike global .fp-dim) */
+    .fp-clip.fp-dim {
+      opacity: 0.55;
+      pointer-events: auto;
+    }
+    /* Clamped on the paper end — sit above the strip so jaws read as biting it */
+    .fp-clip.fp-clip--attached {
+      z-index: 10;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.55));
+    }
+    /* Small paper strip stack — fully on the benchtop, never hanging off the edge */
+    .fp-stack {
+      position: absolute;
+      left: 41%;
+      top: 55%;
+      width: min(5.5%, 52px);
+      height: 18px;
+      z-index: 3;
+      cursor: pointer;
+    }
+    .fp-stack-sheet {
+      position: absolute;
+      left: 0; top: 0;
+      width: 100%;
+      height: auto;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.35));
+    }
+    .fp-paper {
+      position: absolute;
+      width: min(7%, 64px);
+      height: auto;
+      aspect-ratio: 4 / 1;
+      z-index: 8;
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,0.45));
+      overflow: hidden; /* keep purple spot inside the strip */
+    }
+    .fp-paper img,
+    .fp-paper .fp-paper-img {
+      position: absolute;
+      inset: 0;
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: fill;
+      aspect-ratio: auto;
+    }
+    .fp-paper--wet { filter: drop-shadow(0 3px 3px rgba(0,0,0,0.4)); }
+    .fp-paper--wet .fp-paper-img--wet {
+      transform: none;
+    }
+    .fp-paper--fly { animation: fp-fly 0.7s ease forwards; }
+    @keyframes fp-fly {
+      to { transform: translate(120px, 180px) rotate(140deg); opacity: 0; }
+    }
+    /* Dashed centre target — where to drop KMnO4 */
+    .fp-center-target {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 48%;
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%);
+      border: 2px dashed rgba(244, 114, 182, 0.95);
+      border-radius: 50%;
+      background: rgba(236, 72, 153, 0.14);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.35), inset 0 0 8px rgba(236, 72, 153, 0.2);
+      pointer-events: none;
+      z-index: 4;
+      animation: fp-target-pulse 1.4s ease-in-out infinite;
+    }
+    .fp-center-target.hidden { display: none !important; }
+    @keyframes fp-target-pulse {
+      0%, 100% { opacity: 0.85; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.06); }
+    }
+    /* Fixed crystal origin — stays at strip centre; ions leave a trail outward */
+    .fp-spot {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 14%;
+      height: 58%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 40%,
+        rgba(20,0,30,0.95) 0%,
+        rgba(90,10,120,0.9) 32%,
+        rgba(140,40,180,0.55) 62%,
+        rgba(180,80,220,0) 82%);
+      pointer-events: none;
+      filter: blur(0.2px);
+      z-index: 6;
+      transform: translate(-50%, -50%);
+    }
+    /* Supply OFF: isotropic diffusion halo (all directions) — trail is kept separately */
+    .fp-spot-diffuse {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 18%;
+      height: 70%;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 4;
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.6);
+      background: radial-gradient(circle at 50% 50%,
+        rgba(90, 10, 120, 0.55) 0%,
+        rgba(130, 40, 180, 0.28) 42%,
+        rgba(160, 70, 210, 0.1) 68%,
+        rgba(180, 80, 220, 0) 100%);
+      filter: blur(1.2px);
+    }
+    /* Migration route: ONE direction only — centre → red (+) pole */
+    .fp-spot-trail {
+      position: absolute;
+      top: 50%;
+      height: 46%;
+      width: 0;
+      border-radius: 42% / 55%;
+      pointer-events: none;
+      filter: blur(0.55px);
+      z-index: 5;
+      opacity: 0;
+      transform: translateY(-50%);
+      /* default: grow to the right from centre */
+      left: 50%;
+      right: auto;
+      background: linear-gradient(
+        90deg,
+        rgba(70, 8, 100, 0.92) 0%,
+        rgba(120, 30, 170, 0.7) 40%,
+        rgba(160, 70, 210, 0.32) 75%,
+        rgba(180, 80, 220, 0) 100%
+      );
+    }
+    .fp-spot-trail.fp-spot-trail--left {
+      left: auto;
+      right: 50%;
+      background: linear-gradient(
+        270deg,
+        rgba(70, 8, 100, 0.92) 0%,
+        rgba(120, 30, 170, 0.7) 40%,
+        rgba(160, 70, 210, 0.32) 75%,
+        rgba(180, 80, 220, 0) 100%
+      );
+    }
+    /* Hit zones: invisible by default (microscope-style), only drop target is guided */
+    .fp-zone {
+      position: absolute;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .fp-zone-label {
+      position: absolute;
+      left: 50%;
+      top: -1.35rem;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      font-size: 11px;
+      font-weight: 700;
+      color: #e0f2fe;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.65);
+    }
+    /* Invisible fill hit-target — liquid interior of the beaker (for dropper tip) */
+    #fp-beaker-zone {
+      left: 26.5%;
+      top: 46%;
+      width: 7%;
+      height: 16%;
+      border: none;
+      background: transparent;
+      border-radius: 6px 6px 18% 18%;
+    }
+    #fp-beaker-zone.fp-zone--active {
+      box-shadow: inset 0 0 0 2px rgba(56,189,248,0.55);
+      background: rgba(56,189,248,0.12);
+    }
+    /* Invisible scoop hit-target — within the watch-glass plate only */
+    #fp-crystal-zone {
+      left: 48.6%;
+      top: 52.2%;
+      width: 4.8%;
+      height: 7.2%;
+      border: none;
+      background: transparent;
+      border-radius: 50%;
+    }
+    #fp-drop-zone {
+      left: 38%;
+      top: 50%;
+      width: 28%;
+      height: 22%;
+      border: 1.5px dashed rgba(56,189,248,0.7);
+      background: rgba(14,165,233,0.14);
+    }
+    #fp-slide-zone { left: 56%; top: 48%; width: 15%; height: 16%; }
+    /*
+      Invisible hit target over the photo's real white POWER rocker.
+      Never show text labels like OFF — the photograph is the control.
+    */
+    /*
+      POWER rocker on the plain three-quarter photo is NOT at the left edge —
+      the side panel fills ~0–22%; the white rocker sits ~27–36% across.
+    */
+    #fp-power-switch {
+      position: absolute;
+      left: 27.5%;
+      top: 80%;
+      z-index: 10;
+      width: 9%;
+      height: 11.5%;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 3px;
+      background: transparent !important;
+      color: transparent !important;
+      font-size: 0 !important;
+      line-height: 0;
+      text-indent: -9999px;
+      overflow: hidden;
+      cursor: pointer;
+      pointer-events: auto !important;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: none !important;
+    }
+    /* Wired uses the same plain chassis — rocker hit box stays on the plain photo */
+    #fp-power-switch:hover {
+      background: rgba(56,189,248,0.2) !important;
+    }
+    /* When on, the label paints the green rocker cue (avoid double stacking) */
+    #fp-power-switch.fp-switch--on {
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+    #fp-power-switch.fp-power-switch--armed:not(.fp-switch--on) {
+      box-shadow: inset 0 0 0 2px rgba(56,189,248,0.75) !important;
+      background: rgba(56,189,248,0.14) !important;
+    }
+    /* Visual ON badge is baked into fp-dc-supply-plain-on.png — no floating HTML label */
+    .fp-supply-output {
+      display: none !important;
+    }
+    /*
+      Live voltage digits over the blanked LCD on fp-dc-supply-plain*.png.
+      Digits are baked out of the photo — this layer only draws the readout
+      (no black “sticker” panel), aligned to the recessed screen.
+    */
+    .fp-voltage-readout {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      transform: none;
+      z-index: 11;
+      margin: 0;
+      padding: 0;
+      border: none;
+      background: transparent;
+      pointer-events: none;
+      box-shadow: none;
+      opacity: 0;
+      visibility: hidden;
+      overflow: hidden;
+    }
+    .fp-voltage-readout-inner {
+      position: absolute;
+      left: 41.5%;
+      top: 27.8%;
+      width: 21%;
+      height: 14.5%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 0.22em;
+      box-sizing: border-box;
+      padding: 0 0 0 0.4em;
+      color: #f0c419;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      line-height: 1;
+      transform: skewY(-1.35deg);
+      transform-origin: left center;
+    }
+    .fp-voltage-readout-v {
+      display: block;
+      font-size: clamp(13px, 1.85vw, 21px);
+      font-variant-numeric: tabular-nums;
+      color: #f0c419;
+      text-shadow: 0 0 6px rgba(240, 196, 25, 0.45);
+    }
+    .fp-voltage-readout-a {
+      display: block;
+      font-size: clamp(12px, 1.65vw, 19px);
+      font-variant-numeric: tabular-nums;
+      color: #e11d48;
+      text-shadow: 0 0 5px rgba(225, 29, 72, 0.4);
+    }
+    .fp-voltage-readout-unit {
+      font-size: 0.5em;
+      font-weight: 600;
+      opacity: 0.95;
+      margin-left: 0.2em;
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      letter-spacing: 0;
+      vertical-align: 0.14em;
+      color: #e5e7eb;
+      text-shadow: none;
+    }
+    .fp-voltage-readout.fp-voltage-readout--visible {
+      opacity: 1;
+      visibility: visible;
+    }
+    .fp-voltage-readout.fp-voltage-readout--ok .fp-voltage-readout-v,
+    .fp-voltage-readout.fp-voltage-readout--on .fp-voltage-readout-v {
+      color: #f5cc22;
+    }
+    /* Floating voltage dial — shown when clips are ready */
+    .fp-voltage-panel {
+      position: absolute;
+      right: 0.75rem;
+      top: 1rem;
+      z-index: 16;
+      width: min(220px, 46%);
+      background: rgba(15,23,42,0.92);
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 0.65rem 0.75rem 0.7rem;
+      color: #e2e8f0;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+      pointer-events: auto;
+    }
+    .fp-voltage-panel.hidden { display: none !important; }
+    .fp-voltage-panel-title {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #94a3b8;
+      margin-bottom: 0.35rem;
+    }
+    .fp-voltage-panel-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .fp-voltage-panel input[type="range"] {
+      flex: 1;
+      min-width: 0;
+      accent-color: #10b981;
+      cursor: pointer;
+    }
+    .fp-voltage-panel-value {
+      flex: 0 0 auto;
+      min-width: 3.4rem;
+      text-align: center;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 15px;
+      font-weight: 800;
+      color: #34d399;
+      background: #020617;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 0.28rem 0.35rem;
+    }
+    .fp-voltage-panel-value.fp-voltage-panel-value--ok {
+      color: #6ee7b7;
+      border-color: #059669;
+    }
+    .fp-voltage-panel-hint {
+      margin-top: 0.4rem;
+      font-size: 10px;
+      font-weight: 600;
+      color: #fbbf24;
+      line-height: 1.35;
+    }
+    .fp-voltage-panel-hint.fp-voltage-panel-hint--ok {
+      color: #6ee7b7;
+    }
+    /* When ready to switch on, raise supply above bench clutter so rocker is clickable */
+    .fp-supply.fp-supply--armed {
+      z-index: 16 !important;
+    }
+    .fp-power-switch:focus-visible {
+      outline: 2px solid #38bdf8;
+      outline-offset: 2px;
+    }
+    .fp-rocker-press { display: none; }
+    .fp-supply-led { display: none; }
+    .fp-supply img {
+      filter: saturate(0.95) brightness(0.98);
+      transition: filter 0.2s ease;
+    }
+    .fp-supply.fp-supply--on img {
+      filter: saturate(1.06) brightness(1.04);
+    }
+    .fp-soak-meter {
+      position: absolute;
+      left: 1rem; top: 1rem;
+      z-index: 15;
+      width: 200px;
+      background: rgba(15,23,42,0.88);
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 0.55rem 0.7rem;
+      color: #e2e8f0;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .fp-soak-track {
+      margin-top: 0.35rem;
+      height: 10px;
+      background: #1e293b;
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+    .fp-soak-fill {
+      position: relative;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #38bdf8, #7dd3fc);
+      transition: width 0.08s linear;
+    }
+    .fp-warning {
+      position: absolute;
+      left: 50%;
+      top: 16%;
+      transform: translateX(-50%) translateY(-8px);
+      z-index: 30;
+      max-width: min(520px, 92%);
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease;
+    }
+    .fp-warning--visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+    .fp-warning-badge {
+      width: 48px; height: 48px;
+      margin: 0 auto 0.5rem;
+      border-radius: 9999px;
+      background: rgba(239, 68, 68, 0.25);
+      border: 2px solid #ef4444;
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; font-weight: 900;
+    }
+    .fp-warning-banner {
+      background: rgba(127, 29, 29, 0.92);
+      border: 1px solid #f87171;
+      color: #fee2e2;
+      padding: 0.65rem 1rem;
+      border-radius: 0.65rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col font-sans">
+
+  <header class="bg-gradient-to-r from-chemistry-900 via-chemistry-800 to-slate-900 text-white shadow-md px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+    <div class="flex items-center gap-3">
+      <div class="bg-chemistry-500 p-2.5 rounded-lg text-white shadow-inner flex items-center justify-center">
+        <i class="fa-solid fa-flask-vial text-2xl"></i>
+      </div>
+      <div>
+        <h1 class="text-xl md:text-2xl font-black tracking-tight flex items-center gap-2 flex-wrap">
+          <span>Migration of Coloured Ions</span>
+          <span class="text-xs bg-chemistry-500 text-white px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider">HKDSE</span>
+        </h1>
+        <p class="text-xs text-slate-300 mt-1">Topic 2 Microscopic World I · Ion migration experiments</p>
+      </div>
+    </div>
+    <div class="bg-slate-800 p-1 rounded-xl border border-slate-700 flex flex-wrap" role="tablist" aria-label="Experiment section">
+      <button type="button" id="btn-mode-filter" class="mode-btn px-3 py-1.5 rounded-lg text-xs md:text-sm font-bold transition duration-150 text-slate-400 hover:text-slate-200 flex items-center gap-1.5">
+        <i class="fa-solid fa-scroll"></i>
+        <span>Filter Paper</span>
+      </button>
+      <button type="button" id="btn-mode-utube" class="mode-btn px-3 py-1.5 rounded-lg text-xs md:text-sm font-bold transition duration-150 bg-chemistry-500 text-white shadow-sm flex items-center gap-1.5">
+        <i class="fa-solid fa-flask"></i>
+        <span>U-tube</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="flex-grow flex flex-col overflow-y-auto p-4 md:p-6 gap-6 max-w-7xl w-full mx-auto">
+
+    <!-- ========== Section: Filter Paper (Part 1 lab + Part 2 observation) ========== -->
+    <section id="section-filter-paper" class="hidden space-y-4" aria-label="Filter Paper experiment">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-200 pb-2">
+        <div class="flex items-center gap-2 px-1 py-2 text-chemistry-600 font-black text-sm tracking-wide">
+          <i class="fa-solid fa-scroll"></i>
+          <span>Experiment 1 · Filter Paper</span>
+        </div>
+        <div class="bg-slate-100 p-1 rounded-xl border border-slate-200 flex flex-wrap gap-1" role="tablist" aria-label="Filter paper parts">
+          <button type="button" id="fp-tab-part1" class="fp-part-tab px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-chemistry-700 shadow-sm border border-slate-200">
+            Part 1 · Virtual Lab
+          </button>
+          <button type="button" id="fp-tab-part2" class="fp-part-tab px-3 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-700">
+            Part 2 · Observation
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== Part 1 ===== -->
+      <div id="fp-part1" class="space-y-4">
+      <div class="flex flex-wrap items-center justify-end gap-2">
+          <span id="fp-paper-stock" class="text-xs font-semibold text-slate-500">Filter papers left: 3</span>
+          <button type="button" id="fp-btn-restart" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-200">
+            <i class="fa-solid fa-rotate-left mr-1"></i>Restart
+          </button>
+          <button type="button" id="fp-btn-power" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm">
+            <i class="fa-solid fa-bolt mr-1"></i><span id="fp-btn-power-label">Switch on</span>
+          </button>
+          <button type="button" id="fp-btn-begin" class="bg-chemistry-600 hover:bg-chemistry-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold">
+            <i class="fa-solid fa-play mr-1"></i>Begin experiment
+          </button>
+      </div>
+
+      <div class="fp-lab-shell">
+        <div class="flex flex-wrap gap-2 justify-center px-4 pt-4">
+          <span class="fp-step-pill fp-step-pill--active">1. Apparatus</span>
+          <span class="fp-step-pill">2. Moisten paper</span>
+          <span class="fp-step-pill">3. Add crystals</span>
+          <span class="fp-step-pill">4. Connect &amp; run</span>
+        </div>
+        <div class="px-4 pt-3 pb-2">
+          <div id="fp-instruction" class="fp-instruction">
+            Study the real apparatus on the bench, then press <strong>Begin experiment</strong>.
+          </div>
+        </div>
+        <div class="fp-stage-wrap">
+          <div id="fp-warning" class="fp-warning" role="alert">
+            <div class="fp-warning-badge">×</div>
+            <div id="fp-warning-text" class="fp-warning-banner"></div>
+          </div>
+          <div id="fp-soak-meter" class="fp-soak-meter hidden">
+            Paper moistening (dropper)
+            <div class="fp-soak-track">
+              <div id="fp-soak-fill" class="fp-soak-fill"></div>
+            </div>
+          </div>
+          <div id="fp-voltage-panel" class="fp-voltage-panel hidden" aria-label="d.c. voltage control">
+            <div class="fp-voltage-panel-title">d.c. supply voltage</div>
+            <div class="fp-voltage-panel-row">
+              <input type="range" id="fp-voltage" min="0" max="30" step="1" value="0" aria-valuemin="0" aria-valuemax="30" aria-valuenow="0" aria-label="Adjust d.c. voltage" />
+              <div id="fp-voltage-panel-value" class="fp-voltage-panel-value">0 V</div>
+            </div>
+            <div id="fp-voltage-panel-hint" class="fp-voltage-panel-hint">
+              Adjust to the appropriate voltage: <strong>20 V</strong>
+            </div>
+          </div>
+          <div id="fp-stage" aria-label="Photorealistic filter paper lab bench">
+            <!-- zones -->
+            <div id="fp-beaker-zone" class="fp-zone" aria-hidden="true"></div>
+            <div id="fp-crystal-zone" class="fp-zone" aria-hidden="true"></div>
+            <div id="fp-drop-zone" class="fp-zone hidden"><span class="fp-zone-label">Place dry paper here</span></div>
+            <div id="fp-slide-zone" class="fp-zone" aria-hidden="true"></div>
+
+            <!-- static photo props -->
+            <div class="fp-prop fp-static fp-beaker" id="fp-beaker">
+              <img src="./assets/fp-beaker.png?v=8" alt="Glass beaker with colourless Na2SO4 solution" />
+              <span class="fp-beaker-liquid" aria-hidden="true"></span>
+            </div>
+            <div class="fp-prop fp-static fp-watch" id="fp-watch">
+              <img src="./assets/fp-kmno4-watchglass.png?v=4" alt="KMnO4 crystals on watch glass" />
+            </div>
+            <div class="fp-prop fp-static fp-slide-img" id="fp-slide">
+              <img src="./assets/fp-slide.png?v=4" alt="Glass microscope slide" />
+            </div>
+            <div class="fp-prop fp-static fp-supply fp-supply--wired" id="fp-supply">
+              <img id="fp-supply-img" src="./assets/fp-dc-supply-wired.png?v=12" alt="Laboratory DC power supply with leads" />
+              <button type="button" id="fp-power-switch" class="fp-power-switch" aria-pressed="false" aria-label="Power switch" title="Power"></button>
+              <span id="fp-voltage-readout" class="fp-voltage-readout" aria-hidden="true">
+                <span class="fp-voltage-readout-inner">
+                  <span class="fp-voltage-readout-v"><span id="fp-voltage-readout-num">0.0</span><span class="fp-voltage-readout-unit">V</span></span>
+                  <span class="fp-voltage-readout-a"><span id="fp-current-readout-num">0.00</span><span class="fp-voltage-readout-unit">A</span></span>
+                </span>
+              </span>
+              <span id="fp-supply-output" class="fp-supply-output" aria-hidden="true">20 V<br>ON</span>
+            </div>
+            <div id="fp-supply-leads" class="fp-supply-leads hidden" aria-hidden="true"></div>
+
+            <svg id="fp-cables" class="fp-cables fp-cables--hidden" aria-hidden="true">
+              <path id="fp-cable-red" d="" />
+              <path id="fp-cable-black" d="" />
+              <!-- Banana-plug tips so the binding posts don’t look empty after the parked photo swaps away -->
+              <circle id="fp-plug-red" class="fp-plug" r="4.5" cx="0" cy="0" fill="#b91c1c" stroke="#7f1d1d" stroke-width="1" visibility="hidden" />
+              <circle id="fp-plug-black" class="fp-plug" r="4.5" cx="0" cy="0" fill="#171717" stroke="#0a0a0a" stroke-width="1" visibility="hidden" />
+            </svg>
+
+            <div id="fp-paper-stack" class="fp-stack" title="Filter paper stack"></div>
+
+            <!-- tools -->
+            <div class="fp-prop fp-forceps" id="fp-forceps" data-kind="tool">
+              <img src="./assets/fp-forceps.png" alt="Stainless steel forceps" />
+            </div>
+            <div class="fp-prop fp-spatula" id="fp-spatula" data-kind="tool">
+              <img src="./assets/fp-spatula.png" alt="Stainless steel spatula" />
+              <div id="fp-spatula-crystals" class="fp-spatula-crystals" style="--load: 0; --load-opacity: 0;" aria-hidden="true">
+                <img src="./assets/fp-kmno4-scoop.png?v=1" alt="" draggable="false" />
+              </div>
+            </div>
+            <div class="fp-prop fp-dropper" id="fp-dropper" data-kind="tool" style="--fill: 0;">
+              <img src="./assets/fp-dropper.png?v=1" alt="Plastic transfer pipette (dropper)" draggable="false" />
+              <span class="fp-dropper-liquid" aria-hidden="true"></span>
+            </div>
+            <div class="fp-prop fp-clip" id="fp-clip-red" data-kind="clip">
+              <img src="./assets/fp-clip-red.png?v=8" alt="Red positive crocodile clip" />
+            </div>
+            <div class="fp-prop fp-clip" id="fp-clip-black" data-kind="clip">
+              <img src="./assets/fp-clip-black.png?v=8" alt="Black negative crocodile clip" />
+            </div>
+          </div>
+        </div>
+      </div>
+      </div><!-- /fp-part1 -->
+
+      <!-- ===== Part 2 · Observation ===== -->
+      <div id="fp-part2" class="hidden space-y-4" aria-label="Filter paper observation">
+        <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-end">
+          <div class="flex flex-wrap gap-4 items-end w-full">
+            <div class="flex flex-col gap-1.5 min-w-[220px] flex-1">
+              <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider" for="fp2-ion-select">
+                Crystal / compound <span class="text-slate-400 font-semibold normal-case">(one or both ions coloured)</span>
+              </label>
+              <select id="fp2-ion-select" class="select-control w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-chemistry-500/40"></select>
+            </div>
+            <div class="flex flex-col gap-1.5 min-w-[160px]">
+              <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider" for="fp2-voltage">
+                d.c. supply voltage
+              </label>
+              <div class="flex items-center gap-3">
+                <input type="range" id="fp2-voltage" min="5" max="30" step="1" value="20" class="w-28 accent-chemistry-500" />
+                <div id="fp2-voltage-readout" class="bg-slate-900 text-emerald-400 font-mono text-base px-3 py-2 rounded-xl border-2 border-slate-800 shadow-inner font-bold tracking-wide min-w-[4.5rem] text-center">
+                  20 V
+                </div>
+              </div>
+              <p class="text-[10px] text-slate-400">Higher voltage → faster migration.</p>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Polarity</span>
+              <button type="button" id="fp2-btn-swap" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-sm font-bold border border-slate-200">
+                <i class="fa-solid fa-right-left mr-1"></i>Swap + / − ends
+              </button>
+            </div>
+          </div>
+          <div class="flex gap-2 shrink-0 w-full lg:w-auto justify-end">
+            <button type="button" id="fp2-btn-power" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 rounded-xl text-sm font-bold shadow-sm flex items-center gap-2">
+              <i class="fa-solid fa-bolt" id="fp2-power-icon"></i>
+              <span id="fp2-power-label">Switch on</span>
+            </button>
+            <button type="button" id="fp2-btn-reset" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-3 rounded-xl text-sm font-bold border border-slate-200 flex items-center gap-2">
+              <i class="fa-solid fa-rotate-left"></i>
+              <span>Reset</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+          <div class="xl:col-span-8 flex flex-col bg-slate-950 p-4 rounded-2xl border border-slate-800 shadow-sm">
+            <div class="flex justify-between items-center mb-3 flex-wrap gap-2">
+              <span class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span id="fp2-live-dot" class="w-2 h-2 rounded-full bg-slate-600"></span>
+                Observation · moist filter paper on slide
+              </span>
+              <div class="flex gap-2 flex-wrap text-[10px] font-bold">
+                <span id="fp2-badge-pos" class="bg-red-500/20 text-red-300 border border-red-500/40 px-2 py-0.5 rounded">+ anode</span>
+                <span id="fp2-badge-neg" class="bg-sky-500/20 text-sky-300 border border-sky-500/40 px-2 py-0.5 rounded">− cathode</span>
+              </div>
+            </div>
+            <div class="relative w-full aspect-[16/9] min-h-[320px] rounded-xl overflow-hidden bg-black">
+              <canvas id="fp2-canvas" width="960" height="540" aria-label="Filter paper ion migration observation"></canvas>
+            </div>
+          </div>
+
+          <div class="xl:col-span-4 flex flex-col gap-4">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+              <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-3">
+                <h3 class="font-black text-slate-800 text-sm tracking-wide uppercase flex items-center gap-2">
+                  <i class="fa-solid fa-eye text-chemistry-500"></i>
+                  What you see
+                </h3>
+                <span id="fp2-status" class="text-[10px] bg-slate-100 text-slate-500 border border-slate-200 px-2 py-0.5 rounded font-bold uppercase">Off</span>
+              </div>
+              <p id="fp2-obs" class="text-sm text-slate-600 leading-relaxed">
+                Choose a crystal, set the voltage, then switch on the d.c. supply.
+              </p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+              <h3 class="font-black text-slate-800 text-sm tracking-wide uppercase flex items-center gap-2 border-b border-slate-100 pb-3 mb-3">
+                <i class="fa-solid fa-lightbulb text-amber-400"></i>
+                Key idea
+              </h3>
+              <p id="fp2-key" class="text-sm text-slate-600 leading-relaxed">
+                In an electric field, coloured ions migrate: anions toward the anode (+), cations toward the cathode (−).
+                The blurry streak is the trail of the moving coloured spot on the moist paper.
+              </p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+              <h3 class="font-black text-slate-800 text-sm tracking-wide uppercase flex items-center gap-2 border-b border-slate-100 pb-3 mb-3">
+                <i class="fa-solid fa-sticky-note text-amber-500"></i>
+                Notes
+              </h3>
+              <ol class="space-y-3 text-sm text-slate-600 leading-relaxed list-none">
+                <li>
+                  <span class="font-bold text-slate-800">Note 1:</span>
+                  If the paper is not connected to d.c. supply, the purple color patch will diffuse to all directions.
+                </li>
+                <li>
+                  <span class="font-bold text-slate-800">Note 2:</span>
+                  To speed up the experiment, higher voltage can be applied.
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div><!-- /fp-part2 -->
+    </section>
+
+    <!-- ========== Section: U-tube (current lab) ========== -->
+    <section id="section-utube" class="space-y-6" aria-label="U-tube experiment">
+
+    <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+      <div class="flex items-center gap-2 px-1 py-2 text-chemistry-600 font-black text-sm tracking-wide">
+        <i class="fa-solid fa-cubes"></i>
+        <span>Experiment 2 · U-tube</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs text-slate-500 font-semibold">Animation Speed:</span>
+        <input type="range" id="sim-speed" min="0.25" max="2" step="0.05" value="0.5" class="w-24 accent-chemistry-500">
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
+      <div class="flex flex-wrap gap-4 items-end w-full">
+        <div class="flex flex-col gap-1.5 min-w-[180px]">
+          <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider" for="cation-select">
+            Coloured cation <span class="text-emerald-600">(→ cathode)</span>
+          </label>
+          <select id="cation-select" class="select-control w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-chemistry-500/40"></select>
+        </div>
+        <div class="flex flex-col gap-1.5 min-w-[200px]">
+          <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider" for="anion-select">
+            Coloured anion <span class="text-red-500">(→ anode)</span>
+          </label>
+          <select id="anion-select" class="select-control w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-chemistry-500/40"></select>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">d.c. supply</span>
+          <div class="bg-slate-900 text-emerald-400 font-mono text-lg px-4 py-2 rounded-xl border-2 border-slate-800 shadow-inner font-bold tracking-wide">
+            20 V
+          </div>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Electrodes</span>
+          <div class="bg-slate-100 border border-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-sm font-bold">
+            Carbon (graphite)
+          </div>
+        </div>
+      </div>
+      <div class="flex gap-2 shrink-0 w-full lg:w-auto justify-end">
+        <button id="btn-play" class="bg-chemistry-600 hover:bg-chemistry-700 text-white px-6 py-3 rounded-xl text-base font-bold shadow-sm flex items-center gap-2 transition duration-150">
+          <i class="fa-solid fa-play" id="play-icon"></i>
+          <span id="play-text">Start</span>
+        </button>
+        <button id="btn-reset" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-3 rounded-xl text-base font-bold border border-slate-200 flex items-center gap-2 transition duration-150">
+          <i class="fa-solid fa-rotate-left"></i>
+          <span>Reset</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+      <!-- Canvas -->
+      <div class="xl:col-span-7 flex flex-col bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex justify-between items-center mb-3 flex-wrap gap-2">
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+            <span id="live-dot" class="w-2 h-2 rounded-full bg-slate-300"></span>
+            <span>Real-time 2D Active Lab</span>
+          </span>
+          <div class="flex gap-2 flex-wrap">
+            <span class="text-[10px] bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded font-bold">Anode — Red</span>
+            <span class="text-[10px] bg-emerald-50 text-emerald-600 border border-emerald-200 px-2 py-0.5 rounded font-bold">Cathode — Green</span>
+          </div>
+        </div>
+        <div class="relative w-full aspect-[16/11] min-h-[420px]">
+          <canvas id="utube-canvas" width="900" height="620"></canvas>
+        </div>
+      </div>
+
+      <!-- Side panel -->
+      <div class="xl:col-span-5 flex flex-col gap-6">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
+            <h3 class="font-black text-slate-800 text-sm tracking-wide uppercase flex items-center gap-2">
+              <i class="fa-solid fa-bolt text-chemistry-500"></i>
+              Power &amp; Terminals
+            </h3>
+            <span class="text-xs font-bold text-slate-400">20 V d.c.</span>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div id="anode-card" class="rounded-xl border-2 border-red-200 bg-red-50/60 p-3 transition">
+              <div class="text-[10px] font-bold text-red-500 uppercase tracking-wider mb-1">Anode (+)</div>
+              <div class="text-sm font-black text-red-700">Left arm</div>
+              <div class="text-xs text-red-600/80 mt-1">Attracts anions (−)</div>
+            </div>
+            <div id="cathode-card" class="rounded-xl border-2 border-emerald-200 bg-emerald-50/60 p-3 transition">
+              <div class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1">Cathode (−)</div>
+              <div class="text-sm font-black text-emerald-700">Right arm</div>
+              <div class="text-xs text-emerald-600/80 mt-1">Attracts cations (+)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex-grow">
+          <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
+            <h3 class="font-black text-slate-800 text-sm tracking-wide uppercase flex items-center gap-2">
+              <i class="fa-solid fa-eye text-chemistry-500"></i>
+              Observations
+            </h3>
+            <span id="status-badge" class="text-[10px] bg-slate-100 text-slate-500 border border-slate-200 px-2 py-0.5 rounded font-bold uppercase">Idle</span>
+          </div>
+          <div id="obs-running" class="space-y-3 text-sm leading-relaxed">
+            <div class="rounded-xl border border-red-100 bg-red-50/50 p-3">
+              <div class="font-bold text-red-700 mb-1">Anode region (left)</div>
+              <p id="obs-anode" class="text-slate-700"></p>
+            </div>
+            <div class="rounded-xl border border-emerald-100 bg-emerald-50/50 p-3">
+              <div class="font-bold text-emerald-700 mb-1">Cathode region (right)</div>
+              <p id="obs-cathode" class="text-slate-700"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <h3 class="font-black text-slate-800 text-sm tracking-wide uppercase flex items-center gap-2 border-b border-slate-100 pb-3 mb-3">
+            <i class="fa-solid fa-lightbulb text-amber-400"></i>
+            Key idea
+          </h3>
+          <p class="text-sm text-slate-600 leading-relaxed" id="key-idea">
+            In an electric field, cations migrate to the cathode (−) and anions migrate to the anode (+).
+            The movement of coloured ions shows that ions are charged particles that can move through the electrolyte.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm">
+      <h3 class="font-black text-slate-800 text-sm tracking-wide uppercase flex items-center gap-2 mb-3">
+        <i class="fa-solid fa-book-open text-chemistry-500"></i>
+        Gel composition
+      </h3>
+      <p class="text-sm text-slate-600" id="gel-formula">
+        Gel containing copper(II) ions and dichromate ions
+      </p>
+    </div>
+
+    </section>
+  </main>
+
+  <script>
+    /** HKDSE-range coloured ions for the U-tube demo */
+    const CATIONS = {
+      cu2: {
+        id: 'cu2',
+        label: 'Cu²⁺ — blue',
+        formula: 'Cu^{2+}',
+        name: 'copper(II)',
+        colourWord: 'blue',
+        color: [56, 132, 214],
+        maxAlpha: 0.42,
+      },
+      fe2: {
+        id: 'fe2',
+        label: 'Fe²⁺ — pale green',
+        formula: 'Fe^{2+}',
+        name: 'iron(II)',
+        colourWord: 'pale green',
+        color: [120, 180, 110],
+        maxAlpha: 0.38,
+      },
+      fe3: {
+        id: 'fe3',
+        label: 'Fe³⁺ — yellow-brown',
+        formula: 'Fe^{3+}',
+        name: 'iron(III)',
+        colourWord: 'yellow-brown',
+        color: [196, 140, 48],
+        maxAlpha: 0.40,
+      },
+      co2: {
+        id: 'co2',
+        label: 'Co²⁺ — pink',
+        formula: 'Co^{2+}',
+        name: 'cobalt(II)',
+        colourWord: 'pink',
+        color: [220, 110, 150],
+        maxAlpha: 0.38,
+      },
+      ni2: {
+        id: 'ni2',
+        label: 'Ni²⁺ — green',
+        formula: 'Ni^{2+}',
+        name: 'nickel(II)',
+        colourWord: 'green',
+        color: [70, 160, 100],
+        maxAlpha: 0.40,
+      },
+    };
+
+    const ANIONS = {
+      cr2o7: {
+        id: 'cr2o7',
+        label: 'Cr₂O₇²⁻ — orange',
+        formula: 'Cr_2O_7^{2-}',
+        name: 'dichromate',
+        colourWord: 'orange',
+        color: [232, 140, 48],
+        maxAlpha: 0.40,
+      },
+      mno4: {
+        id: 'mno4',
+        label: 'MnO₄⁻ — purple',
+        formula: 'MnO_4^{-}',
+        name: 'permanganate',
+        colourWord: 'purple',
+        color: [150, 60, 170],
+        maxAlpha: 0.38,
+      },
+      cro4: {
+        id: 'cro4',
+        label: 'CrO₄²⁻ — yellow',
+        formula: 'CrO_4^{2-}',
+        name: 'chromate',
+        colourWord: 'yellow',
+        color: [230, 200, 40],
+        maxAlpha: 0.36,
+      },
+    };
+
+    const state = {
+      running: false,
+      progress: 0,          // 0 → 1, asymptotic approach
+      speed: 0.5,
+      cation: 'cu2',
+      anion: 'cr2o7',
+      lastTs: 0,
+      raf: null,
+    };
+
+    const canvas = document.getElementById('utube-canvas');
+    const ctx = canvas.getContext('2d');
+
+    function populateSelects() {
+      const cat = document.getElementById('cation-select');
+      const ani = document.getElementById('anion-select');
+      cat.innerHTML = Object.values(CATIONS).map(c =>
+        `<option value="${c.id}">${c.label}</option>`).join('');
+      ani.innerHTML = Object.values(ANIONS).map(a =>
+        `<option value="${a.id}">${a.label}</option>`).join('');
+      cat.value = state.cation;
+      ani.value = state.anion;
+    }
+
+    function currentIons() {
+      return { cation: CATIONS[state.cation], anion: ANIONS[state.anion] };
+    }
+
+    function blendGelColor(cation, anion) {
+      // Mix cation + anion RGB for gel appearance
+      const r = Math.round((cation.color[0] * 0.45 + anion.color[0] * 0.55));
+      const g = Math.round((cation.color[1] * 0.45 + anion.color[1] * 0.55));
+      const b = Math.round((cation.color[2] * 0.45 + anion.color[2] * 0.55));
+      return [r, g, b];
+    }
+
+    function updateSideCopy() {
+      const { cation, anion } = currentIons();
+      document.getElementById('gel-formula').innerHTML =
+        `Gel containing <strong>${cation.name} ions</strong> ($${cation.formula}$) and <strong>${anion.name} ions</strong> ($${anion.formula}$). Dilute hydrochloric acid fills both arms above the gel.`;
+
+      // Textbook-style observations — colour & ion name follow the selected species
+      document.getElementById('obs-anode').textContent =
+        `This region slowly becomes ${anion.colourWord} due to the migration of negative ${anion.name} ions towards the positive electrode.`;
+      document.getElementById('obs-cathode').textContent =
+        `This region slowly becomes ${cation.colourWord} due to the migration of positive ${cation.name} ions towards the negative electrode.`;
+
+      if (window.renderMathInElement) {
+        renderMathInElement(document.getElementById('gel-formula'), {
+          delimiters: [{ left: '$', right: '$', display: false }]
+        });
+      }
+    }
+
+    function setRunningUI(on) {
+      const badge = document.getElementById('status-badge');
+      const live = document.getElementById('live-dot');
+      const playIcon = document.getElementById('play-icon');
+      const playText = document.getElementById('play-text');
+      const anodeCard = document.getElementById('anode-card');
+      const cathodeCard = document.getElementById('cathode-card');
+
+      if (on) {
+        badge.textContent = 'Running';
+        badge.className = 'text-[10px] bg-emerald-50 text-emerald-600 border border-emerald-200 px-2 py-0.5 rounded font-bold uppercase';
+        live.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-ping';
+        playIcon.className = 'fa-solid fa-pause';
+        playText.textContent = 'Pause';
+        anodeCard.classList.add('glow-anode');
+        cathodeCard.classList.add('glow-cathode');
+      } else {
+        const idle = state.progress <= 0.001;
+        badge.textContent = idle ? 'Idle' : 'Paused';
+        badge.className = idle
+          ? 'text-[10px] bg-slate-100 text-slate-500 border border-slate-200 px-2 py-0.5 rounded font-bold uppercase'
+          : 'text-[10px] bg-amber-50 text-amber-600 border border-amber-200 px-2 py-0.5 rounded font-bold uppercase';
+        live.className = idle ? 'w-2 h-2 rounded-full bg-slate-300' : 'w-2 h-2 rounded-full bg-amber-400';
+        playIcon.className = 'fa-solid fa-play';
+        playText.textContent = 'Start';
+        anodeCard.classList.remove('glow-anode');
+        cathodeCard.classList.remove('glow-cathode');
+      }
+    }
+
+    /**
+     * Geometry (logical canvas 900×620).
+     * Proper U-tube: vertical arms + LOWER semicircle bend (curve at the bottom).
+     * midX centres the d.c. supply between the arms.
+     */
+    const G = {
+      midX: 450,
+      armGap: 280,
+      outerR: 40,
+      wall: 8,
+      topY: 108,
+      rimFlare: 5,
+      liquidTop: 150,
+      gelTop: 390,
+      bendCy: 430,          // y where arms meet the bend (diameter line)
+      supplyY: 46,
+      badgeR: 14,
+      rodHalfW: 6,
+      bendSteps: 48,
+    };
+
+    Object.defineProperties(G, {
+      leftCx:  { get() { return this.midX - this.armGap / 2; } },
+      rightCx: { get() { return this.midX + this.armGap / 2; } },
+      boreR:   { get() { return this.outerR - this.wall; } },
+      R:       { get() { return this.armGap / 2; } },
+      armW:    { get() { return this.outerR * 2; } },
+      leftX:   { get() { return this.leftCx - this.outerR; } },
+      rightX:  { get() { return this.rightCx - this.outerR; } },
+      rodTop:    { get() { return this.liquidTop - 52; } },
+      rodBottom: { get() { return this.gelTop - 12; } },
+      badgeY:    { get() { return this.supplyY + 36; } },
+      // Bottom-most point of the outer glass
+      tubeBottom: { get() { return this.bendCy + this.R + this.outerR; } },
+    });
+
+    function roundedRectPath(x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
+
+    /**
+     * Lower semicircle only (the U curve at the BOTTOM).
+     * θ: π → 0  => left → bottom → right
+     * x = midX + cos(θ)·r ,  y = bendCy + sin(θ)·r  (sin≥0 ⇒ below bendCy)
+     */
+    function lineToLowerSemi(radius, leftToRight) {
+      const { midX, bendCy, bendSteps } = G;
+      if (radius <= 0) return;
+      for (let i = 1; i <= bendSteps; i++) {
+        const t = i / bendSteps;
+        const theta = leftToRight
+          ? Math.PI - t * Math.PI          // π → 0
+          : t * Math.PI;                   // 0 → π
+        ctx.lineTo(
+          midX + Math.cos(theta) * radius,
+          bendCy + Math.sin(theta) * radius
+        );
+      }
+    }
+
+    function drawRim(cx) {
+      const { outerR, wall, topY, rimFlare } = G;
+      ctx.strokeStyle = 'rgba(100, 116, 139, 0.95)';
+      ctx.lineWidth = 2.4;
+      ctx.beginPath();
+      ctx.moveTo(cx - outerR - rimFlare, topY - 4);
+      ctx.quadraticCurveTo(cx - outerR, topY - 1, cx - outerR, topY + 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx + outerR + rimFlare, topY - 4);
+      ctx.quadraticCurveTo(cx + outerR, topY - 1, cx + outerR, topY + 2);
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.95)';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.moveTo(cx - outerR + wall, topY);
+      ctx.lineTo(cx - outerR + wall, topY + 6);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx + outerR - wall, topY);
+      ctx.lineTo(cx + outerR - wall, topY + 6);
+      ctx.stroke();
+    }
+
+    /** evenodd path: outer U silhouette minus bore U (both curve DOWN). */
+    function glassBodyPath() {
+      const { outerR, boreR, leftCx, rightCx, bendCy, topY, R } = G;
+
+      ctx.beginPath();
+      // Outer U silhouette
+      ctx.moveTo(leftCx - outerR, topY);
+      ctx.lineTo(leftCx - outerR, bendCy);
+      lineToLowerSemi(R + outerR, true);           // bottom outer
+      ctx.lineTo(rightCx + outerR, topY);
+      ctx.lineTo(rightCx - outerR, topY);
+      ctx.lineTo(rightCx - outerR, bendCy);
+      lineToLowerSemi(R - outerR, false);          // bottom inner (still DOWN)
+      ctx.lineTo(leftCx + outerR, topY);
+      ctx.closePath();
+
+      // Bore hole (subtract)
+      ctx.moveTo(leftCx - boreR, topY);
+      ctx.lineTo(leftCx - boreR, bendCy);
+      lineToLowerSemi(R + boreR, true);
+      ctx.lineTo(rightCx + boreR, topY);
+      ctx.lineTo(rightCx - boreR, topY);
+      ctx.lineTo(rightCx - boreR, bendCy);
+      lineToLowerSemi(R - boreR, false);
+      ctx.lineTo(leftCx + boreR, topY);
+      ctx.closePath();
+    }
+
+    /** Stroke both walls of a U at a given offset from the centre-line. */
+    function strokeLowerU(offset, color, width) {
+      const { leftCx, rightCx, bendCy, topY, R } = G;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      // Outer-facing walls + large bottom curve
+      ctx.beginPath();
+      ctx.moveTo(leftCx - offset, topY);
+      ctx.lineTo(leftCx - offset, bendCy);
+      lineToLowerSemi(R + offset, true);
+      ctx.lineTo(rightCx + offset, topY);
+      ctx.stroke();
+      // Inner-facing walls + smaller bottom curve (still dips DOWN)
+      ctx.beginPath();
+      ctx.moveTo(leftCx + offset, topY);
+      ctx.lineTo(leftCx + offset, bendCy);
+      lineToLowerSemi(R - offset, true);
+      ctx.lineTo(rightCx - offset, topY);
+      ctx.stroke();
+    }
+
+    function drawUTubeOutline() {
+      const { outerR, boreR, leftCx, rightCx } = G;
+
+      ctx.save();
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      glassBodyPath();
+      ctx.fillStyle = 'rgba(148, 163, 184, 0.30)';
+      ctx.fill('evenodd');
+
+      strokeLowerU(outerR, 'rgba(71, 85, 105, 0.95)', 2.5);
+      strokeLowerU(boreR, 'rgba(100, 116, 139, 0.95)', 2.1);
+
+      drawRim(leftCx);
+      drawRim(rightCx);
+      ctx.restore();
+    }
+
+    function clipBore() {
+      const { leftCx, rightCx, bendCy, topY, R, boreR } = G;
+      ctx.beginPath();
+      ctx.moveTo(leftCx - boreR, topY);
+      ctx.lineTo(leftCx - boreR, bendCy);
+      lineToLowerSemi(R + boreR, true);
+      ctx.lineTo(rightCx + boreR, topY);
+      ctx.lineTo(rightCx - boreR, topY);
+      ctx.lineTo(rightCx - boreR, bendCy);
+      lineToLowerSemi(R - boreR, false);
+      ctx.lineTo(leftCx + boreR, topY);
+      ctx.closePath();
+      ctx.clip();
+    }
+
+    function drawArmGradient(armCx, color, alphaScale, progress) {
+      const { boreR, liquidTop, gelTop } = G;
+      const [r, g, b] = color;
+      const maxRise = gelTop - liquidTop;
+      const rise = maxRise * Math.min(1, progress * 1.15);
+      if (rise < 2) return;
+
+      const fillTop = gelTop - rise;
+      // Soft diffusion front (clamped so color stops stay in [0, 1] and ascending)
+      const feather = Math.min(rise * 0.45, 56);
+      const hazeH = Math.min(feather * 0.55, rise * 0.25);
+
+      // y: gelTop (intense) → fillTop (transparent) — blurry border, no hard edge
+      const grad = ctx.createLinearGradient(0, gelTop, 0, fillTop);
+      grad.addColorStop(0, `rgba(${r},${g},${b},${alphaScale})`);
+      grad.addColorStop(0.30, `rgba(${r},${g},${b},${alphaScale * 0.58})`);
+      grad.addColorStop(0.58, `rgba(${r},${g},${b},${alphaScale * 0.28})`);
+      grad.addColorStop(0.82, `rgba(${r},${g},${b},${alphaScale * 0.10})`);
+      grad.addColorStop(0.94, `rgba(${r},${g},${b},${alphaScale * 0.03})`);
+      grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
+
+      ctx.fillStyle = grad;
+      ctx.fillRect(armCx - boreR + 1, fillTop, boreR * 2 - 2, rise + 2);
+
+      if (hazeH > 1) {
+        const haze = ctx.createLinearGradient(0, fillTop, 0, fillTop - hazeH);
+        haze.addColorStop(0, `rgba(${r},${g},${b},${alphaScale * 0.05})`);
+        haze.addColorStop(1, `rgba(${r},${g},${b},0)`);
+        ctx.fillStyle = haze;
+        ctx.fillRect(armCx - boreR + 1, fillTop - hazeH, boreR * 2 - 2, hazeH);
+      }
+    }
+
+    function drawGel(cation, anion) {
+      const { leftCx, rightCx, midX, bendCy, gelTop, R, boreR } = G;
+      const [r, g, b] = blendGelColor(cation, anion);
+
+      ctx.save();
+      try {
+        clipBore();
+
+        const gelBottom = bendCy + R + boreR;
+        const gelGrad = ctx.createLinearGradient(0, gelTop, 0, gelBottom);
+        gelGrad.addColorStop(0, `rgba(${r},${g},${b},0.90)`);
+        gelGrad.addColorStop(1, `rgba(${Math.max(0, r - 30)},${Math.max(0, g - 25)},${Math.max(0, b - 20)},0.96)`);
+
+        ctx.fillStyle = gelGrad;
+        ctx.fillRect(midX - R - boreR - 4, gelTop, (R + boreR) * 2 + 8, gelBottom - gelTop + 4);
+
+        ctx.globalAlpha = 0.22;
+        for (let i = 0; i < 36; i++) {
+          const ang = Math.PI + (i / 36) * Math.PI;
+          const rad = (R - boreR) + 10 + (i % 5) * 5;
+          const px = midX + Math.cos(ang) * rad;
+          const py = bendCy + Math.sin(ang) * rad;
+          if (py < gelTop) continue;
+          ctx.fillStyle = i % 2 ? `rgb(${cation.color.join(',')})` : `rgb(${anion.color.join(',')})`;
+          ctx.beginPath();
+          ctx.arc(px, py, 2.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        for (let i = 0; i < 16; i++) {
+          const onLeft = i % 2 === 0;
+          const cxArm = onLeft ? leftCx : rightCx;
+          const px = cxArm - boreR + 8 + (i * 7) % (boreR * 2 - 16);
+          const py = gelTop + 10 + (i * 11) % Math.max(20, bendCy - gelTop - 16);
+          ctx.fillStyle = i % 3 ? `rgb(${cation.color.join(',')})` : `rgb(${anion.color.join(',')})`;
+          ctx.beginPath();
+          ctx.arc(px, py, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      } finally {
+        ctx.globalAlpha = 1;
+        ctx.restore();
+      }
+    }
+
+    function drawElectrode(armCx, isAnode, powered) {
+      const { rodTop, rodBottom, badgeY, badgeR, rodHalfW, supplyY } = G;
+
+      // Continuous lead: from supply height → through badge → into carbon rod
+      const wireColor = powered
+        ? (isAnode ? '#ef4444' : '#10b981')
+        : '#94a3b8';
+
+      ctx.strokeStyle = wireColor;
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(armCx, supplyY);
+      ctx.lineTo(armCx, rodTop);
+      ctx.stroke();
+
+      // Carbon rod
+      const rodGrad = ctx.createLinearGradient(armCx - rodHalfW, 0, armCx + rodHalfW, 0);
+      rodGrad.addColorStop(0, '#1e293b');
+      rodGrad.addColorStop(0.5, '#334155');
+      rodGrad.addColorStop(1, '#0f172a');
+      ctx.fillStyle = rodGrad;
+      roundedRectPath(armCx - rodHalfW, rodTop, rodHalfW * 2, rodBottom - rodTop, 3);
+      ctx.fill();
+
+      // Terminal badge sitting ON the wire (wire already passes through its centre)
+      const fill = isAnode ? '#ef4444' : '#10b981';
+      ctx.beginPath();
+      ctx.arc(armCx, badgeY, badgeR, 0, Math.PI * 2);
+      ctx.fillStyle = fill;
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 18px ui-sans-serif, system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(isAnode ? '+' : '−', armCx, badgeY + (isAnode ? 1 : -1));
+
+      ctx.fillStyle = isAnode ? '#b91c1c' : '#047857';
+      ctx.font = 'bold 11px ui-sans-serif, system-ui, sans-serif';
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText(isAnode ? 'Anode' : 'Cathode', armCx, badgeY - badgeR - 8);
+    }
+
+    function drawPowerSupply(powered) {
+      const { midX, supplyY, leftCx, rightCx, badgeY } = G;
+      const boxW = 140;
+      const boxH = 44;
+      const y = supplyY;
+
+      // Wires first (under the box), continuous to electrode badges
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+
+      // Left (+) red
+      ctx.strokeStyle = powered ? '#ef4444' : '#94a3b8';
+      ctx.beginPath();
+      ctx.moveTo(midX - boxW / 2, y);
+      ctx.lineTo(leftCx, y);
+      ctx.lineTo(leftCx, badgeY);
+      ctx.stroke();
+
+      // Right (−) green
+      ctx.strokeStyle = powered ? '#10b981' : '#94a3b8';
+      ctx.beginPath();
+      ctx.moveTo(midX + boxW / 2, y);
+      ctx.lineTo(rightCx, y);
+      ctx.lineTo(rightCx, badgeY);
+      ctx.stroke();
+
+      // Supply box — always centred on midX (midpoint of the two arms)
+      ctx.fillStyle = '#0f172a';
+      roundedRectPath(midX - boxW / 2, y - boxH / 2, boxW, boxH, 10);
+      ctx.fill();
+      ctx.strokeStyle = powered ? '#0ea5e9' : '#334155';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = 'bold 10px ui-sans-serif, system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText('d.c. SUPPLY', midX, y - 6);
+
+      ctx.fillStyle = powered ? '#34d399' : '#64748b';
+      ctx.font = 'bold 16px ui-monospace, SFMono-Regular, Menlo, monospace';
+      ctx.fillText('20 V', midX, y + 14);
+    }
+
+    function drawLabels(cation, anion) {
+      const { leftCx, rightCx, midX, outerR, leftX } = G;
+      ctx.save();
+      ctx.fillStyle = '#64748b';
+      ctx.font = '12px ui-sans-serif, system-ui, sans-serif';
+      ctx.textAlign = 'left';
+
+      ctx.fillText('dilute hydrochloric acid', 36, 220);
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(188, 220);
+      ctx.lineTo(leftX - 4, 230);
+      ctx.stroke();
+
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#475569';
+      ctx.font = 'bold 12px ui-sans-serif, system-ui, sans-serif';
+      const gelLabelY = G.bendCy + G.R + G.outerR + 28;
+      ctx.fillText('gel containing coloured ions', midX, gelLabelY);
+      ctx.font = '11px ui-sans-serif, system-ui, sans-serif';
+      ctx.fillStyle = '#64748b';
+      ctx.fillText(`${cation.name} + ${anion.name}`, midX, gelLabelY + 18);
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#64748b';
+      ctx.font = '11px ui-sans-serif, system-ui, sans-serif';
+      ctx.fillText('carbon electrode', leftCx - outerR - 118, 280);
+      ctx.beginPath();
+      ctx.moveTo(leftCx - outerR - 8, 280);
+      ctx.lineTo(leftCx - 10, 300);
+      ctx.stroke();
+
+      ctx.textAlign = 'right';
+      ctx.fillText('carbon electrode', rightCx + outerR + 118, 280);
+      ctx.beginPath();
+      ctx.moveTo(rightCx + outerR + 8, 280);
+      ctx.lineTo(rightCx + 10, 300);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawIonParticles(progress, cation, anion) {
+      if (progress < 0.02) return;
+      const t = performance.now() / 1000;
+      const n = Math.floor(progress * 14);
+      const { leftCx, rightCx, boreR, liquidTop, gelTop } = G;
+
+      for (let i = 0; i < n; i++) {
+        const ay = gelTop - ((t * 5 * state.speed + i * 37) % (gelTop - liquidTop - 10)) * progress;
+        const ax = leftCx - boreR + 12 + (i % 4) * 12 + Math.sin(t * 0.8 + i) * 3;
+        ctx.globalAlpha = 0.35 * progress;
+        ctx.fillStyle = `rgb(${anion.color.join(',')})`;
+        ctx.beginPath();
+        ctx.arc(ax, ay, 3.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 7px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('−', ax, ay + 2);
+
+        const cy = gelTop - ((t * 5 * state.speed + i * 41 + 20) % (gelTop - liquidTop - 10)) * progress;
+        const cx = rightCx - boreR + 12 + (i % 4) * 12 + Math.cos(t * 0.8 + i) * 3;
+        ctx.fillStyle = `rgb(${cation.color.join(',')})`;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 3.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.fillText('+', cx, cy + 2.5);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    function drawHClSurface() {
+      const { leftCx, rightCx, boreR, liquidTop, gelTop } = G;
+      ctx.save();
+      clipBore();
+
+      ctx.strokeStyle = 'rgba(125, 211, 252, 0.55)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(leftCx - boreR + 1, liquidTop);
+      ctx.lineTo(leftCx + boreR - 1, liquidTop);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(rightCx - boreR + 1, liquidTop);
+      ctx.lineTo(rightCx + boreR - 1, liquidTop);
+      ctx.stroke();
+
+      // Colourless HCl — faint glass sheen only
+      ctx.fillStyle = 'rgba(241, 245, 249, 0.18)';
+      ctx.fillRect(leftCx - boreR, liquidTop, boreR * 2, gelTop - liquidTop);
+      ctx.fillRect(rightCx - boreR, liquidTop, boreR * 2, gelTop - liquidTop);
+      ctx.restore();
+    }
+
+    function drawFrame() {
+      const { cation, anion } = currentIons();
+      const p = state.progress;
+      const powered = state.running || p > 0.01;
+
+      // Clear in device pixels, then re-apply logical transform (also drops any stuck clip)
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const parent = canvas.parentElement;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const cssW = parent.clientWidth || 900;
+      const cssH = parent.clientHeight || 620;
+      ctx.setTransform(dpr * (cssW / 900), 0, 0, dpr * (cssH / 620), 0, 0);
+
+      ctx.fillStyle = 'rgba(148, 163, 184, 0.12)';
+      ctx.beginPath();
+      ctx.ellipse(G.midX, G.bendCy + G.R + G.outerR + 40, 220, 12, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      drawLabels(cation, anion);
+
+      // Liquids inside bore
+      drawHClSurface();
+      if (p > 0.001) {
+        ctx.save();
+        try {
+          clipBore();
+          drawArmGradient(G.leftCx, anion.color, anion.maxAlpha * p, p);
+          drawArmGradient(G.rightCx, cation.color, cation.maxAlpha * p, p);
+        } finally {
+          ctx.restore();
+        }
+      }
+
+      drawGel(cation, anion);
+      drawIonParticles(p, cation, anion);
+
+      // Glass walls on top of liquids
+      drawUTubeOutline();
+
+      // Circuit: wires + supply (centred) + electrodes (connected)
+      drawPowerSupply(powered);
+      drawElectrode(G.leftCx, true, powered);
+      drawElectrode(G.rightCx, false, powered);
+
+      if (p > 0.05) {
+        ctx.font = 'bold 12px ui-sans-serif, system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = `rgba(${anion.color.join(',')},${0.55 + p * 0.35})`;
+        ctx.fillText(anion.label.split('—')[0].trim() + ' →', G.leftCx, G.gelTop + 36);
+        ctx.fillStyle = `rgba(${cation.color.join(',')},${0.55 + p * 0.35})`;
+        ctx.fillText('← ' + cation.label.split('—')[0].trim(), G.rightCx, G.gelTop + 36);
+      }
+    }
+
+    function tick(ts) {
+      if (!state.lastTs) state.lastTs = ts;
+      const dt = Math.min(0.05, (ts - state.lastTs) / 1000);
+      state.lastTs = ts;
+
+      if (state.running) {
+        // Asymptotic approach so colour never becomes too intense
+        // Slow asymptotic colour bleed (~4–5× slower than original)
+        const target = 0.82;
+        const rate = 0.028 * state.speed;
+        state.progress += (target - state.progress) * rate * dt;
+        if (state.progress > target - 0.002) state.progress = target;
+      }
+
+      drawFrame();
+      state.raf = requestAnimationFrame(tick);
+    }
+
+    function startLoop() {
+      if (!state.raf) {
+        state.lastTs = 0;
+        state.raf = requestAnimationFrame(tick);
+      }
+    }
+
+    function togglePlay() {
+      state.running = !state.running;
+      setRunningUI(state.running);
+      updateSideCopy();
+      startLoop();
+    }
+
+    function resetSim() {
+      state.running = false;
+      state.progress = 0;
+      setRunningUI(false);
+      updateSideCopy();
+      drawFrame();
+    }
+
+    function onIonChange() {
+      const wasRunning = state.running;
+      state.cation = document.getElementById('cation-select').value;
+      state.anion = document.getElementById('anion-select').value;
+      // Changing ions resets colour migration for a clean demo
+      state.progress = 0;
+      state.running = false;
+      setRunningUI(false);
+      updateSideCopy();
+      drawFrame();
+      if (wasRunning) {
+        // keep selects responsive; user can press Start again
+      }
+    }
+
+    const MODE_ACTIVE = 'bg-chemistry-500 text-white shadow-sm';
+    const MODE_IDLE = 'text-slate-400 hover:text-slate-200';
+
+    function switchSection(mode) {
+      const isUtube = mode === 'utube';
+      const filterSec = document.getElementById('section-filter-paper');
+      const utubeSec = document.getElementById('section-utube');
+      const btnFilter = document.getElementById('btn-mode-filter');
+      const btnUtube = document.getElementById('btn-mode-utube');
+
+      filterSec.classList.toggle('hidden', isUtube);
+      utubeSec.classList.toggle('hidden', !isUtube);
+
+      btnFilter.className = `mode-btn px-3 py-1.5 rounded-lg text-xs md:text-sm font-bold transition duration-150 flex items-center gap-1.5 ${isUtube ? MODE_IDLE : MODE_ACTIVE}`;
+      btnUtube.className = `mode-btn px-3 py-1.5 rounded-lg text-xs md:text-sm font-bold transition duration-150 flex items-center gap-1.5 ${isUtube ? MODE_ACTIVE : MODE_IDLE}`;
+
+      if (!isUtube && state.running) {
+        state.running = false;
+        setRunningUI(false);
+      }
+      if (isUtube) {
+        requestAnimationFrame(() => {
+          resizeCanvas();
+          drawFrame();
+        });
+      } else {
+        requestAnimationFrame(() => {
+          window.FilterPaperObs?.init?.();
+          window.FilterPaperObs?.showPart?.(2);
+        });
+      }
+    }
+
+    // Init
+    populateSelects();
+    updateSideCopy();
+    setRunningUI(false);
+    drawFrame();
+    startLoop();
+    switchSection('filter');
+
+    document.getElementById('btn-mode-filter').addEventListener('click', () => switchSection('filter'));
+    document.getElementById('btn-mode-utube').addEventListener('click', () => switchSection('utube'));
+    document.getElementById('btn-play').addEventListener('click', togglePlay);
+    document.getElementById('btn-reset').addEventListener('click', resetSim);
+    document.getElementById('cation-select').addEventListener('change', onIonChange);
+    document.getElementById('anion-select').addEventListener('change', onIonChange);
+    document.getElementById('sim-speed').addEventListener('input', (e) => {
+      state.speed = parseFloat(e.target.value);
+    });
+
+    // HiDPI crispness
+    function resizeCanvas() {
+      const parent = canvas.parentElement;
+      if (!parent || parent.clientWidth < 2) return;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const cssW = parent.clientWidth;
+      const cssH = parent.clientHeight;
+      canvas.style.width = cssW + 'px';
+      canvas.style.height = cssH + 'px';
+      canvas.width = Math.floor(cssW * dpr);
+      canvas.height = Math.floor(cssH * dpr);
+      ctx.setTransform(dpr * (cssW / 900), 0, 0, dpr * (cssH / 620), 0, 0);
+      drawFrame();
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+  </script>
+  <script src="./filter-paper-lab.js?v=38"></script>
+  <script src="./filter-paper-obs.js?v=8"></script>
+</body>
+</html>
