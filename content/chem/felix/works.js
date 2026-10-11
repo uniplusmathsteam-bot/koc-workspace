@@ -1,6 +1,18 @@
 ﻿/* Felix - Chem KOC - submissions. */
 KOC.works('chem', 'felix', [
   {
+    id: 'topic-02-part-4-set-2',
+    title: 'Topic 02 Part 4 set 2.docx',
+    original: 'Topic 02 Part 4 set 2.docx',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Microscopic world I Covalent bond electron diagrams dative bond naming',
+    submitted: '2026-10-11',
+    tags: ['LQ', 'Long questions', 'Word worksheet', 'Microscopic world I', 'Topic 02'],
+    src: 'content/chem/felix/topic-02-part-4-set-2/index.html',
+    notes: 'Long-question practice Set 2 for Topic 02 Part 4 (Microscopic world I). Download the .docx to use in Word - questions with writing space, diagrams, and an answer key.'
+  },
+  {
     id: 'topic-02-part-3-set-2',
     title: 'Topic 02 Part 3 set 2.docx',
     original: 'Topic 02 Part 3 set 2.docx',
