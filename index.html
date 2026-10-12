@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>UniPlus KOC Work Gallery</title>
-<link rel="stylesheet" href="assets/css/app.css?v=20261001h">
+<link rel="stylesheet" href="assets/css/app.css?v=20261012a">
 </head>
 <body>
 
@@ -49,6 +49,18 @@
     <div class="overlay-stage" id="ov-stage"></div>
     <aside class="overlay-side">
       <div class="side-block">
+        <div class="side-label">Approval</div>
+        <div class="status-picker">
+          <button class="status-opt ok" id="ov-approve" data-status="approved" type="button"><span class="swatch"></span>Approved</button>
+          <button class="status-opt pend" id="ov-unapprove" data-status="pending" type="button"><span class="swatch"></span>Not approved</button>
+        </div>
+        <div class="side-hint">Press Save in the top bar to publish the decision.</div>
+      </div>
+      <div class="side-block">
+        <div class="side-label">五行 Element</div>
+        <div id="ov-elements"></div>
+      </div>
+      <div class="side-block">
         <div class="side-label">Review link</div>
         <div class="link-field">
           <input id="ov-review-link" type="url" readonly aria-label="Review link">
@@ -71,10 +83,10 @@
 
 <div class="toast" id="toast" hidden></div>
 
-<script src="assets/js/app.js?v=20261001h"></script>
+<script src="assets/js/app.js?v=20261012a"></script>
 <script src="data/roster.js?v=20260928b"></script>
 <script src="data/state.js?v=20261001"></script>
-<script src="data/manifest.js?v=20261005c"></script>
+<script src="data/manifest.js?v=20261012a"></script>
 <script>KOC.start();</script>
 </body>
 </html>

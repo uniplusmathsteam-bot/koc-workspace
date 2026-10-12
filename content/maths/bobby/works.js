@@ -8,6 +8,7 @@ KOC.works('maths', 'bobby', [
     submitted: '2026-09-29',
     status: 'pending',
     tags: ['Interactive', 'Game', 'Factorization'],
+    elements: ['fire'],
     cover: 'content/maths/bobby/comics/jm25/factorization-chapter-1-color.png',
     src: 'https://uniunipluskoc-blip.github.io/comics/lessons/jm25/index.html#game',
     notes: 'JM25 lesson page, opened on the game section.'
@@ -20,6 +21,7 @@ KOC.works('maths', 'bobby', [
     submitted: '2026-08-28',
     status: 'pending',
     tags: ['Comics', 'Indices', 'Scientific notation', 'Binary'],
+    elements: ['water'],
     cover: 'content/maths/bobby/comics/jm24/indices-club-chapter-1-color.png',
     srcs: [
       'content/maths/bobby/comics/jm24/indices-club-chapter-1-color.png',
@@ -47,6 +49,7 @@ KOC.works('maths', 'bobby', [
     submitted: '2026-08-28',
     status: 'pending',
     tags: ['Comics', 'Factorization', 'Cross method'],
+    elements: ['water'],
     cover: 'content/maths/bobby/comics/jm25/factorization-chapter-1-color.png',
     srcs: [
       'content/maths/bobby/comics/jm25/factorization-chapter-1-color.png',
@@ -67,6 +70,7 @@ KOC.works('maths', 'bobby', [
     submitted: '2026-08-28',
     status: 'pending',
     tags: ['Comics', 'Inequalities'],
+    elements: ['water'],
     cover: 'content/maths/bobby/comics/jm26/inequalities-chapter-1-color.png',
     srcs: [
       'content/maths/bobby/comics/jm26/inequalities-chapter-1-color.png',
@@ -84,6 +88,7 @@ KOC.works('maths', 'bobby', [
     submitted: '2026-08-28',
     status: 'pending',
     tags: ['Comics', 'Triangles', 'Angle pairs', 'Similar', 'Congruent'],
+    elements: ['water'],
     cover: 'content/maths/bobby/comics/jm28/triangle-lines-chapter-1-color.png',
     srcs: [
       'content/maths/bobby/comics/jm28/triangle-lines-chapter-1-color.png',

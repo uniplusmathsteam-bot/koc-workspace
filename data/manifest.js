@@ -6,22 +6,22 @@
  * so two teams submitting on the same day never touch the same file.
  */
 KOC.manifest([
-  'content/maths/eric/works.js?v=20260929',
-  'content/maths/hugo/works.js',
+  'content/maths/eric/works.js?v=20261012a',
+  'content/maths/hugo/works.js?v=20261012a',
   'content/maths/rachel/works.js?v=20261001',
-  'content/maths/tracy/works.js?v=20260929',
-  'content/maths/bobby/works.js?v=20261001b',
+  'content/maths/tracy/works.js?v=20261012a',
+  'content/maths/bobby/works.js?v=20261012a',
 
   'content/chem/keith/works.js?v=20261001c',
-  'content/chem/james/works.js?v=20261005c',
-  'content/chem/felix/works.js?v=20261001h',
+  'content/chem/james/works.js?v=20261012a',
+  'content/chem/felix/works.js?v=20261012a',
   'content/chem/adrain/works.js',
-  'content/chem/duncan/works.js?v=20261001h',
+  'content/chem/duncan/works.js?v=20261012a',
 
   'content/phy/winnie/works.js',
   'content/phy/jerry/works.js',
 
-  'content/bio-is/jeff/works.js?v=20261009b',
-  'content/bio-is/issac/works.js?v=20261001h',
-  'content/bio-is/javin/works.js?v=20261001h'
+  'content/bio-is/jeff/works.js?v=20261012a',
+  'content/bio-is/issac/works.js?v=20261012a',
+  'content/bio-is/javin/works.js?v=20261012a'
 ]);

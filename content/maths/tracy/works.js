@@ -8,6 +8,7 @@ KOC.works('maths', 'tracy', [
     submitted: '2026-09-29',
     status: 'pending',
     tags: ['Interactive', 'Indices', 'Rules', 'S3'],
+    elements: ['gold'],
     cover: 'content/maths/tracy/s3-cover.svg',
     src: 'https://unikoc5.github.io/s3-maths/topics/law_of_indices/rules-only.html',
     notes: 'Law of Indices rules page.'
@@ -20,6 +21,7 @@ KOC.works('maths', 'tracy', [
     submitted: '2026-09-29',
     status: 'pending',
     tags: ['Interactive', 'Triangles', 'Special lines', 'S3'],
+    elements: ['wood'],
     cover: 'content/maths/tracy/s3-cover.svg',
     src: 'https://unikoc5.github.io/s3-maths/topics/triangle_centres/special-lines-only.html',
     notes: 'Special lines in triangles page.'
@@ -32,6 +34,7 @@ KOC.works('maths', 'tracy', [
     submitted: '2026-09-29',
     status: 'pending',
     tags: ['Interactive', 'Quadrilaterals', 'Concept', 'S3'],
+    elements: ['wood'],
     cover: 'content/maths/tracy/s3-cover.svg',
     src: 'https://unikoc5.github.io/s3-maths/topics/quadrilaterals/concept-only.html',
     notes: 'Quadrilaterals concept page.'
@@ -44,6 +47,7 @@ KOC.works('maths', 'tracy', [
     submitted: '2026-09-29',
     status: 'pending',
     tags: ['Interactive', 'Quadrilaterals', 'Game', 'S3'],
+    elements: ['fire'],
     cover: 'content/maths/tracy/s3-cover.svg',
     src: 'https://unikoc5.github.io/s3-maths/topics/quadrilaterals/games-only.html',
     notes: 'Quadrilaterals games page.'
@@ -56,6 +60,7 @@ KOC.works('maths', 'tracy', [
     submitted: '2026-09-29',
     status: 'pending',
     tags: ['Interactive', 'Quadrilaterals', 'Comics', 'S3'],
+    elements: ['water'],
     cover: 'content/maths/tracy/s3-cover.svg',
     src: 'https://unikoc5.github.io/s3-maths/topics/quadrilaterals/comics-only.html',
     notes: 'Quadrilaterals comics page.'
@@ -68,6 +73,7 @@ KOC.works('maths', 'tracy', [
     submitted: '2026-09-29',
     status: 'pending',
     tags: ['Interactive', 'Trigonometry', 'Concept', 'S3'],
+    elements: ['wood'],
     cover: 'content/maths/tracy/s3-cover.svg',
     src: 'https://unikoc5.github.io/s3-maths/topics/trigonometry/concept-only.html',
     notes: 'Trigonometry concept page.'
@@ -80,6 +86,7 @@ KOC.works('maths', 'tracy', [
     submitted: '2026-09-29',
     status: 'pending',
     tags: ['Interactive', 'Trigonometry', 'Tools', 'S3'],
+    elements: ['wood'],
     cover: 'content/maths/tracy/s3-cover.svg',
     src: 'https://unikoc5.github.io/s3-maths/topics/trigonometry/tools-only.html',
     notes: 'Special triangles, the identity, and co-functions.'
@@ -92,6 +99,7 @@ KOC.works('maths', 'tracy', [
     submitted: '2026-08-28',
     status: 'pending',
     tags: ['Interactive', 'Comics', 'Gallery', 'JM24–JM35'],
+    elements: ['wood', 'water'],
     cover: 'content/maths/tracy/s3-cover.svg',
     src: 'https://unikoc5.github.io/s3-maths/#lessons',
     notes:
@@ -109,6 +117,7 @@ KOC.works('maths', 'tracy', [
     submitted: '2026-08-16',
     status: 'pending',
     tags: ['Script', 'YouMind', 'External'],
+    elements: ['water'],
     url: 'https://youmind.ai/',
     notes: 'Script and storyboard still live in YouMind. Link included for review before I export the final assets into this repo.'
   }

@@ -28,6 +28,17 @@ window.KOC = (function () {
     link:        { label: 'Link',        icon: '🔗' }
   };
 
+  /* 五行 X-axis style modules from 三維動態教學系統 V12. A work lists the
+     element(s) it trains in its `elements` field. */
+  var ELEMENTS = {
+    gold:  { zh: '金', label: 'Gold',  role: '架構師 / 裁判',   use: '建立標準、拆解難題、除錯' },
+    wood:  { zh: '木', label: 'Wood',  role: '園丁 / 導航員',   use: '構建知識體系、激發聯想、舉一反三' },
+    water: { zh: '水', label: 'Water', role: '說書人 / 治療師', use: '處理情緒、建立共情、價值重塑' },
+    fire:  { zh: '火', label: 'Fire',  role: '表演者 / 啦啦隊', use: '搶奪注意力、點燃動機、打破沉悶' },
+    earth: { zh: '土', label: 'Earth', role: '建築師 / 守護者', use: '鞏固基礎、建立習慣、提供安全感' }
+  };
+  var ELEMENT_ORDER = ['gold', 'wood', 'water', 'fire', 'earth'];
+
   var REVIEW_KEY = 'uniplus-koc-review-v1';
   var THEME_KEY = 'uniplus-koc-theme';
   var BOARD_KEY = 'uniplus-koc-board-v1';
@@ -68,6 +79,7 @@ window.KOC = (function () {
     out.id = out.id || slug(out.title || 'work-' + (i + 1));
     out.status = STATUSES[out.status] ? out.status : 'pending';
     out.tags = out.tags || [];
+    out.elements = (out.elements || []).filter(function (e) { return ELEMENTS[e]; });
     out.key = subjectId + '/' + kocId + '/' + out.id;
     return out;
   }
@@ -469,17 +481,31 @@ window.KOC = (function () {
   var route = { subject: null, koc: null, workSubject: null, work: null };
   var query = '';
   var RANGE_KEY = 'koc-date-range';
+  var ELEMENT_KEY = 'koc-element';
   var range = 'all';
+  var element = 'all';
 
   function loadRange() {
     try { range = sessionStorage.getItem(RANGE_KEY) || 'all'; } catch (e) { range = 'all'; }
     if (['all', 'day', 'week', 'month'].indexOf(range) < 0) range = 'all';
+    try { element = sessionStorage.getItem(ELEMENT_KEY) || 'all'; } catch (e) { element = 'all'; }
+    if (element !== 'all' && !ELEMENTS[element]) element = 'all';
   }
 
   function setRange(next) {
     range = next;
     try { sessionStorage.setItem(RANGE_KEY, range); } catch (e) { /* ignore */ }
     render();
+  }
+
+  function setElement(next) {
+    element = next;
+    try { sessionStorage.setItem(ELEMENT_KEY, element); } catch (e) { /* ignore */ }
+    render();
+  }
+
+  function hasElement(work, el) {
+    return el === 'all' || work.elements.indexOf(el) > -1;
   }
 
   function parseSubmitted(value) {
@@ -519,7 +545,9 @@ window.KOC = (function () {
 
   function applyRange(list) {
     var now = new Date();
-    return sortByDate(list.filter(function (work) { return inRange(work, range, now); }));
+    return sortByDate(list.filter(function (work) {
+      return inRange(work, range, now) && hasElement(work, element);
+    }));
   }
 
   function rangeBar(list) {
@@ -528,11 +556,31 @@ window.KOC = (function () {
     return '<div class="toolbar" role="toolbar" aria-label="Sort by date">' +
       '<span class="section-label" style="margin:0">Date</span>' +
       modes.map(function (mode) {
-        var count = list.filter(function (work) { return inRange(work, mode[0], now); }).length;
+        var count = list.filter(function (work) {
+          return inRange(work, mode[0], now) && hasElement(work, element);
+        }).length;
         return '<button type="button" class="chip" data-range="' + mode[0] + '" aria-pressed="' +
           (range === mode[0] ? 'true' : 'false') + '">' + mode[1] + ' ' + count + '</button>';
       }).join('') +
-      '<span class="hint">Newest first</span></div>';
+      '<span class="hint">Newest first</span></div>' +
+      elementBar(list);
+  }
+
+  function elementBar(list) {
+    var now = new Date();
+    var inDates = list.filter(function (work) { return inRange(work, range, now); });
+    var chips = [['all', 'All']].concat(ELEMENT_ORDER.map(function (id) {
+      return [id, ELEMENTS[id].zh + ' ' + ELEMENTS[id].label];
+    }));
+    return '<div class="toolbar" role="toolbar" aria-label="Filter by 五行 element">' +
+      '<span class="section-label" style="margin:0">五行</span>' +
+      chips.map(function (c) {
+        var count = inDates.filter(function (work) { return hasElement(work, c[0]); }).length;
+        var title = ELEMENTS[c[0]] ? ' title="' + esc(ELEMENTS[c[0]].role + ' · ' + ELEMENTS[c[0]].use) + '"' : '';
+        return '<button type="button" class="chip" data-element="' + c[0] + '" aria-pressed="' +
+          (element === c[0] ? 'true' : 'false') + '"' + title + '>' + esc(c[1]) + ' ' + count + '</button>';
+      }).join('') +
+      '</div>';
   }
 
   function emptyRange() {
@@ -541,8 +589,10 @@ window.KOC = (function () {
       week: 'Nothing submitted this week.',
       month: 'Nothing submitted this month.'
     };
+    var picked = ELEMENTS[element];
     return '<div class="empty"><strong>No submissions in this range</strong>' +
-      (copy[range] || 'Nothing matches this date range.') + '</div>';
+      (copy[range] || 'Nothing matches this date range.') +
+      (picked ? ' Filtered to ' + esc(picked.zh + ' ' + picked.label) + '.' : '') + '</div>';
   }
 
 
@@ -614,7 +664,7 @@ window.KOC = (function () {
     btn.disabled = !n;
     btn.title = n
       ? (canSave ? 'Writes data/state.js in the repo' : 'Downloads data/state.js — run start-board.cmd to write it directly')
-      : 'Board messages and Notion task links are all in data/state.js';
+      : 'Board messages, approvals and Notion task links are all in data/state.js';
   }
 
   function renderCrumbs(koc) {
@@ -644,6 +694,22 @@ window.KOC = (function () {
   function statusTag(status) {
     var s = STATUSES[status];
     return '<span class="tag ' + s.tone + '">' + s.label + '</span>';
+  }
+
+  // Anything short of approved reads as "Not approved"; the tooltip keeps the detail.
+  function approvalTag(work) {
+    var st = statusOf(work);
+    return st === 'approved'
+      ? '<span class="tag green approval" title="Approved">✓ Approved</span>'
+      : '<span class="tag ' + STATUSES[st].tone + ' approval" title="' + esc(STATUSES[st].label) + '">Not approved</span>';
+  }
+
+  function elementTags(work) {
+    return work.elements.map(function (id) {
+      var e = ELEMENTS[id];
+      return '<span class="tag el-' + id + '" title="' + esc(e.role + ' · ' + e.use) + '">' +
+        esc(e.zh + ' ' + e.label) + '</span>';
+    }).join('');
   }
 
   function progressBar(r) {
@@ -912,9 +978,9 @@ window.KOC = (function () {
         '<span class="type-badge">' + esc(t.icon + ' ' + t.label) + '</span>' +
       '</div>' +
       '<div class="card-body">' +
-        '<div class="card-title"><span>' + esc(w.title) + '</span></div>' +
+        '<div class="card-title"><span class="title-text">' + esc(w.title) + '</span>' + approvalTag(w) + '</div>' +
         '<div class="card-sub">' + esc((w.original ? [w.original, prettyDate(w.submitted)] : [w.chapter, prettyDate(w.submitted)]).filter(Boolean).join(' · ')) + '</div>' +
-        '<div class="props"><span class="tag blue">Subject: ' + esc(taskSubject(w)) + '</span>' +
+        '<div class="props">' + elementTags(w) + '<span class="tag blue">Subject: ' + esc(taskSubject(w)) + '</span>' +
           w.tags.slice(0, 3).map(function (tg) { return '<span class="tag">' + esc(tg) + '</span>'; }).join('') +
         '</div>' +
       '</div>' +
@@ -928,7 +994,9 @@ window.KOC = (function () {
     var hits = allWorks().filter(function (w) {
       var s = findSubject(w.subjectId), k = findKocProfile(w.kocId);
       var hay = [w.title, w.original, w.chapter, w.notes, w.tags.join(' '), k && k.name,
-        taskSubject(w), s && s.name, w.type].join(' ').toLowerCase();
+        taskSubject(w), s && s.name, w.type,
+        w.elements.map(function (id) { return ELEMENTS[id].zh + ' ' + ELEMENTS[id].label; }).join(' ')
+      ].join(' ').toLowerCase();
       return hay.indexOf(q) > -1;
     });
 
@@ -967,6 +1035,19 @@ window.KOC = (function () {
     el('ov-stage').innerHTML = stageFor(w);
 
     el('ov-review-link').value = location.href;
+
+    var approved = statusOf(w) === 'approved';
+    el('ov-approve').setAttribute('aria-pressed', approved ? 'true' : 'false');
+    el('ov-unapprove').setAttribute('aria-pressed', approved ? 'false' : 'true');
+
+    el('ov-elements').innerHTML = w.elements.length
+      ? w.elements.map(function (id) {
+          var e = ELEMENTS[id];
+          return '<div class="element-row"><span class="tag el-' + id + '">' + esc(e.zh + ' ' + e.label) + '</span>' +
+            '<span class="element-role">' + esc(e.role) + '</span>' +
+            '<div class="side-hint">' + esc(e.use) + '</div></div>';
+        }).join('')
+      : '<div class="side-hint">Not tagged yet. Add <code>elements</code> to this card in <code>works.js</code>.</div>';
 
     var taskUrl = taskLinkOf(w);
     el('ov-task-link').value = taskUrl;
@@ -1060,6 +1141,9 @@ window.KOC = (function () {
     document.addEventListener('click', function (e) {
       var rangeBtn = e.target.closest('[data-range]');
       if (rangeBtn) { setRange(rangeBtn.getAttribute('data-range')); return; }
+
+      var elementBtn = e.target.closest('[data-element]');
+      if (elementBtn) { setElement(elementBtn.getAttribute('data-element')); return; }
 
       var card = e.target.closest('[data-hash]');
       if (card) { go(card.getAttribute('data-hash')); return; }

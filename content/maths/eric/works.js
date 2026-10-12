@@ -8,6 +8,7 @@ KOC.works('maths', 'eric', [
     submitted: '2026-09-29',
     status: 'pending',
     tags: ['Interactive', 'Indices', 'Concept', 'S3'],
+    elements: ['wood'],
     cover: 'content/maths/eric/covers/jm24.svg',
     src: 'https://unikoc5.github.io/s3-maths/topics/law_of_indices/concept-only.html',
     notes: 'Law of Indices concept page.'
@@ -20,6 +21,7 @@ KOC.works('maths', 'eric', [
     submitted: '2026-08-28',
     status: 'pending',
     tags: ['Interactive', 'Indices', 'S3'],
+    elements: ['wood'],
     cover: 'content/maths/eric/covers/jm24.svg',
     src: 'content/maths/eric/jm24-law-of-indices/index.html?jmTools=1',
     notes: 'Powers and binary labs. Digits can be highlighted; sliders stay draggable; no typing caret on the chrome.'
@@ -32,6 +34,7 @@ KOC.works('maths', 'eric', [
     submitted: '2026-08-28',
     status: 'pending',
     tags: ['Interactive', 'Factorization', 'S3'],
+    elements: ['wood'],
     cover: 'content/maths/eric/covers/jm25.svg',
     src: 'content/maths/eric/jm25-factorization/index.html?jmTools=1',
     notes: 'Area models for perfect squares and the cross method. Same chrome as the S3 lesson tools tab.'
@@ -44,6 +47,7 @@ KOC.works('maths', 'eric', [
     submitted: '2026-08-28',
     status: 'pending',
     tags: ['Interactive', 'Inequalities', 'S3'],
+    elements: ['earth'],
     cover: 'content/maths/eric/covers/jm26.svg',
     src: 'content/maths/eric/jm26-inequalities/index.html?jmTools=1',
     notes: 'Sign-flip practice with a draggable number-line boundary.'
@@ -56,6 +60,7 @@ KOC.works('maths', 'eric', [
     submitted: '2026-08-28',
     status: 'pending',
     tags: ['Interactive', 'Percentages', 'S3'],
+    elements: ['wood'],
     cover: 'content/maths/eric/covers/jm27.svg',
     src: 'content/maths/eric/jm27-percentages/index.html?jmTools=1',
     notes: 'Simple vs compound interest. Drag principal, rate and time.'
@@ -68,6 +73,7 @@ KOC.works('maths', 'eric', [
     submitted: '2026-08-28',
     status: 'pending',
     tags: ['Interactive', 'Geometry', 'S3'],
+    elements: ['wood'],
     cover: 'content/maths/eric/covers/jm28.svg',
     src: 'content/maths/eric/jm28-triangle-centres/index.html?jmTools=1',
     notes: 'Special lines and centres. Drag triangle vertices; construction lines update live.'
@@ -80,6 +86,7 @@ KOC.works('maths', 'eric', [
     submitted: '2026-08-28',
     status: 'pending',
     tags: ['Interactive', 'Quadrilaterals', 'S3'],
+    elements: ['wood'],
     cover: 'content/maths/eric/covers/jm29.svg',
     src: 'content/maths/eric/jm29-quadrilaterals/index.html?jmTools=1',
     notes: 'Drag vertices to classify quadrilaterals and explore mid-point theorems.'
@@ -92,6 +99,7 @@ KOC.works('maths', 'eric', [
     submitted: '2026-08-28',
     status: 'pending',
     tags: ['Interactive', 'Probability', 'S3'],
+    elements: ['wood'],
     cover: 'content/maths/eric/covers/jm30.svg',
     src: 'content/maths/eric/jm30-probabilities/index.html?jmTools=1',
     notes: '52-card deck and ball-drawing labs. Formula, tree and table stay in sync.'
@@ -104,6 +112,7 @@ KOC.works('maths', 'eric', [
     submitted: '2026-08-28',
     status: 'pending',
     tags: ['Interactive', 'Statistics', 'S3'],
+    elements: ['wood'],
     cover: 'content/maths/eric/covers/jm31.svg',
     src: 'content/maths/eric/jm31-central-tendency/index.html?jmTools=1',
     notes: 'Build a data set and watch mean, median and mode update. Drag to add an outlier.'

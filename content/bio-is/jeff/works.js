@@ -9,6 +9,7 @@ KOC.works('bio-is', 'jeff', [
     chapter: 'S3 Chemistry MWI2 Ion migration — filter paper and U-tube',
     submitted: '2026-10-09',
     tags: ['Interactive', 'Ion migration', 'Filter paper', 'U-tube'],
+    elements: ['wood'],
     src: 'content/bio-is/jeff/migration-of-coloured-ions/index.html',
     notes: 'Separate interactive lab. Filter-paper experiment and U-tube show how coloured ions move toward the electrodes.'
   },
@@ -21,6 +22,7 @@ KOC.works('bio-is', 'jeff', [
     chapter: 'S3 Basic Biology Ch2 Cells — plant, animal and prokaryotic cells',
     submitted: '2026-10-09',
     tags: ['Interactive', 'Cells', 'Comparison'],
+    elements: ['wood'],
     src: 'content/bio-is/jeff/ch2-cell-structure.html',
     notes: 'One-page cell model. Compare plant, animal and prokaryotic cells: nucleus, organelles, cell wall, ribosomes, and size.'
   }

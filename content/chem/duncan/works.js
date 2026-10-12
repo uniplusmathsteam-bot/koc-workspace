@@ -10,6 +10,7 @@ KOC.works('chem', 'duncan', [
     chapter: 'S3 Rocks Earth4 Earth4B Limecycle',
     submitted: '2026-09-13',
     tags: ['Interactive', 'Game', 'Lime cycle'],
+    elements: ['fire'],
     src: 'content/chem/duncan/Calcarius-Game/calcarius-move-list.html',
     notes: 'Turn-based lime-cycle game: pick moves to defeat Calcarius, the Stone King.'
   },
@@ -22,6 +23,7 @@ KOC.works('chem', 'duncan', [
     chapter: 'S3/S4 Senior Biology SB02 2.4 Digestion',
     submitted: '2026-09-13',
     tags: ['Interactive', 'Game', 'Hydrolysis'],
+    elements: ['fire'],
     src: 'content/chem/duncan/gut-shot/index.html',
     notes: 'Shooter: fire the matching substance to hydrolyse food in the gut.'
   },
@@ -34,6 +36,7 @@ KOC.works('chem', 'duncan', [
     chapter: 'S3 Structures and properties of substances MWI5 MWI5A Giant metallic structure, MWI5B Giant ionic structure, MWI5C Simple molecular structure, MWI5D Giant covalent structure',
     submitted: '2026-09-13',
     tags: ['Interactive', 'Game', 'Bonding'],
+    elements: ['fire'],
     src: 'content/chem/duncan/structure-breach/index.html',
     notes: 'Switch weapons to match metallic, ionic, giant covalent, and molecular structures.'
   },
@@ -46,6 +49,7 @@ KOC.works('chem', 'duncan', [
     chapter: 'S3 Fundamentals of chemistry Earth1 Earth1A Laboratory apparatus, Earth1B Laboratory safety',
     submitted: '2026-09-13',
     tags: ['Flashcards', 'S3', 'Laboratory safety'],
+    elements: ['earth'],
     src: 'content/chem/duncan/chem-topic-00-flashcards/flashcards-study.html',
     notes: 'S3 Topic 00 laboratory safety deck: apparatus, handling, and lab rules.'
   },
@@ -58,6 +62,7 @@ KOC.works('chem', 'duncan', [
     chapter: 'S3 Atmosphere Earth2 Earth2A Matters',
     submitted: '2026-09-13',
     tags: ['Flashcards', 'S3', 'Planet Earth'],
+    elements: ['earth'],
     src: 'content/chem/duncan/chem-topic-01-flashcards/flashcards-study.html',
     notes: 'S3 Topic 01 Planet Earth deck: classification of matter and related ideas.'
   },
@@ -70,6 +75,7 @@ KOC.works('chem', 'duncan', [
     chapter: 'S4 - S5 Energy changes in chemical reactions Heat1',
     submitted: '2026-09-13',
     tags: ['Comics', 'Bilingual', 'Heat', 'Energy'],
+    elements: ['water'],
     src: 'content/chem/duncan/Heat and Energy Comic Panels - Updated Bilingual.pdf',
     notes: 'Bilingual comic panels on heat and energy (updated version).'
   }

@@ -9,6 +9,7 @@ KOC.works('bio-is', 'javin', [
     chapter: 'SB01 Food and humans · SB01.1.1 Food requirements of humans · SB01.1.2 Summary of food tests · SB01.1.3 Balanced diet · SB02 Nutrition in humans · BB06.6.2 Non-infectious diseases · BB06.6.3 Infectious diseases · SB34.34.1 Introduction to biotechnology',
     submitted: '2026-10-01',
     tags: ['Comics', 'PDF'],
+    elements: ['water'],
     src: 'content/bio-is/javin/comics/index.html',
     notes: 'One box, 16 files. Topic name first, then the original filename. The duplicate Petalino balanced-diet file was left out.'
   },
@@ -21,6 +22,7 @@ KOC.works('bio-is', 'javin', [
     chapter: 'S3 Basic Biology BB03 3.1 Cells as the Basic Unit of Life, 3.2 Introduction to Microscopes, 3.3 Structures of Animal and Plant Cells, 3.4 Prokaryotic and Eukaryotic Cells',
     submitted: '2026-09-08',
     tags: ['Flashcards', 'Interactive', 'Revision tool', 'Cells'],
+    elements: ['earth'],
     src: 'content/bio-is/javin/chapter2-cells/flashcards-study.html',
     notes: '45 fully bilingual EN/中文 cards from notes pages 1–15 (cell theory, microscopes, organelles). Photo cards show photomicrographs on the front. Every front and back has English and Chinese.'
   },
@@ -33,6 +35,7 @@ KOC.works('bio-is', 'javin', [
     chapter: 'S3 Basic Biology BB04 4.1 Fluid Mosaic model of the Cell Membrane, 4.2 Movement of Subtances across Membranes',
     submitted: '2026-09-08',
     tags: ['Flashcards', 'Interactive', 'Revision tool', 'Membrane'],
+    elements: ['earth'],
     src: 'content/bio-is/javin/chapter3-membrane/flashcards-study.html',
     notes: '42 fully bilingual EN/中文 cards (fluid mosaic, membrane proteins, diffusion, osmosis, active transport). Short note-questions on beetroot leak, potato osmosis, and cyanide. Diagrams on phospholipid, osmosis, and iso/hypo/hyper cells.'
   },
@@ -45,6 +48,7 @@ KOC.works('bio-is', 'javin', [
     chapter: 'S3 Basic Biology BB05 5.1 Metabolism: Catabolism and Anabolism, 5.2 Enzymes as Biological Catalysts, 5.3 Enzyme Action and Properties, 5.4 Factors Affecting Enzymatic Reaction Rates, 5.5 Applications of Enzymes',
     submitted: '2026-09-08',
     tags: ['Flashcards', 'Interactive', 'Revision tool', 'Enzymes'],
+    elements: ['earth'],
     src: 'content/bio-is/javin/chapter4-enzymes/flashcards-study.html',
     notes: '33 fully bilingual EN/中文 cards (metabolism, enzyme properties, temperature/pH, inhibitors, applications). Short note-questions on boiled-enzyme control and agar clear zone. Diagrams on energy graphs and lock-and-key.'
   },
@@ -57,6 +61,7 @@ KOC.works('bio-is', 'javin', [
     chapter: 'S3 Basic Biology BB02 2.1 Chemical Constituents of Organisms, 2.3 Minerals, 2.4 Carbohydrates, 2.5 Lipids, 2.6 Protein',
     submitted: '2026-09-08',
     tags: ['Flashcards', 'Interactive', 'Revision tool', 'Nutrition'],
+    elements: ['earth'],
     src: 'content/bio-is/javin/chapter5-food/flashcards-study.html',
     notes: '47 fully bilingual EN/中文 cards from notes pages 1–16 (condensation/hydrolysis, carbohydrates, lipids, proteins). Every front and back has English and Chinese.'
   },
@@ -69,6 +74,7 @@ KOC.works('bio-is', 'javin', [
     chapter: 'S3/S4 Senior Biology SB02 2.1 Modes of nutrition, 2.2 The human nutrition process, 2.3 Dentition and ingestion, 2.4 Digestion, 2.5 Absorption, 2.6 Assimilation, 2.7 Egestion',
     submitted: '2026-09-08',
     tags: ['Flashcards', 'Interactive', 'Revision tool', 'Digestion'],
+    elements: ['earth'],
     src: 'content/bio-is/javin/chapter6-nutrition/flashcards-study.html',
     notes: '48 fully bilingual EN/中文 cards (nutrition processes, gut and peristalsis, teeth, digestion, absorption, liver). Short note-questions on ingestion, bile, starvation hepatic vein, and assimilation. Photos/diagrams of nutrition types, teeth, and villi.'
   }

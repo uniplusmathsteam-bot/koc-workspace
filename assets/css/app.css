@@ -318,6 +318,21 @@ h1.page-title {
 .tag.red   { background: var(--red-bg);   color: var(--red-fg); }
 .tag.blue  { background: var(--blue-bg);  color: var(--blue-fg); }
 
+/* 五行 elements */
+.tag.el-gold  { background: #f6ecc6; color: #85650a; }
+.tag.el-wood  { background: #dcefd6; color: #2e6a28; }
+.tag.el-water { background: #dae8f8; color: #22568f; }
+.tag.el-fire  { background: #fde0d6; color: #b03a17; }
+.tag.el-earth { background: #eee2d4; color: #7a5230; }
+html[data-theme="dark"] .tag.el-gold  { background: #3a3116; color: #e6c75e; }
+html[data-theme="dark"] .tag.el-wood  { background: #1f3520; color: #9fd89a; }
+html[data-theme="dark"] .tag.el-water { background: #1b2e44; color: #9cc3ec; }
+html[data-theme="dark"] .tag.el-fire  { background: #42221a; color: #f0a68f; }
+html[data-theme="dark"] .tag.el-earth { background: #36291d; color: #d6b590; }
+
+.card-title .title-text { flex: 1; min-width: 0; }
+.card-title .approval { flex: none; align-self: flex-start; }
+
 .count-pill {
   position: absolute;
   right: 8px;
@@ -730,6 +745,10 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .status-opt.ok { color: var(--green-fg); }
 .status-opt.rev { color: var(--red-fg); }
 .status-opt.pend { color: var(--amber-fg); }
+
+.element-row { margin-bottom: 10px; }
+.element-row .element-role { margin-left: 8px; font-size: 13px; color: var(--text-soft); }
+.element-row .side-hint { margin-top: 3px; }
 
 .overlay-side textarea {
   width: 100%;

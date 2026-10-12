@@ -57,6 +57,7 @@ KOC.works('bio-is', 'jeff', [
     chapter: 'Bio Ch. 2',
     submitted: '2026-08-20',                                 // YYYY-MM-DD
     tags: ['Comics', 'IG post'],
+    elements: ['water'],                                     // 五行 area(s), see below
     cover: 'content/bio-is/jeff/chapter-2-cover.png',        // optional thumbnail
     src: 'content/bio-is/jeff/chapter-2-comics.png',
     notes: 'What it is, who it is for, what is still unfinished.'
@@ -81,6 +82,22 @@ Paths are written from the repo root, not relative to your folder.
 | `link` | button out to an external tool | `url` |
 
 Only `title` and `type` are strictly required — a card with a missing file still appears, and the viewer says the file is not committed yet, which is a useful way to flag work in progress.
+
+### 五行 elements
+
+`elements` places the work on the X axis (五行戰術模組) of 三維動態教學系統 V12. List one, or two if the work clearly does both. The gallery shows the element on the card and lets reviewers filter by it.
+
+| value | | Role | Typical work |
+|---|---|---|---|
+| `gold` | 金 | 架構師 / 裁判 | step-by-step method, rules, exam-style questions with marking points, procedures with checks |
+| `wood` | 木 | 園丁 / 導航員 | concept pages, notes, models and labs that build the knowledge tree |
+| `water` | 水 | 說書人 / 治療師 | comics, stories, explainer scripts |
+| `fire` | 火 | 表演者 / 啦啦隊 | games, races, timed challenges |
+| `earth` | 土 | 建築師 / 守護者 | flashcards, drill sets, repeated practice of one question type |
+
+### Approval
+
+Every card shows **Approved** or **Not approved** next to its title. Reviewers set it in the work viewer under **Approval**, then press **Save** so the decision lands in `data/state.js`.
 
 ### A new KOC joins
 

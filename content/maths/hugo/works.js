@@ -9,6 +9,7 @@ KOC.works('maths', 'hugo', [
     submitted: '2026-08-17',
     status: 'pending',
     tags: ['Comics', '6 pages', 'Inequalities', 'Number line'],
+    elements: ['water'],
     cover: 'content/maths/hugo/balance-quest-cover.jpg',
     srcs: [
       'content/maths/hugo/balance-quest/01-height-check.png',
