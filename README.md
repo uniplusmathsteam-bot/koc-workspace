@@ -87,7 +87,7 @@ Only `title` and `type` are strictly required — a card with a missing file sti
 
 `elements` places the work on the X axis (五行戰術模組) of 三維動態教學系統 V12. List one, or two if the work clearly does both. The gallery shows the element on the card and lets reviewers filter by it.
 
-The front page opens with a **五行 Teaching Elements** summary: the overview infographic (`assets/wuxing/wuxing-overview.svg`, copied from the [五行教學資料庫](https://uniplusmathsteam-bot.github.io/wuxing-teaching-databank/)), the 動態應變矩陣, and one card per element with its key description, weapons, when to use it and its balance warning. The wording lives in `ELEMENTS` at the top of `assets/js/app.js`; if the databank changes an element's role or weapons, update both.
+The front page opens with a **五行 Teaching Elements** summary: an infographic (`assets/wuxing/wuxing-summary.svg`) covering each element's role, functions, weapons and balance warning plus 先嚴後寬 and the 動態應變矩陣, followed by one card per element with its key description and when to use it. Card wording lives in `ELEMENTS` at the top of `assets/js/app.js`; the infographic is hand-written SVG, so edit both if an element's wording changes.
 
 | value | | Role | Typical work |
 |---|---|---|---|

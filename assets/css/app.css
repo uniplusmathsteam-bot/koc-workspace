@@ -750,7 +750,6 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .element-row .element-role { margin-left: 8px; font-size: 13px; color: var(--text-soft); }
 .element-row .element-use { margin-top: 6px; font-size: 13px; }
 .element-row .side-hint { margin-top: 3px; }
-.element-row .wx-link { display: inline-block; margin-top: 6px; }
 
 /* ---------- 五行 teaching elements ---------- */
 
@@ -775,38 +774,14 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .wuxing-head .spacer { flex: 1; }
 
 .wuxing-body { padding: 18px; }
-.wuxing-intro {
-  display: grid;
-  grid-template-columns: minmax(0, 1.75fr) minmax(250px, 1fr);
-  gap: 18px;
-  align-items: start;
-  margin-bottom: 18px;
-}
 .wuxing-figure {
   display: block;
-  border-radius: var(--radius);
+  border-radius: 12px;
   overflow: hidden;
-  background: #121110;
+  border: 1px solid var(--line);
+  margin-bottom: 18px;
 }
 .wuxing-figure img { display: block; width: 100%; height: auto; }
-
-.wuxing-matrix h3 { margin: 0 0 2px; font-size: 13.5px; font-weight: 600; }
-.wuxing-matrix h3 + .hint { margin-top: 0; }
-.wuxing-matrix .hint { margin: 0 0 12px; font-size: 12.5px; color: var(--text-faint); line-height: 1.55; }
-.wuxing-matrix ul { list-style: none; margin: 0 0 16px; padding: 0; }
-.wuxing-matrix li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 7px 0;
-  border-top: 1px solid var(--line);
-  font-size: 13px;
-}
-.wuxing-matrix li:last-child { border-bottom: 1px solid var(--line); }
-.wx-sign span { display: block; font-size: 11.5px; color: var(--text-faint); }
-.wx-mix { flex: none; display: flex; align-items: center; gap: 4px; }
-.wx-mix i { font-style: normal; color: var(--text-faint); font-size: 12px; }
 
 .wx-grid {
   display: grid;
@@ -853,18 +828,12 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; }
   padding-top: 4px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
 }
-.wx-link { font-size: 12.5px; color: var(--text-soft); text-decoration: none; }
-.wx-link:hover { color: var(--text); text-decoration: underline; }
 .wuxing-foot { margin: 16px 0 0; font-size: 12.5px; color: var(--text-faint); }
 
 @media (max-width: 1100px) {
   .wx-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
-}
-@media (max-width: 860px) {
-  .wuxing-intro { grid-template-columns: 1fr; }
 }
 
 .overlay-side textarea {

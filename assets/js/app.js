@@ -28,14 +28,12 @@ window.KOC = (function () {
     link:        { label: 'Link',        icon: '🔗' }
   };
 
-  /* 五行 X-axis style modules from 三維動態教學系統 V12, worded as in the
-     五行教學資料庫. A work lists the element(s) it trains in its `elements`
-     field. `bank` is the element's id in the databank, which says metal. */
-  var DATABANK_URL = 'https://uniplusmathsteam-bot.github.io/wuxing-teaching-databank/';
-
+  /* 五行 X-axis style modules from 三維動態教學系統 V12. A work lists the
+     element(s) it trains in its `elements` field. Accents match
+     assets/wuxing/wuxing-summary.svg. */
   var ELEMENTS = {
     gold: {
-      zh: '金', label: 'Gold', bank: 'metal', accent: '#d4a94e',
+      zh: '金', label: 'Gold', accent: '#c99a3b',
       role: '架構師 / 裁判',
       use: '建立標準、拆解難題、除錯',
       desc: '把複雜任務整理成學生可以跟隨的路徑，並像裁判一樣指出答案與過程是否符合標準。',
@@ -45,7 +43,7 @@ window.KOC = (function () {
       gallery: '步驟框架、規則頁、附評分要點的長題目、有檢查點的實驗程序'
     },
     wood: {
-      zh: '木', label: 'Wood', bank: 'wood', accent: '#66a86f',
+      zh: '木', label: 'Wood', accent: '#4f9a5a',
       role: '園丁 / 導航員',
       use: '構建知識體系、激發聯想、舉一反三',
       desc: '讓一個核心概念長出分支，幫助學生看見新知識與既有經驗之間的路線。',
@@ -55,7 +53,7 @@ window.KOC = (function () {
       gallery: '概念頁、筆記、可操作的模型與探究實驗'
     },
     water: {
-      zh: '水', label: 'Water', bank: 'water', accent: '#559fcb',
+      zh: '水', label: 'Water', accent: '#3f8cc0',
       role: '說書人 / 治療師',
       use: '處理情緒、建立共情、價值重塑',
       desc: '以情境和軼事把抽象知識變得可感受；先承接學生的挫敗，再引導其返回問題。',
@@ -65,7 +63,7 @@ window.KOC = (function () {
       gallery: '漫畫、故事、講解腳本'
     },
     fire: {
-      zh: '火', label: 'Fire', bank: 'fire', accent: '#eb6a45',
+      zh: '火', label: 'Fire', accent: '#e0603a',
       role: '表演者 / 啦啦隊',
       use: '搶奪注意力、點燃動機、打破沉悶',
       desc: '以節奏和視覺刺激重新聚焦全班，並把學生的微小勝利放大，形成正向增益。',
@@ -75,7 +73,7 @@ window.KOC = (function () {
       gallery: '遊戲、射擊、競賽與限時挑戰'
     },
     earth: {
-      zh: '土', label: 'Earth', bank: 'earth', accent: '#ad8151',
+      zh: '土', label: 'Earth', accent: '#a57645',
       role: '建築師 / 守護者',
       use: '鞏固基礎、建立習慣、提供安全感',
       desc: '以穩固步驟建立可持續的學習結構，用清晰界線和可預測節奏維持課堂秩序。',
@@ -821,8 +819,8 @@ window.KOC = (function () {
       (missingFiles.length ? warnBox() : '');
   }
 
-  /* 五行 summary: the databank's overview infographic plus one card per
-     element, each linking to its works below and its databank page. */
+  /* 五行 summary: the infographic plus one card per element, each jumping to
+     that element's works below. */
   var WUXING_KEY = 'koc-wuxing-open';
 
   function wuxingOpen() {
@@ -838,32 +836,6 @@ window.KOC = (function () {
     setElement(id);
     var target = el('submissions');
     if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  // 動態應變矩陣: what the KOC sees in class -> which pair of elements to switch to.
-  var WUXING_MATRIX = [
-    { sign: '眼神呆滯、停留時間過長', diag: '認知疲勞', mix: ['fire', 'wood'] },
-    { sign: '集體掉入陷阱、錯誤率飆升', diag: '挫折感過載', mix: ['water', 'wood'] },
-    { sign: '答題過快但錯誤率高、氣氛浮躁', diag: '紀律渙散', mix: ['earth', 'gold'] },
-    { sign: '答案對但步驟缺失', diag: '基礎不牢', mix: ['gold', 'earth'] }
-  ];
-
-  function wuxingMatrix() {
-    var rows = WUXING_MATRIX.map(function (r) {
-      return '<li><div class="wx-sign">' + esc(r.sign) + '<span>' + esc(r.diag) + '</span></div>' +
-        '<div class="wx-mix">' + r.mix.map(function (id) {
-          return '<span class="tag el-' + id + '">' + esc(ELEMENTS[id].zh) + '</span>';
-        }).join('<i>+</i>') + '</div></li>';
-    }).join('');
-    return '<div class="wuxing-matrix">' +
-      '<h3>動態應變矩陣</h3>' +
-      '<p class="hint">按學生即時狀態切換，不與 TLA 階段死板綁定。</p>' +
-      '<ul>' + rows + '</ul>' +
-      '<h3>先嚴後寬</h3>' +
-      '<p class="hint">開課初期先用 土／金 鎮場，建立規矩；後期再引入 火／水。</p>' +
-      '<h3>相生 · 相剋</h3>' +
-      '<p class="hint">相生：木 → 火 → 土 → 金 → 水 → 木<br>相剋：木 → 土 → 水 → 火 → 金 → 木</p>' +
-    '</div>';
   }
 
   function wuxingSection() {
@@ -889,7 +861,6 @@ window.KOC = (function () {
         '</dl>' +
         '<div class="wx-actions">' +
           '<button type="button" class="chip" data-element-jump="' + id + '">' + plural(n, 'work') + ' →</button>' +
-          '<a class="wx-link" href="' + DATABANK_URL + '#/' + e.bank + '" target="_blank" rel="noopener">資料庫 ↗</a>' +
         '</div>' +
       '</article>';
     }).join('');
@@ -899,17 +870,13 @@ window.KOC = (function () {
         '<h2>五行 Teaching Elements</h2>' +
         '<span class="hint">X 軸 · 用什麼方式互動 — Uni+ 2.0 三維動態教學系統 V12</span>' +
         '<span class="spacer"></span>' +
-        '<a class="btn" href="' + DATABANK_URL + '" target="_blank" rel="noopener">五行教學資料庫 ↗</a>' +
         '<button type="button" class="btn" data-wuxing-toggle aria-expanded="' + open + '">' + (open ? 'Hide' : 'Show') + '</button>' +
       '</div>' +
       (open
         ? '<div class="wuxing-body">' +
-            '<div class="wuxing-intro">' +
-              '<a class="wuxing-figure" href="assets/wuxing/wuxing-overview.svg" target="_blank" rel="noopener" title="Open full size">' +
-                '<img src="assets/wuxing/wuxing-overview.svg" alt="五行總覽：金、木、水、火、土五個教學戰術模組的角色、功能與戰術武器，以及相生與相剋的關係">' +
-              '</a>' +
-              wuxingMatrix() +
-            '</div>' +
+            '<a class="wuxing-figure" href="assets/wuxing/wuxing-summary.svg" target="_blank" rel="noopener" title="Open full size">' +
+              '<img src="assets/wuxing/wuxing-summary.svg" alt="五行戰術模組總結：金、木、水、火、土五種教學能量的角色、功能、戰術武器與平衡提醒，以及先嚴後寬的課堂節奏和動態應變矩陣">' +
+            '</a>' +
             '<div class="wx-grid">' + cards + '</div>' +
             '<p class="wuxing-foot">五行不與 TLA 階段固定綁定，導師應按 AI 儀表板提示的學生即時狀態動態切換。' +
               '正向增益：微小勝利用火大聲宣告、用土固化為 SOP；錯誤的高級化先用水承接挫折，再用木提煉錯誤中的邏輯。</p>' +
@@ -1193,8 +1160,7 @@ window.KOC = (function () {
             '<span class="element-role">' + esc(e.role) + '</span>' +
             '<div class="element-use">' + esc(e.use) + '</div>' +
             '<div class="side-hint">戰術武器：' + esc(e.weapons) + '</div>' +
-            '<div class="side-hint">平衡提醒：' + esc(e.caution) + '</div>' +
-            '<a class="wx-link" href="' + DATABANK_URL + '#/' + e.bank + '" target="_blank" rel="noopener">在五行教學資料庫查看 ↗</a></div>';
+            '<div class="side-hint">平衡提醒：' + esc(e.caution) + '</div></div>';
         }).join('')
       : '<div class="side-hint">Not tagged yet. Add <code>elements</code> to this card in <code>works.js</code>.</div>';
 
