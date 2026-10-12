@@ -38,14 +38,14 @@ KOC.works('chem', 'james', [
   {
     id: 'earth3a-distillation',
     title: 'Earth3A_Physical separation_(ex)',
-    original: 'Fractional distillation',
+    original: 'Distillation, filtration, evaporation',
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Ocean Earth3 Earth3A Physical separation',
     submitted: '2026-10-12',
     tags: ['Interactive', 'S3', 'Physical separation'],
     elements: ['gold'],
-    src: 'content/chem/james/physical-separation/Earth3A_Physical%20separation_(ex).html?v=20261012c',
+    src: 'content/chem/james/physical-separation/Earth3A_Physical%20separation_(ex).html?v=20261012e',
     notes: 'Build fractional distillation, filtration, or evaporation in 3D or 2D, then check the set-up.'
   },
   {
