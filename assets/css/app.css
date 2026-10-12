@@ -774,14 +774,6 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .wuxing-head .spacer { flex: 1; }
 
 .wuxing-body { padding: 18px; }
-.wuxing-figure {
-  display: block;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  margin-bottom: 18px;
-}
-.wuxing-figure img { display: block; width: 100%; height: auto; }
 
 .wx-grid {
   display: grid;
@@ -791,12 +783,12 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .wx-card {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   padding: 14px;
   border: 1px solid var(--line);
   border-top: 3px solid var(--wx);
   border-radius: var(--radius);
-  background: var(--bg);
+  background: linear-gradient(color-mix(in srgb, var(--wx) 7%, transparent), transparent 90px), var(--bg);
 }
 .wx-top { display: flex; align-items: center; gap: 10px; }
 .wx-glyph {
@@ -814,26 +806,92 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .wx-name { font-weight: 600; font-size: 15px; }
 .wx-role { font-size: 12.5px; color: var(--text-soft); }
 .wx-desc { margin: 0; font-size: 13px; line-height: 1.55; }
-.wx-list { margin: 0; font-size: 12.5px; line-height: 1.5; }
-.wx-list dt {
-  margin-top: 7px;
+.wx-label {
+  margin-top: 2px;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: .06em;
   color: var(--wx);
 }
-.wx-list dd { margin: 1px 0 0; color: var(--text-soft); }
-.wx-actions {
+.wx-uses { display: flex; flex-wrap: wrap; gap: 4px; margin-top: -4px; }
+.wx-uses span {
+  font-size: 12px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--wx) 35%, transparent);
+  background: color-mix(in srgb, var(--wx) 9%, transparent);
+}
+.wx-weapons {
+  margin: -4px 0 0;
+  padding-left: 15px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-soft);
+}
+.wx-weapons li::marker { color: var(--wx); }
+.wx-weapons b { color: var(--text); font-weight: 600; }
+.wx-balance {
   margin-top: auto;
-  padding-top: 4px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: center;
+  color: var(--wx);
+  background: color-mix(in srgb, var(--wx) 12%, transparent);
+}
+.wx-jump { align-self: flex-start; }
+
+.wx-flow {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+.wx-panel {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+.wx-panel-title { font-weight: 600; font-size: 14px; margin-bottom: 10px; }
+.wx-panel-title span { margin-left: 6px; font-weight: 400; font-size: 12.5px; color: var(--text-faint); }
+.wx-steps { display: flex; align-items: center; gap: 10px; }
+.wx-step {
+  flex: 1;
   display: flex;
   align-items: center;
   gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--bg-sunken);
 }
-.wuxing-foot { margin: 16px 0 0; font-size: 12.5px; color: var(--text-faint); }
+.wx-step b, .wx-cell b { display: block; font-size: 13px; font-weight: 600; }
+.wx-step span:not(.wx-dot):not(.wx-plus), .wx-cell > span { display: block; font-size: 12px; color: var(--text-soft); }
+.wx-arrow { color: var(--text-faint); font-size: 18px; }
+.wx-matrix { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.wx-cell { padding: 8px 10px; border-radius: 8px; background: var(--bg-sunken); }
+.wx-mix { display: flex; align-items: center; margin-top: 6px; }
+.wx-step .wx-dot, .wx-mix .wx-dot { flex: none; }
+.wx-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  font: 600 12px/1 "Noto Serif TC", "Microsoft JhengHei", serif;
+  color: #fff;
+  background: var(--wx);
+}
+.wx-plus { margin: 0 3px; font-size: 12px; color: var(--text-faint); }
+.wuxing-foot { margin: 12px 0 0; font-size: 12.5px; color: var(--text-faint); }
 
 @media (max-width: 1100px) {
   .wx-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+  .wx-flow { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .wx-matrix { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 .overlay-side textarea {

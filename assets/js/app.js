@@ -29,8 +29,8 @@ window.KOC = (function () {
   };
 
   /* 五行 X-axis style modules from 三維動態教學系統 V12. A work lists the
-     element(s) it trains in its `elements` field. Accents match
-     assets/wuxing/wuxing-summary.svg. */
+     element(s) it trains in its `elements` field. `weapons` is split on
+     "·" and "（…）" by the front-page summary. */
   var ELEMENTS = {
     gold: {
       zh: '金', label: 'Gold', accent: '#c99a3b',
@@ -38,8 +38,8 @@ window.KOC = (function () {
       use: '建立標準、拆解難題、除錯',
       desc: '把複雜任務整理成學生可以跟隨的路徑，並像裁判一樣指出答案與過程是否符合標準。',
       weapons: 'SOP 手術刀（切分 Step 1, 2, 3）· 陷阱雷達（指出 Past Paper 扣分位）',
-      when: '答案對但步驟缺失、跳步時（金 + 土）',
       caution: '全堂使用會太高壓，需搭配火／水調節。',
+      balance: '太高壓 → 配火 / 水',
       gallery: '步驟框架、規則頁、附評分要點的長題目、有檢查點的實驗程序'
     },
     wood: {
@@ -48,8 +48,8 @@ window.KOC = (function () {
       use: '構建知識體系、激發聯想、舉一反三',
       desc: '讓一個核心概念長出分支，幫助學生看見新知識與既有經驗之間的路線。',
       weapons: '思維導圖（畫出知識樹）· 鷹架 Scaffolding（填空式筆記）',
-      when: '眼神呆滯、缺乏關聯感，或全班掉入同一陷阱後重建概念時（火 + 木、水 + 木）',
       caution: '發散過度會離題，需用金來修剪。',
+      balance: '易離題 → 用金修剪',
       gallery: '概念頁、筆記、可操作的模型與探究實驗'
     },
     water: {
@@ -58,8 +58,8 @@ window.KOC = (function () {
       use: '處理情緒、建立共情、價值重塑',
       desc: '以情境和軼事把抽象知識變得可感受；先承接學生的挫敗，再引導其返回問題。',
       weapons: '故事掛鉤（用軼事軟化枯燥知識）· 情緒緩衝墊（先承接挫敗感）',
-      when: '集體掉入陷阱、錯誤率飆升、挫折感過載時（水 + 木）',
       caution: '太溫柔會導致散漫，需用土來立規矩。',
+      balance: '易散漫 → 用土立規矩',
       gallery: '漫畫、故事、講解腳本'
     },
     fire: {
@@ -68,8 +68,8 @@ window.KOC = (function () {
       use: '搶奪注意力、點燃動機、打破沉悶',
       desc: '以節奏和視覺刺激重新聚焦全班，並把學生的微小勝利放大，形成正向增益。',
       weapons: '高頻互動（快問快答、Kahoot!）· 視覺衝擊（誇張語調、震撼演示）',
-      when: '眼神呆滯、停留過長、認知疲勞時（火 + 木）',
       caution: '過度亢奮會只玩不學，需接土來靜心。',
+      balance: '只玩不學 → 接土靜心',
       gallery: '遊戲、射擊、競賽與限時挑戰'
     },
     earth: {
@@ -78,8 +78,8 @@ window.KOC = (function () {
       use: '鞏固基礎、建立習慣、提供安全感',
       desc: '以穩固步驟建立可持續的學習結構，用清晰界線和可預測節奏維持課堂秩序。',
       weapons: '刻意練習（同類題型反覆操練）· 錯題本（踏實積累）',
-      when: '答題過快但錯誤率高、氣氛浮躁時（土 + 金）',
       caution: '太沉悶會厭學，需插播木／火來鬆土。',
+      balance: '太沉悶 → 插木 / 火鬆土',
       gallery: '閃卡、MC 操練題組、同類題反覆練習'
     }
   };
@@ -819,9 +819,22 @@ window.KOC = (function () {
       (missingFiles.length ? warnBox() : '');
   }
 
-  /* 五行 summary: the infographic plus one card per element, each jumping to
-     that element's works below. */
+  /* 五行 summary: one column per element, each jumping to that element's
+     works below, then the class rhythm and the response matrix. */
   var WUXING_KEY = 'koc-wuxing-open';
+
+  var WUXING_MATRIX = [
+    { state: '認知疲勞', signal: '眼神呆滯、停留過長', mix: ['fire', 'wood'] },
+    { state: '挫折過載', signal: '集體掉入陷阱', mix: ['water', 'wood'] },
+    { state: '紀律渙散', signal: '答題快但錯誤率高', mix: ['earth', 'gold'] },
+    { state: '基礎不牢', signal: '答案對但步驟缺失', mix: ['gold', 'earth'] }
+  ];
+
+  function wxDots(ids) {
+    return ids.map(function (id) {
+      return '<span class="wx-dot" style="--wx:' + ELEMENTS[id].accent + '" title="' + esc(ELEMENTS[id].label) + '">' + esc(ELEMENTS[id].zh) + '</span>';
+    }).join('<span class="wx-plus">+</span>');
+  }
 
   function wuxingOpen() {
     try { return localStorage.getItem(WUXING_KEY) !== 'no'; } catch (e) { return true; }
@@ -852,17 +865,21 @@ window.KOC = (function () {
           '<div class="wx-role">' + esc(e.role) + '</div></div>' +
         '</div>' +
         '<p class="wx-desc">' + esc(e.desc) + '</p>' +
-        '<dl class="wx-list">' +
-          '<dt>功能</dt><dd>' + esc(e.use) + '</dd>' +
-          '<dt>戰術武器</dt><dd>' + esc(e.weapons) + '</dd>' +
-          '<dt>何時用</dt><dd>' + esc(e.when) + '</dd>' +
-          '<dt>平衡提醒</dt><dd>' + esc(e.caution) + '</dd>' +
-          '<dt>本館作品</dt><dd>' + esc(e.gallery) + '</dd>' +
-        '</dl>' +
-        '<div class="wx-actions">' +
-          '<button type="button" class="chip" data-element-jump="' + id + '">' + plural(n, 'work') + ' →</button>' +
-        '</div>' +
+        '<div class="wx-label">功能</div>' +
+        '<div class="wx-uses">' + e.use.split('、').map(function (u) { return '<span>' + esc(u) + '</span>'; }).join('') + '</div>' +
+        '<div class="wx-label">戰術武器</div>' +
+        '<ul class="wx-weapons">' + e.weapons.split(/\s*·\s*/).map(function (wp) {
+          var m = /^(.*?)（(.*)）$/.exec(wp);
+          return '<li>' + (m ? '<b>' + esc(m[1]) + '</b> ' + esc(m[2]) : esc(wp)) + '</li>';
+        }).join('') + '</ul>' +
+        '<div class="wx-balance" title="' + esc(e.caution) + '">' + esc(e.balance) + '</div>' +
+        '<button type="button" class="chip wx-jump" data-element-jump="' + id + '" title="本館作品：' + esc(e.gallery) + '">' + plural(n, 'work') + ' →</button>' +
       '</article>';
+    }).join('');
+
+    var matrix = WUXING_MATRIX.map(function (m) {
+      return '<div class="wx-cell"><b>' + esc(m.state) + '</b><span>' + esc(m.signal) + '</span>' +
+        '<div class="wx-mix">' + wxDots(m.mix) + '</div></div>';
     }).join('');
 
     return '<section class="wuxing' + (open ? '' : ' closed') + '">' +
@@ -874,12 +891,23 @@ window.KOC = (function () {
       '</div>' +
       (open
         ? '<div class="wuxing-body">' +
-            '<a class="wuxing-figure" href="assets/wuxing/wuxing-summary.svg" target="_blank" rel="noopener" title="Open full size">' +
-              '<img src="assets/wuxing/wuxing-summary.svg" alt="五行戰術模組總結：金、木、水、火、土五種教學能量的角色、功能、戰術武器與平衡提醒，以及先嚴後寬的課堂節奏和動態應變矩陣">' +
-            '</a>' +
             '<div class="wx-grid">' + cards + '</div>' +
-            '<p class="wuxing-foot">五行不與 TLA 階段固定綁定，導師應按 AI 儀表板提示的學生即時狀態動態切換。' +
-              '正向增益：微小勝利用火大聲宣告、用土固化為 SOP；錯誤的高級化先用水承接挫折，再用木提煉錯誤中的邏輯。</p>' +
+            '<div class="wx-flow">' +
+              '<div class="wx-panel wx-rhythm">' +
+                '<div class="wx-panel-title">先嚴後寬 <span>課堂節奏</span></div>' +
+                '<div class="wx-steps">' +
+                  '<div class="wx-step">' + wxDots(['earth', 'gold']) + '<div><b>開課初期</b><span>鎮場 · 立規矩</span></div></div>' +
+                  '<span class="wx-arrow">→</span>' +
+                  '<div class="wx-step">' + wxDots(['fire', 'water']) + '<div><b>中後段</b><span>激活 · 承接</span></div></div>' +
+                '</div>' +
+              '</div>' +
+              '<div class="wx-panel">' +
+                '<div class="wx-panel-title">動態應變矩陣 <span>看見訊號，切換組合</span></div>' +
+                '<div class="wx-matrix">' + matrix + '</div>' +
+              '</div>' +
+            '</div>' +
+            '<p class="wuxing-foot">五行不與 TLA 階段固定綁定，按學生即時狀態動態切換。' +
+              '微小勝利用火大聲宣告、用土固化為 SOP；犯錯時先用水承接挫折，再用木提煉錯誤中的邏輯。</p>' +
           '</div>'
         : '') +
     '</section>';
