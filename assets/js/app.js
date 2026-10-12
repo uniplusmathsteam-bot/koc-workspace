@@ -28,14 +28,62 @@ window.KOC = (function () {
     link:        { label: 'Link',        icon: '🔗' }
   };
 
-  /* 五行 X-axis style modules from 三維動態教學系統 V12. A work lists the
-     element(s) it trains in its `elements` field. */
+  /* 五行 X-axis style modules from 三維動態教學系統 V12, worded as in the
+     五行教學資料庫. A work lists the element(s) it trains in its `elements`
+     field. `bank` is the element's id in the databank, which says metal. */
+  var DATABANK_URL = 'https://uniplusmathsteam-bot.github.io/wuxing-teaching-databank/';
+
   var ELEMENTS = {
-    gold:  { zh: '金', label: 'Gold',  role: '架構師 / 裁判',   use: '建立標準、拆解難題、除錯' },
-    wood:  { zh: '木', label: 'Wood',  role: '園丁 / 導航員',   use: '構建知識體系、激發聯想、舉一反三' },
-    water: { zh: '水', label: 'Water', role: '說書人 / 治療師', use: '處理情緒、建立共情、價值重塑' },
-    fire:  { zh: '火', label: 'Fire',  role: '表演者 / 啦啦隊', use: '搶奪注意力、點燃動機、打破沉悶' },
-    earth: { zh: '土', label: 'Earth', role: '建築師 / 守護者', use: '鞏固基礎、建立習慣、提供安全感' }
+    gold: {
+      zh: '金', label: 'Gold', bank: 'metal', accent: '#d4a94e',
+      role: '架構師 / 裁判',
+      use: '建立標準、拆解難題、除錯',
+      desc: '把複雜任務整理成學生可以跟隨的路徑，並像裁判一樣指出答案與過程是否符合標準。',
+      weapons: 'SOP 手術刀（切分 Step 1, 2, 3）· 陷阱雷達（指出 Past Paper 扣分位）',
+      when: '答案對但步驟缺失、跳步時（金 + 土）',
+      caution: '全堂使用會太高壓，需搭配火／水調節。',
+      gallery: '步驟框架、規則頁、附評分要點的長題目、有檢查點的實驗程序'
+    },
+    wood: {
+      zh: '木', label: 'Wood', bank: 'wood', accent: '#66a86f',
+      role: '園丁 / 導航員',
+      use: '構建知識體系、激發聯想、舉一反三',
+      desc: '讓一個核心概念長出分支，幫助學生看見新知識與既有經驗之間的路線。',
+      weapons: '思維導圖（畫出知識樹）· 鷹架 Scaffolding（填空式筆記）',
+      when: '眼神呆滯、缺乏關聯感，或全班掉入同一陷阱後重建概念時（火 + 木、水 + 木）',
+      caution: '發散過度會離題，需用金來修剪。',
+      gallery: '概念頁、筆記、可操作的模型與探究實驗'
+    },
+    water: {
+      zh: '水', label: 'Water', bank: 'water', accent: '#559fcb',
+      role: '說書人 / 治療師',
+      use: '處理情緒、建立共情、價值重塑',
+      desc: '以情境和軼事把抽象知識變得可感受；先承接學生的挫敗，再引導其返回問題。',
+      weapons: '故事掛鉤（用軼事軟化枯燥知識）· 情緒緩衝墊（先承接挫敗感）',
+      when: '集體掉入陷阱、錯誤率飆升、挫折感過載時（水 + 木）',
+      caution: '太溫柔會導致散漫，需用土來立規矩。',
+      gallery: '漫畫、故事、講解腳本'
+    },
+    fire: {
+      zh: '火', label: 'Fire', bank: 'fire', accent: '#eb6a45',
+      role: '表演者 / 啦啦隊',
+      use: '搶奪注意力、點燃動機、打破沉悶',
+      desc: '以節奏和視覺刺激重新聚焦全班，並把學生的微小勝利放大，形成正向增益。',
+      weapons: '高頻互動（快問快答、Kahoot!）· 視覺衝擊（誇張語調、震撼演示）',
+      when: '眼神呆滯、停留過長、認知疲勞時（火 + 木）',
+      caution: '過度亢奮會只玩不學，需接土來靜心。',
+      gallery: '遊戲、射擊、競賽與限時挑戰'
+    },
+    earth: {
+      zh: '土', label: 'Earth', bank: 'earth', accent: '#ad8151',
+      role: '建築師 / 守護者',
+      use: '鞏固基礎、建立習慣、提供安全感',
+      desc: '以穩固步驟建立可持續的學習結構，用清晰界線和可預測節奏維持課堂秩序。',
+      weapons: '刻意練習（同類題型反覆操練）· 錯題本（踏實積累）',
+      when: '答題過快但錯誤率高、氣氛浮躁時（土 + 金）',
+      caution: '太沉悶會厭學，需插播木／火來鬆土。',
+      gallery: '閃卡、MC 操練題組、同類題反覆練習'
+    }
   };
   var ELEMENT_ORDER = ['gold', 'wood', 'water', 'fire', 'earth'];
 
@@ -763,13 +811,111 @@ window.KOC = (function () {
         '<span>' + plural(all.total, 'submission') + '</span>',
         '<span>Updated ' + prettyDate(latestDate()) + '</span>'
       ]) +
+      wuxingSection() +
       kocChart() +
       '<div class="toolbar"><span class="section-label" style="margin:0">KOCs</span></div>' +
       '<div class="grid">' + cards + '</div>' +
-      '<div class="section-label">Submissions</div>' +
+      '<div class="section-label" id="submissions">Submissions</div>' +
       rangeBar(allWorks()) +
       submissionGrid(allWorks(), true) +
       (missingFiles.length ? warnBox() : '');
+  }
+
+  /* 五行 summary: the databank's overview infographic plus one card per
+     element, each linking to its works below and its databank page. */
+  var WUXING_KEY = 'koc-wuxing-open';
+
+  function wuxingOpen() {
+    try { return localStorage.getItem(WUXING_KEY) !== 'no'; } catch (e) { return true; }
+  }
+
+  function toggleWuxing() {
+    try { localStorage.setItem(WUXING_KEY, wuxingOpen() ? 'no' : 'yes'); } catch (e) { /* ignore */ }
+    render();
+  }
+
+  function jumpToElement(id) {
+    setElement(id);
+    var target = el('submissions');
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // 動態應變矩陣: what the KOC sees in class -> which pair of elements to switch to.
+  var WUXING_MATRIX = [
+    { sign: '眼神呆滯、停留時間過長', diag: '認知疲勞', mix: ['fire', 'wood'] },
+    { sign: '集體掉入陷阱、錯誤率飆升', diag: '挫折感過載', mix: ['water', 'wood'] },
+    { sign: '答題過快但錯誤率高、氣氛浮躁', diag: '紀律渙散', mix: ['earth', 'gold'] },
+    { sign: '答案對但步驟缺失', diag: '基礎不牢', mix: ['gold', 'earth'] }
+  ];
+
+  function wuxingMatrix() {
+    var rows = WUXING_MATRIX.map(function (r) {
+      return '<li><div class="wx-sign">' + esc(r.sign) + '<span>' + esc(r.diag) + '</span></div>' +
+        '<div class="wx-mix">' + r.mix.map(function (id) {
+          return '<span class="tag el-' + id + '">' + esc(ELEMENTS[id].zh) + '</span>';
+        }).join('<i>+</i>') + '</div></li>';
+    }).join('');
+    return '<div class="wuxing-matrix">' +
+      '<h3>動態應變矩陣</h3>' +
+      '<p class="hint">按學生即時狀態切換，不與 TLA 階段死板綁定。</p>' +
+      '<ul>' + rows + '</ul>' +
+      '<h3>先嚴後寬</h3>' +
+      '<p class="hint">開課初期先用 土／金 鎮場，建立規矩；後期再引入 火／水。</p>' +
+      '<h3>相生 · 相剋</h3>' +
+      '<p class="hint">相生：木 → 火 → 土 → 金 → 水 → 木<br>相剋：木 → 土 → 水 → 火 → 金 → 木</p>' +
+    '</div>';
+  }
+
+  function wuxingSection() {
+    var open = wuxingOpen();
+    var works = allWorks();
+
+    var cards = ELEMENT_ORDER.map(function (id) {
+      var e = ELEMENTS[id];
+      var n = works.filter(function (w) { return hasElement(w, id); }).length;
+      return '<article class="wx-card" style="--wx:' + e.accent + '">' +
+        '<div class="wx-top">' +
+          '<span class="wx-glyph">' + esc(e.zh) + '</span>' +
+          '<div><div class="wx-name">' + esc(e.zh + ' ' + e.label) + '</div>' +
+          '<div class="wx-role">' + esc(e.role) + '</div></div>' +
+        '</div>' +
+        '<p class="wx-desc">' + esc(e.desc) + '</p>' +
+        '<dl class="wx-list">' +
+          '<dt>功能</dt><dd>' + esc(e.use) + '</dd>' +
+          '<dt>戰術武器</dt><dd>' + esc(e.weapons) + '</dd>' +
+          '<dt>何時用</dt><dd>' + esc(e.when) + '</dd>' +
+          '<dt>平衡提醒</dt><dd>' + esc(e.caution) + '</dd>' +
+          '<dt>本館作品</dt><dd>' + esc(e.gallery) + '</dd>' +
+        '</dl>' +
+        '<div class="wx-actions">' +
+          '<button type="button" class="chip" data-element-jump="' + id + '">' + plural(n, 'work') + ' →</button>' +
+          '<a class="wx-link" href="' + DATABANK_URL + '#/' + e.bank + '" target="_blank" rel="noopener">資料庫 ↗</a>' +
+        '</div>' +
+      '</article>';
+    }).join('');
+
+    return '<section class="wuxing' + (open ? '' : ' closed') + '">' +
+      '<div class="wuxing-head">' +
+        '<h2>五行 Teaching Elements</h2>' +
+        '<span class="hint">X 軸 · 用什麼方式互動 — Uni+ 2.0 三維動態教學系統 V12</span>' +
+        '<span class="spacer"></span>' +
+        '<a class="btn" href="' + DATABANK_URL + '" target="_blank" rel="noopener">五行教學資料庫 ↗</a>' +
+        '<button type="button" class="btn" data-wuxing-toggle aria-expanded="' + open + '">' + (open ? 'Hide' : 'Show') + '</button>' +
+      '</div>' +
+      (open
+        ? '<div class="wuxing-body">' +
+            '<div class="wuxing-intro">' +
+              '<a class="wuxing-figure" href="assets/wuxing/wuxing-overview.svg" target="_blank" rel="noopener" title="Open full size">' +
+                '<img src="assets/wuxing/wuxing-overview.svg" alt="五行總覽：金、木、水、火、土五個教學戰術模組的角色、功能與戰術武器，以及相生與相剋的關係">' +
+              '</a>' +
+              wuxingMatrix() +
+            '</div>' +
+            '<div class="wx-grid">' + cards + '</div>' +
+            '<p class="wuxing-foot">五行不與 TLA 階段固定綁定，導師應按 AI 儀表板提示的學生即時狀態動態切換。' +
+              '正向增益：微小勝利用火大聲宣告、用土固化為 SOP；錯誤的高級化先用水承接挫折，再用木提煉錯誤中的邏輯。</p>' +
+          '</div>'
+        : '') +
+    '</section>';
   }
 
   function latestDate() {
@@ -1045,7 +1191,10 @@ window.KOC = (function () {
           var e = ELEMENTS[id];
           return '<div class="element-row"><span class="tag el-' + id + '">' + esc(e.zh + ' ' + e.label) + '</span>' +
             '<span class="element-role">' + esc(e.role) + '</span>' +
-            '<div class="side-hint">' + esc(e.use) + '</div></div>';
+            '<div class="element-use">' + esc(e.use) + '</div>' +
+            '<div class="side-hint">戰術武器：' + esc(e.weapons) + '</div>' +
+            '<div class="side-hint">平衡提醒：' + esc(e.caution) + '</div>' +
+            '<a class="wx-link" href="' + DATABANK_URL + '#/' + e.bank + '" target="_blank" rel="noopener">在五行教學資料庫查看 ↗</a></div>';
         }).join('')
       : '<div class="side-hint">Not tagged yet. Add <code>elements</code> to this card in <code>works.js</code>.</div>';
 
@@ -1144,6 +1293,11 @@ window.KOC = (function () {
 
       var elementBtn = e.target.closest('[data-element]');
       if (elementBtn) { setElement(elementBtn.getAttribute('data-element')); return; }
+
+      var jump = e.target.closest('[data-element-jump]');
+      if (jump) { jumpToElement(jump.getAttribute('data-element-jump')); return; }
+
+      if (e.target.closest('[data-wuxing-toggle]')) { toggleWuxing(); return; }
 
       var card = e.target.closest('[data-hash]');
       if (card) { go(card.getAttribute('data-hash')); return; }

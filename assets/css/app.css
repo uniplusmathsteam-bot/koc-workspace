@@ -746,9 +746,126 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .status-opt.rev { color: var(--red-fg); }
 .status-opt.pend { color: var(--amber-fg); }
 
-.element-row { margin-bottom: 10px; }
+.element-row { margin-bottom: 14px; }
 .element-row .element-role { margin-left: 8px; font-size: 13px; color: var(--text-soft); }
+.element-row .element-use { margin-top: 6px; font-size: 13px; }
 .element-row .side-hint { margin-top: 3px; }
+.element-row .wx-link { display: inline-block; margin-top: 6px; }
+
+/* ---------- 五行 teaching elements ---------- */
+
+.wuxing {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  margin: 0 0 28px;
+  overflow: hidden;
+}
+.wuxing-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 14px 18px;
+}
+.wuxing:not(.closed) .wuxing-head { border-bottom: 1px solid var(--line); }
+.wuxing-head h2 { margin: 0; font-size: 16px; font-weight: 600; }
+.wuxing-head .hint { font-size: 12.5px; color: var(--text-faint); }
+.wuxing-head .spacer { flex: 1; }
+
+.wuxing-body { padding: 18px; }
+.wuxing-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1.75fr) minmax(250px, 1fr);
+  gap: 18px;
+  align-items: start;
+  margin-bottom: 18px;
+}
+.wuxing-figure {
+  display: block;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #121110;
+}
+.wuxing-figure img { display: block; width: 100%; height: auto; }
+
+.wuxing-matrix h3 { margin: 0 0 2px; font-size: 13.5px; font-weight: 600; }
+.wuxing-matrix h3 + .hint { margin-top: 0; }
+.wuxing-matrix .hint { margin: 0 0 12px; font-size: 12.5px; color: var(--text-faint); line-height: 1.55; }
+.wuxing-matrix ul { list-style: none; margin: 0 0 16px; padding: 0; }
+.wuxing-matrix li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 0;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+}
+.wuxing-matrix li:last-child { border-bottom: 1px solid var(--line); }
+.wx-sign span { display: block; font-size: 11.5px; color: var(--text-faint); }
+.wx-mix { flex: none; display: flex; align-items: center; gap: 4px; }
+.wx-mix i { font-style: normal; color: var(--text-faint); font-size: 12px; }
+
+.wx-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+.wx-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--wx);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+.wx-top { display: flex; align-items: center; gap: 10px; }
+.wx-glyph {
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font: 600 22px/1 Georgia, "Noto Serif TC", "Microsoft JhengHei", serif;
+  color: var(--wx);
+  border: 1.5px solid var(--wx);
+  background: color-mix(in srgb, var(--wx) 12%, transparent);
+}
+.wx-name { font-weight: 600; font-size: 15px; }
+.wx-role { font-size: 12.5px; color: var(--text-soft); }
+.wx-desc { margin: 0; font-size: 13px; line-height: 1.55; }
+.wx-list { margin: 0; font-size: 12.5px; line-height: 1.5; }
+.wx-list dt {
+  margin-top: 7px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  color: var(--wx);
+}
+.wx-list dd { margin: 1px 0 0; color: var(--text-soft); }
+.wx-actions {
+  margin-top: auto;
+  padding-top: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.wx-link { font-size: 12.5px; color: var(--text-soft); text-decoration: none; }
+.wx-link:hover { color: var(--text); text-decoration: underline; }
+.wuxing-foot { margin: 16px 0 0; font-size: 12.5px; color: var(--text-faint); }
+
+@media (max-width: 1100px) {
+  .wx-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+}
+@media (max-width: 860px) {
+  .wuxing-intro { grid-template-columns: 1fr; }
+}
 
 .overlay-side textarea {
   width: 100%;
