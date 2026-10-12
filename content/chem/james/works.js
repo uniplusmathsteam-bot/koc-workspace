@@ -42,11 +42,11 @@ KOC.works('chem', 'james', [
     type: 'interactive',
     subject: 'Chem',
     chapter: 'S3 Ocean Earth3 Earth3A Physical separation',
-    submitted: '2026-10-04',
+    submitted: '2026-10-12',
     tags: ['Interactive', 'S3', 'Physical separation'],
     elements: ['gold'],
-    src: 'content/chem/james/physical-separation/Earth3A_Physical%20separation_(ex).html?v=20261004b',
-    notes: 'Join the quick-fit fractional distillation apparatus, then check the set-up. Obtain pure water from sea water.'
+    src: 'content/chem/james/physical-separation/Earth3A_Physical%20separation_(ex).html?v=20261012c',
+    notes: 'Build fractional distillation, filtration, or evaporation in 3D or 2D, then check the set-up.'
   },
   {
     id: 'earth3a-crystallisation',
