@@ -14,6 +14,19 @@ KOC.works('maths', 'tracy', [
     notes: 'Law of Indices rules page.'
   },
   {
+    id: 'jm24-law-of-indices-games',
+    title: 'JM24 · Games',
+    type: 'interactive',
+    chapter: 'S3 JM24',
+    submitted: '2026-10-14',
+    status: 'pending',
+    tags: ['Interactive', 'Indices', 'Game', 'S3'],
+    elements: ['fire'],
+    cover: 'content/maths/tracy/s3-cover.svg',
+    src: 'https://unikoc5.github.io/s3-maths/topics/law_of_indices/index.html#games',
+    notes: 'Index cards, Magnitude Express, and Signal Room.'
+  },
+  {
     id: 'jm28-triangle-centres-special-lines',
     title: 'JM28 · Special Lines',
     type: 'interactive',
@@ -44,7 +57,7 @@ KOC.works('maths', 'tracy', [
     title: 'JM29 · Quadrilaterals Games',
     type: 'interactive',
     chapter: 'S3 JM29',
-    submitted: '2026-09-29',
+    submitted: '2026-10-14',
     status: 'pending',
     tags: ['Interactive', 'Quadrilaterals', 'Game', 'S3'],
     elements: ['fire'],
