@@ -110,11 +110,11 @@ KOC.works('maths', 'eric', [
     type: 'interactive',
     chapter: 'S3 JM31',
     submitted: '2026-08-28',
-    status: 'pending',
+    status: 'ready',
     tags: ['Interactive', 'Statistics', 'S3'],
     elements: ['wood'],
     cover: 'content/maths/eric/covers/jm31.svg',
     src: 'content/maths/eric/jm31-central-tendency/index.html?jmTools=1',
-    notes: 'Build a data set and watch mean, median and mode update. Drag to add an outlier.'
+    notes: 'Number-line balance for mean, missions, weighted-share bar, and shift/stretch twin lines.'
   }
 ]);

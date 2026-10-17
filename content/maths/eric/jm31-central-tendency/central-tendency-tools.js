@@ -8,15 +8,69 @@
   var MODE = "#f472b6";
   var MUTED = "#64748b";
   var INPUT_MIN = 0;
-  var INPUT_MAX = 999;
+  var INPUT_MAX = 20; /* keep the playground readable on one line */
   var BAR_MAX_H = 100;
   var DEFAULT_DATA = [0, 1, 3, 4, 5, 7, 7, 8, 10];
+  var LINE_LO = 0;
+  var LINE_HI = 12;
 
   var LABS = [
     { id: "averages", label: "Mean · Median · Mode" },
-    { id: "transform", label: "+ / × constant" },
+    { id: "transform", label: "Shift & stretch" },
   ];
 
+  var MISSIONS = {
+    sandbox: {
+      title: "Sandbox",
+      goal: "Freestyle — drop and drag dots. Watch the triangle (mean) slide as you move mass.",
+      start: function () { avgData = DEFAULT_DATA.slice(); },
+      check: function () { return null; },
+    },
+    mean6: {
+      title: "Mission: mean = 6",
+      goal: "Arrange any data so the mean is exactly 6 (median can be anything).",
+      start: function () { avgData = [4, 5, 8]; },
+      check: function () {
+        var m = mean(avgData);
+        if (m == null) return false;
+        return Math.abs(m - 6) < 0.051;
+      },
+    },
+    split: {
+      title: "Mission: split the averages",
+      goal: "Make |mean − median| ≥ 2 so students see how an extreme value pulls the mean.",
+      start: function () { avgData = [3, 4, 5, 5, 6]; },
+      check: function () {
+        if (avgData.length < 3) return false;
+        return Math.abs(mean(avgData) - median(avgData)) >= 2;
+      },
+    },
+    mode3: {
+      title: "Mission: mode = 3",
+      goal: "Make 3 the unique mode (it must appear more often than every other value).",
+      start: function () { avgData = [1, 2, 4, 5]; },
+      check: function () {
+        var mo = modeValue(avgData);
+        return mo === 3;
+      },
+    },
+    outlier: {
+      title: "Mission: survive an outlier",
+      goal: "Keep the median at 5 while the mean is at least 8 — one large value is enough.",
+      start: function () { avgData = [3, 4, 5, 6, 7]; },
+      check: function () {
+        if (avgData.length < 3) return false;
+        return Math.abs(median(avgData) - 5) < 0.051 && mean(avgData) >= 8;
+      },
+    },
+  };
+
+  var activeMission = "sandbox";
+  var dragState = null;
+  var suppressClick = false;
+  var numlineBound = null;
+
+  var WEIGHT_COLORS = ["#38bdf8", "#a78bfa", "#34d399", "#fb7185"];
   var WEIGHT_ROWS = [
     { label: "Song", mark: 59, weight: 45 },
     { label: "Scale", mark: 47, weight: 25 },
@@ -153,37 +207,66 @@
   }
 
 
+  function lineRange(data) {
+    var hi = LINE_HI;
+    var lo = LINE_LO;
+    if (data.length) {
+      hi = Math.max(LINE_HI, Math.max.apply(null, data) + 1);
+      lo = Math.min(LINE_LO, Math.min.apply(null, data));
+    }
+    return { lo: lo, hi: hi };
+  }
+
+  /** Triangle tip sits on the number line (no extra beam). */
+  function drawFulcrum(svg, mx, yLine, label) {
+    var tipY = yLine; /* tip shares the axis y — visually kisses the stroke */
+    var baseY = yLine + 18;
+    svg.appendChild(E("polygon", {
+      points: (mx - 10) + "," + baseY + " " + (mx + 10) + "," + baseY + " " + mx + "," + tipY,
+      fill: "#f59e0b", stroke: "#d97706", "stroke-width": 1,
+    }));
+    if (label) {
+      var t = E("text", {
+        x: mx, y: baseY + 14, fill: "#b45309", "font-size": 10, "font-weight": 800, "text-anchor": "middle",
+      });
+      t.textContent = label;
+      svg.appendChild(t);
+    }
+  }
+
   function drawNumline(svgId, data, opts) {
     opts = opts || {};
     var svg = document.getElementById(svgId);
     if (!svg) return;
     while (svg.firstChild) svg.removeChild(svg.firstChild);
-    if (!data.length) {
-      var empty = E("text", {
-        x: 320, y: 55, fill: MUTED, "font-size": 14, "text-anchor": "middle",
-      });
-      empty.textContent = "Add data to see the number line";
-      svg.appendChild(empty);
-      return;
-    }
 
-    var dataMax = Math.max.apply(null, data);
-    var dataMin = Math.min.apply(null, data);
-    var lo = Math.min(0, dataMin);
-    var hi = dataMax;
-    if (lo < 0) lo -= Math.max(2, Math.abs(lo) * 0.05);
+    var range = lineRange(data);
+    var lo = range.lo;
+    var hi = range.hi;
     var x0 = 36;
-    var x1 = 604;
-    var yAxis = 72;
+    var x1 = 684;
+    var yAxis = 98;
 
     function xScale(v) {
       if (hi === lo) return (x0 + x1) / 2;
       return x0 + ((v - lo) / (hi - lo)) * (x1 - x0);
     }
+    function xToValue(px) {
+      if (hi === lo) return lo;
+      var t = (px - x0) / (x1 - x0);
+      return lo + t * (hi - lo);
+    }
+
+    numlineBound = { svg: svg, x0: x0, x1: x1, lo: lo, hi: hi, xScale: xScale, xToValue: xToValue };
+
+    svg.appendChild(E("rect", {
+      x: x0 - 8, y: yAxis - 40, width: (x1 - x0) + 16, height: 72,
+      fill: "transparent", class: "track-hit",
+    }));
 
     svg.appendChild(E("line", {
       x1: x0, y1: yAxis, x2: x1, y2: yAxis,
-      stroke: "#334155", "stroke-width": 2,
+      stroke: "#334155", "stroke-width": 2.5,
     }));
 
     var ticks = {};
@@ -191,18 +274,16 @@
     var t0 = Math.ceil(lo / tickStep) * tickStep;
     for (var t = t0; t <= hi + 0.001; t += tickStep) ticks[fmt(t)] = t;
     ticks["0"] = 0;
-    ticks[String(dataMax)] = dataMax;
-
     Object.keys(ticks).map(function (k) { return ticks[k]; }).sort(function (a, b) { return a - b; })
       .forEach(function (tv) {
         var tx = xScale(tv);
         svg.appendChild(E("line", {
-          x1: tx, y1: yAxis - 4, x2: tx, y2: yAxis + 4,
+          x1: tx, y1: yAxis - 5, x2: tx, y2: yAxis + 5,
           stroke: tv === 0 ? "#94a3b8" : "#475569",
           "stroke-width": tv === 0 ? 1.5 : 1,
         }));
         var lbl = E("text", {
-          x: tx, y: yAxis + 16, fill: tv === 0 ? INK : MUTED,
+          x: tx, y: yAxis + 18, fill: tv === 0 ? "#0f172a" : MUTED,
           "font-size": tv === 0 ? 11 : 10, "font-weight": tv === 0 ? 700 : 400,
           "text-anchor": "middle",
         });
@@ -210,31 +291,44 @@
         svg.appendChild(lbl);
       });
 
-    var groups = {};
-    data.forEach(function (v) {
+    var m = data.length ? mean(data) : null;
+    var mx = m != null ? xScale(m) : (x0 + x1) / 2;
+
+    if (!data.length) {
+      var empty = E("text", {
+        x: 360, y: 48, fill: MUTED, "font-size": 14, "text-anchor": "middle",
+      });
+      empty.textContent = "Click the line to drop your first value";
+      svg.appendChild(empty);
+      drawFulcrum(svg, mx, yAxis, null);
+      return;
+    }
+
+    var stack = {};
+    data.forEach(function (v, idx) {
       var key = String(v);
-      groups[key] = (groups[key] || 0) + 1;
+      if (!stack[key]) stack[key] = [];
+      stack[key].push(idx);
     });
 
-    Object.keys(groups).forEach(function (key) {
+    Object.keys(stack).forEach(function (key) {
       var v = +key;
-      var count = groups[key];
+      var idxs = stack[key];
       var cx = xScale(v);
-      for (var i = 0; i < count; i++) {
-        var cy = yAxis - 14 - i * 11;
-        svg.appendChild(E("circle", {
-          cx: cx, cy: cy, r: 5,
-          fill: opts.outlier && v >= 50 ? "#f87171" : "#38bdf8",
-          stroke: "#0ea5e9", "stroke-width": 1.2,
-        }));
-      }
+      idxs.forEach(function (dataIdx, i) {
+        var cy = yAxis - 16 - i * 12;
+        var c = E("circle", {
+          cx: cx, cy: cy, r: 7,
+          fill: "#38bdf8", stroke: "#0284c7", "stroke-width": 1.4,
+          class: "dot-hit",
+          "data-index": String(dataIdx),
+        });
+        svg.appendChild(c);
+      });
     });
 
-    var m = mean(data);
     var med = median(data);
     var mod = modeValue(data);
-
-    var mx = xScale(m);
     var mdx = xScale(med);
     var meanDx = 0;
     var medDx = 0;
@@ -243,8 +337,8 @@
       medDx = 16;
     }
 
-    drawMarker(svg, mx, MEAN, "mean", meanDx);
-    drawMarker(svg, mdx, MEDIAN, "median", medDx);
+    drawMarker(svg, mx, MEAN, "mean", meanDx, 18, yAxis);
+    drawMarker(svg, mdx, MEDIAN, "median", medDx, 18, yAxis);
     if (mod != null) {
       var modX = Array.isArray(mod)
         ? xScale(mod.reduce(function (a, b) { return a + b; }, 0) / mod.length)
@@ -252,21 +346,209 @@
       var modDx = 0;
       if (Math.abs(modX - mx) < 24) modDx = 22;
       else if (Math.abs(modX - mdx) < 24) modDx = -22;
-      drawMarker(svg, modX, MODE, "mode", modDx);
+      drawMarker(svg, modX, MODE, "mode", modDx, 18, yAxis);
     }
+
+    drawFulcrum(svg, mx, yAxis, "mean " + fmt(m));
   }
 
-  function drawMarker(svg, x, col, label, labelDx) {
-    labelDx = labelDx || 0;
+  /** Twin number lines for outlier story (before | after) */
+  function drawOutlierStory() {
+    var svg = document.getElementById("outlier-viz");
+    if (!svg) return;
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var before = [2, 4, 6, 8];
+    var after = [2, 4, 6, 8, 20];
+    drawMiniBalance(svg, before, 16, 348, "before");
+    drawMiniBalance(svg, after, 372, 704, "after");
     svg.appendChild(E("line", {
-      x1: x, y1: 22, x2: x, y2: 58,
+      x1: 360, y1: 14, x2: 360, y2: 136, stroke: "#cbd5e1", "stroke-width": 1, "stroke-dasharray": "4 3",
+    }));
+  }
+
+  function drawMiniBalance(svg, data, xL, xR, tag) {
+    var lo = 0;
+    var hi = 20;
+    var yAxis = 78;
+    function xs(v) { return xL + 14 + ((v - lo) / (hi - lo)) * ((xR - xL) - 28); }
+    var m = mean(data);
+    var med = median(data);
+    var mx = xs(m);
+    var title = E("text", {
+      x: (xL + xR) / 2, y: 14, fill: "#475569", "font-size": 11, "font-weight": 800, "text-anchor": "middle",
+    });
+    title.textContent = tag === "after" ? "After +20" : "Before";
+    svg.appendChild(title);
+    [0, 5, 10, 15, 20].forEach(function (tv) {
+      var tx = xs(tv);
+      svg.appendChild(E("line", { x1: tx, y1: yAxis - 4, x2: tx, y2: yAxis + 4, stroke: "#94a3b8", "stroke-width": 1 }));
+      var tl = E("text", { x: tx, y: yAxis + 16, fill: MUTED, "font-size": 8, "text-anchor": "middle" });
+      tl.textContent = String(tv);
+      svg.appendChild(tl);
+    });
+    svg.appendChild(E("line", {
+      x1: xL + 8, y1: yAxis, x2: xR - 8, y2: yAxis,
+      stroke: "#334155", "stroke-width": 2,
+    }));
+    data.forEach(function (v, i) {
+      var cx = xs(v);
+      var order = data.slice(0, i).filter(function (x) { return x === v; }).length;
+      var cy = yAxis - 14 - order * 11;
+      var isOut = v >= 20;
+      svg.appendChild(E("circle", {
+        cx: cx, cy: cy, r: isOut ? 8 : 6,
+        fill: isOut ? "#f87171" : "#38bdf8",
+        stroke: isOut ? "#dc2626" : "#0284c7", "stroke-width": 1.2,
+      }));
+      if (isOut) {
+        var ot = E("text", {
+          x: cx, y: cy - 12, fill: "#dc2626", "font-size": 9, "font-weight": 800, "text-anchor": "middle",
+        });
+        ot.textContent = "20";
+        svg.appendChild(ot);
+      }
+    });
+    var medX = xs(med);
+    svg.appendChild(E("line", {
+      x1: medX, y1: 28, x2: medX, y2: yAxis,
+      stroke: "#34d399", "stroke-width": 1.5, "stroke-dasharray": "3 2",
+    }));
+    var medT = E("text", {
+      x: medX, y: 26, fill: "#0d9488", "font-size": 9, "font-weight": 700, "text-anchor": "middle",
+    });
+    medT.textContent = "median " + fmt(med);
+    svg.appendChild(medT);
+    drawFulcrum(svg, mx, yAxis, "mean " + fmt(m));
+  }
+
+  function drawMarker(svg, x, col, label, labelDx, topY, endY) {
+    labelDx = labelDx || 0;
+    topY = topY || 22;
+    endY = endY == null ? 98 : endY;
+    svg.appendChild(E("line", {
+      x1: x, y1: topY + 4, x2: x, y2: endY,
       stroke: col, "stroke-width": 2, "stroke-dasharray": "4 3",
     }));
     var t = E("text", {
-      x: x + labelDx, y: 14, fill: col, "font-size": 10, "font-weight": 700, "text-anchor": "middle",
+      x: x + labelDx, y: topY, fill: col, "font-size": 10, "font-weight": 700, "text-anchor": "middle",
     });
     t.textContent = label;
     svg.appendChild(t);
+  }
+
+  function clientToSvgX(svg, clientX) {
+    var pt = svg.createSVGPoint();
+    pt.x = clientX;
+    pt.y = 0;
+    var ctm = svg.getScreenCTM();
+    if (!ctm) return null;
+    return pt.matrixTransform(ctm.inverse()).x;
+  }
+
+  function bindNumlineInteractions() {
+    var svg = document.getElementById("avg-numline");
+    if (!svg || svg.dataset.bound === "1") return;
+    svg.dataset.bound = "1";
+
+    svg.addEventListener("pointerdown", function (e) {
+      if (!numlineBound) return;
+      var target = e.target;
+      if (target && target.classList && target.classList.contains("dot-hit")) {
+        var idx = +target.getAttribute("data-index");
+        if (!isFinite(idx)) return;
+        dragState = { index: idx, pointerId: e.pointerId };
+        svg.classList.add("dragging");
+        try { svg.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+        e.preventDefault();
+        return;
+      }
+    });
+
+    svg.addEventListener("pointermove", function (e) {
+      if (!dragState || e.pointerId !== dragState.pointerId || !numlineBound) return;
+      var sx = clientToSvgX(svg, e.clientX);
+      if (sx == null) return;
+      var v = clampInput(Math.round(numlineBound.xToValue(sx)));
+      if (v == null) return;
+      if (avgData[dragState.index] !== v) {
+        avgData[dragState.index] = v;
+        renderAverages();
+      }
+    });
+
+    function endDrag(e) {
+      if (!dragState || (e && e.pointerId !== dragState.pointerId)) return;
+      suppressClick = true;
+      dragState = null;
+      svg.classList.remove("dragging");
+    }
+    svg.addEventListener("pointerup", endDrag);
+    svg.addEventListener("pointercancel", endDrag);
+
+    svg.addEventListener("click", function (e) {
+      if (suppressClick) { suppressClick = false; return; }
+      if (dragState) return;
+      var target = e.target;
+      if (target && target.classList && target.classList.contains("dot-hit")) return;
+      if (!numlineBound) return;
+      var sx = clientToSvgX(svg, e.clientX);
+      if (sx == null || sx < numlineBound.x0 - 4 || sx > numlineBound.x1 + 4) return;
+      var v = clampInput(Math.round(numlineBound.xToValue(sx)));
+      if (v == null) return;
+      avgData.push(v);
+      renderAverages();
+    });
+
+    svg.addEventListener("dblclick", function (e) {
+      var target = e.target;
+      if (!target || !target.classList || !target.classList.contains("dot-hit")) return;
+      var idx = +target.getAttribute("data-index");
+      if (!isFinite(idx)) return;
+      avgData.splice(idx, 1);
+      renderAverages();
+      e.preventDefault();
+    });
+  }
+
+  function setMission(id) {
+    if (!MISSIONS[id]) id = "sandbox";
+    activeMission = id;
+    var m = MISSIONS[id];
+    m.start();
+    document.querySelectorAll("#mission-bar .chip-mission").forEach(function (b) {
+      b.classList.toggle("active", b.dataset.mission === id);
+    });
+    var hud = document.getElementById("mission-hud");
+    var title = document.getElementById("mission-title");
+    var goal = document.getElementById("mission-goal");
+    if (hud && title && goal) {
+      hud.classList.add("show");
+      hud.classList.remove("ok");
+      title.textContent = m.title;
+      goal.textContent = m.goal;
+    }
+    renderAverages();
+  }
+
+  function updateMissionHud() {
+    var m = MISSIONS[activeMission];
+    var hud = document.getElementById("mission-hud");
+    var goal = document.getElementById("mission-goal");
+    if (!m || !hud || !goal) return;
+    var ok = m.check();
+    if (ok === null) {
+      hud.classList.remove("ok");
+      goal.textContent = m.goal;
+      return;
+    }
+    if (ok) {
+      hud.classList.add("ok");
+      goal.textContent = "Cleared! " + m.goal + "  ·  Try another mission or keep playing.";
+    } else {
+      hud.classList.remove("ok");
+      goal.textContent = m.goal + "  ·  Current mean " + fmt(mean(avgData)) +
+        ", median " + fmt(median(avgData)) + ", mode " + fmtMode(modeValue(avgData)) + ".";
+    }
   }
 
   function niceStep(range) {
@@ -388,12 +670,15 @@
 
     var note = document.getElementById("avg-note");
     if (!avgData.length) {
-      note.textContent = "Mean uses every datum; median resists extreme values; mode is the most frequent value.";
-    } else if (avgData.some(function (v) { return v >= 50; }) || Math.abs(mean(avgData) - median(avgData)) > 8) {
-      note.textContent = "Skewed or outlier present — compare mean and median. Mode highlights the most repeated value.";
+      note.textContent = "Click the number line to drop dots. The triangle under the line is the mean.";
+    } else if (Math.abs(mean(avgData) - median(avgData)) >= 2) {
+      note.textContent = "Mean and median have split — an extreme value is pulling the triangle (mean) away from the middle.";
+    } else if (modeValue(avgData) != null) {
+      note.textContent = "Mode is the tallest stack. Drag dots together to build a mode, or pull one far away to tip the mean.";
     } else {
-      note.textContent = "Mean and median are often close here. Check whether any value repeats for the mode.";
+      note.textContent = "No repeated value yet — mode is undefined. Stack two identical dots to create one.";
     }
+    updateMissionHud();
   }
 
   function weightedMean(rows) {
@@ -407,22 +692,76 @@
     return { mean: sum / wsum, sum: sum, wsum: wsum };
   }
 
+  function syncLastWeight() {
+    var sum3 = weightRows[0].weight + weightRows[1].weight + weightRows[2].weight;
+    if (sum3 > 100) {
+      /* trim the row that just grew — keep first three ≤ 100 */
+      var over = sum3 - 100;
+      for (var i = 2; i >= 0 && over > 0; i--) {
+        var cut = Math.min(weightRows[i].weight, over);
+        weightRows[i].weight -= cut;
+        over -= cut;
+      }
+      sum3 = weightRows[0].weight + weightRows[1].weight + weightRows[2].weight;
+    }
+    weightRows[3].weight = Math.max(0, 100 - sum3);
+  }
+
+  function renderWeightShareBar() {
+    var bar = document.getElementById("weight-share");
+    var labs = document.getElementById("weight-share-labels");
+    if (!bar || !labs) return;
+    bar.innerHTML = "";
+    labs.innerHTML = "";
+    var total = weightRows.reduce(function (s, r) { return s + r.weight; }, 0);
+    weightRows.forEach(function (row, i) {
+      if (row.weight <= 0) return;
+      var pct = total ? (row.weight / total) * 100 : 0;
+      var col = WEIGHT_COLORS[i % WEIGHT_COLORS.length];
+      var lab = document.createElement("span");
+      lab.style.flex = "0 0 " + pct + "%";
+      lab.style.color = col;
+      lab.textContent = pct >= 8 ? row.label : "";
+      lab.title = row.label + " " + row.weight + "%";
+      labs.appendChild(lab);
+      var seg = document.createElement("div");
+      seg.className = "seg";
+      seg.style.flex = "0 0 " + pct + "%";
+      seg.style.background = col;
+      seg.title = row.label + ": mark " + row.mark + ", " + row.weight + "%";
+      if (pct >= 12) seg.textContent = String(row.mark);
+      bar.appendChild(seg);
+    });
+  }
+
   function renderWeightedMean() {
-    var table = document.getElementById("weight-table");
-    if (!table) return;
-    table.innerHTML = "";
-    var thead = document.createElement("thead");
-    thead.innerHTML = "<tr><th>Component</th><th>Mark</th><th>Weight (%)</th><th>Mark × weight</th></tr>";
-    table.appendChild(thead);
-    var tbody = document.createElement("tbody");
-    weightRows.forEach(function (row) {
-      var tr = document.createElement("tr");
-      tr.innerHTML = "<td>" + row.label + "</td><td></td><td></td><td>" + (row.mark * row.weight) + "</td>";
+    var host = document.getElementById("weight-blocks");
+    if (!host) return;
+    syncLastWeight();
+    host.innerHTML = "";
+    var maxW = Math.max.apply(null, weightRows.map(function (r) { return r.weight; }).concat([1]));
+    weightRows.forEach(function (row, idx) {
+      var wrap = document.createElement("div");
+      wrap.className = "weight-row";
+      var name = document.createElement("span");
+      name.className = "w-name";
+      name.textContent = row.label;
+      name.style.color = WEIGHT_COLORS[idx % WEIGHT_COLORS.length];
+      var barWrap = document.createElement("div");
+      barWrap.className = "w-bar-wrap";
+      barWrap.title = row.weight + "%";
+      var bar = document.createElement("div");
+      bar.className = "w-bar";
+      bar.style.width = Math.max(8, (row.weight / maxW) * 100) + "%";
+      bar.style.background = WEIGHT_COLORS[idx % WEIGHT_COLORS.length];
+      bar.textContent = row.mark + "";
+      barWrap.appendChild(bar);
       var markIn = document.createElement("input");
       markIn.type = "number";
       markIn.min = "0";
       markIn.max = "100";
       markIn.value = row.mark;
+      markIn.setAttribute("aria-label", row.label + " score");
       markIn.addEventListener("input", function () {
         row.mark = Math.max(0, Math.min(100, Math.round(+markIn.value) || 0));
         markIn.value = row.mark;
@@ -433,23 +772,84 @@
       wIn.min = "0";
       wIn.max = "100";
       wIn.value = row.weight;
-      wIn.addEventListener("input", function () {
-        row.weight = Math.max(0, Math.min(100, Math.round(+wIn.value) || 0));
-        wIn.value = row.weight;
-        renderWeightedMean();
-      });
-      tr.children[1].appendChild(markIn);
-      tr.children[2].appendChild(wIn);
-      tbody.appendChild(tr);
+      wIn.setAttribute("aria-label", row.label + " weight %");
+      if (idx === 3) {
+        wIn.readOnly = true;
+        wIn.className = "w-locked";
+        wIn.title = "100% minus the other three";
+      } else {
+        wIn.addEventListener("input", function () {
+          row.weight = Math.max(0, Math.min(100, Math.round(+wIn.value) || 0));
+          renderWeightedMean();
+        });
+      }
+      wrap.appendChild(name);
+      wrap.appendChild(barWrap);
+      wrap.appendChild(markIn);
+      wrap.appendChild(wIn);
+      host.appendChild(wrap);
     });
-    table.appendChild(tbody);
+
     var wm = weightedMean(weightRows);
-    document.getElementById("weight-mean").textContent = fmt(wm.mean);
-    document.getElementById("weight-sum").textContent = fmt(wm.sum);
-    document.getElementById("weight-wsum").textContent = fmt(wm.wsum);
-    var parts = weightRows.map(function (r) { return r.weight + "%×" + r.mark; });
-    document.getElementById("weight-formula").textContent =
-      "Weighted mean = (" + parts.join(" + ") + ") ÷ " + wm.wsum + "%";
+    var meanEl = document.getElementById("weight-mean");
+    var wsumEl = document.getElementById("weight-wsum");
+    if (meanEl) meanEl.textContent = fmt(wm.mean);
+    if (wsumEl) wsumEl.textContent = fmt(wm.wsum) + "%";
+    var note = document.getElementById("weight-formula");
+    if (note) {
+      var heaviest = weightRows.slice().sort(function (a, b) { return b.weight - a.weight; })[0];
+      note.textContent = heaviest && heaviest.weight
+        ? ("Overall score sits under the triangle. “" + heaviest.label +
+          "” currently has the largest share — change a score or weight and watch it move.")
+        : "Set the first three weights; the last fills the rest to 100%.";
+    }
+    renderWeightShareBar();
+    drawWeightBalance(wm);
+  }
+
+  /** Scores on a number line; triangle at the overall mean touches the line */
+  function drawWeightBalance(wm) {
+    var svg = document.getElementById("weight-viz");
+    if (!svg) return;
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var x0 = 36;
+    var x1 = 684;
+    var yAxis = 72;
+    var lo = 0;
+    var hi = 100;
+    function xs(v) { return x0 + ((v - lo) / (hi - lo)) * (x1 - x0); }
+
+    svg.appendChild(E("line", {
+      x1: x0, y1: yAxis, x2: x1, y2: yAxis,
+      stroke: "#334155", "stroke-width": 2.2,
+    }));
+    [0, 25, 50, 75, 100].forEach(function (tv) {
+      var tx = xs(tv);
+      svg.appendChild(E("line", { x1: tx, y1: yAxis - 5, x2: tx, y2: yAxis + 5, stroke: "#94a3b8", "stroke-width": 1 }));
+      var tl = E("text", { x: tx, y: yAxis + 18, fill: MUTED, "font-size": 10, "text-anchor": "middle" });
+      tl.textContent = String(tv);
+      svg.appendChild(tl);
+    });
+
+    weightRows.forEach(function (row, i) {
+      if (!row.weight) return;
+      var cx = xs(row.mark);
+      var r = 6 + Math.sqrt(row.weight) * 0.9;
+      var cy = yAxis - 14 - (i % 2) * 2;
+      svg.appendChild(E("circle", {
+        cx: cx, cy: cy, r: r,
+        fill: WEIGHT_COLORS[i % WEIGHT_COLORS.length], stroke: "#0f172a", "stroke-width": 1,
+      }));
+      var lab = E("text", {
+        x: cx, y: cy - r - 4, fill: WEIGHT_COLORS[i % WEIGHT_COLORS.length],
+        "font-size": 9, "font-weight": 700, "text-anchor": "middle",
+      });
+      lab.textContent = row.label;
+      svg.appendChild(lab);
+    });
+
+    var mx = wm.mean != null ? xs(wm.mean) : (x0 + x1) / 2;
+    drawFulcrum(svg, mx, yAxis, wm.mean != null ? ("overall " + fmt(wm.mean)) : null);
   }
 
   function renderScenarios() {
@@ -564,22 +964,110 @@
     });
     document.getElementById("transform-add-val").textContent =
       transformAdd >= 0 ? "+" + transformAdd : String(transformAdd);
-    document.getElementById("transform-mul-val").textContent = fmt(transformMul);
+    document.getElementById("transform-mul-val").textContent = "×" + fmt(transformMul);
 
+    var afterData = applyTransform(transformBase);
     var orig = statsObj(transformBase);
-    var transformed = statsObj(applyTransform(transformBase));
+    var transformed = statsObj(afterData);
     renderStatPills("transform-orig", orig);
     renderStatPills("transform-new", transformed);
+    drawTransformTwin(transformBase, afterData, orig, transformed);
 
     var note = document.getElementById("transform-note");
     if (transformAdd !== 0 && transformMul === 1) {
-      note.textContent = "Adding " + transformAdd + " shifts mean, median and mode each by " + transformAdd + ".";
+      note.textContent = "Everyone got a " + (transformAdd >= 0 ? "+" : "") + transformAdd +
+        " bonus — the whole cloud slid sideways. Mean, median and mode each moved by the same amount.";
     } else if (transformMul !== 1 && transformAdd === 0) {
-      note.textContent = "Multiplying by " + fmt(transformMul) + " scales mean, median and mode each by the same factor.";
+      note.textContent = "Every score was stretched by ×" + fmt(transformMul) +
+        " — gaps grew or shrank together. Mean, median and mode each scaled the same way.";
     } else if (transformAdd !== 0 || transformMul !== 1) {
-      note.textContent = "Each average follows: ×" + fmt(transformMul) + " then " + (transformAdd >= 0 ? "+" : "") + transformAdd + ".";
+      note.textContent = "First stretch (×" + fmt(transformMul) + "), then bonus (" +
+        (transformAdd >= 0 ? "+" : "") + transformAdd + "). Both number lines tell the same story.";
     } else {
-      note.textContent = "Move the sliders — +c shifts all three averages by c; ×k scales all three by k.";
+      note.textContent = "Move the sliders — watch the after-line slide or stretch. The three averages ride along with the dots.";
+    }
+  }
+
+  /** Twin number lines: before (left) vs after (right) — 具像化 shift/stretch */
+  function drawTransformTwin(before, after, so, sn) {
+    var svg = document.getElementById("transform-viz");
+    if (!svg) return;
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var all = before.concat(after);
+    if (!all.length) {
+      var empty = E("text", { x: 360, y: 72, fill: MUTED, "font-size": 14, "text-anchor": "middle" });
+      empty.textContent = "Pick a sample set above";
+      svg.appendChild(empty);
+      return;
+    }
+    var lo = Math.min.apply(null, all);
+    var hi = Math.max.apply(null, all);
+    var pad = Math.max(2, (hi - lo) * 0.12);
+    lo = Math.floor(lo - pad);
+    hi = Math.ceil(hi + pad);
+    if (hi <= lo) { lo -= 1; hi += 1; }
+
+    drawTransformHalf(svg, before, so, 16, 340, lo, hi, "Before");
+    drawTransformHalf(svg, after, sn, 380, 704, lo, hi, "After");
+    svg.appendChild(E("line", {
+      x1: 348, y1: 72, x2: 368, y2: 72,
+      stroke: "#0284c7", "stroke-width": 2.5,
+    }));
+    svg.appendChild(E("polygon", {
+      points: "368,66 380,72 368,78", fill: "#0284c7",
+    }));
+  }
+
+  function drawTransformHalf(svg, data, stats, xL, xR, lo, hi, title) {
+    var y = 78;
+    function xs(v) {
+      if (hi === lo) return (xL + xR) / 2;
+      return xL + 12 + ((v - lo) / (hi - lo)) * ((xR - xL) - 24);
+    }
+    var ttl = E("text", {
+      x: (xL + xR) / 2, y: 14, fill: "#475569", "font-size": 11, "font-weight": 800, "text-anchor": "middle",
+    });
+    ttl.textContent = title;
+    svg.appendChild(ttl);
+    svg.appendChild(E("line", {
+      x1: xL + 8, y1: y, x2: xR - 8, y2: y,
+      stroke: "#334155", "stroke-width": 2,
+    }));
+    var step = niceStep(hi - lo);
+    var t0 = Math.ceil(lo / step) * step;
+    for (var t = t0; t <= hi + 0.001; t += step) {
+      var tx = xs(t);
+      svg.appendChild(E("line", { x1: tx, y1: y - 4, x2: tx, y2: y + 4, stroke: "#94a3b8", "stroke-width": 1 }));
+      var tl = E("text", { x: tx, y: y + 16, fill: MUTED, "font-size": 8, "text-anchor": "middle" });
+      tl.textContent = fmt(t);
+      svg.appendChild(tl);
+    }
+    var stack = {};
+    data.forEach(function (v) {
+      var key = String(v);
+      if (!stack[key]) stack[key] = 0;
+      stack[key] += 1;
+      var order = stack[key] - 1;
+      var cx = xs(v);
+      var cy = y - 14 - order * 11;
+      svg.appendChild(E("circle", {
+        cx: cx, cy: cy, r: 6,
+        fill: "#38bdf8", stroke: "#0284c7", "stroke-width": 1.2,
+      }));
+    });
+    if (stats.median != null) {
+      var mdx = xs(stats.median);
+      svg.appendChild(E("line", {
+        x1: mdx, y1: 32, x2: mdx, y2: y,
+        stroke: MEDIAN, "stroke-width": 1.5, "stroke-dasharray": "3 2",
+      }));
+    }
+    if (stats.mean != null) {
+      var mx = xs(stats.mean);
+      var mt = E("text", { x: mx, y: 26, fill: "#b45309", "font-size": 9, "font-weight": 800, "text-anchor": "middle" });
+      mt.textContent = "mean " + fmt(stats.mean);
+      svg.appendChild(mt);
+      drawFulcrum(svg, mx, y, null);
     }
   }
 
@@ -618,19 +1106,25 @@
 
     document.getElementById("avg-add").addEventListener("click", function () {
       addToAvg(+document.getElementById("avg-in").value);
-      document.getElementById("avg-in").value = "0";
+      document.getElementById("avg-in").value = "5";
     });
     document.getElementById("avg-in").addEventListener("keydown", function (e) {
       if (e.key === "Enter") document.getElementById("avg-add").click();
     });
     document.getElementById("avg-default").addEventListener("click", function () {
-      avgData = DEFAULT_DATA.slice();
-      renderAverages();
+      setMission("sandbox");
     });
     document.getElementById("avg-clear").addEventListener("click", function () {
       avgData = [];
       renderAverages();
     });
+
+    document.querySelectorAll("#mission-bar .chip-mission").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        setMission(btn.dataset.mission);
+      });
+    });
+    bindNumlineInteractions();
 
     document.getElementById("more-questions-btn").addEventListener("click", function () {
       var panel = document.getElementById("more-questions-panel");
@@ -675,8 +1169,9 @@
       });
     });
 
-    renderAverages();
+    setMission("sandbox");
     renderWeightedMean();
+    drawOutlierStory();
     renderTransform();
   }
 
