@@ -83,7 +83,7 @@ KOC.works('maths', 'eric', [
     title: 'JM28 Triangle Centres — games',
     type: 'interactive',
     chapter: 'S3 JM28',
-    submitted: '2026-10-17',
+    submitted: '2026-08-28',
     status: 'pending',
     tags: ['Interactive', 'Geometry', 'Game', 'S3'],
     elements: ['wood'],
