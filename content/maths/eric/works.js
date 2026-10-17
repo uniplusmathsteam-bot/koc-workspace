@@ -79,6 +79,19 @@ KOC.works('maths', 'eric', [
     notes: 'Special lines and centres. Drag triangle vertices; construction lines update live.'
   },
   {
+    id: 'jm28-triangle-centres-games',
+    title: 'JM28 Triangle Centres — games',
+    type: 'interactive',
+    chapter: 'S3 JM28',
+    submitted: '2026-10-17',
+    status: 'pending',
+    tags: ['Interactive', 'Geometry', 'Game', 'S3'],
+    elements: ['wood'],
+    cover: 'content/maths/eric/covers/jm28.svg',
+    src: 'content/maths/eric/jm28-triangle-centres/games.html?jmGame=1',
+    notes: 'Geometry Arena: Centre Snap, Angle Pair Spot, and Condition Check with Factory Line.'
+  },
+  {
     id: 'jm29-quadrilaterals',
     title: 'JM29 Quadrilaterals — interactive tools',
     type: 'interactive',
