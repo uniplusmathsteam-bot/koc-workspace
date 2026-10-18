@@ -11,7 +11,7 @@
     var height = Math.max(
       document.documentElement.scrollHeight || 0,
       document.body ? document.body.scrollHeight : 0,
-      480
+      520
     );
     try { parent.postMessage({ type: "jm-tools-height", height: height }, "*"); } catch (e) {}
   }
@@ -19,9 +19,7 @@
     postH();
     setTimeout(postH, 200);
     setTimeout(postH, 800);
-    if (window.ResizeObserver) {
-      new ResizeObserver(postH).observe(document.documentElement);
-    }
+    if (window.ResizeObserver) new ResizeObserver(postH).observe(document.documentElement);
   });
 })();
 </script>
@@ -34,7 +32,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-  <link rel="stylesheet" href="../_shared/jm-lesson.css?v=20261017-jm28g">
+  <link rel="stylesheet" href="../_shared/jm-lesson.css?v=20261018-arena-mp">
   <style>
     body { margin:0; min-height:100vh; color:var(--text); font-family:"Hanken Grotesk",system-ui,sans-serif;
       background:linear-gradient(180deg,#f8fafc,#f1f5f9); caret-color:transparent; }
@@ -387,6 +385,153 @@
     .tg-factory-prog {
       margin: 8px 0 0; font-size: 12px; font-weight: 700; color: #64748b;
     }
+
+    .tg-modes { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+    @media (max-width: 900px) {
+      .tg-modes { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+    }
+    .tg-modes .chip[data-tg-mode="meet"] .tg-mode-ico {
+      background: rgba(234,88,12,.14); color: #ea580c;
+    }
+    #tg-meet.hidden { display: none !important; }
+    #tg-meet .mp-root {
+      border: none;
+      box-shadow: none;
+      padding: 0;
+      background: transparent;
+      border-radius: 0;
+    }
+    #tg-meet .mp-hero { display: none; }
+    #tg-meet .mp-actions { margin-top: 10px; }
+
+/* JM28 Meeting Point */
+    
+    .mp-root {
+      --mp-ink: #0f172a;
+      --mp-mute: #64748b;
+      --mp-accent: #0284c7;
+      --mp-hot: #ea580c;
+      --mp-ok: #16a34a;
+      position: relative;
+      overflow: hidden;
+      border-radius: 18px;
+      padding: 16px 14px 18px;
+      color: var(--mp-ink);
+      background:
+        radial-gradient(700px 280px at 10% -10%, rgba(56,189,248,.28), transparent 55%),
+        radial-gradient(520px 240px at 100% 0%, rgba(251,191,36,.16), transparent 50%),
+        linear-gradient(180deg, #f8fafc, #eef2ff);
+      border: 1px solid rgba(2,132,199,.18);
+      box-shadow: 0 10px 28px rgba(14,116,144,.08);
+    }
+    .mp-root.mp-pulse-ok { box-shadow: 0 0 0 3px rgba(22,163,74,.35), 0 10px 28px rgba(14,116,144,.08); }
+    .mp-root.mp-pulse-bad { box-shadow: 0 0 0 3px rgba(225,29,72,.3), 0 10px 28px rgba(14,116,144,.08); }
+    .mp-root.mp-pulse-warn { box-shadow: 0 0 0 3px rgba(234,88,12,.35), 0 10px 28px rgba(14,116,144,.08); }
+    .mp-hero { display:flex; flex-wrap:wrap; gap:10px 16px; justify-content:space-between; align-items:flex-end; margin-bottom:12px; }
+    .mp-kicker { margin:0 0 4px; font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:#0284c7; }
+    .mp-title { margin:0; font-size:clamp(22px,3.5vw,30px); font-weight:800; letter-spacing:-.02em; }
+    .mp-tagline { margin:6px 0 0; color:var(--mp-mute); font-size:13px; line-height:1.45; max-width:40em; }
+    .mp-hud {
+      display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin:0 0 10px;
+    }
+    @media (max-width:720px) { .mp-hud { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    .mp-stat {
+      padding:8px 10px; border-radius:12px; background:#fff; border:1px solid rgba(2,132,199,.14);
+      box-shadow:0 2px 8px rgba(14,116,144,.05);
+    }
+    .mp-stat .lbl { display:block; font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--mp-mute); }
+    .mp-stat .val { display:block; margin-top:2px; font-size:16px; font-weight:800; color:var(--mp-ink); font-variant-numeric:tabular-nums; }
+    .mp-energy {
+      grid-column:1 / -1; height:12px; border-radius:999px; background:#e2e8f0; overflow:hidden;
+      border:1px solid rgba(2,132,199,.12);
+    }
+    .mp-energy > span {
+      display:block; height:100%; width:100%;
+      background:linear-gradient(90deg,#38bdf8,#0ea5e9 55%,#f59e0b);
+      transition:width .2s ease;
+    }
+    .mp-tip {
+      margin:0 0 10px; padding:10px 12px; border-radius:12px; font-size:13px; line-height:1.45;
+      background:rgba(2,132,199,.07); border:1px solid rgba(2,132,199,.16); color:#334155;
+    }
+    .mp-tip.mp-tip-pop { animation: mp-tip-pop .45s ease; }
+    @keyframes mp-tip-pop {
+      0% { transform:scale(.98); background:rgba(251,191,36,.2); }
+      100% { transform:scale(1); }
+    }
+    .mp-meta-row {
+      display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:0 0 10px;
+    }
+    .mp-pill {
+      display:inline-flex; align-items:center; gap:6px; padding:5px 10px; border-radius:999px;
+      font-size:12px; font-weight:700; background:#fff; border:1px solid rgba(2,132,199,.16); color:#0c4a6e;
+    }
+    .mp-pill.hot { background:linear-gradient(90deg,#ffedd5,#fef3c7); border-color:#fdba74; color:#9a3412; }
+    .mp-timers { display:flex; gap:8px; flex-wrap:wrap; }
+    .mp-timers.hidden { display:none !important; }
+    .mp-stage-wrap {
+      position:relative; max-width:520px; margin:0 auto; border-radius:16px; overflow:hidden;
+      border:1px solid rgba(2,132,199,.2);
+      background:linear-gradient(180deg,#eef6fc,#dbeafe);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+    }
+    #mp-svg { display:block; width:100%; height:auto; margin:0; touch-action:none; user-select:none; vertical-align:top; }
+    .tg-figure-wrap { max-width: 260px; margin: 0 auto; min-height: 160px !important; }
+    .tg-fig { max-height: 180px; width: 100%; }
+    .mp-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; align-items:center; }
+    .mp-actions .btn { border-radius:999px !important; font-weight:800 !important; }
+    .mp-actions .btn.primary {
+      background:linear-gradient(90deg,#38bdf8,#0ea5e9) !important;
+      border-color:transparent !important; color:#fff !important;
+    }
+    .mp-actions .btn:disabled {
+      opacity:.45; cursor:not-allowed; filter:grayscale(.2);
+    }
+    .mp-solution {
+      margin-top:12px; max-width:520px; margin-left:auto; margin-right:auto;
+      border-radius:16px; border:1px solid rgba(2,132,199,.22);
+      background:linear-gradient(180deg,#f8fafc,#eef2ff);
+      padding:10px 10px 8px;
+    }
+    .mp-solution.hidden { display:none !important; }
+    .mp-solution-label {
+      margin:0 0 6px; font-size:12px; font-weight:800; color:#0c4a6e; letter-spacing:.01em;
+    }
+    #mp-svg-sol { display:block; width:100%; height:auto; margin:0; }
+    .mp-overlay {
+      position:absolute; inset:0; z-index:5;
+      display:flex; align-items:center; justify-content:center;
+      background:rgba(15,23,42,.42); backdrop-filter:blur(3px);
+      padding:16px;
+    }
+    .mp-overlay.hidden { display:none !important; }
+    .mp-card {
+      width:min(420px,100%); text-align:center; padding:22px 18px;
+      border-radius:18px; background:linear-gradient(180deg,#fff,#e0f2fe);
+      border:1px solid rgba(2,132,199,.22);
+      box-shadow:0 16px 40px rgba(15,23,42,.18);
+    }
+    .mp-card h3 { margin:0 0 8px; font-size:22px; font-weight:800; }
+    .mp-card p { margin:0 0 14px; color:var(--mp-mute); font-size:14px; line-height:1.5; }
+    .mp-card .stars { font-size:28px; letter-spacing:4px; color:#d97706; margin:0 0 10px; }
+    .mp-card .btn { margin:0 4px; }
+    .mp-clear-bar {
+      max-width:520px; margin:10px auto 0; padding:12px 14px;
+      border-radius:14px; border:1px solid rgba(217,119,6,.35);
+      background:linear-gradient(90deg,#fffbeb,#ffedd5);
+      display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center;
+    }
+    .mp-clear-bar.hidden { display:none !important; }
+    .mp-clear-bar .stars { font-size:20px; letter-spacing:2px; color:#d97706; }
+    .mp-clear-bar .mp-clear-copy { flex:1 1 160px; min-width:140px; }
+    .mp-clear-bar .mp-clear-copy strong { display:block; font-size:14px; color:#92400e; }
+    .mp-clear-bar .mp-clear-copy p { margin:2px 0 0; font-size:12px; color:#78716c; }
+    .mp-clear-bar .btn { border-radius:999px !important; font-weight:800 !important; }
+    .mp-clear-bar .btn.primary {
+      background:linear-gradient(90deg,#38bdf8,#0ea5e9) !important;
+      border-color:transparent !important; color:#fff !important;
+    }
+
   </style>
 
 <style id="jm-game-only-css">
@@ -424,18 +569,13 @@ html.jm-game-only body {
   overflow-x: hidden !important;
   overflow-y: auto !important;
 }
-html.jm-game-only {
-  background: #ffffff !important;
-}
+html.jm-game-only { background: #ffffff !important; }
 </style>
 <style id="koc-eric-caret">
   html, body { caret-color: transparent; }
   input, textarea, select, [contenteditable="true"] { caret-color: auto; }
-  .chip, .tab, .subnav, .slider-row, .lab-svg, input[type=range], button, .jm-tabs {
+  .chip, .tab, button, .jm-tabs {
     -webkit-user-select: none; user-select: none; caret-color: transparent;
-  }
-  .hint, .lead, .formula, .katex, .eq-line, .note-box, h1, h2, h3, .tg-prompt, .tg-fb {
-    -webkit-user-select: text; user-select: text; caret-color: transparent;
   }
 </style>
 
@@ -445,7 +585,7 @@ html.jm-game-only {
     <a class="jm-back" href="#">← S3 Lessons</a>
     <p class="jm-eyebrow">JM28 · Lesson 28</p>
     <h1>Triangle Centres — Games</h1>
-    <p class="lead">Geometry Arena — Centre Snap, Angle Pair Spot, and Condition Check with Factory Line.</p>
+    <p class="lead">Geometry Arena — Meeting Point, Centre Snap, Angle Pair Spot, Condition Check.</p>
     <nav class="jm-tabs" aria-label="Lesson sections">
       <button class="jm-tab active" type="button" data-tab="game">Game</button>
     </nav>
@@ -457,12 +597,17 @@ html.jm-game-only {
             <div>
               <p class="tg-kicker">JM28 · Quick rounds</p>
               <h2 class="tg-title">Geometry Arena</h2>
-              <p class="tg-tagline">Pick a mission and clear 8 rounds. Condition Check ends with Factory Line. Diagrams use the same marks as the Interactive Tool.</p>
+              <p class="tg-tagline">Four missions: draw special lines in Meeting Point, then Centre Snap, Angle Pair Spot, and Condition Check.</p>
             </div>
           </div>
 
           <div class="tg-modes" role="tablist" aria-label="Game missions">
-            <button class="chip active" type="button" data-tg-mode="centres">
+            <button class="chip active" type="button" data-tg-mode="meet">
+              <span class="tg-mode-ico">✦</span>
+              <span class="tg-mode-name">Meeting Point</span>
+              <span class="tg-mode-sub">Free-draw · find the centre</span>
+            </button>
+            <button class="chip" type="button" data-tg-mode="centres">
               <span class="tg-mode-ico">△</span>
               <span class="tg-mode-name">Centre Snap</span>
               <span class="tg-mode-sub">Special lines → centres</span>
@@ -480,7 +625,80 @@ html.jm-game-only {
           </div>
           <p class="tg-blurb" id="tg-blurb"></p>
 
-          <div id="tg-play">
+          <div id="tg-meet">
+<div class="mp-root" id="mp-root">
+          <div class="mp-hero">
+            <div>
+              <p class="mp-kicker">JM28 · Meeting Point</p>
+              <h2 class="mp-title">Meeting Point</h2>
+              <p class="mp-tagline">Draw three special lines freely. Press Check answer when all three are on the board — centres mark as G / H / I / O.</p>
+            </div>
+          </div>
+
+          <div class="mp-hud" aria-label="Game status">
+            <div class="mp-stat"><span class="lbl">Level</span><span class="val" id="mp-level">1 / 12</span></div>
+            <div class="mp-stat"><span class="lbl">Combo</span><span class="val" id="mp-combo">0</span></div>
+            <div class="mp-stat"><span class="lbl">Crystals</span><span class="val" id="mp-crystals">0 / 1</span></div>
+            <div class="mp-stat"><span class="lbl">Lines</span><span class="val" id="mp-locked">0</span></div>
+            <div class="mp-energy" aria-label="Energy"><span id="mp-energy-fill"></span></div>
+          </div>
+
+          <p class="mp-tip" id="mp-tip">Drag from a vertex or a side mid-point. Release anywhere — find the centre yourself.</p>
+
+          <div class="mp-meta-row">
+            <span class="mp-pill" id="mp-act">Act 1 · Learn the four lines</span>
+            <span class="mp-pill hot">Target: <span id="mp-crystal-name">Centroid</span></span>
+            <span class="mp-pill">Draw: <span id="mp-line-name">medians</span></span>
+            <div class="mp-timers hidden" id="mp-timers">
+              <span class="mp-pill">Swap <b id="mp-timer-switch">12s</b></span>
+              <span class="mp-pill">Left <b id="mp-timer-level">90s</b></span>
+            </div>
+          </div>
+
+          <div class="mp-stage-wrap">
+            <svg id="mp-svg" viewBox="0 0 460 360" role="img" aria-label="Meeting Point playfield"></svg>
+
+            <div class="mp-overlay" id="mp-overlay-title">
+              <div class="mp-card">
+                <h3>Meeting Point</h3>
+                <p>Drag from blue handles (vertices or mid-points). Lines end where you release. With three lines on the board, press Check answer.</p>
+                <button class="btn primary" type="button" id="mp-start">Start</button>
+              </div>
+            </div>
+
+            <div class="mp-overlay hidden" id="mp-overlay-fail">
+              <div class="mp-card">
+                <h3>Challenge failed</h3>
+                <p id="mp-fail-msg">Try again!</p>
+                <button class="btn primary" type="button" id="mp-retry-fail">Retry</button>
+                <button class="btn" type="button" id="mp-menu">Title</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="mp-clear-bar hidden" id="mp-clear-bar">
+            <div class="stars" id="mp-clear-stars">★★★</div>
+            <div class="mp-clear-copy">
+              <strong id="mp-clear-title">Cleared</strong>
+              <p id="mp-clear-msg"></p>
+            </div>
+            <button class="btn primary" type="button" id="mp-next">Next level</button>
+            <button class="btn" type="button" id="mp-retry">Replay</button>
+          </div>
+
+          <div class="mp-solution hidden" id="mp-solution">
+            <p class="mp-solution-label" id="mp-solution-label">Correct construction</p>
+            <svg id="mp-svg-sol" viewBox="0 0 460 360" role="img" aria-label="Correct special lines"></svg>
+          </div>
+
+          <div class="mp-actions">
+            <button class="btn primary" type="button" id="mp-check" disabled>Check answer</button>
+            <button class="btn" type="button" id="mp-skip">Skip level</button>
+          </div>
+        </div>
+          </div>
+
+          <div id="tg-play" class="hidden">
             <div class="tg-hud">
               <span class="tg-stat">Round <b id="tg-qnum">1 / 8</b></span>
               <span class="tg-stat score">Score <b id="tg-score">0</b></span>
@@ -525,7 +743,8 @@ html.jm-game-only {
   </main>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
-  <script defer src="triangle-centres-game.js?v=20261018-arena"></script>
+  <script defer src="triangle-centres-game.js?v=20261018-arena-mp"></script>
+  <script defer src="meeting-point-game.js?v=20261018-arena-mp"></script>
   <script defer src="../_shared/suppress-ui-caret.js?v=20260828"></script>
 </body>
 </html>

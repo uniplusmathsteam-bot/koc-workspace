@@ -83,13 +83,13 @@ KOC.works('maths', 'eric', [
     title: 'JM28 Triangle Centres — games',
     type: 'interactive',
     chapter: 'S3 JM28',
-    submitted: '2026-10-17',
+    submitted: '2026-10-18',
     status: 'pending',
     tags: ['Interactive', 'Geometry', 'Game', 'S3'],
     elements: ['fire'],
     cover: 'content/maths/eric/covers/jm28.svg',
-    src: 'content/maths/eric/jm28-triangle-centres/games.html?jmGame=1&v=20261018-arena',
-    notes: 'Geometry Arena: Centre Snap, Angle Pair Spot, and Condition Check with Factory Line.'
+    src: 'content/maths/eric/jm28-triangle-centres/games.html?jmGame=1&v=20261018-arena-mp',
+    notes: 'Geometry Arena: Meeting Point, Centre Snap, Angle Pair Spot, Condition Check.'
   },
   {
     id: 'jm29-quadrilaterals',
