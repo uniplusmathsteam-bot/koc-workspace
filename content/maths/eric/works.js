@@ -88,7 +88,7 @@ KOC.works('maths', 'eric', [
     tags: ['Interactive', 'Geometry', 'Game', 'S3'],
     elements: ['fire'],
     cover: 'content/maths/eric/covers/jm28.svg',
-    src: 'content/maths/eric/jm28-triangle-centres/games.html?jmGame=1',
+    src: 'content/maths/eric/jm28-triangle-centres/games.html?jmGame=1&v=20261018-arena',
     notes: 'Geometry Arena: Centre Snap, Angle Pair Spot, and Condition Check with Factory Line.'
   },
   {
