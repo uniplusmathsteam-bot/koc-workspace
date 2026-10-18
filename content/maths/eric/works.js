@@ -47,7 +47,7 @@ KOC.works('maths', 'eric', [
     submitted: '2026-08-28',
     status: 'pending',
     tags: ['Interactive', 'Inequalities', 'S3'],
-    elements: ['earth'],
+    elements: ['wood'],
     cover: 'content/maths/eric/covers/jm26.svg',
     src: 'content/maths/eric/jm26-inequalities/index.html?jmTools=1',
     notes: 'Sign-flip practice with a draggable number-line boundary.'
@@ -86,7 +86,7 @@ KOC.works('maths', 'eric', [
     submitted: '2026-10-17',
     status: 'pending',
     tags: ['Interactive', 'Geometry', 'Game', 'S3'],
-    elements: ['earth'],
+    elements: ['fire'],
     cover: 'content/maths/eric/covers/jm28.svg',
     src: 'content/maths/eric/jm28-triangle-centres/games.html?jmGame=1',
     notes: 'Geometry Arena: Centre Snap, Angle Pair Spot, and Condition Check with Factory Line.'
