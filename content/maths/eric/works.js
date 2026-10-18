@@ -89,7 +89,7 @@ KOC.works('maths', 'eric', [
     elements: ['fire'],
     cover: 'content/maths/eric/covers/jm28.svg',
     src: 'content/maths/eric/jm28-triangle-centres/games.html?jmGame=1',
-    notes: 'Geometry Arena: Centre Snap, Angle Pair Spot, and Condition Check with Factory Line.'
+    notes: 'Meeting Point / 三線交會: drag special lines to light the crystal.'
   },
   {
     id: 'jm29-quadrilaterals',
