@@ -1,0 +1,3019 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="F3 biology: phospholipid polarity, the fluid mosaic membrane, membrane proteins, and differential permeability.">
+  <title>Cell membrane</title>
+  <style>
+    :root {
+      --ink: #142033;
+      --line: #d7e0ec;
+      --navy: #163a86;
+      --material: #0f6b4c;
+      --process: #163a86;
+      --property: #9a3412;
+      --bar: 52px;
+    }
+    * { box-sizing: border-box; }
+    html {
+      height: 100%;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: manipulation;
+    }
+    body {
+      margin: 0;
+      height: 100dvh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: #e7eef6;
+      color: var(--ink);
+      font-family: "PingFang HK", "Heiti TC", "Noto Sans TC", system-ui, sans-serif;
+    }
+    button, svg, select { touch-action: manipulation; }
+    button, select { font: inherit; color: inherit; cursor: pointer; }
+    button:focus-visible, select:focus-visible, .prot:focus-visible {
+      outline: 3px solid var(--navy);
+      outline-offset: 2px;
+    }
+    .topbar {
+      flex: 0 0 auto;
+      min-height: var(--bar);
+      height: calc(var(--bar) + env(safe-area-inset-top));
+      padding: env(safe-area-inset-top) 8px 0 max(8px, env(safe-area-inset-left));
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+      z-index: 20;
+    }
+    .nav-btn, .hide-btn, .type-btn {
+      height: 44px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: #fff;
+      padding: 0 12px;
+      font-size: 16px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .nav-btn { background: var(--navy); color: #fff; border-color: var(--navy); }
+    #back { background: #fff; color: var(--ink); border-color: var(--line); }
+    button:disabled { opacity: 0.38; cursor: default; }
+    .step-no {
+      font-size: 15px;
+      font-weight: 700;
+      color: #3d4d63;
+      min-width: 52px;
+      text-align: center;
+    }
+    .types { display: flex; gap: 4px; min-width: 0; }
+    .type-btn { padding: 0 10px; }
+    .type-btn.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .part-select { display: none; min-width: 0; }
+    .part-select select {
+      width: 100%;
+      height: 44px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 0 8px;
+    }
+    .sr {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+    .top-title {
+      margin-left: auto;
+      padding-right: max(8px, env(safe-area-inset-right));
+      font-size: 16px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+    .page {
+      flex: 1;
+      min-height: 0;
+      padding: 8px max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+      display: flex;
+    }
+    .pair { flex: 1; min-width: 0; min-height: 0; display: flex; }
+    .pair-inner {
+      flex: 1;
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 8px 12px 10px;
+    }
+    .lesson-row { flex: 0 0 auto; display: flex; align-items: center; }
+    .lesson-slot {
+      flex: 1;
+      min-width: 0;
+      height: 88px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+    .lesson, .desc {
+      font-size: 38px;
+      line-height: 1.15;
+      font-weight: 650;
+      margin: 0;
+      color: var(--ink);
+    }
+    .lesson { width: 100%; }
+    .answer {
+      margin: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 56px;
+      line-height: 1.05;
+      font-weight: 760;
+      white-space: nowrap;
+      color: var(--ink);
+    }
+    .hl { font-style: normal; font-weight: 760; font-size: 1em; }
+    .hl.material { color: var(--material); }
+    .hl.process { color: var(--process); }
+    .hl.property { color: var(--property); }
+    .word-philic { color: #1d6fd4; }
+    .word-phobic { color: #e11d2e; }
+    .hl.missing { border-bottom: 3px dashed currentColor; }
+    .stage {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+      min-height: 0;
+      margin-right: 64px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #f7fbff;
+    }
+    .box-zoom {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      z-index: 5;
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 28px;
+      font-weight: 500;
+      line-height: 1;
+    }
+    .full-view {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      z-index: 6;
+      height: 40px;
+      padding: 0 14px;
+      border-radius: 10px;
+      border: 1px solid #d7e0ec;
+      background: #fff;
+      color: var(--ink);
+      font-size: 15px;
+      font-weight: 750;
+    }
+    .full-view[hidden] { display: none; }
+    .scene { position: absolute; inset: 0; display: flex; min-width: 0; min-height: 0; }
+    .scene[hidden] { display: none !important; }
+    .side {
+      position: absolute;
+      z-index: 4;
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.2;
+      font-weight: 750;
+      color: #3d4d63;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .side.out { top: 10px; left: 58px; }
+    .side.in { bottom: 8px; left: 10px; }
+    .reminder {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      z-index: 4;
+      max-width: 220px;
+      margin: 0;
+      text-align: right;
+      font-size: 16px;
+      line-height: 1.25;
+      font-weight: 650;
+      color: #3d4d63;
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 8px;
+      padding: 4px 8px;
+      pointer-events: none;
+    }
+    .reminder:empty, .reminder[hidden] { display: none; }
+    .phone-key {
+      display: none;
+      position: absolute;
+      z-index: 4;
+      left: 8px;
+      right: 8px;
+      bottom: 6px;
+      margin: 0;
+      text-align: center;
+      font-size: 14px;
+      line-height: 1.25;
+      font-weight: 750;
+      color: var(--ink);
+      pointer-events: none;
+    }
+    .desc {
+      flex: 0 0 auto;
+      min-height: calc(38px * 1.15 * 3);
+      height: calc(38px * 1.15 * 3);
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+    body.desc-off .desc { display: none; }
+    body.zoomed .pair {
+      position: fixed;
+      z-index: 30;
+      top: calc(var(--bar) + env(safe-area-inset-top));
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 8px max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+      background: #e7eef6;
+    }
+    body.zoomed .pair-inner { transform-origin: top center; }
+    body.zoomed .desc { height: auto; overflow: visible; }
+
+    .philic { color: #1d4ed8; }
+    .phobic { color: #be123c; }
+    .pair-cards { flex: 1; min-width: 0; min-height: 0; display: flex; gap: 12px; padding: 36px 8px 8px; }
+    .mol-card {
+      flex: 1;
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      border-radius: 16px;
+      background: #fff;
+      border: 1px solid var(--line);
+      padding: 8px 10px 10px;
+    }
+    #cardTri { box-shadow: inset 0 0 0 3px #fb7185; }
+    #cardPh { box-shadow: inset 0 0 0 3px #7dd3fc; }
+    #scene-lipids[data-phase="tri"] #cardPh { display: none; }
+    .mol-name { margin: 0; font-size: 16px; font-weight: 800; }
+    .mol-key { margin: 2px 0 6px; font-size: 15px; font-weight: 750; min-height: 1.2em; }
+    .portrait { position: relative; flex: 1; min-width: 0; min-height: 0; overflow: hidden; }
+    .portrait .hero { width: 100%; height: 100%; max-width: 100%; object-fit: contain; display: block; }
+    #scene-lipids .portrait { display: flex; align-items: center; justify-content: center; }
+    #scene-lipids .portrait .hero { width: auto; height: auto; max-width: 72%; max-height: 50%; position: relative; z-index: 1; }
+    #scene-lipids .drop { display: none; }
+    .drop {
+      position: absolute;
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+      opacity: 0;
+      pointer-events: none;
+    }
+    #scene-lipids[data-phase="water"].run .drop.away { animation: away 2.1s ease-in-out forwards; }
+    #scene-lipids[data-phase="water"].run .drop.stick { animation: stick 1.5s ease-out forwards; }
+    @keyframes away {
+      0% { opacity: 0; transform: translate(var(--dx), var(--dy)); }
+      38% { opacity: 1; transform: translate(0, 0); }
+      100% { opacity: 0.9; transform: translate(var(--dx), var(--dy)); }
+    }
+    @keyframes stick {
+      0% { opacity: 0; transform: translate(0, -70px); }
+      100% { opacity: 1; transform: translate(0, 0); }
+    }
+
+    #scene-bilayer .one-lipid {
+      position: absolute;
+      inset: 46px 8% 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    #scene-bilayer[data-phase="many"] .one-lipid,
+    #scene-bilayer[data-phase="bilayer"] .one-lipid,
+    #scene-bilayer[data-phase="many"] .lipid-key,
+    #scene-bilayer[data-phase="bilayer"] .lipid-key { display: none; }
+    .one-lipid img { max-width: min(760px, 100%); max-height: 78%; object-fit: contain; }
+    .bilayer-water {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .lipid-key {
+      position: absolute;
+      left: 50%;
+      bottom: 10px;
+      z-index: 4;
+      margin: 0;
+      padding: 4px 10px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.94);
+      font-size: 16px;
+      font-weight: 750;
+      text-align: center;
+      white-space: nowrap;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+    .lipids-layer { position: absolute; inset: 0; }
+    .lipid {
+      position: absolute;
+      width: 48px;
+      height: 92px;
+      opacity: 0;
+      transition: left 0.8s ease, top 0.8s ease, opacity 0.35s ease;
+    }
+    .lipid svg { width: 100%; height: 100%; display: block; }
+    .lipid.down { transform: rotate(180deg); }
+    #scene-bilayer .side,
+    #scene-bilayer .legend,
+    #scene-bilayer .tail-note { opacity: 0; }
+    #scene-bilayer[data-phase="bilayer"] .side,
+    #scene-bilayer[data-phase="bilayer"] .legend,
+    #scene-bilayer[data-phase="bilayer"] .tail-note { opacity: 1; }
+    .legend, .tail-note {
+      position: absolute;
+      z-index: 3;
+      margin: 0;
+      font-size: 15px;
+      font-weight: 750;
+      pointer-events: none;
+    }
+    .legend { right: 8px; bottom: 8px; background: rgba(255,255,255,.92); border-radius: 8px; padding: 4px 8px; }
+    .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin: 0 4px 0 8px; vertical-align: -1px; }
+    .swatch.blue { background: #1d6fd4; }
+    .swatch.red { background: #e11d2e; }
+    .tail-note { display: none; }
+
+    #scene-mosaic { align-items: stretch; justify-content: center; background: #03080c; }
+    #scene-mosaic .side { color: #f4f8ff; text-shadow: 0 1px 3px #000; }
+    .world {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+    #mosaic3d { width: 100%; height: 100%; display: block; background: #03080c; }
+    .mosaic-key {
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      z-index: 6;
+      max-width: 240px;
+      line-height: 1.55;
+      margin: 0;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: rgba(6, 18, 30, 0.9);
+      color: #e8eef6;
+      font-size: 13px;
+      font-weight: 750;
+      pointer-events: none;
+    }
+    .mosaic-key i {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      margin: 0 4px 0 8px;
+      border-radius: 50%;
+      vertical-align: -1px;
+    }
+    .mosaic-key i:first-child { margin-left: 0; }
+    .mosaic-modes {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      z-index: 7;
+      display: flex;
+      gap: 6px;
+      transform: translateX(-50%);
+    }
+    .mosaic-modes button {
+      height: 40px;
+      padding: 0 16px;
+      border-radius: 10px;
+      border: 1px solid #d7e0ec;
+      background: #fff;
+      color: var(--ink);
+      font-size: 16px;
+      font-weight: 750;
+    }
+    .mosaic-modes button.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .fluid-degrees {
+      position: absolute;
+      top: 54px;
+      left: 50%;
+      z-index: 7;
+      display: none;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      width: max-content;
+      max-width: calc(100% - 16px);
+      transform: translateX(-50%);
+    }
+    #scene-mosaic[data-phase="fluid"] .fluid-degrees { display: flex; }
+    .fluid-degrees button {
+      height: 34px;
+      padding: 0 10px;
+      border-radius: 10px;
+      border: 1px solid #d7e0ec;
+      background: #fff;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 750;
+    }
+    .fluid-degrees button.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+    #scene-mosaic[data-phase="mosaic"] .side { opacity: 0; }
+
+    .board { position: absolute; inset: 0; z-index: 1; transition: transform 0.45s ease; }
+    .outside-mix {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 6;
+      pointer-events: none;
+    }
+    .board.focused .band,
+    .board.focused .waves { opacity: 0.28; }
+    .board.focused .prot { opacity: 0.16; }
+    .board.focused .prot.is-on { opacity: 1; filter: drop-shadow(0 0 8px rgba(255, 90, 100, 0.95)) drop-shadow(0 0 16px rgba(255, 140, 150, 0.65)); }
+    .band {
+      position: absolute;
+      left: 2%;
+      right: 2%;
+      top: 36%;
+      height: 28%;
+      border-radius: 12px;
+      background:
+        radial-gradient(circle at 11px 9px, #f6c445 7px, #e0a31a 8px, transparent 9px) 0 0 / 22px 18px repeat-x,
+        radial-gradient(circle at 11px 9px, #f6c445 7px, #e0a31a 8px, transparent 9px) 0 100% / 22px 18px repeat-x,
+        linear-gradient(#d7e7f8, #f4f9fd 46%, #d7e7f8);
+    }
+    .waves { position: absolute; left: 3%; right: 3%; top: 40%; height: 20%; pointer-events: none; }
+    .prot {
+      position: absolute;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      min-width: 44px;
+      min-height: 44px;
+    }
+    .prot svg { width: 100%; height: 100%; display: block; overflow: visible; }
+    .plab {
+      position: absolute;
+      left: 50%;
+      background: #fff;
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 1px 6px;
+      font-size: 13px;
+      font-weight: 750;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .enzyme { left: 4%; top: 30%; width: 15%; height: 30%; }
+    .enzyme svg { display: none; }
+    .enzyme img { width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; }
+    .enzyme .plab { top: 0; transform: translate(-50%, -120%); z-index: 2; }
+    .channel { left: 25.91%; top: 30%; width: 13%; height: 40%; }
+    .channel .plab { top: 0; transform: translate(-50%, -110%); z-index: 2; }
+    .channel svg { display: none; }
+    .channel-live {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 250%;
+      height: auto;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .carrier { left: 46.46%; top: 28%; width: 14%; height: 44%; }
+    .carrier .plab { top: 0; transform: translate(-50%, -180%); z-index: 2; }
+    .carrier svg { display: none; }
+    .carrier-live {
+      position: absolute;
+      left: 50%;
+      top: 46%;
+      width: 210%;
+      height: auto;
+      transform: translate(-50%, -48%);
+      pointer-events: none;
+    }
+    .receptor { left: 64.14%; top: 29%; width: 13%; height: 42%; }
+    .receptor .plab { top: 0; transform: translate(-50%, -110%); z-index: 2; }
+    .receptor img { width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; }
+    .glyco { left: 77%; top: 27%; width: 16%; height: 46%; }
+    .glyco .plab { bottom: 0; transform: translate(-50%, 100%); }
+    @media (hover: hover) {
+      .prot:hover { filter: drop-shadow(0 0 8px rgba(255, 99, 110, 0.95)) drop-shadow(0 0 14px rgba(255, 160, 160, 0.45)); }
+    }
+    .mover { position: absolute; object-fit: contain; opacity: 0; pointer-events: none; }
+    .substrate { width: 44.3px; left: 7.73%; top: 33.19%; z-index: 5; }
+    .prod { width: 22.2px; top: 33.19%; z-index: 5; }
+    .prod-a { left: 7.73%; }
+    .prod-b { left: calc(7.73% + 22.2px); }
+    .h2o { width: 34px; }
+    .o2 { width: 46px; }
+    .ion { width: 32px; left: 45%; }
+    .hormone { width: 36px; left: 67.34%; top: 4%; z-index: 4; }
+    .bolts {
+      position: absolute;
+      left: 63.34%;
+      top: 47%;
+      width: 15%;
+      height: 36%;
+      overflow: visible;
+      pointer-events: none;
+      z-index: 3;
+    }
+    .bolt {
+      fill: none;
+      stroke: #fff7d6;
+      stroke-width: 5;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      opacity: 0;
+    }
+    .bolt.b { stroke: #d7f4ff; stroke-width: 3.5; }
+    .bolt.c { stroke: #ffe08a; stroke-width: 3; }
+    .other-cell {
+      position: absolute;
+      z-index: 4;
+      left: 73%;
+      top: 40%;
+      width: 72px;
+      height: 46px;
+      border: 4px solid #e0a31a;
+      border-radius: 40%;
+      background: #fff7e6;
+      opacity: 0;
+      transform: translateX(64px);
+    }
+    .other-cell span {
+      position: absolute;
+      top: -18px;
+      left: 8px;
+      font-size: 13px;
+      font-weight: 750;
+      color: #3d4d63;
+      white-space: nowrap;
+    }
+    .carrier .shut { opacity: 0; }
+    #proteinBoard[data-phase="carrier-change"] .carrier .open { opacity: 0; }
+    #proteinBoard[data-phase="carrier-change"] .carrier .shut { opacity: 1; }
+    #scene-proteins.run[data-phase^="enzyme"] .substrate { animation: enzymeReact 6.6s ease-in-out infinite; }
+    #scene-proteins.run[data-phase^="enzyme"] .prod-a { animation: enzymeBreakA 6.6s ease-in-out infinite; }
+    #scene-proteins.run[data-phase^="enzyme"] .prod-b { animation: enzymeBreakB 6.6s ease-in-out infinite; }
+    @keyframes enzymeReact {
+      0% { opacity: 0; top: 5%; }
+      7% { opacity: 1; top: 9%; }
+      32% { opacity: 1; top: 33.19%; }
+      48% { opacity: 1; top: 33.19%; }
+      54% { opacity: 0; top: 33.19%; }
+      100% { opacity: 0; top: 33.19%; }
+    }
+    @keyframes enzymeBreakA {
+      0%, 46% { opacity: 0; transform: translate(5px, 2px); }
+      52% { opacity: 1; transform: translate(5px, 2px); }
+      62% { opacity: 1; transform: translate(0, 0); }
+      82% { opacity: 1; transform: translate(-30px, -56px); }
+      94%, 100% { opacity: 0; transform: translate(-30px, -56px); }
+    }
+    @keyframes enzymeBreakB {
+      0%, 46% { opacity: 0; transform: translate(-5px, 2px); }
+      52% { opacity: 1; transform: translate(-5px, 2px); }
+      62% { opacity: 1; transform: translate(0, 0); }
+      82% { opacity: 1; transform: translate(30px, -56px); }
+      94%, 100% { opacity: 0; transform: translate(30px, -56px); }
+    }
+    #scene-proteins[data-phase^="channel"] .w-a,
+    #scene-proteins[data-phase^="channel"] .w-b,
+    #scene-proteins[data-phase^="channel"] .w-c,
+    #scene-proteins[data-phase^="channel"] .o2block { opacity: 0; animation: none; }
+    .w-a { left: 24%; top: 6%; }
+    .w-b { left: 27%; top: 2%; animation-delay: .15s; }
+    .w-c { left: 21%; top: 10%; animation-delay: .28s; }
+    .o2block { left: 24%; top: 16%; width: 40px; }
+    @keyframes sink { 0% { opacity: 0; top: 4%; } 18% { opacity: 1; } 100% { opacity: 1; top: 74%; } }
+    @keyframes repel { 0% { opacity: 0; top: 18%; } 45% { opacity: 1; top: 34%; } 100% { opacity: 1; top: 22%; } }
+    #scene-proteins.run[data-phase="carrier-bind"] .ion,
+    #scene-proteins.run[data-phase="carrier-change"] .ion,
+    #scene-entry.run[data-phase="ion"] .ion { opacity: 0; animation: none; }
+    .carrier .open, .carrier .shut { transition: opacity 0.35s ease; }
+    @keyframes pocket { from { opacity: 0; top: 4%; } to { opacity: 1; top: 36%; } }
+    @keyframes release { from { opacity: 1; top: 36%; } to { opacity: 1; top: 76%; } }
+    #scene-proteins.run[data-phase^="receptor"] .hormone { animation: hormoneJoin 5.2s ease-in-out infinite; }
+    #scene-proteins.run[data-phase^="receptor"] .bolt,
+    #scene-proteins.run[data-phase="choose"] .bolt { animation: boltFlash 5.2s linear infinite; }
+    #scene-proteins.run[data-phase^="receptor"] .bolt.b,
+    #scene-proteins.run[data-phase="choose"] .bolt.b { animation-name: boltFlashB; }
+    #scene-proteins.run[data-phase^="receptor"] .bolt.c,
+    #scene-proteins.run[data-phase="choose"] .bolt.c { animation-name: boltFlashC; }
+    @keyframes hormoneJoin {
+      0% { opacity: 0; top: 1%; }
+      10% { opacity: 1; top: 8%; }
+      36% { opacity: 1; top: 41%; }
+      44% { top: 40.2%; }
+      52%, 100% { opacity: 1; top: 41%; }
+    }
+    @keyframes boltFlash {
+      0%, 40% { opacity: 0; }
+      46% { opacity: 1; }
+      52% { opacity: 0.08; }
+      58% { opacity: 1; }
+      66% { opacity: 0; }
+      74% { opacity: 1; }
+      82% { opacity: 0.12; }
+      90% { opacity: 0.95; }
+      100% { opacity: 0; }
+    }
+    @keyframes boltFlashB {
+      0%, 48% { opacity: 0; }
+      54% { opacity: 1; }
+      62% { opacity: 0; }
+      78% { opacity: 0.9; }
+      88% { opacity: 0; }
+      100% { opacity: 0; }
+    }
+    @keyframes boltFlashC {
+      0%, 44% { opacity: 0; }
+      50% { opacity: 0.85; }
+      60% { opacity: 0; }
+      70% { opacity: 1; }
+      80% { opacity: 0.1; }
+      92% { opacity: 0.8; }
+      100% { opacity: 0; }
+    }
+    #scene-proteins.run[data-phase="glyco-id"] .other-cell { animation: meet 1.3s ease-out forwards; }
+    #scene-proteins.run[data-phase="glyco-id"] .carb-bit { filter: drop-shadow(0 0 6px #fb7185); }
+    @keyframes meet {
+      from { opacity: 0; transform: translateX(56px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    #scene-entry .h2o { left: 25%; }
+    #scene-entry .ion { left: 46%; }
+    #scene-entry .o2pass { left: 64%; width: 48px; }
+    #scene-entry .o2b { left: 72%; animation-delay: .16s; }
+    #scene-entry .large { width: 120px; top: 6%; }
+    #scene-entry .starch { left: 58%; }
+    #scene-entry .tri-big { left: 76%; width: 150px; }
+    #scene-entry[data-phase="o2"].run .o2pass { animation: cross 1.5s ease-in-out forwards; }
+    #scene-entry[data-phase="water"].run .h2o { animation: sink 1.5s ease-in-out forwards; }
+    #scene-entry[data-phase="ion"] .carrier .open { opacity: 0; }
+    #scene-entry[data-phase="ion"] .carrier .shut { opacity: 1; }
+    #scene-entry[data-phase="large"] .large { opacity: 1; }
+    #scene-entry[data-phase="fold"] .large,
+    #scene-entry[data-phase="fold"] .pouch { opacity: 1; }
+    #scene-entry[data-phase="fold"] .large { top: 64%; transition: top 0.8s ease; }
+    .ban {
+      position: absolute;
+      left: 68%;
+      top: 38%;
+      margin: 0;
+      font-size: 72px;
+      line-height: 1;
+      font-weight: 800;
+      color: #dc2626;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .entry-modes {
+      position: absolute;
+      top: 54px;
+      left: 50%;
+      z-index: 8;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      width: max-content;
+      max-width: calc(100% - 16px);
+      transform: translateX(-50%);
+    }
+    .entry-modes button {
+      height: 34px;
+      padding: 0 12px;
+      border-radius: 10px;
+      border: 1px solid #d7e0ec;
+      background: #fff;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 750;
+    }
+    .entry-modes button.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .entry-modes p {
+      width: 100%;
+      margin: 0;
+      text-align: center;
+      color: #f4f8ff;
+      font-size: 13px;
+      font-weight: 650;
+      text-shadow: 0 1px 3px #000;
+    }
+    #scene-entry[data-phase="fold"] .entry-modes { display: none; }
+    #scene-entry { background: #03080c; }
+    #scene-entry .side { color: #f4f8ff; text-shadow: 0 1px 3px #000; }
+    #entryBoard { display: none; }
+    .pouch {
+      position: absolute;
+      left: 56%;
+      top: 48%;
+      width: 38%;
+      height: 42%;
+      border: 8px solid #f6c445;
+      border-top: 0;
+      border-radius: 0 0 80px 80px;
+      background: rgba(215, 231, 248, 0.55);
+      opacity: 0;
+      pointer-events: none;
+    }
+    @keyframes cross { 0% { opacity: 0; top: 6%; } 16% { opacity: 1; } 100% { opacity: 1; top: 74%; } }
+    @keyframes ionIn { 0% { opacity: 0; top: 6%; } 40% { opacity: 1; top: 34%; } 100% { opacity: 1; top: 76%; } }
+
+    .pen-canvas { position: fixed; inset: 0; z-index: 40; pointer-events: none; touch-action: none; }
+    .laser-canvas { position: fixed; inset: 0; z-index: 45; pointer-events: none; }
+    .laser-dot {
+      position: fixed; width: 22px; height: 22px; margin: -11px 0 0 -11px;
+      border-radius: 50%; pointer-events: none; z-index: 48;
+      background: radial-gradient(circle, rgba(255, 60, 60, 0.98), rgba(255, 0, 0, 0) 72%);
+    }
+    .laser-dot.hidden, .dcolors.hidden { display: none; }
+    body.pen-on { cursor: crosshair; }
+    body.laser-on { cursor: none; }
+    .teach-dock {
+      position: fixed;
+      right: max(8px, env(safe-area-inset-right));
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 8px 6px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      max-height: calc(100dvh - var(--bar) - 24px);
+      overflow-y: auto;
+    }
+    .dbtn {
+      width: 44px; height: 44px; border: 0; border-radius: 12px;
+      background: transparent; display: grid; place-items: center; color: var(--ink);
+    }
+    .dbtn svg { width: 22px; height: 22px; }
+    .dbtn.active { background: var(--navy); color: #fff; }
+    #dkLaser.active { background: #e11d48; }
+    #dkPen.active { background: #0f8a62; }
+    .dcolor {
+      width: 26px; height: 26px; border-radius: 50%;
+      border: 2px solid #fff; background: var(--sc); margin: 0 auto; padding: 0;
+    }
+    .dcolor.active { box-shadow: 0 0 0 2px var(--ink); }
+    .derase.active { background: #d97706; color: #3f2a00; }
+    @media (prefers-reduced-motion: reduce) {
+      .lipid, .board, .sheet, .drop, .mover, .other-cell, .bolt { animation: none !important; transition: none !important; }
+    }
+    @media (max-width: 1100px) { .top-title { display: none; } }
+    @media (max-width: 980px) {
+      .type-btn, .hide-btn { padding: 0 8px; }
+    }
+    @media (max-width: 760px) {
+      .types, .step-no { display: none; }
+      .part-select { display: block; flex: 1; }
+      .lesson-slot { height: 176px; }
+      .reminder { display: none; }
+      .full { display: none; }
+      .plab { display: none; }
+      .phone-key { display: block; }
+      #scene-proteins .side.in { display: none; }
+      .stage { margin-right: 52px; }
+      .nav-btn, .hide-btn { padding: 0 8px; }
+      .drop { width: 28px; height: 28px; }
+      .pair-cards { gap: 6px; padding-top: 48px; }
+      .mol-name, .mol-key, .one-lipid .key, .legend { font-size: 14px; }
+    }
+    @media (min-width: 761px) {
+      .short { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <button type="button" class="nav-btn" id="back">Back</button>
+    <button type="button" class="nav-btn" id="next">Next</button>
+    <span class="step-no" id="stepNo">1 / 4</span>
+    <div class="types" role="tablist" aria-label="Lesson part">
+      <button type="button" class="type-btn active" data-topic="lipids">Lipids</button>
+      <button type="button" class="type-btn" data-topic="bilayer">Phospholipids</button>
+      <button type="button" class="type-btn" data-topic="mosaic">Fluid Mosaic Model</button>
+      <button type="button" class="type-btn" data-topic="proteins">Proteins</button>
+      <button type="button" class="type-btn" data-topic="entry">Permeability</button>
+    </div>
+    <label class="part-select"><span class="sr">Lesson part</span>
+      <select id="partSelect" aria-label="Lesson part">
+        <option value="lipids">Lipids</option>
+        <option value="bilayer">Phospholipids</option>
+        <option value="mosaic">Fluid Mosaic Model</option>
+        <option value="proteins">Proteins</option>
+        <option value="entry">Permeability</option>
+      </select>
+    </label>
+    <button type="button" class="hide-btn" id="hideBtn" aria-expanded="true" aria-controls="desc">Hide</button>
+    <span class="top-title">Cell membrane</span>
+  </header>
+
+  <main class="page">
+    <div class="pair" id="pair">
+      <div class="pair-inner" id="pairInner">
+        <div class="lesson-row">
+          <div class="lesson-slot">
+            <p id="lesson" class="lesson" aria-live="polite"></p>
+            <p id="answer" class="answer" hidden></p>
+          </div>
+        </div>
+        <div class="stage" id="stage">
+          <button type="button" class="box-zoom" id="zoomBtn" aria-pressed="false" aria-label="Zoom lesson">+</button>
+          <p id="reminder" class="reminder"></p>
+
+          <section class="scene" id="scene-lipids">
+            <div class="pair-cards">
+              <article class="mol-card" id="cardTri">
+                <p class="mol-name">Triglyceride</p>
+                <p class="mol-key phobic">hydrophobic 疏水</p>
+                <div class="portrait">
+                  <img class="hero" src="assets/triglyceride.png" alt="Triglyceride: glycerol and three fatty-acid tails">
+                  <canvas class="bilayer-water" id="triWater" aria-hidden="true"></canvas>
+                  <img class="drop away" style="left:6%;top:8%;--dx:-28px;--dy:-36px" src="assets/water.png" alt="">
+                  <img class="drop away" style="left:42%;top:4%;--dx:0px;--dy:-42px" src="assets/water.png" alt="">
+                  <img class="drop away" style="left:84%;top:30%;--dx:48px;--dy:-8px" src="assets/water.png" alt="">
+                  <img class="drop away" style="left:28%;top:78%;--dx:-8px;--dy:42px" src="assets/water.png" alt="">
+                </div>
+              </article>
+              <article class="mol-card" id="cardPh">
+                <p class="mol-name">Phospholipid</p>
+                <p class="mol-key"><span class="philic">hydrophilic 親水 head</span> · <span class="phobic">hydrophobic 疏水 tails</span></p>
+                <div class="portrait">
+                  <img class="hero" src="assets/phospholipid.png" alt="Phospholipid: hydrophilic head and two hydrophobic tails">
+                  <canvas class="bilayer-water" id="phWater" aria-hidden="true"></canvas>
+                  <img class="drop stick" style="left:2%;top:28%" src="assets/water.png" alt="">
+                  <img class="drop stick" style="left:16%;top:18%" src="assets/water.png" alt="">
+                  <img class="drop stick" style="left:8%;top:52%" src="assets/water.png" alt="">
+                  <img class="drop away" style="left:48%;top:2%;--dx:0px;--dy:-40px" src="assets/water.png" alt="">
+                  <img class="drop away" style="left:86%;top:34%;--dx:46px;--dy:0px" src="assets/water.png" alt="">
+                  <img class="drop away" style="left:58%;top:80%;--dx:10px;--dy:40px" src="assets/water.png" alt="">
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="scene" id="scene-bilayer" hidden>
+            <p class="side out"><span class="full">outside the cell (extracellular fluid)</span><span class="short">outside</span></p>
+            <p class="side in"><span class="full">inside the cell (cytoplasm)</span><span class="short">inside</span></p>
+            <div class="one-lipid" id="oneLipid">
+              <img src="assets/phospholipid.png" alt="Phospholipid">
+            </div>
+            <canvas id="bilayerWater" class="bilayer-water" aria-hidden="true"></canvas>
+            <p class="lipid-key"><span class="philic">hydrophilic 親水 head</span> · <span class="phobic">hydrophobic 疏水 tails</span></p>
+            <div class="lipids-layer" id="lipidsLayer"></div>
+            <p class="tail-note">tail-to-tail</p>
+            <p class="legend">tail-to-tail <i class="swatch blue"></i>hydrophilic head <i class="swatch red"></i>hydrophobic tail</p>
+          </section>
+
+          <section class="scene" id="scene-mosaic" hidden>
+            <p class="side out"><span class="full">outside the cell (extracellular fluid)</span><span class="short">outside</span></p>
+            <p class="side in"><span class="full">inside the cell (cytoplasm)</span><span class="short">inside</span></p>
+            <div class="world">
+              <canvas id="mosaic3d" aria-label="Three-dimensional fluid mosaic model"></canvas>
+            </div>
+            <div class="mosaic-modes" role="group" aria-label="Fluid mosaic modes">
+              <button type="button" id="modeFluid" data-mode="fluid">Fluid</button>
+              <button type="button" id="modeMosaic" data-mode="mosaic">Mosaic</button>
+            </div>
+            <div class="fluid-degrees" id="fluidDegrees" role="group" aria-label="Fluid strength">
+              <button type="button" data-degree="slight">Slightly fluid</button>
+              <button type="button" data-degree="medium" class="active" aria-pressed="true">Medium fluid</button>
+              <button type="button" data-degree="fold">Folding</button>
+            </div>
+            <p class="mosaic-key"><i style="background:#2196f3"></i>head <i style="background:#ffb300"></i>tails <i style="background:#9c27b0"></i>channel <i style="background:#e91e63"></i>carrier <i style="background:#00d6a0"></i>receptor <i style="background:#00b0ff"></i>glycoprotein</p>
+          </section>
+
+          <section class="scene" id="scene-proteins" hidden>
+            <p class="side out"><span class="full">outside the cell (extracellular fluid)</span><span class="short">outside</span></p>
+            <p class="side in"><span class="full">inside the cell (cytoplasm)</span><span class="short">inside</span></p>
+            <p class="phone-key">Left to right: enzyme, channel, carrier, receptor, glyco</p>
+            <button type="button" class="full-view" id="fullView" hidden>Full view</button>
+            <div class="board" id="proteinBoard" data-phase="choose">
+              <canvas id="outsideMix" class="outside-mix" aria-hidden="true"></canvas>
+              <div class="band"></div>
+              <svg class="waves" id="proteinWaves" viewBox="0 0 1000 80" preserveAspectRatio="none"></svg>
+              <button type="button" class="prot enzyme" data-prot="enzyme" aria-label="Enzyme">
+                <img src="assets/enzyme.png?v=57" alt="">
+                <span class="plab">enzyme</span>
+              </button>
+              <button type="button" class="prot channel" data-prot="channel" aria-label="Channel protein">
+                <canvas class="channel-live" width="700" height="860"></canvas>
+                <svg viewBox="0 0 100 140">
+                  <rect x="8" y="8" width="32" height="124" rx="16" fill="#e11d78"/>
+                  <rect x="60" y="8" width="32" height="124" rx="16" fill="#e11d78"/>
+                  <rect x="42" y="22" width="16" height="96" rx="8" fill="#ffffff"/>
+                </svg>
+                <span class="plab">channel</span>
+              </button>
+              <button type="button" class="prot carrier" data-prot="carrier" aria-label="Carrier protein">
+                <canvas class="carrier-live" width="700" height="860"></canvas>
+                <svg viewBox="0 0 120 150">
+                  <path class="open" fill="#e11d78" d="M18 18h28c0 28 8 40 14 48 6 8 8 20 8 36v32H30V100c0-20-12-28-12-46V18z"/>
+                  <path class="open" fill="#e11d78" d="M102 18H74c0 28-8 40-14 48-6 8-8 20-8 36v32h38V100c0-20 12-28 12-46V18z"/>
+                  <path class="shut" fill="#e11d78" d="M18 132h28c0-28 8-40 14-48 6-8 8-20 8-36V16H30v36c0 20-12 28-12 46v34z"/>
+                  <path class="shut" fill="#e11d78" d="M102 132H74c0-28-8-40-14-48-6-8-8-20-8-36V16h38v36c0 20 12 28 12 46v34z"/>
+                </svg>
+                <span class="plab">carrier</span>
+              </button>
+              <button type="button" class="prot receptor" data-prot="receptor" aria-label="Receptor protein">
+                <img src="assets/receptor.png" alt="">
+                <span class="plab">receptor</span>
+              </button>
+              <button type="button" class="prot glyco" data-prot="glyco" aria-label="Glycoprotein">
+                <svg viewBox="0 0 120 150">
+                  <rect x="34" y="36" width="52" height="100" rx="22" fill="#e11d78"/>
+                  <g class="carb-bit">
+                    <polygon points="58,8 70,14 70,26 58,32 46,26 46,14" fill="#f59e0b"/>
+                    <polygon points="78,18 90,24 90,36 78,42 66,36 66,24" fill="#fb923c"/>
+                    <polygon points="40,20 52,26 52,38 40,44 28,38 28,26" fill="#fdba74"/>
+                  </g>
+                </svg>
+                <span class="plab"><span class="full">glycoprotein</span><span class="short">glyco</span></span>
+              </button>
+              <img class="mover substrate" src="assets/enzyme-substrate.png" alt="">
+              <img class="mover prod prod-a" src="assets/enzyme-product-a.png" alt="">
+              <img class="mover prod prod-b" src="assets/enzyme-product-b.png" alt="">
+              <img class="mover h2o w-a" src="assets/water.png" alt="">
+              <img class="mover h2o w-b" src="assets/water.png" alt="">
+              <img class="mover h2o w-c" src="assets/water.png" alt="">
+              <img class="mover o2 o2block" src="assets/oxygen.png" alt="">
+              <img class="mover ion" src="assets/calcium.png" alt="">
+              <img class="mover hormone" src="assets/hormone.png?v=30" alt="">
+              <svg class="bolts" viewBox="0 0 100 180" aria-hidden="true">
+                <defs>
+                  <filter id="boltGlow" x="-40%" y="-10%" width="180%" height="120%">
+                    <feGaussianBlur stdDeviation="2.2" result="blur"/>
+                    <feMerge>
+                      <feMergeNode in="blur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                </defs>
+                <polyline class="bolt a" filter="url(#boltGlow)" points="50,2 32,38 58,46 26,96 52,108 18,172"/>
+                <polyline class="bolt b" filter="url(#boltGlow)" points="50,2 68,34 40,58 74,102 36,172"/>
+                <polyline class="bolt c" filter="url(#boltGlow)" points="50,4 44,48 64,72 34,124 46,172"/>
+              </svg>
+              <div class="other-cell" aria-hidden="true"><span>another cell</span></div>
+            </div>
+          </section>
+
+          <section class="scene" id="scene-entry" hidden>
+            <p class="side out"><span class="full">outside the cell (extracellular fluid)</span><span class="short">outside</span></p>
+            <p class="side in"><span class="full">inside the cell (cytoplasm)</span><span class="short">inside</span></p>
+            <div class="entry-modes" id="entryModes" role="group" aria-label="Molecule type">
+              <button type="button" data-mol="all" class="active" aria-pressed="true">All</button>
+              <button type="button" data-mol="nonpolar">Small non-polar</button>
+              <button type="button" data-mol="polar">Small polar</button>
+              <button type="button" data-mol="ion">Small ions</button>
+              <button type="button" data-mol="large">Large molecules</button>
+              <button type="button" id="animSpeedBtn">Speed 1×</button>
+              <p id="entryTip">Molecules are spread outside the cell.</p>
+            </div>
+            <div class="board" id="entryBoard">
+              <div class="band"></div>
+              <svg class="waves" id="entryWaves" viewBox="0 0 1000 80" preserveAspectRatio="none"></svg>
+              <div class="prot channel" aria-hidden="true">
+                <svg viewBox="0 0 100 140">
+                  <rect x="8" y="8" width="32" height="124" rx="16" fill="#e11d78"/>
+                  <rect x="60" y="8" width="32" height="124" rx="16" fill="#e11d78"/>
+                  <rect x="42" y="22" width="16" height="96" rx="8" fill="#ffffff"/>
+                </svg>
+              </div>
+              <div class="prot carrier" aria-hidden="true">
+                <canvas class="carrier-live" width="700" height="860"></canvas>
+                <svg viewBox="0 0 120 150">
+                  <path class="open" fill="#e11d78" d="M18 18h28c0 28 8 40 14 48 6 8 8 20 8 36v32H30V100c0-20-12-28-12-46V18z"/>
+                  <path class="open" fill="#e11d78" d="M102 18H74c0 28-8 40-14 48-6 8-8 20-8 36v32h38V100c0-20 12-28 12-46V18z"/>
+                  <path class="shut" fill="#e11d78" d="M18 132h28c0-28 8-40 14-48 6-8 8-20 8-36V16H30v36c0 20-12 28-12 46v34z"/>
+                  <path class="shut" fill="#e11d78" d="M102 132H74c0-28-8-40-14-48-6-8-8-20-8-36V16h38v36c0 20 12 28 12 46v34z"/>
+                </svg>
+              </div>
+              <img class="mover o2 o2pass" src="assets/oxygen.png" alt="">
+              <img class="mover o2 o2pass o2b" src="assets/oxygen.png" alt="">
+              <img class="mover h2o w-a" src="assets/water.png" alt="">
+              <img class="mover h2o w-b" src="assets/water.png" alt="">
+              <img class="mover ion" src="assets/calcium.png" alt="">
+              <img class="mover large starch" src="assets/starch.png" alt="">
+              <img class="mover large tri-big" src="assets/triglyceride.png" alt="">
+              <p class="ban" aria-hidden="true">×</p>
+              <div class="pouch" aria-hidden="true"></div>
+            </div>
+          </section>
+        </div>
+        <p id="desc" class="desc" aria-live="polite"></p>
+      </div>
+    </div>
+  </main>
+
+  <canvas id="penCanvas" class="pen-canvas"></canvas>
+  <div id="laserDot" class="laser-dot hidden"></div>
+  <div class="teach-dock">
+    <button type="button" class="dbtn" id="dkLaser" aria-label="Laser pointer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/></svg>
+    </button>
+    <button type="button" class="dbtn" id="dkPen" aria-label="Pen">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+    </button>
+    <div class="dcolors hidden" id="dkColors">
+      <button type="button" class="dcolor active" data-c="#e11d48" style="--sc:#e11d48" aria-label="Red"></button>
+      <button type="button" class="dcolor" data-c="#2563eb" style="--sc:#2563eb" aria-label="Blue"></button>
+      <button type="button" class="dcolor" data-c="#059669" style="--sc:#059669" aria-label="Green"></button>
+      <button type="button" class="dcolor" data-c="#111827" style="--sc:#111827" aria-label="Black"></button>
+      <button type="button" class="dbtn derase" id="dkErase" aria-label="Eraser">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15l7-7 6 6-4 4H8z"/><line x1="4" y1="21" x2="20" y2="21"/></svg>
+      </button>
+    </div>
+    <button type="button" class="dbtn" id="dkClear" aria-label="Clear writing">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 21 6"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/></svg>
+    </button>
+  </div>
+
+  <script src="vendor/three.min.js"></script>
+  <script src="vendor/OrbitControls.js"></script>
+  <script src="carrier-motion.js?v=37"></script>
+  <script src="channel-motion.js?v=28"></script>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const LIPID = `<svg viewBox="0 0 48 92" aria-hidden="true"><circle cx="24" cy="18" r="15" fill="#1d6fd4"/><circle cx="18" cy="16" r="5.5" fill="#9ecbff"/><path d="M15 34 l5 8 -5 8 5 8 -5 8 5 8 -5 8" fill="none" stroke="#e11d2e" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M29 34 l5 8 -5 8 5 8 -5 8 5 8 -5 8" fill="none" stroke="#e11d2e" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+    const TOPICS = {
+      lipids: [
+        { lesson: "A triglyceride is hydrophobic.", mark: "hydrophobic", kind: "property", desc: "Glycerol 甘油 + 3 fatty acids 脂肪酸. Non-polar 非極性. Lipid-soluble.", reminder: "似油: Non-polar 非極性", scene: "lipids", phase: "tri" },
+        { lesson: "A phospholipid has a hydrophilic head.", mark: "hydrophilic", kind: "property", desc: "Phosphate 磷 + glycerol 甘油 + 2 fatty acids 脂肪酸. Main component of cell membranes 細胞膜.", reminder: "Hydrophobic 疏水 tails", scene: "lipids", phase: "both" },
+        { lesson: "The hydrophilic head attracts water.", mark: "hydrophilic", kind: "property", desc: "Hydrophobic tails repel water. A triglyceride does not attract water.", scene: "lipids", phase: "water" },
+        { answer: "Hydrophilic head + hydrophobic tails.", mark: "Hydrophilic", kind: "property", desc: "The phosphate group is hydrophilic. Fatty acid tails are hydrophobic.", scene: "lipids", phase: "water" }
+      ],
+      bilayer: [
+        { lesson: "A phospholipid has a hydrophilic head and a hydrophobic tail.", mark: "hydrophilic", kind: "property", desc: "Phosphate group: hydrophilic 親水. Fatty acid tails: hydrophobic 疏水.", scene: "bilayer", phase: "one" },
+        { lesson: "Many phospholipids gather in water.", mark: "phospholipids", kind: "material", desc: "Heads are attracted to water. Tails avoid water.", scene: "bilayer", phase: "many" },
+        { lesson: "They form a tail-to-tail bilayer.", mark: "tail-to-tail", kind: "property", desc: "Hydrophilic 親水 heads face water. Hydrophobic 疏水 tails face each other.", scene: "bilayer", phase: "bilayer" },
+        { answer: "Hydrophobic tails face each other.", mark: "Hydrophobic", kind: "property", desc: "Hydrophilic head + hydrophobic tail. Tail-to-tail bilayer.", scene: "bilayer", phase: "bilayer" }
+      ],
+      mosaic: [
+        { lesson: "The cell membrane is a fluid mosaic model.", mark: "fluid mosaic model", kind: "property", desc: "Phospholipid bilayer 磷脂雙層 and embedded membrane proteins 膜蛋白.", scene: "mosaic", phase: "still" },
+        { lesson: "The phospholipid bilayer is fluid and could move laterally.", mark: "fluid", kind: "property", desc: "Phospholipid bilayer 磷脂雙層 is fluid and could move laterally 橫向移動 together with the embedded proteins, infer flexibility靈活性.", scene: "mosaic", phase: "fluid" },
+        { lesson: "Membrane proteins are embedded in a mosaic pattern.", mark: "mosaic", kind: "property", desc: "Membrane proteins 膜蛋白. Embedded in a mosaic pattern.", scene: "mosaic", phase: "mosaic" },
+        { answer: "Flexibility.", mark: "Flexibility", kind: "property", desc: "Fluid movement infers flexibility靈活性.", scene: "mosaic", phase: "mosaic" }
+      ],
+      proteins: [
+        { lesson: "Choose a membrane protein.", mark: "membrane protein", kind: "material", desc: "Enzymes 酶. Channel proteins 通道蛋白. Carrier proteins 輸運蛋白. Receptor proteins 受體蛋白. Glycoproteins 糖蛋白.", reminder: "Choose one", scene: "proteins", phase: "choose" }
+      ],
+      entry: [
+        { lesson: "The cell membrane is differentially permeable.", mark: "differentially permeable", kind: "property", desc: "Polar 極性 molecules are water-soluble (hydrophilic 親水). Non-polar 非極性 molecules are lipid-soluble (hydrophobic 疏水).", scene: "entry", phase: "intro" },
+        { lesson: "Small, non-polar molecules cross the phospholipid bilayer.", mark: "phospholipid bilayer", kind: "material", desc: "Oxygen, carbon dioxide, fatty acids 脂肪酸, glycerol 甘油.", reminder: "Oxygen, carbon dioxide", scene: "entry", phase: "o2" },
+        { lesson: "Small, polar molecules cross through proteins.", mark: "proteins", kind: "material", desc: "Water, amino acids 胺基酸, glucose 葡萄糖. Channel proteins let water through.", reminder: "Water", scene: "entry", phase: "water" },
+        { lesson: "Small ions cross through proteins.", mark: "proteins", kind: "material", desc: "Sodium 鈉, calcium 鈣. Carrier proteins change shape.", reminder: "Calcium 鈣", scene: "entry", phase: "ion" },
+        { lesson: "Large molecules cannot cross the phospholipid bilayer.", mark: "Large molecules", kind: "material", desc: "Starch, triglycerides 三酸甘油酯, proteins 蛋白質.", reminder: "Too large", scene: "entry", phase: "large" },
+        { lesson: "Membrane folding is enabled by the ___ property.", mark: "___", kind: "property", missing: true, desc: "Some unicellular organisms 單細胞生物 eat by membrane folding.", scene: "entry", phase: "fold" },
+        { answer: "Fluid", mark: "Fluid", kind: "property", desc: "Membrane folding is enabled by the fluid property.", scene: "entry", phase: "fold" }
+      ]
+    };
+
+    const PROTEIN = {
+      enzyme: [
+        { lesson: "Enzymes speed up chemical reactions.", mark: "chemical reactions", kind: "process", desc: "Enzymes 酶. The active site fits one substrate.", scene: "proteins", phase: "enzyme-intro" },
+        { lesson: "The substrate fits the active site.", mark: "active site", kind: "material", desc: "The shapes match.", scene: "proteins", phase: "enzyme-fit" },
+        { lesson: "The substrate is broken into products.", mark: "broken", kind: "process", desc: "This is the chemical reaction.", scene: "proteins", phase: "enzyme-split" },
+        { answer: "Speed up chemical reactions.", mark: "chemical reactions", kind: "process", desc: "Enzymes 酶.", scene: "proteins", phase: "enzyme-split" }
+      ],
+      channel: [
+        { lesson: "Provide channels for water-soluble molecules to move across the membrane.", mark: "water-soluble", kind: "property", desc: "Channel proteins 通道蛋白.", scene: "proteins", phase: "channel-intro" },
+        { lesson: "Water passes through the channel.", mark: "Water", kind: "material", desc: "Water is small and polar.", scene: "proteins", phase: "channel-water" },
+        { lesson: "A calcium ion cannot pass through the channel.", mark: "calcium ion", kind: "material", desc: "The pore fits water. A calcium ion is too large to enter.", scene: "proteins", phase: "channel-block" },
+        { answer: "Provide channels for water-soluble molecules to move across the membrane.", mark: "water-soluble", kind: "property", desc: "Channel proteins 通道蛋白.", scene: "proteins", phase: "channel-block" }
+      ],
+      carrier: [
+        { lesson: "Transport substances by shape change (needs energy from respiration)", mark: "shape change", kind: "process", desc: "Needs energy from respiration. Large, polar molecules.", scene: "proteins", phase: "carrier-intro" },
+        { lesson: "The substance binds the carrier.", mark: "binds", kind: "process", desc: "Carrier proteins 輸運蛋白.", scene: "proteins", phase: "carrier-bind" },
+        { lesson: "The carrier changes shape.", mark: "changes shape", kind: "process", desc: "The substance is released inside the cell.", scene: "proteins", phase: "carrier-change" },
+        { answer: "Transport substances by shape change (needs energy from respiration)", mark: "shape change", kind: "process", desc: "Needs energy from respiration.", scene: "proteins", phase: "carrier-change" }
+      ],
+      receptor: [
+        { lesson: "Bind 結合 specific chemical messengers (e.g., hormones) to regulate cell activities.", mark: "chemical messengers", kind: "material", desc: "Card reader. e.g. hormones. Receptor proteins 受體蛋白.", scene: "proteins", phase: "receptor-intro" },
+        { lesson: "A hormone binds the receptor.", mark: "hormone", kind: "material", desc: "The shapes match.", scene: "proteins", phase: "receptor-fit" },
+        { lesson: "The receptor sends a signal into the cell.", mark: "signal", kind: "process", desc: "This regulates cell activities.", scene: "proteins", phase: "receptor-signal" },
+        { answer: "Bind 結合 specific chemical messengers (e.g., hormones) to regulate cell activities.", mark: "chemical messengers", kind: "material", desc: "Bind specific chemical messengers (e.g. hormones).", scene: "proteins", phase: "receptor-signal" }
+      ],
+      glyco: [
+        { lesson: "Glycoproteins act as antigens for cell identification.", mark: "cell identification", kind: "process", desc: "ID card. Glycoproteins 糖蛋白. Antigen 抗原.", scene: "proteins", phase: "glyco-intro" },
+        { lesson: "Another cell identifies this cell.", mark: "identifies", kind: "process", desc: "The carbohydrate chain is the tag.", scene: "proteins", phase: "glyco-id" },
+        { answer: "Cell identification.", mark: "identification", kind: "process", desc: "Glycoproteins act as antigens 抗原.", scene: "proteins", phase: "glyco-id" }
+      ]
+    };
+
+    let topic = "lipids";
+    let step = 0;
+    let protein = null;
+    let zoomed = false;
+    let shownKey = "";
+    let focusId = "";
+
+    function esc(text) {
+      return text.replace(/[&<>]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[ch]));
+    }
+    function withMark(text, mark, kind, missing) {
+      if (!mark) return esc(text);
+      const at = text.indexOf(mark);
+      if (at < 0) return esc(text);
+      const cls = `hl ${kind}${missing ? " missing" : ""}`;
+      return esc(text.slice(0, at)) + `<em class="${cls}">${esc(mark)}</em>` + esc(text.slice(at + mark.length));
+    }
+    function colorPolarity(html) {
+      return html
+        .replace(/hydrophilic/gi, (word) => `<span class="word-philic">${word}</span>`)
+        .replace(/hydrophobic/gi, (word) => `<span class="word-phobic">${word}</span>`);
+    }
+    function stepsOf() {
+      if (topic === "proteins" && protein) return PROTEIN[protein];
+      return TOPICS[topic];
+    }
+    function fitAnswer() {
+      const el = $("answer");
+      if (el.hidden) return;
+      el.style.fontSize = "56px";
+      const avail = el.clientWidth;
+      const need = el.scrollWidth;
+      if (need > avail && avail > 0) el.style.fontSize = `${56 * (avail - 8) / need}px`;
+    }
+    function fitLesson() {
+      const el = $("lesson");
+      const slot = el.parentElement;
+      if (el.hidden || !slot) return;
+      let size = 38;
+      el.style.fontSize = `${size}px`;
+      while (el.scrollHeight > slot.clientHeight + 1 && size > 16) {
+        size -= 1;
+        el.style.fontSize = `${size}px`;
+      }
+    }
+    function layoutBilayer(phase) {
+      document.querySelectorAll("#lipidsLayer .lipid").forEach((node) => {
+        const col = Number(node.dataset.col);
+        const down = node.dataset.down === "1";
+        const x = 2.5 + col * 8.4;
+        const scatter = (col % 3) - 1;
+        if (phase === "one") {
+          node.style.opacity = "0";
+          return;
+        }
+        node.style.opacity = "1";
+        node.style.left = `${phase === "many" ? x + scatter * 1.4 : x}%`;
+        const layerH = node.parentElement.clientHeight || 480;
+        const topY = layerH * 0.16;
+        const bottomY = topY + 84;
+        const scatterY = phase === "many" ? scatter * 28 : 0;
+        node.style.top = `${(down ? bottomY : topY) + scatterY}px`;
+      });
+    }
+    function applyScene(scene, phase) {
+      document.querySelectorAll(".scene").forEach((el) => {
+        el.hidden = el.id !== `scene-${scene}`;
+      });
+      const el = $(`scene-${scene}`);
+      const board = scene === "proteins" ? $("proteinBoard") : scene === "entry" ? $("entryBoard") : null;
+      if (board) board.dataset.phase = phase;
+      const key = `${scene}:${phase}:${protein || ""}`;
+      if (scene === "bilayer") {
+        void el.offsetHeight;
+        layoutBilayer(phase);
+      }
+      if (shownKey === key) return;
+      shownKey = key;
+      el.classList.remove("run");
+      if (board) board.classList.remove("run");
+      el.dataset.phase = phase;
+      void el.offsetWidth;
+      el.classList.add("run");
+      if (board) board.classList.add("run");
+      syncCarriers(scene, phase);
+      syncChannels(scene, phase);
+      syncOutside(scene, phase);
+      syncBilayerWater(scene, phase);
+      syncLipidWater(scene);
+      const world = document.querySelector(".world");
+      if ((scene === "mosaic" || scene === "entry") && world) {
+        const host = $(`scene-${scene}`);
+        if (world.parentElement !== host) host.insertBefore(world, host.firstChild);
+        startMosaic();
+      }
+      setTransport(scene === "entry" ? phase : "none");
+    }
+    const carrierViews = [...document.querySelectorAll(".carrier-live")].map((canvas) => mountCarrier(canvas));
+    function syncCarriers(scene, phase) {
+      const playing = scene === "proteins" && (phase === "choose" || String(phase).startsWith("carrier"));
+      carrierViews.forEach((view) => {
+        const host = view.canvas.closest(".scene");
+        if (!host || host.hidden) {
+          view.setMode("off");
+          return;
+        }
+        view.setGuests(phase !== "choose");
+        view.setMode(playing ? "cycle" : "still");
+      });
+    }
+    const channelViews = [...document.querySelectorAll(".channel-live")].map((canvas) => mountChannel(canvas));
+    function syncChannels(scene, phase) {
+      const playing = scene === "proteins" && (phase === "choose" || String(phase).startsWith("channel"));
+      channelViews.forEach((view) => {
+        const host = view.canvas.closest(".scene");
+        if (!host || host.hidden) {
+          view.setMode("off");
+          return;
+        }
+        view.setGuests(phase !== "choose");
+        view.setMode(playing ? "cycle" : "still");
+      });
+    }
+    function mountOutsideMix(canvas, channelView, carrierView) {
+      const ctx = canvas.getContext("2d");
+      const water = new Image();
+      water.src = "assets/water.png";
+      const substrate = new Image();
+      substrate.src = "assets/enzyme-substrate.png";
+      const hormone = new Image();
+      hormone.src = "assets/hormone.png?v=30";
+      const prodA = new Image();
+      prodA.src = "assets/enzyme-product-a.png";
+      const prodB = new Image();
+      prodB.src = "assets/enzyme-product-b.png";
+      const ion = document.createElement("canvas");
+      ion.width = ion.height = 64;
+      const ictx = ion.getContext("2d");
+      const glow = ictx.createRadialGradient(22, 20, 2, 32, 32, 30);
+      glow.addColorStop(0, "#fff6e4");
+      glow.addColorStop(0.45, "#ff8c1a");
+      glow.addColorStop(1, "#d4530a");
+      ictx.fillStyle = glow;
+      ictx.beginPath();
+      ictx.arc(32, 32, 28, 0, Math.PI * 2);
+      ictx.fill();
+      const sprite = { water, ion, sub: substrate, hormone };
+      const spec = [
+        ["water", 20, 22],
+        ["ion", 8, 22],
+        ["sub", 4, 28],
+        ["hormone", 3, 24]
+      ];
+      const bits = [];
+      const actors = { w1: null, w2: null, bounce: null, pass: null, sub: null, hor: null };
+      let enzymeT = 0;
+      let mode = "";
+      let raf = 0;
+      let filledFor = "";
+      let clock0 = 0;
+      let boltCycle = -1;
+      function resize() {
+        const scene = canvas.closest(".scene").getBoundingClientRect();
+        const parent = canvas.parentElement.getBoundingClientRect();
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const w = Math.max(2, parent.width, scene.width);
+        const h = Math.max(2, parent.height, scene.height);
+        const bw = Math.round(w * dpr);
+        const bh = Math.round(h * dpr);
+        if (canvas.width !== bw || canvas.height !== bh) {
+          canvas.width = bw;
+          canvas.height = bh;
+        }
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        return { w, h };
+      }
+      function makeBit(kind, size, w, h, fade) {
+        const floor = h * 0.3;
+        return {
+          kind,
+          size,
+          x: 16 + Math.random() * Math.max(20, w - 32),
+          y: 44 + Math.random() * Math.max(20, floor - 70),
+          vx: (Math.random() - 0.5) * 0.9,
+          vy: (Math.random() - 0.5) * 0.45,
+          job: "drift",
+          fade,
+          squash: 1
+        };
+      }
+      function fill(w, h) {
+        bits.length = 0;
+        for (const key of Object.keys(actors)) actors[key] = null;
+        for (const [kind, count, size] of spec) {
+          for (let i = 0; i < count; i++) bits.push(makeBit(kind, size, w, h, 1));
+        }
+        filledFor = `${Math.round(w)}x${Math.round(h)}`;
+      }
+      function spawn(kind, size, w, h) {
+        bits.push(makeBit(kind, size, w, h, 0));
+      }
+      function takeBit(kind, targetX) {
+        let best = null;
+        let bestD = 1e9;
+        for (const bit of bits) {
+          if (bit.job !== "drift" || bit.kind !== kind) continue;
+          const d = Math.abs(bit.x - targetX);
+          if (d < bestD) { best = bit; bestD = d; }
+        }
+        if (!best) return null;
+        best.job = "busy";
+        best.fromX = best.x;
+        best.fromY = best.y;
+        best.fromSize = best.size;
+        best.grabT = null;
+        return best;
+      }
+      function finish(slot, kind, size, w, h) {
+        const bit = actors[slot];
+        if (!bit) return;
+        const i = bits.indexOf(bit);
+        if (i >= 0) bits.splice(i, 1);
+        actors[slot] = null;
+        spawn(kind, size, w, h);
+      }
+      function revert(slot) {
+        const bit = actors[slot];
+        if (!bit) return;
+        bit.job = "drift";
+        bit.drawSize = bit.size;
+        bit.squash = 1;
+        bit.vy = -1.1;
+        bit.vx = (Math.random() - 0.5) * 0.6;
+        actors[slot] = null;
+      }
+      function mapPoint(el, nx, ny) {
+        const board = canvas.getBoundingClientRect();
+        const r = el.getBoundingClientRect();
+        return {
+          x: r.left - board.left + r.width * nx,
+          y: r.top - board.top + r.height * ny,
+          scale: r.width / 700,
+          squash: 1
+        };
+      }
+      function follow(slot, kind, t, point, drawSize) {
+        let bit = actors[slot];
+        if (!bit) {
+          bit = takeBit(kind, point.x);
+          if (!bit) return null;
+          bit.grabT = t;
+          actors[slot] = bit;
+        }
+        const span = Math.max(0.12, 0.34 - bit.grabT);
+        const e = Math.max(0, Math.min(1, (t - bit.grabT) / span));
+        const s = e * e * (3 - 2 * e);
+        bit.x = bit.fromX + (point.x - bit.fromX) * s;
+        bit.y = bit.fromY + (point.y - bit.fromY) * s;
+        bit.drawSize = bit.fromSize + (drawSize - bit.fromSize) * s;
+        bit.squash = point.squash || 1;
+        return bit;
+      }
+      function rideChannel(w, h) {
+        const el = document.querySelector("#scene-proteins .channel-live");
+        if (!el || !channelView) return;
+        const u = channelView.progress();
+        const slots = [
+          ["w1", channelView.waterState(u, 0, 0.34), 48],
+          ["w2", channelView.waterState(u, 0.16, 0.34), 48]
+        ];
+        for (const [slot, state, diameter] of slots) {
+          if (state) {
+            const p = mapPoint(el, 0.5, state.y / 860);
+            follow(slot, "water", state.t, p, Math.max(22, diameter * p.scale));
+          } else if (actors[slot]) finish(slot, "water", 22, w, h);
+        }
+        const ionS = channelView.ionState(u);
+        if (ionS) {
+          const p = mapPoint(el, 0.5, ionS.y / 860);
+          p.squash = ionS.squash;
+          follow("bounce", "ion", ionS.t, p, 104 * p.scale);
+        } else if (actors.bounce) revert("bounce");
+      }
+      function rideCarrier(w, h) {
+        const el = document.querySelector("#scene-proteins .carrier-live");
+        if (!el || !carrierView) return;
+        const state = carrierView.ionState(carrierView.progress());
+        if (state) {
+          const p = mapPoint(el, 0.5, state.y / 860);
+          follow("pass", "ion", state.t, p, 114 * p.scale);
+        } else if (actors.pass) finish("pass", "ion", 22, w, h);
+      }
+      function imageBox(img, left, top, width) {
+        const aspect = img.width ? img.height / img.width : 1;
+        const height = width * aspect;
+        return { x: left + width / 2, y: top + height / 2, squash: 1, height };
+      }
+      function rideEnzyme(w, h, now) {
+        enzymeT = ((now - clock0) % 6600) / 6600;
+        const dock = imageBox(substrate, w * 0.0773, h * 0.3319, 44.3);
+        if (enzymeT < 0.54) {
+          const bit = follow("sub", "sub", Math.min(1, enzymeT / 0.32), dock, 44.3);
+          if (bit) bit.fade = enzymeT > 0.48 ? Math.max(0, 1 - (enzymeT - 0.48) / 0.06) : 1;
+        } else if (actors.sub) finish("sub", "sub", 28, w, h);
+      }
+      function rideHormone(w, h, now) {
+        const dur = 5200;
+        const t = ((now - clock0) % dur) / dur;
+        const cycle = Math.floor((now - clock0) / dur);
+        if (t < 0.04 && boltCycle !== cycle) {
+          boltCycle = cycle;
+          document.querySelectorAll("#proteinBoard .bolt").forEach((el) => {
+            el.style.animation = "none";
+            void el.offsetWidth;
+            el.style.animation = "";
+          });
+        }
+        const dock = imageBox(hormone, w * 0.6734, h * 0.41, 36);
+        if (t < 0.82) {
+          const bit = follow("hor", "hormone", Math.min(1, t / 0.36), dock, 36);
+          if (bit) bit.fade = 1;
+        } else if (actors.hor) {
+          actors.hor.fade = Math.max(0, 1 - (t - 0.82) / 0.1);
+          if (t > 0.93) finish("hor", "hormone", 24, w, h);
+        }
+      }
+      function paintBit(bit) {
+        const img = sprite[bit.kind];
+        if (!img || !img.width) return;
+        const size = bit.drawSize || bit.size;
+        const aspect = img.height / img.width;
+        const squash = bit.squash || 1;
+        ctx.save();
+        ctx.globalAlpha = bit.fade == null ? 1 : bit.fade;
+        ctx.translate(bit.x, bit.y);
+        ctx.scale(1 / squash, squash);
+        ctx.drawImage(img, -size / 2, -(size * aspect) / 2, size, size * aspect);
+        ctx.restore();
+      }
+      function paintProducts(w, h) {
+        const t = enzymeT;
+        if (t < 0.52 || t > 0.94 || !prodA.width || !prodB.width) return;
+        let shift = 0;
+        if (t >= 0.82) shift = 1;
+        else if (t >= 0.62) shift = (t - 0.62) / 0.2;
+        let fade = 1;
+        if (t < 0.56) fade = (t - 0.52) / 0.04;
+        else if (t > 0.88) fade = Math.max(0, 1 - (t - 0.88) / 0.06);
+        const box = imageBox(substrate, w * 0.0773, h * 0.3319, 44.3);
+        ctx.save();
+        ctx.globalAlpha = fade;
+        const aw = 22.2;
+        const ah = aw * (prodA.height / prodA.width);
+        const bw = 22.2;
+        const bh = bw * (prodB.height / prodB.width);
+        ctx.drawImage(prodA, box.x - aw + (-30 * shift), box.y - ah / 2 + (-56 * shift), aw, ah);
+        ctx.drawImage(prodB, box.x + (30 * shift), box.y - bh / 2 + (-56 * shift), bw, bh);
+        ctx.restore();
+      }
+      function tick(now) {
+        if (mode !== "play") return;
+        now = now || performance.now();
+        const { w, h } = resize();
+        const key = `${Math.round(w)}x${Math.round(h)}`;
+        if (filledFor !== key || bits.length < 10) fill(w, h);
+        const floor = h * 0.3;
+        for (const bit of bits) {
+          if (bit.job !== "drift") continue;
+          bit.vx += (Math.random() - 0.5) * 0.2;
+          bit.vy += (Math.random() - 0.5) * 0.12;
+          bit.vx *= 0.985;
+          bit.vy *= 0.985;
+          const speed = Math.hypot(bit.vx, bit.vy);
+          if (speed > 1.6) {
+            bit.vx *= 1.6 / speed;
+            bit.vy *= 1.6 / speed;
+          }
+          bit.x += bit.vx;
+          bit.y += bit.vy;
+          if (bit.fade < 1) bit.fade = Math.min(1, bit.fade + 0.03);
+          if (bit.y > floor) bit.vy -= 0.05;
+          else if (bit.y < 40) { bit.y = 40; bit.vy *= -0.4; }
+          if (bit.x < -24) bit.x = w + 12;
+          else if (bit.x > w + 24) bit.x = -12;
+        }
+        rideChannel(w, h);
+        rideCarrier(w, h);
+        rideEnzyme(w, h, now);
+        rideHormone(w, h, now);
+        ctx.clearRect(0, 0, w, h);
+        for (const bit of bits) paintBit(bit);
+        paintProducts(w, h);
+        raf = requestAnimationFrame(tick);
+      }
+      return {
+        setMode(next) {
+          if (next === mode) return;
+          mode = next;
+          cancelAnimationFrame(raf);
+          if (next === "play") {
+            clock0 = performance.now();
+            boltCycle = -1;
+            tick(clock0);
+          } else {
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+          }
+        }
+      };
+    }
+    const proteinChannel = channelViews.find((view) => view.canvas.closest("#scene-proteins"));
+    const proteinCarrier = carrierViews.find((view) => view.canvas.closest("#scene-proteins"));
+    const outsideMix = mountOutsideMix($("outsideMix"), proteinChannel, proteinCarrier);
+    function syncOutside(scene, phase) {
+      const host = $("scene-proteins");
+      outsideMix.setMode(scene === "proteins" && phase === "choose" && host && !host.hidden ? "play" : "off");
+    }
+    function mountBilayerWater(canvas, getImage, profile) {
+      const ctx = canvas.getContext("2d");
+      const sprite = document.createElement("canvas");
+      sprite.width = sprite.height = 32;
+      const sctx = sprite.getContext("2d");
+      const sg = sctx.createRadialGradient(11, 10, 1, 16, 16, 15);
+      sg.addColorStop(0, "#eaf4ff");
+      sg.addColorStop(0.45, "#3b86f5");
+      sg.addColorStop(1, "#1d4fd0");
+      sctx.fillStyle = sg;
+      sctx.beginPath();
+      sctx.arc(16, 16, 14, 0, Math.PI * 2);
+      sctx.fill();
+      const drops = [];
+      let mode = "";
+      let raf = 0;
+      let filledFor = "";
+      function resize() {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const w = Math.max(2, rect.width);
+        const h = Math.max(2, rect.height);
+        const bw = Math.round(w * dpr);
+        const bh = Math.round(h * dpr);
+        if (canvas.width !== bw || canvas.height !== bh) {
+          canvas.width = bw;
+          canvas.height = bh;
+        }
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        return { w, h };
+      }
+      function lipidBox() {
+        const img = getImage();
+        if (!img) return null;
+        const ir = img.getBoundingClientRect();
+        const sr = canvas.parentElement.getBoundingClientRect();
+        if (ir.width < 8) return null;
+        return { x: ir.left - sr.left, y: ir.top - sr.top, w: ir.width, h: ir.height, viewW: sr.width, viewH: sr.height };
+      }
+      function regions(box) {
+        return {
+          head: { x: box.x + box.w * 0.15, y: box.y + box.h * 0.5, r: box.h * 0.46 },
+          tail: {
+            x0: box.x + box.w * 0.3,
+            x1: box.x + box.w * 0.99,
+            y0: box.y + box.h * 0.18,
+            y1: box.y + box.h * 0.82
+          }
+        };
+      }
+      function makeDrop(x, y) {
+        return {
+          x,
+          y,
+          vx: (Math.random() - 0.5) * 3.4,
+          vy: (Math.random() - 0.5) * 3.4,
+          r: 6.2 + Math.random() * 1.6
+        };
+      }
+      function tailSpan(tail) {
+        return (tail.y1 - tail.y0) * 1.15;
+      }
+      function inTailBand(x, y, box) {
+        const tail = regions(box).tail;
+        const midY = (tail.y0 + tail.y1) / 2;
+        return x > tail.x0 - 6 && x < tail.x1 + 48 && Math.abs(y - midY) < tailSpan(tail);
+      }
+      function wholeHalo(box) {
+        const padX = Math.max(28, box.h * 0.42);
+        const padY = Math.max(28, box.h * 0.62);
+        return { x0: box.x - padX, y0: box.y - padY, x1: box.x + box.w + padX, y1: box.y + box.h + padY };
+      }
+      function inClear(x, y, box) {
+        if (profile === "whole") {
+          const band = wholeHalo(box);
+          return x > band.x0 && x < band.x1 && y > band.y0 && y < band.y1;
+        }
+        return inTailBand(x, y, box);
+      }
+      function fillSea(w, h, box) {
+        drops.length = 0;
+        const gap = 30;
+        const row = gap * 0.88;
+        let rowIndex = 0;
+        for (let y = 2; y < h + gap; y += row) {
+          const shift = (rowIndex % 2) * gap * 0.5;
+          for (let x = shift - gap; x < w + gap; x += gap) {
+            const px = x + (Math.random() - 0.5) * 8;
+            const py = y + (Math.random() - 0.5) * 8;
+            if (box && inClear(px, py, box)) continue;
+            drops.push(makeDrop(px, py));
+          }
+          rowIndex += 1;
+        }
+        if (box && profile !== "whole") {
+          const head = regions(box).head;
+          for (let i = 0; i < 14; i++) {
+            const ang = Math.random() * Math.PI * 2;
+            const rad = head.r * Math.sqrt(Math.random()) * 1.7;
+            drops.push(makeDrop(head.x + Math.cos(ang) * rad, head.y + Math.sin(ang) * rad));
+          }
+        }
+        filledFor = `${Math.round(w)}x${Math.round(h)}`;
+      }
+      function tick() {
+        if (mode !== "play") return;
+        const { w, h } = resize();
+        const box = lipidBox();
+        ctx.clearRect(0, 0, w, h);
+        if (!box) {
+          raf = requestAnimationFrame(tick);
+          return;
+        }
+        const key = `${Math.round(w)}x${Math.round(h)}`;
+        if (filledFor !== key || drops.length < 40) fillSea(w, h, box);
+        const { head, tail } = regions(box);
+        const midY = (tail.y0 + tail.y1) / 2;
+        const cell = 20;
+        const buckets = new Map();
+        const bucketKey = (ix, iy) => ix + iy * 4096;
+        for (const drop of drops) {
+          const ix = Math.floor(drop.x / cell);
+          const iy = Math.floor(drop.y / cell);
+          const k = bucketKey(ix, iy);
+          const list = buckets.get(k);
+          if (list) list.push(drop);
+          else buckets.set(k, [drop]);
+        }
+        for (const drop of drops) {
+          drop.vx += (Math.random() - 0.5) * 0.85;
+          drop.vy += (Math.random() - 0.5) * 0.85;
+          const ix = Math.floor(drop.x / cell);
+          const iy = Math.floor(drop.y / cell);
+          for (let oy = -1; oy <= 1; oy++) {
+            for (let ox = -1; ox <= 1; ox++) {
+              const list = buckets.get(bucketKey(ix + ox, iy + oy));
+              if (!list) continue;
+              for (const other of list) {
+                if (other === drop) continue;
+                const sx = drop.x - other.x;
+                const sy = drop.y - other.y;
+                const min = drop.r + other.r - 2;
+                const d2 = sx * sx + sy * sy;
+                if (d2 > 0 && d2 < min * min) {
+                  const d = Math.sqrt(d2);
+                  const push = (min - d) * 0.04;
+                  drop.vx += (sx / d) * push;
+                  drop.vy += (sy / d) * push;
+                }
+              }
+            }
+          }
+          if (profile === "whole") {
+            const band = wholeHalo(box);
+            if (drop.x > band.x0 && drop.x < band.x1 && drop.y > band.y0 && drop.y < band.y1) {
+              const dl = drop.x - band.x0;
+              const dr = band.x1 - drop.x;
+              const dt = drop.y - band.y0;
+              const db = band.y1 - drop.y;
+              const m = Math.min(dl, dr, dt, db);
+              const near = Math.max(0, 1 - m / Math.max(24, box.h * 0.55));
+              const kick = 0.6 + near * 1.3;
+              const step = 0.6 + near * 1.5;
+              if (m === dl) { drop.vx -= kick; drop.x -= step; }
+              else if (m === dr) { drop.vx += kick; drop.x += step; }
+              else if (m === dt) { drop.vy -= kick; drop.y -= step; }
+              else { drop.vy += kick; drop.y += step; }
+            }
+          } else {
+            const dx = head.x - drop.x;
+            const dy = head.y - drop.y;
+            const dist = Math.hypot(dx, dy) || 1;
+            if (dist < head.r * 2.5) {
+              const pull = 0.07 * (1 - dist / (head.r * 2.5));
+              drop.vx += (dx / dist) * pull;
+              drop.vy += (dy / dist) * pull;
+            }
+            if (dist < head.r * 0.74) {
+              drop.vx -= (dx / dist) * 0.7;
+              drop.vy -= (dy / dist) * 0.7;
+            }
+            if (drop.x > tail.x0 - 6 && drop.x < tail.x1 + 48) {
+              const away = drop.y - midY;
+              const span = tailSpan(tail);
+              const ad = Math.abs(away);
+              if (ad < span) {
+                const sign = away >= 0 ? 1 : -1;
+                const near = 1 - ad / span;
+                drop.vy += sign * (0.55 + near * 1.25);
+                drop.y += sign * (0.55 + near * 1.5);
+              }
+            }
+          }
+          drop.vx *= 0.985;
+          drop.vy *= 0.985;
+          const sp = Math.hypot(drop.vx, drop.vy) || 1;
+          const max = 2.8;
+          if (sp > max) { drop.vx *= max / sp; drop.vy *= max / sp; }
+          drop.x += drop.vx;
+          drop.y += drop.vy;
+          if (drop.x < -14) drop.x += w + 18;
+          else if (drop.x > w + 14) drop.x -= w + 18;
+          if (drop.y < -14) drop.y += h + 18;
+          else if (drop.y > h + 14) drop.y -= h + 18;
+          const size = drop.r * 2;
+          ctx.drawImage(sprite, drop.x - drop.r, drop.y - drop.r, size, size);
+        }
+        raf = requestAnimationFrame(tick);
+      }
+      return {
+        setMode(next) {
+          if (next === mode) return;
+          mode = next;
+          cancelAnimationFrame(raf);
+          if (next === "play") raf = requestAnimationFrame(tick);
+          else {
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+          }
+        }
+      };
+    }
+    const bilayerWater = mountBilayerWater($("bilayerWater"), () => document.querySelector("#oneLipid img"), "tails");
+    const triWater = mountBilayerWater($("triWater"), () => document.querySelector("#cardTri .hero"), "whole");
+    const phWater = mountBilayerWater($("phWater"), () => document.querySelector("#cardPh .hero"), "tails");
+    function syncBilayerWater(scene, phase) {
+      const host = $("scene-bilayer");
+      bilayerWater.setMode(scene === "bilayer" && phase === "one" && host && !host.hidden ? "play" : "off");
+    }
+    function syncLipidWater(scene) {
+      const host = $("scene-lipids");
+      const on = scene === "lipids" && host && !host.hidden;
+      triWater.setMode(on ? "play" : "off");
+      const ph = $("cardPh");
+      phWater.setMode(on && ph && getComputedStyle(ph).display !== "none" ? "play" : "off");
+    }
+    function focusBoard() {
+      const board = $("proteinBoard");
+      if (topic !== "proteins" || !protein) {
+        focusId = "";
+        board.classList.remove("focused");
+        board.style.transform = "none";
+        board.querySelectorAll(".prot").forEach((el) => el.classList.remove("is-on"));
+        return;
+      }
+      board.querySelectorAll(".prot").forEach((el) => {
+        el.classList.toggle("is-on", el.dataset.prot === protein);
+      });
+      if (focusId === protein) return;
+      focusId = protein;
+      const prot = board.querySelector(`[data-prot="${protein}"]`);
+      const br = board.getBoundingClientRect();
+      const pr = prot.getBoundingClientRect();
+      const cx = ((pr.left + pr.width / 2 - br.left) / br.width) * 100;
+      const cy = ((pr.top + pr.height / 2 - br.top) / br.height) * 100;
+      board.style.transformOrigin = `${cx}% ${cy}%`;
+      board.classList.add("focused");
+      board.style.transform = "scale(1.28)";
+    }
+    function render() {
+      const list = stepsOf();
+      const item = list[step];
+      $("stepNo").textContent = `${step + 1} / ${list.length}`;
+      $("back").disabled = step === 0 && !(topic === "proteins" && protein);
+      $("next").disabled = step >= list.length - 1;
+      document.querySelectorAll("[data-topic]").forEach((btn) => {
+        const on = btn.dataset.topic === topic;
+        btn.classList.toggle("active", on);
+        btn.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      document.querySelectorAll(".mosaic-modes button").forEach((btn) => {
+        const on = topic === "mosaic" && item.phase === btn.dataset.mode;
+        btn.classList.toggle("active", on);
+        btn.setAttribute("aria-pressed", on ? "true" : "false");
+      });
+      document.querySelectorAll(".fluid-degrees button").forEach((btn) => {
+        const on = fluidDegree === btn.dataset.degree;
+        btn.classList.toggle("active", on);
+        btn.setAttribute("aria-pressed", on ? "true" : "false");
+      });
+      $("partSelect").value = topic;
+      if (item.answer) {
+        $("lesson").hidden = true;
+        $("answer").hidden = false;
+        $("answer").innerHTML = colorPolarity(withMark(item.answer, item.mark, item.kind, item.missing));
+      } else {
+        $("answer").hidden = true;
+        $("lesson").hidden = false;
+        $("lesson").innerHTML = colorPolarity(withMark(item.lesson, item.mark, item.kind, item.missing));
+      }
+      $("desc").textContent = item.desc || "";
+      const reminder = $("reminder");
+      reminder.textContent = item.reminder || "";
+      reminder.hidden = !item.reminder || Boolean(protein);
+      $("fullView").hidden = !(topic === "proteins" && protein);
+      applyScene(item.scene, item.phase);
+      requestAnimationFrame(() => {
+        fitLesson();
+        fitAnswer();
+        focusBoard();
+        if (zoomed) fitZoom();
+      });
+    }
+    function setTopic(id) {
+      topic = id;
+      step = 0;
+      protein = null;
+      shownKey = "";
+      render();
+    }
+    function go(delta) {
+      if (delta < 0 && topic === "proteins" && protein && step === 0) {
+        protein = null;
+        shownKey = "";
+        render();
+        return;
+      }
+      const max = stepsOf().length - 1;
+      step = Math.max(0, Math.min(max, step + delta));
+      render();
+    }
+    function chooseProtein(id) {
+      if (topic !== "proteins" || toolsOn()) return;
+      protein = id;
+      step = 0;
+      shownKey = "";
+      focusId = "";
+      render();
+    }
+    function showAllProteins() {
+      if (topic !== "proteins" || !protein) return;
+      protein = null;
+      step = 0;
+      shownKey = "";
+      focusId = "";
+      render();
+    }
+    function setDescHidden(hidden) {
+      document.body.classList.toggle("desc-off", hidden);
+      const btn = $("hideBtn");
+      btn.textContent = hidden ? "Show" : "Hide";
+      btn.setAttribute("aria-expanded", hidden ? "false" : "true");
+      if (zoomed) requestAnimationFrame(fitZoom);
+    }
+    function fitZoom() {
+      const inner = $("pairInner");
+      inner.style.transform = "none";
+      if (!zoomed) return;
+      const parent = $("pair");
+      const scale = Math.min(1, parent.clientHeight / inner.offsetHeight, parent.clientWidth / inner.scrollWidth);
+      if (scale < 1) inner.style.transform = `scale(${scale})`;
+    }
+    function setZoom(on) {
+      zoomed = on;
+      document.body.classList.toggle("zoomed", on);
+      $("zoomBtn").setAttribute("aria-pressed", on ? "true" : "false");
+      requestAnimationFrame(fitZoom);
+    }
+    function toolsOn() {
+      return document.body.classList.contains("pen-on") || document.body.classList.contains("laser-on");
+    }
+
+    let startMosaic = () => {};
+    let setTransport = () => {};
+    let setMoleculeFilter = () => {};
+    let moleculeFilter = "all";
+    let animSpeed = 1;
+    let fluidDegree = "medium";
+    (function buildStage() {
+      const layer = $("lipidsLayer");
+      for (let col = 0; col < 11; col += 1) {
+        [false, true].forEach((down) => {
+          const node = document.createElement("div");
+          node.className = `lipid${down ? " down" : ""}`;
+          node.dataset.col = String(col);
+          node.dataset.down = down ? "1" : "0";
+          node.innerHTML = LIPID;
+          layer.appendChild(node);
+        });
+      }
+      mountMosaic3d();
+    })();
+
+    function mountMosaic3d() {
+      const canvas = $("mosaic3d");
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x03080c);
+      scene.fog = new THREE.FogExp2(0x03080c, 0.012);
+      const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 400);
+      camera.position.set(0, 22, 48);
+      camera.lookAt(0, 0, 0);
+      const topCam = new THREE.OrthographicCamera(-40, 40, 30, -30, 0.1, 200);
+      topCam.position.set(0, 40, 0);
+      topCam.up.set(0, 0, -1);
+      topCam.lookAt(0, 0, 0);
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      const controls = new THREE.OrbitControls(camera, canvas);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.08;
+      controls.enablePan = true;
+      controls.screenSpacePanning = true;
+      controls.minPolarAngle = 0;
+      controls.maxPolarAngle = Math.PI;
+      controls.minDistance = 12;
+      controls.maxDistance = 140;
+      controls.minZoom = 0.35;
+      controls.maxZoom = 4;
+      controls.target.set(0, 0, 0);
+      scene.add(new THREE.AmbientLight(0xffffff, 0.85));
+      const topLight = new THREE.DirectionalLight(0xffffff, 1.1);
+      topLight.position.set(10, 40, 15);
+      scene.add(topLight);
+      const rimLight = new THREE.DirectionalLight(0x3a86ff, 0.4);
+      rimLight.position.set(-20, 5, -20);
+      scene.add(rimLight);
+
+      const membrane = new THREE.Group();
+      scene.add(membrane);
+      const headMat = new THREE.MeshPhongMaterial({ color: 0x2196f3, shininess: 35 });
+      const tailMat = new THREE.MeshPhongMaterial({ color: 0xffb300, shininess: 5 });
+      const channelMat = new THREE.MeshStandardMaterial({ color: 0x9c27b0, roughness: 0.4, side: THREE.DoubleSide });
+      const carrierMat = new THREE.MeshStandardMaterial({ color: 0xe91e63, roughness: 0.4, side: THREE.DoubleSide });
+      const receptorMat = new THREE.MeshStandardMaterial({ color: 0x00d6a0, roughness: 0.4 });
+      const glyMat = new THREE.MeshStandardMaterial({ color: 0x00b0ff, roughness: 0.4 });
+      const glycanMat = new THREE.MeshPhongMaterial({ color: 0x00e676, shininess: 40 });
+      const tailGeo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(0, -0.6, 0),
+        new THREE.Vector3(0.12, -1.3, 0),
+        new THREE.Vector3(0.2, -2.1, 0)
+      ]), 8, 0.07, 6, false);
+      const headGeo = new THREE.SphereGeometry(0.5, 16, 16);
+      const rows = 36;
+      const cols = 26;
+      const spacing = 1.9;
+      const proteinMap = [
+        { r: 5, c: 6, type: "channel", rad: 1.6 },
+        { r: 12, c: 18, type: "channel", rad: 1.6 },
+        { r: 24, c: 8, type: "channel", rad: 1.6 },
+        { r: 30, c: 16, type: "carrier", rad: 1.6 },
+        { r: 16, c: 13, type: "carrier", rad: 1.6 },
+        { r: 28, c: 5, type: "glycoprotein", rad: 1.5 },
+        { r: 8, c: 16, type: "glycoprotein", rad: 1.5 },
+        { r: 20, c: 20, type: "receptor", rad: 1.5 }
+      ];
+      const lipids = [];
+      const proteins = [];
+      function hole(i, j) {
+        return proteinMap.some((p) => Math.hypot(i - p.r, j - p.c) < p.rad * 1.25);
+      }
+      for (let i = 0; i < rows; i += 1) {
+        for (let j = 0; j < cols; j += 1) {
+          if (hole(i, j)) continue;
+          const x = (i - rows / 2) * spacing;
+          const z = (j - cols / 2) * spacing;
+          const seed = i * 0.15 + j * 0.45;
+          [["top", 2.1, 0], ["bot", -2.1, Math.PI]].forEach(([leaflet, y, flip]) => {
+            const unit = new THREE.Group();
+            const head = new THREE.Mesh(headGeo, headMat);
+            head.position.y = y;
+            const t1 = new THREE.Mesh(tailGeo, tailMat);
+            const t2 = new THREE.Mesh(tailGeo, tailMat);
+            t1.position.set(-0.16, y, 0);
+            t2.position.set(0.16, y, 0);
+            if (leaflet === "top") t2.rotation.y = Math.PI;
+            else {
+              t1.rotation.x = flip;
+              t2.rotation.set(flip, Math.PI, 0);
+            }
+            unit.add(head, t1, t2);
+            unit.position.set(x, 0, z);
+            membrane.add(unit);
+            lipids.push({ obj: unit, s: seed + (leaflet === "bot" ? 5 : 0), rx: x, rz: z });
+          });
+        }
+      }
+      function hollowCylinder(height, outRad, inRad) {
+        const shape = new THREE.Shape();
+        shape.absarc(0, 0, outRad, 0, Math.PI * 2, false);
+        const holePath = new THREE.Path();
+        holePath.absarc(0, 0, inRad, 0, Math.PI * 2, true);
+        shape.holes.push(holePath);
+        const geo = new THREE.ExtrudeGeometry(shape, {
+          depth: height,
+          bevelEnabled: false,
+          curveSegments: 28,
+          steps: 1
+        });
+        geo.center();
+        geo.rotateX(Math.PI / 2);
+        return geo;
+      }
+      const CARRIER_OUTER = [
+        [-1, 0.55], [-0.94, 0.74], [-0.86, 0.9], [-0.76, 0.98], [-0.64, 1],
+        [-0.5, 0.99], [-0.36, 0.93], [-0.22, 0.84], [-0.08, 0.75], [0.06, 0.68],
+        [0.2, 0.65], [0.34, 0.64], [0.48, 0.64], [0.62, 0.6], [0.74, 0.56],
+        [0.86, 0.52], [1, 0.5]
+      ];
+      function carrierSample(y) {
+        const table = CARRIER_OUTER;
+        if (y <= table[0][0]) return table[0][1];
+        const last = table[table.length - 1];
+        if (y >= last[0]) return last[1];
+        for (let i = 1; i < table.length; i += 1) {
+          if (y <= table[i][0]) {
+            const span = table[i][0] - table[i - 1][0];
+            const t = (y - table[i - 1][0]) / span;
+            const s = t * t * (3 - 2 * t);
+            return table[i - 1][1] + (table[i][1] - table[i - 1][1]) * s;
+          }
+        }
+        return last[1];
+      }
+      function carrierSmax(a, b, k) {
+        const m = Math.max(a, b);
+        if (m <= 0.001) return 0;
+        const h = Math.max(k - Math.abs(a - b), 0) / k;
+        return m + h * h * k * 0.25;
+      }
+      function carrierOuter(yn, open) {
+        const up = carrierSample(yn);
+        const down = carrierSample(-yn);
+        const mixed = up + (down - up) * open;
+        const full = carrierSmax(carrierSmax(up, down, 0.1), 0.72, 0.1);
+        return mixed + (full - mixed) * (0.7 * Math.sin(Math.PI * open));
+      }
+      function carrierBell(dist) {
+        const shape = [0, 1, 0.1, 1.14, 0.22, 1.22, 0.38, 1.05, 0.54, 0.72, 0.7, 0.4, 0.84, 0.16, 0.94, 0.05, 1, 0];
+        const u = Math.max(0, Math.min(1, dist));
+        for (let i = 2; i < shape.length; i += 2) {
+          if (u <= shape[i]) {
+            const span = shape[i] - shape[i - 2] || 1;
+            const s = (u - shape[i - 2]) / span;
+            const e = s * s * (3 - 2 * s);
+            return shape[i - 1] + (shape[i + 1] - shape[i - 1]) * e;
+          }
+        }
+        return 0;
+      }
+      function carrierCavity(t, open) {
+        const reach = 0.5;
+        const mouth = 0.5;
+        const top = t < reach ? carrierBell(t / reach) * mouth * (1 - open) : 0;
+        const bot = (1 - t) < reach ? carrierBell((1 - t) / reach) * mouth * open : 0;
+        const mid = Math.sin(Math.PI * open) * 0.2 * Math.exp(-((t - 0.5) * (t - 0.5)) / 0.018);
+        return Math.max(top, bot, mid);
+      }
+      function carrierSilhouette(t, open) {
+        const yn = -0.7 + 1.4 * Math.max(0, Math.min(1, t));
+        const side = Math.max(0.52, carrierOuter(yn, open));
+        const cap = 0.14;
+        const topRound = t < cap ? Math.sin((t / cap) * Math.PI * 0.5) : 1;
+        const botRound = t > 1 - cap ? Math.sin(((1 - t) / cap) * Math.PI * 0.5) : 1;
+        const topK = (1 - open) + open * topRound;
+        const botK = open + (1 - open) * botRound;
+        return side * topK * botK;
+      }
+      const carrierGloss = new THREE.MeshPhongMaterial({
+        color: 0xd41470,
+        specular: 0x4a1024,
+        shininess: 10,
+        transparent: false,
+        opacity: 1,
+        depthWrite: true,
+        side: THREE.FrontSide
+      });
+      const carrierMouthMat = new THREE.MeshPhongMaterial({
+        color: 0x14040e,
+        specular: 0x14040c,
+        shininess: 2,
+        transparent: false,
+        opacity: 1,
+        depthWrite: true,
+        side: THREE.DoubleSide
+      });
+      const carrierH = 6.05;
+      const carrierR = 1.82;
+      function carrierEndRadius(t, open, amt) {
+        return Math.max(0.02, carrierSilhouette(t, open) * carrierR * (0.28 + 0.62 * amt));
+      }
+      function carrierBodyPoints(open) {
+        const pts = [];
+        const n = 40;
+        const topAmt = 1 - open;
+        const botAmt = open;
+        pts.push(new THREE.Vector2(botAmt < 0.04 ? 0.02 : carrierEndRadius(0.97, open, botAmt), -carrierH * 0.5));
+        for (let i = n - 1; i >= 1; i -= 1) {
+          const t = i / n;
+          const y = carrierH * 0.5 * (1 - 2 * t);
+          pts.push(new THREE.Vector2(Math.max(0.08, carrierSilhouette(t, open) * carrierR), y));
+        }
+        pts.push(new THREE.Vector2(topAmt < 0.04 ? 0.02 : carrierEndRadius(0.03, open, topAmt), carrierH * 0.5));
+        return pts;
+      }
+      function carrierPocketPoints(amount) {
+        const amt = Math.max(0, Math.min(1, amount));
+        const mouth = carrierR * (0.22 + 0.62 * amt);
+        const depth = 0.7 + 1.15 * amt;
+        const n = 18;
+        const pts = [];
+        for (let i = 0; i <= n; i += 1) {
+          const u = i / n;
+          const s = Math.cos(u * Math.PI * 0.5);
+          const flare = 1 + 0.16 * Math.sin(u * Math.PI);
+          pts.push(new THREE.Vector2(Math.max(0.02, mouth * s * flare), -depth * u));
+        }
+        return pts;
+      }
+      let bodyGeo = new THREE.LatheGeometry(carrierBodyPoints(0), 48);
+      let topPocketGeo = new THREE.LatheGeometry(carrierPocketPoints(1), 36);
+      let botPocketGeo = new THREE.LatheGeometry(carrierPocketPoints(0), 36);
+      let carrierOpen = 0;
+      const carrierBodies = [];
+      const carrierTopBells = [];
+      const carrierBotBells = [];
+      function setCarrierOpen(open) {
+        const nextBody = new THREE.LatheGeometry(carrierBodyPoints(open), 48);
+        const topAmt = 1 - open;
+        const botAmt = open;
+        const nextTop = new THREE.LatheGeometry(carrierPocketPoints(topAmt), 36);
+        const nextBot = new THREE.LatheGeometry(carrierPocketPoints(botAmt), 36);
+        carrierBodies.forEach((body) => { body.geometry = nextBody; });
+        carrierTopBells.forEach((bell) => {
+          bell.geometry = nextTop;
+          bell.visible = topAmt > 0.08;
+          bell.position.y = carrierH * 0.5 - 0.06;
+        });
+        carrierBotBells.forEach((bell) => {
+          bell.geometry = nextBot;
+          bell.visible = botAmt > 0.08;
+          bell.position.y = -carrierH * 0.5 + 0.06;
+        });
+        bodyGeo.dispose();
+        topPocketGeo.dispose();
+        botPocketGeo.dispose();
+        bodyGeo = nextBody;
+        topPocketGeo = nextTop;
+        botPocketGeo = nextBot;
+      }
+      function carrierPose(u) {
+        const clamp = (v) => Math.max(0, Math.min(1, v));
+        const smooth = (v) => { const t = clamp(v); return t * t * t * (t * (t * 6 - 15) + 10); };
+        if (u < 0.16) return 0;
+        if (u < 0.74) return smooth((u - 0.16) / 0.58);
+        if (u < 0.9) return 1;
+        return 1 - smooth((u - 0.9) / 0.1);
+      }
+      setCarrierOpen(0);
+      const carrierShells = [];
+      proteinMap.forEach((p) => {
+        const px = (p.r - rows / 2) * spacing;
+        const pz = (p.c - cols / 2) * spacing;
+        let mesh;
+        if (p.type === "channel") {
+          mesh = new THREE.Mesh(hollowCylinder(4.1, p.rad * 0.9, p.rad * 0.45), channelMat);
+        } else if (p.type === "carrier") {
+          const shell = new THREE.Mesh(hollowCylinder(4.1, p.rad * 0.9, p.rad * 0.45), carrierMat);
+          const body = new THREE.Mesh(bodyGeo, carrierGloss);
+          const topBell = new THREE.Mesh(topPocketGeo, carrierMouthMat);
+          const botBell = new THREE.Mesh(botPocketGeo, carrierMouthMat);
+          topBell.position.y = carrierH * 0.5 - 0.06;
+          botBell.position.y = -carrierH * 0.5 + 0.06;
+          botBell.rotation.x = Math.PI;
+          body.add(topBell, botBell);
+          body.visible = false;
+          mesh = new THREE.Group();
+          mesh.add(shell, body);
+          carrierShells.push(shell);
+          carrierBodies.push(body);
+          carrierTopBells.push(topBell);
+          carrierBotBells.push(botBell);
+        } else if (p.type === "glycoprotein") {
+          mesh = new THREE.Mesh(new THREE.SphereGeometry(p.rad * 0.9, 24, 24), glyMat);
+          mesh.scale.set(1, 1.2, 1);
+          const sugars = new THREE.Group();
+          sugars.position.set(0, 0.9, 0);
+          const sugarGeo = new THREE.BoxGeometry(0.32, 0.32, 0.32);
+          let sy = 0;
+          for (let k = 0; k < 4; k += 1) {
+            const sugar = new THREE.Mesh(sugarGeo, glycanMat);
+            sy += 0.38;
+            sugar.position.set(Math.sin(k) * 0.22, sy, 0);
+            sugars.add(sugar);
+          }
+          mesh.add(sugars);
+        } else {
+          mesh = new THREE.Mesh(new THREE.CylinderGeometry(p.rad * 0.75, p.rad * 0.8, 3.9, 24), receptorMat);
+          const cleft = new THREE.Mesh(new THREE.SphereGeometry(p.rad * 0.42, 16, 16), new THREE.MeshBasicMaterial({ color: 0x03080c }));
+          cleft.position.set(0, 2.0, 0);
+          mesh.add(cleft);
+        }
+        mesh.position.set(px, 0, pz);
+        membrane.add(mesh);
+        proteins.push({ obj: mesh, rx: px, rz: pz, s: p.r * 2.5, type: p.type });
+      });
+
+      const particleGroup = new THREE.Group();
+      scene.add(particleGroup);
+      const smallGeo = new THREE.SphereGeometry(0.72, 14, 14);
+      const cargoGeo = new THREE.SphereGeometry(1.7, 18, 18);
+      const particleMats = {
+        nonpolar: new THREE.MeshPhongMaterial({ color: 0xf8fafc, shininess: 30 }),
+        water: new THREE.MeshPhongMaterial({ color: 0xe0f7ff, specular: 0xffffff, shininess: 80 }),
+        ion: new THREE.MeshPhongMaterial({ color: 0xff8c1a, specular: 0xffe0b2, shininess: 40 }),
+        yellow: new THREE.MeshPhongMaterial({ color: 0xffca28, specular: 0xfff8e1, shininess: 40 }),
+        grey: new THREE.MeshPhongMaterial({ color: 0x90a4ae, specular: 0xeceff1, shininess: 28 }),
+        large: new THREE.MeshStandardMaterial({ color: 0x4ade80, roughness: 0.35 })
+      };
+      const mixScale = { water: 0.4, ion: 0.9, yellow: 0.46, grey: 0.46, large: 1.65 };
+      const particles = [];
+      const foldCargo = new THREE.Mesh(cargoGeo, particleMats.large);
+      foldCargo.visible = false;
+      scene.add(foldCargo);
+      let transport = "none";
+      const outsideY0 = 3.6;
+      const outsideY1 = 9.2;
+      const molTips = {
+        all: "Molecules are spread outside the cell.",
+        nonpolar: "Small non-polar molecules pass straight through the phospholipid bilayer.",
+        polar: "Small polar molecules pass through channel proteins.",
+        ion: "Small ions pass through carrier proteins.",
+        large: "Large molecules cannot pass through the cell membrane."
+      };
+      function mixPlan() {
+        if (moleculeFilter === "polar") return { water: 24 };
+        if (moleculeFilter === "ion") return { ion: 16 };
+        if (moleculeFilter === "nonpolar") return { yellow: 14, grey: 14 };
+        if (moleculeFilter === "large") return { large: 7 };
+        return { water: 18, ion: 12, yellow: 8, grey: 8, large: 4 };
+      }
+      function sheetHalf() {
+        return { x: rows * spacing * 0.46, z: cols * spacing * 0.46 };
+      }
+      function clearParticles() {
+        while (particles.length) particleGroup.remove(particles.pop().mesh);
+      }
+      function randomOutside() {
+        const half = sheetHalf();
+        return new THREE.Vector3(
+          (Math.random() - 0.5) * half.x * 2,
+          outsideY0 + Math.random() * (outsideY1 - outsideY0),
+          (Math.random() - 0.5) * half.z * 2
+        );
+      }
+      function overProtein(x, z, pad) {
+        return proteins.some((item) => Math.hypot(item.rx - x, item.rz - z) < 1.7 + (pad || 0));
+      }
+      function lipidSpot() {
+        const half = sheetHalf();
+        for (let n = 0; n < 16; n += 1) {
+          const x = (Math.random() - 0.5) * half.x * 2;
+          const z = (Math.random() - 0.5) * half.z * 2;
+          if (!overProtein(x, z, 0.3)) return { x, z };
+        }
+        return { x: half.x * 0.4, z: 0 };
+      }
+      function newHeading(bit) {
+        const ang = Math.random() * Math.PI * 2;
+        const spd = bit.type === "large" ? 0.026 : 0.038 + Math.random() * 0.016;
+        bit.tx = Math.cos(ang) * spd;
+        bit.ty = (Math.random() - 0.45) * spd * 0.45;
+        bit.tz = Math.sin(ang) * spd;
+        bit.steer = 80 + Math.random() * 100;
+      }
+      function recycleOutside(bit) {
+        bit.mesh.position.copy(randomOutside());
+        bit.mode = "drift";
+        bit.gate = null;
+        bit.spot = null;
+        bit.dropping = false;
+        bit.riding = false;
+        bit.leaving = false;
+        bit.reject = 0;
+        newHeading(bit);
+        bit.vx = bit.tx;
+        bit.vy = bit.ty;
+        bit.vz = bit.tz;
+      }
+      function spawnMix(type) {
+        const mesh = new THREE.Mesh(smallGeo, particleMats[type]);
+        mesh.scale.setScalar(mixScale[type]);
+        particleGroup.add(mesh);
+        const bit = {
+          mesh, type, speed: 0.05, gate: null, bounce: false,
+          seed: Math.random() * Math.PI * 2, riding: false, leaving: false,
+          mode: "drift", spot: null, dropping: false, reject: 0,
+          vx: 0, vy: 0, vz: 0, tx: 0, ty: 0, tz: 0, steer: 0
+        };
+        recycleOutside(bit);
+        particles.push(bit);
+      }
+      function fillMix() {
+        Object.entries(mixPlan()).forEach(([type, count]) => {
+          for (let n = 0; n < count; n += 1) spawnMix(type);
+        });
+      }
+      function easeMove(bit, desired, rate) {
+        bit.vx += (desired.x - bit.vx) * rate;
+        bit.vy += (desired.y - bit.vy) * rate;
+        bit.vz += (desired.z - bit.vz) * rate;
+        bit.mesh.position.x += bit.vx;
+        bit.mesh.position.y += bit.vy;
+        bit.mesh.position.z += bit.vz;
+      }
+      function driftOutside(bit) {
+        bit.steer -= 1;
+        if (bit.steer <= 0) newHeading(bit);
+        const p = bit.mesh.position;
+        const half = sheetHalf();
+        if (bit.type === "large") bit.ty = 0;
+        easeMove(bit, { x: bit.tx, y: bit.ty, z: bit.tz }, 0.04);
+        if (p.x < -half.x) p.x = half.x;
+        else if (p.x > half.x) p.x = -half.x;
+        if (p.z < -half.z) p.z = half.z;
+        else if (p.z > half.z) p.z = -half.z;
+        if (p.y > outsideY1) {
+          p.y = outsideY1;
+          bit.vy = 0;
+          bit.ty = -0.01;
+        }
+        if (bit.type === "large" && p.y < 4.8) {
+          p.y = 4.8;
+          bit.vy = 0;
+        } else if (bit.type !== "large" && p.y < 4.3) {
+          bit.ty = Math.max(bit.ty, 0.02);
+        }
+      }
+      function pickIdle(type) {
+        const idle = particles.filter((bit) => bit.type === type && bit.mode === "drift");
+        if (!idle.length) return null;
+        return idle[Math.floor(Math.random() * idle.length)];
+      }
+      function assignMixJobs() {
+        const channels = proteins.filter((item) => item.type === "channel");
+        const carriers = proteins.filter((item) => item.type === "carrier");
+        const waterCap = moleculeFilter === "polar" ? 8 : 5;
+        const watersBusy = particles.filter((bit) => bit.type === "water" && (bit.mode === "seek" || bit.mode === "through")).length;
+        if (channels.length && watersBusy < waterCap && Math.random() < 0.12) {
+          const bit = pickIdle("water");
+          if (bit) {
+            let nearest = channels[0];
+            let nearestD = Infinity;
+            channels.forEach((gate) => {
+              const d = Math.hypot(gate.obj.position.x - bit.mesh.position.x, gate.obj.position.z - bit.mesh.position.z);
+              if (d < nearestD) {
+                nearest = gate;
+                nearestD = d;
+              }
+            });
+            bit.mode = "seek";
+            bit.gate = nearest;
+          }
+        }
+        if (carrierOpen <= 0.35) {
+          const idle = particles.filter((bit) => bit.type === "ion" && bit.mode === "drift");
+          carriers.forEach((gate) => {
+            const taken = particles.some((bit) => bit.type === "ion" && bit.gate === gate && (bit.mode === "to-carrier" || bit.mode === "ride"));
+            if (taken || !idle.length || Math.random() > 0.35) return;
+            let bestI = 0;
+            let bestD = Infinity;
+            idle.forEach((item, i) => {
+              const d = Math.hypot(gate.obj.position.x - item.mesh.position.x, gate.obj.position.z - item.mesh.position.z);
+              if (d < bestD) {
+                bestD = d;
+                bestI = i;
+              }
+            });
+            const bit = idle.splice(bestI, 1)[0];
+            bit.mode = "to-carrier";
+            bit.gate = gate;
+            bit.riding = false;
+            bit.leaving = false;
+          });
+        }
+        ["yellow", "grey"].forEach((type) => {
+          const busy = particles.filter((bit) => bit.type === type && bit.mode === "cross").length;
+          const crossCap = moleculeFilter === "nonpolar" ? 8 : 5;
+          if (busy >= crossCap || Math.random() > 0.22) return;
+          const bit = pickIdle(type);
+          if (!bit) return;
+          bit.mode = "cross";
+          bit.spot = lipidSpot();
+          bit.dropping = false;
+        });
+      }
+      function updateMix() {
+        assignMixJobs();
+        particles.forEach((bit) => {
+          if (bit.mode === "drift") {
+            driftOutside(bit);
+            return;
+          }
+          if (bit.mode === "seek" && bit.gate) {
+            const gate = bit.gate;
+            const p = bit.mesh.position;
+            const x = gate.obj.position.x;
+            const z = gate.obj.position.z;
+            const hover = gate.obj.position.y + 2.85;
+            const dx = x - p.x;
+            const dz = z - p.z;
+            const dist = Math.hypot(dx, dz);
+            if (p.y < hover - 0.01) {
+              p.y += Math.min(0.06, hover - p.y);
+              return;
+            }
+            if (dist > 0.04) {
+              const step = Math.min(0.045, dist);
+              p.x += dx / dist * step;
+              p.z += dz / dist * step;
+            } else {
+              p.x = x;
+              p.z = z;
+              p.y = Math.max(p.y, hover);
+              bit.mode = "through";
+            }
+            return;
+          }
+          if (bit.mode === "through" && bit.gate) {
+            const gate = bit.gate;
+            const p = bit.mesh.position;
+            p.x = gate.obj.position.x;
+            p.z = gate.obj.position.z;
+            p.y -= 0.04;
+            if (p.y < -5.5) recycleOutside(bit);
+            return;
+          }
+          if (bit.mode === "to-carrier" && bit.gate) {
+            const gate = bit.gate;
+            const p = bit.mesh.position;
+            const x = gate.obj.position.x;
+            const z = gate.obj.position.z;
+            const hover = gate.obj.position.y + 4.1;
+            const dx = x - p.x;
+            const dz = z - p.z;
+            const dist = Math.hypot(dx, dz);
+            if (p.y < hover - 0.01) {
+              p.y += Math.min(0.06, hover - p.y);
+              return;
+            }
+            if (dist > 0.05) {
+              const step = Math.min(0.045, dist);
+              p.x += dx / dist * step;
+              p.z += dz / dist * step;
+            } else if (carrierOpen <= 0.32) {
+              p.x = x;
+              p.z = z;
+              p.y = Math.max(p.y, hover);
+              bit.mode = "ride";
+              bit.riding = true;
+              bit.leaving = false;
+            } else {
+              p.x = x;
+              p.z = z;
+            }
+            return;
+          }
+          if (bit.mode === "ride" && bit.gate) {
+            const gate = bit.gate;
+            const p = bit.mesh.position;
+            p.x = gate.obj.position.x;
+            p.z = gate.obj.position.z;
+            let target = p.y - 0.04;
+            if (!bit.leaving && carrierOpen < 0.92) {
+              const drop = carrierOpen < 0.16 ? 0 : (carrierOpen - 0.16) / 0.74;
+              const eased = drop * drop * (3 - 2 * drop);
+              target = gate.obj.position.y + (2.15 + (-2.15 - 2.15) * eased);
+            } else bit.leaving = true;
+            const gap = target - p.y;
+            p.y += Math.max(-0.04, Math.min(0.04, gap));
+            if (p.y < -5.5) recycleOutside(bit);
+            return;
+          }
+          if (bit.mode === "cross" && bit.spot) {
+            const dx = bit.spot.x - bit.mesh.position.x;
+            const dz = bit.spot.z - bit.mesh.position.z;
+            const dist = Math.hypot(dx, dz) || 1;
+            if (!bit.dropping && overProtein(bit.mesh.position.x, bit.mesh.position.z, 0.2)) bit.spot = lipidSpot();
+            if (dist < 0.6) bit.dropping = true;
+            easeMove(bit, {
+              x: bit.dropping ? dx * 0.08 : dx / dist * 0.04,
+              y: bit.dropping ? -0.07 : -0.02,
+              z: bit.dropping ? dz * 0.08 : dz / dist * 0.04
+            }, 0.08);
+            if (bit.mesh.position.y < -6) recycleOutside(bit);
+          }
+        });
+      }
+      function updateParticles(time) {
+        if (transport === "fold") {
+          const amount = 0.5 - 0.5 * Math.cos(time * 0.65);
+          foldCargo.visible = true;
+          foldCargo.position.set(0, 8 - amount * 4.5, 0);
+          return;
+        }
+        foldCargo.visible = false;
+        if (transport === "mix") {
+          for (let n = 0; n < animSpeed; n += 1) updateMix();
+        }
+      }
+      function paintMoleculeButtons() {
+        document.querySelectorAll(".entry-modes button").forEach((btn) => {
+          const on = btn.dataset.mol === moleculeFilter;
+          btn.classList.toggle("active", on);
+          btn.setAttribute("aria-pressed", on ? "true" : "false");
+        });
+        const tip = $("entryTip");
+        if (tip) tip.textContent = molTips[moleculeFilter] || molTips.all;
+      }
+      setMoleculeFilter = (kind) => {
+        moleculeFilter = kind;
+        paintMoleculeButtons();
+        if (transport !== "mix") return;
+        clearParticles();
+        fillMix();
+      };
+      setTransport = (phase) => {
+        const mode = phase === "fold" ? "fold" : (phase && phase !== "none" ? "mix" : "none");
+        if (mode === transport) return;
+        transport = mode;
+        clearParticles();
+        foldCargo.visible = mode === "fold";
+        if (mode === "mix") fillMix();
+      };
+
+      function resize() {
+        const rect = canvas.getBoundingClientRect();
+        const w = Math.max(2, Math.round(rect.width));
+        const h = Math.max(2, Math.round(rect.height));
+        const bufW = Math.round(w * renderer.getPixelRatio());
+        const bufH = Math.round(h * renderer.getPixelRatio());
+        if (canvas.width === bufW && canvas.height === bufH) return;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        const halfX = rows * spacing * 0.52;
+        const halfZ = cols * spacing * 0.52;
+        const aspect = w / h;
+        let spanX = halfZ * aspect;
+        let spanZ = halfZ;
+        if (spanX < halfX) {
+          spanX = halfX;
+          spanZ = halfX / aspect;
+        }
+        topCam.left = -spanX;
+        topCam.right = spanX;
+        topCam.top = spanZ;
+        topCam.bottom = -spanZ;
+        topCam.updateProjectionMatrix();
+        renderer.setSize(w, h, false);
+      }
+      const sidePos = new THREE.Vector3(0, 22, 48);
+      const topPos = new THREE.Vector3(0, 72, 0.4);
+      const sideUp = new THREE.Vector3(0, 1, 0);
+      const topUp = new THREE.Vector3(0, 0, -1);
+      const fromPos = new THREE.Vector3().copy(sidePos);
+      const fromUp = new THREE.Vector3().copy(sideUp);
+      let aim = "side";
+      let glide = 1;
+      function beginGlide(next) {
+        const current = controls.object;
+        fromPos.copy(current.position);
+        fromUp.copy(current.up);
+        if (current !== camera) {
+          camera.position.copy(current.position);
+          camera.up.copy(current.up);
+          controls.object = camera;
+        }
+        aim = next;
+        glide = 0;
+        controls.enabled = false;
+      }
+      function holdView() {
+        controls.enabled = true;
+        controls.update();
+      }
+      let mosaicFrame = 0;
+      const clock = new THREE.Clock();
+      let realTime = 0;
+      let entryTime = 0;
+      function draw() {
+        resize();
+        const onEntry = !$("scene-entry").hidden;
+        const phase = $("scene-mosaic").dataset.phase || "still";
+        const entryPhase = $("scene-entry").dataset.phase || "intro";
+        const fluid = !onEntry && phase === "fluid";
+        const want = !onEntry && phase === "mosaic" ? "top" : "side";
+        if (want !== aim) beginGlide(want);
+        const delta = Math.min(clock.getDelta(), 0.05);
+        realTime += delta;
+        if (onEntry) entryTime += delta * animSpeed;
+        const time = onEntry ? entryTime : realTime;
+        const halfX = rows * spacing * 0.5;
+        const halfZ = cols * spacing * 0.5;
+        const degree = onEntry ? (entryPhase === "fold" ? "fold" : "slight") : (fluid ? fluidDegree : "still");
+        function place(obj, restX, restZ, seed, kind) {
+          if (degree === "fold") {
+            const amount = 0.5 - 0.5 * Math.cos(time * 0.65);
+            const arcX = amount * Math.PI * 0.92;
+            const arcZ = amount * Math.PI * 0.55;
+            let px = restX;
+            let py = 0;
+            let pz = restZ;
+            let rotX = 0;
+            let rotZ = 0;
+            if (arcX > 0.03) {
+              const radiusX = halfX / (arcX * 0.5);
+              const thetaX = (restX / halfX) * (arcX * 0.5);
+              px = Math.sin(thetaX) * radiusX;
+              py += (1 - Math.cos(thetaX)) * radiusX;
+              rotZ = thetaX;
+            }
+            if (arcZ > 0.03) {
+              const radiusZ = halfZ / (arcZ * 0.5);
+              const thetaZ = (restZ / halfZ) * (arcZ * 0.5);
+              pz = Math.sin(thetaZ) * radiusZ;
+              py += (1 - Math.cos(thetaZ)) * radiusZ;
+              rotX = -thetaZ;
+            }
+            obj.position.set(px, py, pz);
+            obj.rotation.x = rotX;
+            obj.rotation.z = rotZ;
+            return;
+          }
+          obj.rotation.x = 0;
+          obj.rotation.z = 0;
+          if (degree === "slight") {
+            const bob = kind === "protein" ? 0.05 : 0.12;
+            const drift = kind === "protein" ? 0.06 : 0.05;
+            const speed = kind === "protein" ? 0.25 : 0.35;
+            const bobSpeed = kind === "protein" ? 0.8 : 1.1;
+            obj.position.set(
+              restX + Math.sin(time * speed + seed) * drift,
+              Math.sin(time * bobSpeed + seed) * bob,
+              restZ + Math.cos(time * speed + seed) * drift
+            );
+            return;
+          }
+          if (degree === "medium") {
+            const wave = Math.sin(time * 3.1 + restX * 0.24) * 1.2 + Math.sin(time * 2.05 + restZ * 0.2) * 0.75;
+            const slide = 0.72;
+            const speedX = kind === "protein" ? 0.55 : 0.9;
+            const speedZ = kind === "protein" ? 0.45 : 0.7;
+            obj.position.set(
+              restX + Math.sin(time * speedX + seed) * slide,
+              wave,
+              restZ + Math.cos(time * speedZ + seed) * slide * 0.65
+            );
+            return;
+          }
+          const slide = phase === "still" ? 0.06 : 0;
+          const lift = phase === "still" ? 0.08 : 0;
+          const wave = Math.sin(time * 3.1 + restX * 0.24) * 1.2 + Math.sin(time * 2.05 + restZ * 0.2) * 0.75;
+          obj.position.set(
+            restX + Math.sin(time * 0.9 + seed) * slide,
+            wave * lift,
+            restZ + Math.cos(time * 0.7 + seed) * slide * 0.65
+          );
+        }
+        lipids.forEach((lipid) => place(lipid.obj, lipid.rx, lipid.rz, lipid.s, "lipid"));
+        proteins.forEach((protein) => place(protein.obj, protein.rx, protein.rz, protein.s, "protein"));
+        const showCarrier = onEntry;
+        carrierOpen = showCarrier ? carrierPose((time % 8) / 8) : 0;
+        if (showCarrier) setCarrierOpen(carrierOpen);
+        carrierBodies.forEach((body) => { body.visible = showCarrier; });
+        carrierShells.forEach((shell) => { shell.visible = !showCarrier; });
+        updateParticles(time);
+        if (glide < 1) {
+          glide = Math.min(1, glide + 0.04);
+          const t = glide * glide * (3 - 2 * glide);
+          const dest = aim === "top" ? topPos : sidePos;
+          const destUp = aim === "top" ? topUp : sideUp;
+          camera.position.lerpVectors(fromPos, dest, t);
+          camera.up.lerpVectors(fromUp, destUp, t).normalize();
+          camera.lookAt(0, 0, 0);
+          scene.fog.density = 0.012 + (0.0015 - 0.012) * (aim === "top" ? t : 1 - t);
+          if (glide >= 1 && aim === "side") {
+            camera.position.copy(sidePos);
+            camera.up.set(0, 1, 0);
+            camera.lookAt(0, 0, 0);
+            controls.object = camera;
+            controls.target.set(0, 0, 0);
+            holdView();
+          }
+          if (glide >= 1 && aim === "top") {
+            topCam.position.set(0, 40, 0);
+            topCam.up.set(0, 0, -1);
+            topCam.zoom = 1;
+            topCam.lookAt(0, 0, 0);
+            topCam.updateProjectionMatrix();
+            controls.object = topCam;
+            controls.target.set(0, 0, 0);
+            holdView();
+          }
+        } else {
+          holdView();
+        }
+        renderer.render(scene, controls.object);
+        if (!$("scene-mosaic").hidden || !$("scene-entry").hidden) mosaicFrame = requestAnimationFrame(draw);
+        else mosaicFrame = 0;
+      }
+      startMosaic = () => {
+        if (mosaicFrame) return;
+        resize();
+        mosaicFrame = requestAnimationFrame(draw);
+      };
+      startMosaic();
+    }
+      function zig(svg) {
+        const ns = "http://www.w3.org/2000/svg";
+        for (let row = 0; row < 4; row += 1) {
+          const path = document.createElementNS(ns, "path");
+          let d = "";
+          const y = 12 + row * 18;
+          for (let x = 0; x <= 1000; x += 18) {
+            const yy = y + ((x / 18) % 2 === 0 ? -7 : 7);
+            d += `${x === 0 ? "M" : "L"}${x} ${yy} `;
+          }
+          path.setAttribute("d", d);
+          path.setAttribute("fill", "none");
+          path.setAttribute("stroke", "#7aa2d4");
+          path.setAttribute("stroke-width", "3");
+          path.setAttribute("stroke-linecap", "round");
+          svg.appendChild(path);
+        }
+      }
+      ["proteinWaves", "entryWaves"].forEach((id) => zig($(id)));
+
+    document.querySelectorAll("[data-topic]").forEach((btn) => {
+      btn.addEventListener("click", () => setTopic(btn.dataset.topic));
+    });
+    document.querySelectorAll(".mosaic-modes button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (topic !== "mosaic" || toolsOn()) return;
+        const index = TOPICS.mosaic.findIndex((item) => item.phase === btn.dataset.mode && !item.answer);
+        if (index < 0 || index === step) return;
+        step = index;
+        shownKey = "";
+        render();
+      });
+    });
+    document.querySelectorAll(".fluid-degrees button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (topic !== "mosaic" || toolsOn()) return;
+        fluidDegree = btn.dataset.degree;
+        const index = TOPICS.mosaic.findIndex((item) => item.phase === "fluid" && !item.answer);
+        if (index >= 0 && index !== step) {
+          step = index;
+          shownKey = "";
+          render();
+          return;
+        }
+        render();
+      });
+    });
+    document.querySelectorAll(".entry-modes button").forEach((btn) => {
+      if (!btn.dataset.mol) return;
+      btn.addEventListener("click", () => {
+        if (toolsOn()) return;
+        setMoleculeFilter(btn.dataset.mol);
+      });
+    });
+    $("animSpeedBtn").addEventListener("click", () => {
+      if (toolsOn()) return;
+      animSpeed = animSpeed === 1 ? 2 : animSpeed === 2 ? 4 : 1;
+      $("animSpeedBtn").textContent = `Speed ${animSpeed}×`;
+    });
+    $("partSelect").addEventListener("change", () => setTopic($("partSelect").value));
+    $("back").addEventListener("click", () => go(-1));
+    $("next").addEventListener("click", () => go(1));
+    $("hideBtn").addEventListener("click", () => setDescHidden(!document.body.classList.contains("desc-off")));
+    $("zoomBtn").addEventListener("click", () => setZoom(!zoomed));
+    $("fullView").addEventListener("click", showAllProteins);
+    document.querySelectorAll("#proteinBoard .prot").forEach((btn) => {
+      btn.addEventListener("click", () => chooseProtein(btn.dataset.prot));
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+      if (toolsOn() || event.metaKey || event.ctrlKey || event.altKey) return;
+      const tag = document.activeElement && document.activeElement.tagName;
+      if (tag === "SELECT" || tag === "INPUT" || tag === "TEXTAREA") return;
+      event.preventDefault();
+      go(event.key === "ArrowRight" ? 1 : -1);
+    });
+    window.addEventListener("resize", () => {
+      fitAnswer();
+      focusId = "";
+      focusBoard();
+      if (zoomed) fitZoom();
+    });
+    if (matchMedia("(max-width: 760px)").matches) setDescHidden(true);
+    const hash = location.hash.replace("#", "");
+    if (hash) {
+      const [part, index, picked] = hash.split("/");
+      if (TOPICS[part]) {
+        topic = part;
+        protein = picked && PROTEIN[picked] ? picked : null;
+        const max = stepsOf().length - 1;
+        step = Math.max(0, Math.min(max, Number(index) || 0));
+      }
+    }
+    render();
+
+    (function setupTeachTools() {
+      const canvas = $("penCanvas");
+      const penCtx = canvas.getContext("2d");
+      const laserDot = $("laserDot");
+      const laserCanvas = document.createElement("canvas");
+      laserCanvas.className = "laser-canvas";
+      document.body.appendChild(laserCanvas);
+      const lctx = laserCanvas.getContext("2d");
+      let laserOn = false;
+      let penOn = false;
+      let drawing = false;
+      let erasing = false;
+      let penColor = "#e11d48";
+      let lastPt = null;
+      let laserPts = [];
+      let laserRAF = null;
+      const LASER_LIFE = 1600;
+      function fitPen() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        const dpr = window.devicePixelRatio || 1;
+        if (canvas._w === w && canvas._h === h) return;
+        canvas._w = w;
+        canvas._h = h;
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        canvas.style.width = `${w}px`;
+        canvas.style.height = `${h}px`;
+        penCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        penCtx.lineCap = "round";
+        penCtx.lineJoin = "round";
+      }
+      function syncLaserCanvas() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        const dpr = window.devicePixelRatio || 1;
+        const cw = Math.round(w * dpr);
+        const ch = Math.round(h * dpr);
+        if (laserCanvas.width === cw && laserCanvas.height === ch) return;
+        laserCanvas.width = cw;
+        laserCanvas.height = ch;
+        laserCanvas.style.width = `${w}px`;
+        laserCanvas.style.height = `${h}px`;
+        lctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        lctx.lineCap = "round";
+        lctx.lineJoin = "round";
+      }
+      function drawLaserTrail() {
+        syncLaserCanvas();
+        const now = performance.now();
+        laserPts = laserPts.filter((point) => now - point.t < LASER_LIFE);
+        lctx.clearRect(0, 0, laserCanvas.width, laserCanvas.height);
+        for (let i = 1; i < laserPts.length; i += 1) {
+          const a = laserPts[i - 1];
+          const b = laserPts[i];
+          const alpha = Math.max(0, 1 - (now - b.t) / LASER_LIFE);
+          lctx.strokeStyle = `rgba(255,42,42,${(0.6 * alpha).toFixed(3)})`;
+          lctx.lineWidth = 3 + 5 * alpha;
+          lctx.beginPath();
+          lctx.moveTo(a.x, a.y);
+          lctx.lineTo(b.x, b.y);
+          lctx.stroke();
+        }
+        if (laserOn || laserPts.length > 1) laserRAF = requestAnimationFrame(drawLaserTrail);
+        else {
+          lctx.clearRect(0, 0, laserCanvas.width, laserCanvas.height);
+          laserRAF = null;
+        }
+      }
+      function setLaser(on) {
+        laserOn = on;
+        if (on) setPen(false);
+        document.body.classList.toggle("laser-on", on);
+        laserDot.classList.toggle("hidden", !on);
+        $("dkLaser").classList.toggle("active", on);
+        if (on) {
+          syncLaserCanvas();
+          if (!laserRAF) laserRAF = requestAnimationFrame(drawLaserTrail);
+        }
+      }
+      function setPen(on) {
+        penOn = on;
+        if (on) setLaser(false);
+        document.body.classList.toggle("pen-on", on);
+        canvas.style.pointerEvents = on ? "auto" : "none";
+        $("dkPen").classList.toggle("active", on);
+        $("dkColors").classList.toggle("hidden", !on);
+      }
+      document.addEventListener("pointermove", (event) => {
+        if (!laserOn) return;
+        laserDot.style.left = `${event.clientX}px`;
+        laserDot.style.top = `${event.clientY}px`;
+        laserPts.push({ x: event.clientX, y: event.clientY, t: performance.now() });
+        if (laserPts.length > 600) laserPts.shift();
+      });
+      const pointOf = (event) => {
+        const touch = event.touches ? event.touches[0] : event;
+        return { x: touch.clientX, y: touch.clientY };
+      };
+      function penStart(event) {
+        if (!penOn) return;
+        drawing = true;
+        lastPt = pointOf(event);
+        event.preventDefault();
+      }
+      function penMove(event) {
+        if (!penOn || !drawing) return;
+        const point = pointOf(event);
+        penCtx.globalCompositeOperation = erasing ? "destination-out" : "source-over";
+        penCtx.strokeStyle = penColor;
+        penCtx.lineWidth = erasing ? 26 : 3.6;
+        penCtx.beginPath();
+        penCtx.moveTo(lastPt.x, lastPt.y);
+        penCtx.lineTo(point.x, point.y);
+        penCtx.stroke();
+        lastPt = point;
+        event.preventDefault();
+      }
+      function penEnd() { drawing = false; }
+      canvas.addEventListener("mousedown", penStart);
+      canvas.addEventListener("mousemove", penMove);
+      window.addEventListener("mouseup", penEnd);
+      canvas.addEventListener("touchstart", penStart, { passive: false });
+      canvas.addEventListener("touchmove", penMove, { passive: false });
+      window.addEventListener("touchend", penEnd);
+      $("dkLaser").addEventListener("click", () => setLaser(!laserOn));
+      $("dkPen").addEventListener("click", () => setPen(!penOn));
+      $("dkClear").addEventListener("click", () => penCtx.clearRect(0, 0, canvas.width, canvas.height));
+      $("dkErase").addEventListener("click", () => {
+        erasing = !erasing;
+        $("dkErase").classList.toggle("active", erasing);
+        if (erasing && !penOn) setPen(true);
+      });
+      document.querySelectorAll(".dcolor").forEach((button) => {
+        button.addEventListener("click", () => {
+          penColor = button.dataset.c;
+          erasing = false;
+          $("dkErase").classList.remove("active");
+          document.querySelectorAll(".dcolor").forEach((item) => item.classList.toggle("active", item === button));
+          if (!penOn) setPen(true);
+        });
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          setLaser(false);
+          setPen(false);
+        }
+      });
+      window.addEventListener("resize", fitPen);
+      fitPen();
+    })();
+  </script>
+</body>
+</html>

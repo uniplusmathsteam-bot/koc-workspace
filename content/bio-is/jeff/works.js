@@ -1,6 +1,19 @@
 /* Jeff · Bio + IS KOC lead — submissions. */
 KOC.works('bio-is', 'jeff', [
   {
+    id: 'cell-membrane',
+    title: 'Ch2 Cell membrane',
+    original: 'Phospholipids, fluid mosaic model, and permeability',
+    type: 'interactive',
+    subject: 'Bio',
+    chapter: 'S3 Basic Biology Ch2 Cells — cell membrane',
+    submitted: '2026-10-20',
+    tags: ['Interactive', 'Cell membrane', 'Fluid mosaic'],
+    elements: ['wood'],
+    src: 'content/bio-is/jeff/cell-membrane/index.html',
+    notes: 'Cell membrane lesson: phospholipids, the fluid mosaic model, membrane proteins, and how different molecules cross the membrane.'
+  },
+  {
     id: 'migration-of-coloured-ions',
     title: 'MWI2_Ion migration_(Migration of Ions)',
     original: 'Migration of coloured ions',
