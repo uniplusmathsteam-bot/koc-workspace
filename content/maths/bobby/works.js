@@ -115,5 +115,18 @@ KOC.works('maths', 'bobby', [
       'content/maths/bobby/comics/jm28/similar-congruent-quick-reference-color.png'
     ],
     notes: 'Classroom manga: four special lines and centres, angle pairs, and similar and congruent triangles, with quick-reference cards.'
+  },
+  {
+    id: 'jm28-summary',
+    title: 'JM28 · Summary',
+    type: 'interactive',
+    chapter: 'JM28',
+    submitted: '2026-10-22',
+    status: 'pending',
+    tags: ['Interactive', 'Summary', 'Triangles'],
+    elements: ['gold'],
+    cover: 'content/maths/bobby/comics/jm28/triangle-lines-chapter-1-color.png',
+    src: 'https://uniunipluskoc-blip.github.io/comics/lessons/jm28/index.html#summary',
+    notes: 'JM28 lesson page, opened on the summary posters: special lines, triangle centres, angle pairs, and similar and congruent triangles.'
   }
 ]);
