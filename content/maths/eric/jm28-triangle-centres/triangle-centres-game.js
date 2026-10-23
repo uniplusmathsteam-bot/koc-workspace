@@ -645,11 +645,11 @@
     return out;
   }
 
-  /** Two half-signs, same count, 錯開 (different radii). */
+  /** Two half-signs, same count, 錯開 (different radii). Shorter, same ratios. */
   function bisectorArcs(V, P, Q, I, count, baseR) {
-    var r0 = baseR == null ? 14 : baseR;
-    var gap = 4.5;
-    var stagger = 3;
+    var r0 = (baseR == null ? 14 : baseR) * 0.55;
+    var gap = 4.5 * 0.55;
+    var stagger = 3 * 0.55;
     var out = "";
     var k;
     for (k = 0; k < count; k++) {

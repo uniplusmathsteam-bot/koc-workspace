@@ -248,6 +248,22 @@
     return circumcentre(v);
   }
 
+  function triangleArea(v) {
+    return Math.abs(
+      (v[0].x * (v[1].y - v[2].y) + v[1].x * (v[2].y - v[0].y) + v[2].x * (v[0].y - v[1].y)) / 2
+    );
+  }
+
+  /** Inradius r = Area / s — reliable tangency to all three sides. */
+  function inradiusOf(v) {
+    var a = dist(v[1], v[2]);
+    var b = dist(v[0], v[2]);
+    var c = dist(v[0], v[1]);
+    var s = (a + b + c) / 2;
+    if (s < 1e-6) return 0;
+    return triangleArea(v) / s;
+  }
+
   function fitToView(verts, mode) {
     var src = cloneVerts(verts);
     var c0 = trueCentre(mode, src);
@@ -255,6 +271,31 @@
     if (c0) pts.push(c0);
     var i;
     for (i = 0; i < 3; i++) pts.push(mid(src[i], src[(i + 1) % 3]));
+    /* leave room for circumcircle / incircle so answer-key circles stay on-canvas */
+    if (c0 && mode === "perp") {
+      var R = dist(c0, src[0]);
+      pts.push(
+        { x: c0.x + R, y: c0.y },
+        { x: c0.x - R, y: c0.y },
+        { x: c0.x, y: c0.y + R },
+        { x: c0.x, y: c0.y - R }
+      );
+    }
+    if (c0 && mode === "bisector") {
+      var rIn = inradiusOf(src);
+      pts.push(
+        { x: c0.x + rIn, y: c0.y },
+        { x: c0.x - rIn, y: c0.y },
+        { x: c0.x, y: c0.y + rIn },
+        { x: c0.x, y: c0.y - rIn }
+      );
+    }
+    /* obtuse altitudes: include exterior feet so side extensions stay on-canvas */
+    if (mode === "altitude") {
+      for (i = 0; i < 3; i++) {
+        pts.push(foot(src[i], src[(i + 1) % 3], src[(i + 2) % 3]));
+      }
+    }
     var minX = Infinity;
     var minY = Infinity;
     var maxX = -Infinity;
@@ -380,17 +421,27 @@
     drawSolution();
   }
 
+  /** Full mission reset (lives, stars, combo, level) — used after Game over / Start. */
+  function resetRunState() {
+    state.combo = 0;
+    state.maxCombo = 0;
+    state.totalStars = 0;
+    state.stars = 0;
+    state.lives = LIVES_MAX;
+    state.gameOver = false;
+    state.crystalsDone = 0;
+    state.misses = 0;
+    state.crystalLit = false;
+    state.levelIdx = 0;
+  }
+
   function startLevel(idx) {
     clearTimers();
     hideClearBar();
     /* fresh run only — keep combo when advancing to the next level */
     if (idx === 0) {
       shuffleLevels();
-      state.combo = 0;
-      state.maxCombo = 0;
-      state.totalStars = 0;
-      state.lives = LIVES_MAX;
-      state.gameOver = false;
+      resetRunState();
     }
     state.levelIdx = Math.max(0, Math.min(LEVELS.length - 1, idx));
     var lv = levelDef();
@@ -414,6 +465,11 @@
     updateHud();
     draw();
     drawSolution();
+  }
+
+  function restartMission() {
+    resetRunState();
+    startLevel(0);
   }
 
   function updateTimers() {
@@ -956,6 +1012,26 @@
     }));
   }
 
+  /**
+   * Answer-key / obtuse altitudes: if the foot lies outside the opposite side,
+   * draw a grey dashed extension of that side out to (and slightly past) the foot
+   * so the ⊥ mark sits on a visible line.
+   */
+  function appendAltitudeFootExtension(svg, v, vi) {
+    var V = v[vi];
+    var A = v[(vi + 1) % 3];
+    var B = v[(vi + 2) % 3];
+    var F = foot(V, A, B);
+    if (F.t >= -0.02 && F.t <= 1.02) return;
+    var nearer = F.t < 0 ? A : B;
+    var beyond = add(F, unit(nearer, F), SIDE_EXT_OVERSHOOT);
+    svg.appendChild(E("line", {
+      x1: nearer.x, y1: nearer.y, x2: beyond.x, y2: beyond.y,
+      stroke: "#64748b", "stroke-width": 1.7, "stroke-dasharray": "3 3.5",
+      "stroke-linecap": "round",
+    }));
+  }
+
   function correctSpecialLines(mode, v) {
     var c = trueCentre(mode, v);
     var lines = [];
@@ -970,17 +1046,32 @@
         });
       }
     } else if (mode === "altitude") {
+      /* span foot AND orthocentre — obtuse: H is opposite the foot from the vertex */
       for (i = 0; i < 3; i++) {
         var f = foot(v[i], v[(i + 1) % 3], v[(i + 2) % 3]);
-        var len = Math.max(dist(v[i], f), dist(v[i], c)) + 22;
-        lines.push({ a: v[i], b: add(v[i], unit(v[i], f), len) });
+        var uAlt = unit(v[i], f);
+        var alongF = dist(v[i], f);
+        var alongH = (c.x - v[i].x) * uAlt.x + (c.y - v[i].y) * uAlt.y;
+        var tMin = Math.min(0, alongF, alongH) - 22;
+        var tMax = Math.max(0, alongF, alongH) + 22;
+        lines.push({
+          a: add(v[i], uAlt, tMin),
+          b: add(v[i], uAlt, tMax),
+        });
       }
     } else if (mode === "bisector") {
+      /* vertex → through I → opposite side (so every ray visibly passes through the centre) */
       for (i = 0; i < 3; i++) {
-        lines.push({
-          a: v[i],
-          b: add(v[i], unit(v[i], c), dist(v[i], c) + 28),
-        });
+        var oppA = v[(i + 1) % 3];
+        var oppB = v[(i + 2) % 3];
+        var hit = intersectLines(v[i], c, oppA, oppB);
+        var end;
+        if (hit && hit.t > 0.05) {
+          end = add(v[i], unit(v[i], hit), dist(v[i], hit) + 10);
+        } else {
+          end = add(v[i], unit(v[i], c), dist(v[i], c) + 36);
+        }
+        lines.push({ a: v[i], b: end });
       }
     } else {
       for (i = 0; i < 3; i++) {
@@ -991,6 +1082,29 @@
       }
     }
     return lines;
+  }
+
+  /**
+   * True SVG <circle> — circumcircle (O) or incircle (I).
+   * Always recomputes the true centre from verts so radius stays exact.
+   */
+  function appendSolutionCircle(svg, mode, v) {
+    if (!v) return;
+    if (mode !== "perp" && mode !== "bisector") return;
+    var c = trueCentre(mode, v);
+    if (!c) return;
+    var r = mode === "perp" ? dist(c, v[0]) : inradiusOf(v);
+    if (!(r > 1)) return;
+    svg.appendChild(E("circle", {
+      cx: String(c.x),
+      cy: String(c.y),
+      r: String(r),
+      fill: "rgba(37,99,235,.07)",
+      stroke: MARK,
+      "stroke-width": "2.2",
+      "stroke-dasharray": "6 4",
+      "stroke-opacity": "0.95",
+    }));
   }
 
   function drawSolution() {
@@ -1037,7 +1151,7 @@
     var solPerp = [];
     solLines.forEach(function (L, i) {
       if (state.mode === "altitude") {
-        appendOppositeSideExtension(svg, L.a, L.b, { kind: "vertex", index: i });
+        appendAltitudeFootExtension(svg, v, i);
         var B = v[(i + 1) % 3];
         var C = v[(i + 2) % 3];
         var F = foot(v[i], B, C);
@@ -1069,7 +1183,9 @@
     dedupePerpHits(solPerp).forEach(function (hit) {
       svg.appendChild(rightAngleMark(hit, hit.alongLine, hit.alongSide));
     });
-    var solC = state.reveal.trueC || trueCentre(state.mode, v);
+    var solC = trueCentre(state.mode, v) || state.reveal.trueC;
+    /* reveal step: circumcircle (O) or incircle (I) — true radius, tangent / through vertices */
+    appendSolutionCircle(svg, state.mode, v);
     appendCentreSpot(svg, solC, state.mode, solSegs);
     var i;
     for (i = 0; i < 3; i++) {
@@ -1178,15 +1294,17 @@
   /**
    * Two half-signs at a vertex: same curve count, but 錯開 — different radii
    * so they read as two separate marks, not one continuous arc.
+   * Distances scaled down (~0.55×) with the same base:gap:stagger ratio.
    */
   function appendEqualAnglePair(svg, V, P, Q, I, count) {
     var n = Math.max(1, count || 1);
-    var gap = 7;
-    var stagger = 4; /* radial offset between the two half-signs */
+    var base = 8;   /* was 14 */
+    var gap = 4;    /* was 7  — same ratio */
+    var stagger = 2.3; /* was 4 — same ratio */
     var k;
     for (k = 0; k < n; k++) {
-      svg.appendChild(equalAngleArc(V, P, I, 14 + k * gap));
-      svg.appendChild(equalAngleArc(V, I, Q, 14 + stagger + k * gap));
+      svg.appendChild(equalAngleArc(V, P, I, base + k * gap));
+      svg.appendChild(equalAngleArc(V, I, Q, base + stagger + k * gap));
     }
   }
 
@@ -1365,9 +1483,10 @@
       svg.appendChild(rightAngleMark(hit, hit.alongLine, hit.alongSide));
     });
 
-    /* centre spot on player figure only after a correct Check */
+    /* centre + circumcircle / incircle after a correct Check */
     var showC = state.reveal && state.reveal.ok && state.reveal.point;
     if (showC) {
+      appendSolutionCircle(svg, state.mode, v);
       appendCentreSpot(svg, state.reveal.point, state.mode);
     }
 
@@ -1467,23 +1586,36 @@
   }
 
   function wireUi() {
-    els.startBtn.addEventListener("click", function () { startLevel(0); });
+    els.startBtn.addEventListener("click", function () { restartMission(); });
     els.retryFailBtn.addEventListener("click", function () { startLevel(state.levelIdx); });
     els.nextBtn.addEventListener("click", function () {
-      if (state.gameOver || state.levelIdx >= LEVELS.length - 1) {
-        /* game over / last question → Centre Snap */
-        state.gameOver = false;
-        var chip = document.querySelector('[data-tg-mode="centres"]');
-        if (chip) chip.click();
-        else startLevel(0);
+      if (state.gameOver) {
+        /* full reset then jump to Centre Snap (or restart Meeting Point) */
+        hideClearBar();
+        resetRunState();
+        state.running = false;
+        state.overlay = "title";
+        state.reveal = null;
+        state.lines = [];
+        updateLivesBar(false);
+        updateHud();
+        var chipGo = document.querySelector('[data-tg-mode="centres"]');
+        if (chipGo) chipGo.click();
+        else restartMission();
+        return;
+      }
+      if (state.levelIdx >= LEVELS.length - 1) {
+        resetRunState();
+        var chipEnd = document.querySelector('[data-tg-mode="centres"]');
+        if (chipEnd) chipEnd.click();
+        else restartMission();
         return;
       }
       startLevel(state.levelIdx + 1);
     });
     els.retryBtn.addEventListener("click", function () {
       if (state.gameOver) {
-        state.gameOver = false;
-        startLevel(0);
+        restartMission();
         return;
       }
       startLevel(state.levelIdx);
@@ -1491,12 +1623,14 @@
     els.menuBtn.addEventListener("click", function () {
       clearTimers();
       hideClearBar();
+      resetRunState();
       state.running = false;
       state.overlay = "title";
       state.mode = "median";
       applyVerts(SHAPES.acute, "median");
       state.lines = [];
       state.reveal = null;
+      updateLivesBar(false);
       draw();
       drawSolution();
       updateHud();
@@ -1507,11 +1641,25 @@
     }
     els.skipBtn.addEventListener("click", function () {
       if (state.overlay === "clear") {
-        if (state.gameOver || state.levelIdx >= LEVELS.length - 1) {
-          state.gameOver = false;
-          var chip = document.querySelector('[data-tg-mode="centres"]');
-          if (chip) chip.click();
-          else startLevel(0);
+        if (state.gameOver) {
+          hideClearBar();
+          resetRunState();
+          state.running = false;
+          state.overlay = "title";
+          state.reveal = null;
+          state.lines = [];
+          updateLivesBar(false);
+          updateHud();
+          var chipSkip = document.querySelector('[data-tg-mode="centres"]');
+          if (chipSkip) chipSkip.click();
+          else restartMission();
+          return;
+        }
+        if (state.levelIdx >= LEVELS.length - 1) {
+          resetRunState();
+          var chipLast = document.querySelector('[data-tg-mode="centres"]');
+          if (chipLast) chipLast.click();
+          else restartMission();
           return;
         }
         startLevel(state.levelIdx + 1);

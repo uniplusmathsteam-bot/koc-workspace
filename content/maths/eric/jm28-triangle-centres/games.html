@@ -32,7 +32,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-  <link rel="stylesheet" href="../_shared/jm-lesson.css?v=20261023-polish">
+  <link rel="stylesheet" href="../_shared/jm-lesson.css?v=20261023-final">
   <style>
     body { margin:0; min-height:100vh; color:var(--text); font-family:"Hanken Grotesk",system-ui,sans-serif;
       background:linear-gradient(180deg,#f8fafc,#f1f5f9); caret-color:transparent; }
@@ -525,7 +525,10 @@
     .mp-solution-label {
       margin:0 0 6px; font-size:12px; font-weight:800; color:#0c4a6e; letter-spacing:.01em;
     }
-    #mp-svg-sol { display:block; width:100%; height:auto; margin:0; }
+    #mp-svg-sol {
+      display:block; width:100%; height:auto; margin:0;
+      aspect-ratio:460 / 360;
+    }
     .mp-overlay {
       position:absolute; inset:0; z-index:5;
       display:flex; align-items:center; justify-content:center;
@@ -747,7 +750,7 @@ html.jm-game-only { background: #ffffff !important; }
 
           <div class="mp-solution hidden" id="mp-solution">
             <p class="mp-solution-label" id="mp-solution-label">Correct construction</p>
-            <svg id="mp-svg-sol" viewBox="0 0 460 360" role="img" aria-label="Correct special lines"></svg>
+            <svg id="mp-svg-sol" viewBox="0 0 460 360" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Correct special lines"></svg>
           </div>
 
           <div class="mp-actions">
@@ -802,8 +805,8 @@ html.jm-game-only { background: #ffffff !important; }
   </main>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
-  <script defer src="triangle-centres-game.js?v=20261023-polish"></script>
-  <script defer src="meeting-point-game.js?v=20261023-polish"></script>
+  <script defer src="triangle-centres-game.js?v=20261023-final"></script>
+  <script defer src="meeting-point-game.js?v=20261023-final"></script>
   <script defer src="../_shared/suppress-ui-caret.js?v=20260828"></script>
 </body>
 </html>

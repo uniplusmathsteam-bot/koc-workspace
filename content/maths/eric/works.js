@@ -88,7 +88,7 @@ KOC.works('maths', 'eric', [
     tags: ['Interactive', 'Geometry', 'Game', 'S3'],
     elements: ['fire'],
     cover: 'content/maths/eric/covers/jm28.svg',
-    src: 'content/maths/eric/jm28-triangle-centres/games.html?jmGame=1&v=20261023-polish',
+    src: 'content/maths/eric/jm28-triangle-centres/games.html?jmGame=1&v=20261023-final',
     notes: 'Geometry Arena: Meeting Point, Centre Snap, Angle Pair Spot, Condition Check.'
   },
   {
@@ -127,7 +127,7 @@ KOC.works('maths', 'eric', [
     tags: ['Interactive', 'Statistics', 'S3'],
     elements: ['wood'],
     cover: 'content/maths/eric/covers/jm31.svg',
-    src: 'content/maths/eric/jm31-central-tendency/index.html?jmTools=1&v=20261023-polish',
+    src: 'content/maths/eric/jm31-central-tendency/index.html?jmTools=1&v=20261023-final',
     notes: 'Number-line balance for mean, missions, weighted-share bar, and shift/stretch twin lines.'
   }
 ]);
