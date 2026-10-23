@@ -1292,15 +1292,15 @@
   }
 
   /**
-   * Two half-signs at a vertex: same curve count, but 錯開 — different radii
-   * so they read as two separate marks, not one continuous arc.
-   * Distances scaled down (~0.55×) with the same base:gap:stagger ratio.
+   * Two half-signs at a vertex: same curve count, but 錯開 — different radii.
+   * 1 curve → farther out (previous single-arc distance).
+   * 2+ curves → shorter pack, same gap:stagger ratio between arcs.
    */
   function appendEqualAnglePair(svg, V, P, Q, I, count) {
     var n = Math.max(1, count || 1);
-    var base = 8;   /* was 14 */
-    var gap = 4;    /* was 7  — same ratio */
-    var stagger = 2.3; /* was 4 — same ratio */
+    var base = n === 1 ? 14 : 8;
+    var gap = n === 1 ? 7 : 4;
+    var stagger = n === 1 ? 4 : 2.3;
     var k;
     for (k = 0; k < n; k++) {
       svg.appendChild(equalAngleArc(V, P, I, base + k * gap));
