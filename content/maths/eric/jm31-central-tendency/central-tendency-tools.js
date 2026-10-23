@@ -2,7 +2,7 @@
   "use strict";
 
   var NS = "http://www.w3.org/2000/svg";
-  var INK = "#e2e8f0";
+  var INK = "#0f172a";
   var MEAN = "#fbbf24";
   var MEDIAN = "#34d399";
   var MODE = "#f472b6";
@@ -330,23 +330,21 @@
     var med = median(data);
     var mod = modeValue(data);
     var mdx = xScale(med);
-    var meanDx = 0;
     var medDx = 0;
-    if (Math.abs(mx - mdx) < 28) {
-      meanDx = -16;
-      medDx = 16;
-    }
-
-    drawMarker(svg, mx, MEAN, "mean", meanDx, 18, yAxis);
-    drawMarker(svg, mdx, MEDIAN, "median", medDx, 18, yAxis);
+    /* mean uses the triangle only — no dashed mean line */
     if (mod != null) {
       var modX = Array.isArray(mod)
         ? xScale(mod.reduce(function (a, b) { return a + b; }, 0) / mod.length)
         : xScale(mod);
       var modDx = 0;
-      if (Math.abs(modX - mx) < 24) modDx = 22;
-      else if (Math.abs(modX - mdx) < 24) modDx = -22;
+      if (Math.abs(modX - mdx) < 28) {
+        medDx = -14;
+        modDx = 14;
+      }
+      drawMarker(svg, mdx, MEDIAN, "median", medDx, 18, yAxis);
       drawMarker(svg, modX, MODE, "mode", modDx, 18, yAxis);
+    } else {
+      drawMarker(svg, mdx, MEDIAN, "median", medDx, 18, yAxis);
     }
 
     drawFulcrum(svg, mx, yAxis, "mean " + fmt(m));
@@ -831,6 +829,7 @@
       svg.appendChild(tl);
     });
 
+    var weightLabs = [];
     weightRows.forEach(function (row, i) {
       if (!row.weight) return;
       var cx = xs(row.mark);
@@ -840,16 +839,56 @@
         cx: cx, cy: cy, r: r,
         fill: WEIGHT_COLORS[i % WEIGHT_COLORS.length], stroke: "#0f172a", "stroke-width": 1,
       }));
-      var lab = E("text", {
-        x: cx, y: cy - r - 4, fill: WEIGHT_COLORS[i % WEIGHT_COLORS.length],
-        "font-size": 9, "font-weight": 700, "text-anchor": "middle",
+      weightLabs.push({
+        x: cx,
+        baseY: cy - r - 2,
+        label: row.label,
+        color: WEIGHT_COLORS[i % WEIGHT_COLORS.length],
+        approxW: Math.max(28, row.label.length * 5.2),
       });
-      lab.textContent = row.label;
-      svg.appendChild(lab);
     });
+    placeLiftedLabels(svg, weightLabs);
 
     var mx = wm.mean != null ? xs(wm.mean) : (x0 + x1) / 2;
     drawFulcrum(svg, mx, yAxis, wm.mean != null ? ("overall " + fmt(wm.mean)) : null);
+  }
+
+  /**
+   * When labels would overlap on x, lift one and draw a stem down to the point.
+   * items: { x, baseY, label, color, approxW }
+   */
+  function placeLiftedLabels(svg, items) {
+    if (!items.length) return;
+    var sorted = items.slice().sort(function (a, b) { return a.x - b.x; });
+    var lifts = sorted.map(function () { return 0; });
+    var i, j;
+    for (i = 1; i < sorted.length; i++) {
+      for (j = 0; j < i; j++) {
+        var gap = Math.abs(sorted[i].x - sorted[j].x);
+        var need = (sorted[i].approxW + sorted[j].approxW) / 2 + 4;
+        if (gap >= need) continue;
+        var conflictY = Math.abs((sorted[i].baseY - lifts[i]) - (sorted[j].baseY - lifts[j]));
+        if (conflictY < 12) {
+          lifts[i] = Math.max(lifts[i], lifts[j] + 14);
+        }
+      }
+    }
+    sorted.forEach(function (item, idx) {
+      var lift = lifts[idx];
+      var ty = item.baseY - lift;
+      if (lift > 2) {
+        svg.appendChild(E("line", {
+          x1: item.x, y1: item.baseY + 2, x2: item.x, y2: ty + 2,
+          stroke: item.color, "stroke-width": 1, "stroke-linecap": "round",
+        }));
+      }
+      var lab = E("text", {
+        x: item.x, y: ty,
+        fill: item.color, "font-size": 9, "font-weight": 700, "text-anchor": "middle",
+      });
+      lab.textContent = item.label;
+      svg.appendChild(lab);
+    });
   }
 
   function renderScenarios() {
@@ -1061,13 +1100,33 @@
         x1: mdx, y1: 32, x2: mdx, y2: y,
         stroke: MEDIAN, "stroke-width": 1.5, "stroke-dasharray": "3 2",
       }));
+      var medT = E("text", {
+        x: mdx, y: 26, fill: "#0d9488", "font-size": 9, "font-weight": 700, "text-anchor": "middle",
+      });
+      medT.textContent = "median";
+      svg.appendChild(medT);
+    }
+    if (stats.mode != null) {
+      var mod = stats.mode;
+      var modX = Array.isArray(mod)
+        ? xs(mod.reduce(function (a, b) { return a + b; }, 0) / mod.length)
+        : xs(mod);
+      var modDx = 0;
+      if (stats.median != null && Math.abs(modX - xs(stats.median)) < 22) modDx = 16;
+      svg.appendChild(E("line", {
+        x1: modX, y1: 32, x2: modX, y2: y,
+        stroke: MODE, "stroke-width": 1.5, "stroke-dasharray": "3 2",
+      }));
+      var modeT = E("text", {
+        x: modX + modDx, y: 26, fill: MODE, "font-size": 9, "font-weight": 700, "text-anchor": "middle",
+      });
+      modeT.textContent = "mode";
+      svg.appendChild(modeT);
     }
     if (stats.mean != null) {
       var mx = xs(stats.mean);
-      var mt = E("text", { x: mx, y: 26, fill: "#b45309", "font-size": 9, "font-weight": 800, "text-anchor": "middle" });
-      mt.textContent = "mean " + fmt(stats.mean);
-      svg.appendChild(mt);
-      drawFulcrum(svg, mx, y, null);
+      /* mean label under the triangle — no dashed mean line */
+      drawFulcrum(svg, mx, y, "mean " + fmt(stats.mean));
     }
   }
 

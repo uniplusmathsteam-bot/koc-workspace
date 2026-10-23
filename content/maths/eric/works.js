@@ -83,12 +83,12 @@ KOC.works('maths', 'eric', [
     title: 'JM28 Triangle Centres — games',
     type: 'interactive',
     chapter: 'S3 JM28',
-    submitted: '2026-10-18',
+    submitted: '2026-10-23',
     status: 'pending',
     tags: ['Interactive', 'Geometry', 'Game', 'S3'],
     elements: ['fire'],
     cover: 'content/maths/eric/covers/jm28.svg',
-    src: 'content/maths/eric/jm28-triangle-centres/games.html?jmGame=1&v=20261018-arena-mp',
+    src: 'content/maths/eric/jm28-triangle-centres/games.html?jmGame=1&v=20261023-polish',
     notes: 'Geometry Arena: Meeting Point, Centre Snap, Angle Pair Spot, Condition Check.'
   },
   {
@@ -122,12 +122,12 @@ KOC.works('maths', 'eric', [
     title: 'JM31 Central Tendency — interactive tools',
     type: 'interactive',
     chapter: 'S3 JM31',
-    submitted: '2026-08-28',
+    submitted: '2026-10-23',
     status: 'ready',
     tags: ['Interactive', 'Statistics', 'S3'],
     elements: ['wood'],
     cover: 'content/maths/eric/covers/jm31.svg',
-    src: 'content/maths/eric/jm31-central-tendency/index.html?jmTools=1',
+    src: 'content/maths/eric/jm31-central-tendency/index.html?jmTools=1&v=20261023-polish',
     notes: 'Number-line balance for mean, missions, weighted-share bar, and shift/stretch twin lines.'
   }
 ]);
