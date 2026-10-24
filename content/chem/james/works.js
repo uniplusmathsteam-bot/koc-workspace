@@ -1,6 +1,19 @@
 /* James · Chem KOC lead — submissions. */
 KOC.works('chem', 'james', [
   {
+    id: 'ionic-compound-puzzle',
+    title: 'MWI3D_Naming of ionic compound_(ex)',
+    original: 'Ionic compound puzzle',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Ionic bond and metallic bond MWI3 MWI3D Naming of ionic compound',
+    submitted: '2026-10-24',
+    tags: ['Interactive', 'S3', 'Ionic compound'],
+    elements: ['wood', 'earth'],
+    src: 'content/chem/james/ionic-compound-puzzle/MWI3D_Naming%20of%20ionic%20compound_(ex).html?v=20261024a',
+    notes: 'Lab and Quest: lock cations and anions into a charge-balanced formula, then read the crystal fact. EN/中.'
+  },
+  {
     id: 'tiaogao-song-youren',
     title: '跳高高 · 送友人',
     type: 'interactive',

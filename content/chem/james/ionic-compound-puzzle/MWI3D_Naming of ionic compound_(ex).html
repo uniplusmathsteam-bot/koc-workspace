@@ -1,0 +1,3338 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>極致化學：離子化合物立體拼圖學堂 (Aesthetic Ionic Compound Puzzle Lab)</title>
+    <!-- 引入科幛字體及標準 Calibri 字體 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/calibri" rel="stylesheet">
+    <!-- FontAwesome 圖標庫 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- KaTeX 化學與數學公式軔染器 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+
+    <style>
+:root {
+            --bg: #f4f7fb;
+            --ink: #1e293b;
+            --muted: #64748b;
+            --line: #d7e0ec;
+            --blue: #0066cc;
+            --amber: #d97706;
+            --green: #059669;
+            --bar-h: 48px;
+            --dock: 64px;
+            --text-main: #1e293b;
+            --svg-shell-color: rgba(0, 0, 0, 0.08);
+            --svg-plus-color: rgba(30, 41, 59, 0.4);
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            height: 100dvh;
+            overflow: hidden;
+            background: var(--bg);
+            color: var(--ink);
+            font-family: Calibri, "Noto Sans TC", sans-serif;
+        }
+
+        body.lang-zh-active { font-family: "Noto Sans TC", Calibri, sans-serif; }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        body.lang-zh-active .lang-en { display: none !important; }
+        body.lang-en-active .lang-zh { display: none !important; }
+        body.desc-hidden .desc-block { display: none; }
+
+        .topbar {
+            height: var(--bar-h);
+            flex: 0 0 var(--bar-h);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 8px 0 max(8px, env(safe-area-inset-left));
+            background: #fff;
+            border-bottom: 1px solid var(--line);
+            z-index: 20;
+        }
+
+        .brand { font-weight: 700; font-size: 16px; margin-right: 4px; white-space: nowrap; }
+
+        .topbar button, .zoom-btn, .sheet-close {
+            min-height: 36px;
+            border: 1px solid var(--line);
+            background: #fff;
+            color: var(--ink);
+            border-radius: 10px;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0 10px;
+        }
+
+        .nav-item.active, #btn-lang-zh.active-lang, #btn-lang-en.active-lang {
+            background: var(--blue);
+            border-color: var(--blue);
+            color: #fff;
+        }
+
+        #quest-status-box {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--green);
+            white-space: nowrap;
+        }
+
+        .top-actions { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+
+        #main-content {
+            flex: 1;
+            min-height: 0;
+            padding: 8px  var(--dock) 8px max(8px, env(safe-area-inset-left));
+            display: flex;
+            flex-direction: column;
+        }
+
+        .view-section { display: none; min-height: 0; height: 100%; }
+        .view-section.active { display: flex; flex-direction: column; min-height: 0; }
+
+        .work {
+            flex: 1;
+            min-height: 0;
+            display: grid;
+            grid-template-columns: minmax(188px, 250px) minmax(0, 1fr) minmax(188px, 250px);
+            gap: 8px;
+        }
+
+        .zoom-pair {
+            min-width: 0;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .lesson-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .lesson-line {
+            flex: 1;
+            min-width: 0;
+            font-size: 38px;
+            line-height: 1.15;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            color: var(--ink);
+        }
+
+        .lesson-line .katex { font-size: 1em !important; }
+        .lesson-line.eq-open {
+            background-image: repeating-linear-gradient(90deg, var(--dash, #64748b) 0 8px, transparent 8px 14px);
+            background-size: 100% 3px;
+            background-repeat: no-repeat;
+            background-position: left bottom;
+            padding-bottom: 3px;
+        }
+        .lesson-line.eq-open[data-side="pos"] { --dash: var(--blue); }
+        .lesson-line.eq-open[data-side="neg"] { --dash: var(--amber); }
+
+        .zoom-btn {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            font-size: 22px;
+            line-height: 1;
+            flex: 0 0 auto;
+        }
+        body.zoom-lab #zoom-lab,
+        body.zoom-quest #zoom-quest,
+        body.zoom-form #zoom-form,
+        body.zoom-shell #zoom-shell { background: #163a86; color: #fff; border-color: #163a86; }
+
+        .desc-block { flex: 0 0 auto; min-height: 0; }
+        .desc {
+            margin: 0;
+            font-size: 18px;
+            line-height: 1.3;
+            color: var(--muted);
+        }
+
+        .ion-pool {
+            min-width: 0;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 8px;
+            overflow: hidden;
+        }
+        .ion-pool h3 { margin: 0 0 6px; text-align: center; font-size: 14px; }
+        .pool-cation h3 { color: var(--blue); }
+        .pool-anion h3 { color: var(--amber); }
+
+        .chip-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 6px;
+            align-content: start;
+            min-height: 0;
+        }
+
+        .ion-card {
+            min-height: 44px;
+            min-width: 0;
+            display: grid;
+            place-items: center;
+            padding: 2px 4px;
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            background: #fff;
+            cursor: pointer;
+            user-select: none;
+        }
+        .ion-card.cation-hover { color: var(--blue); }
+        .ion-card.anion-hover { color: var(--amber); }
+        .ion-sym-badge { font-weight: 700; font-size: 16px; line-height: 1; white-space: nowrap; }
+        .ion-sym-badge sup { font-size: 11px; }
+
+        .reaction-vessel {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            background: rgba(255,255,255,.92);
+            border: 1px dashed #b9cbe4;
+            border-radius: 14px;
+            padding: 6px 8px 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scale-container {
+            position: relative;
+            height: 78px;
+            flex: 0 0 78px;
+        }
+        .scale-base {
+            width: 120px; height: 8px; background: #2a3b5c; border-radius: 4px;
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+        }
+        .scale-pole {
+            width: 8px; height: 42px; background: #2a3b5c;
+            position: absolute; bottom: 8px; left: 50%; margin-left: -4px;
+        }
+        .scale-beam {
+            width: 220px; height: 6px;
+            background: linear-gradient(90deg, var(--blue), var(--amber));
+            position: absolute; bottom: 46px; left: 50%; margin-left: -110px;
+            border-radius: 3px; transform-origin: center center;
+            transition: transform 0.3s ease;
+            display: flex; justify-content: space-between; align-items: flex-end;
+        }
+        .scale-pan {
+            width: 50px; height: 6px; background: #475d82; border-radius: 3px;
+            position: relative; transition: transform 0.3s ease;
+        }
+        .scale-pan-left { transform: translate(-20px, 30px); }
+        .scale-pan-right { transform: translate(20px, 30px); }
+        .scale-string-left, .scale-string-right {
+            position: absolute; width: 2px; height: 24px; background: rgba(0,0,0,.18); top: -24px;
+        }
+        .scale-string-left { left: 10px; }
+        .scale-string-right { right: 10px; }
+        .scale-weight-indicator {
+            position: absolute; top: 0; font-size: 28px; font-weight: 800; line-height: 1;
+        }
+        #weight-left, #q-weight-left { color: var(--blue); left: 8px; }
+        #weight-right, #q-weight-right { color: var(--amber); right: 8px; }
+        .scale-indicator-light {
+            position: absolute; width: 14px; height: 14px; border-radius: 50%;
+            background: #ef4444; top: 8px; left: 50%; margin-left: -7px;
+        }
+        .scale-indicator-light.balanced { background: var(--green); }
+
+        .puzzle-slot {
+            flex: 1;
+            min-height: 0;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+        }
+        .puzzle-board { display: flex; align-items: center; justify-content: center; transform-origin: center center; }
+        .puzzle-column { display: flex; flex-direction: column; align-items: center; }
+
+        #particle-canvas {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 5;
+        }
+
+        .vessel-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            z-index: 6;
+            flex: 0 0 auto;
+        }
+
+        .cyber-btn {
+            min-height: 44px;
+            border: 0;
+            border-radius: 10px;
+            background: var(--blue);
+            color: #fff;
+            font: inherit;
+            font-weight: 700;
+            padding: 8px 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .cyber-btn-secondary { background: #eef2f7; color: #334155; }
+        .cyber-btn-gold { background: var(--amber); }
+
+        .hint-box {
+            display: none;
+            margin-top: 4px;
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        .chg-pos { color: var(--blue); }
+        .chg-neg { color: var(--amber); }
+
+        .lattice-container { height: 72px; position: relative; margin-top: 4px; overflow: hidden; }
+        .lattice-grid { width: 100%; height: 100%; position: absolute; }
+
+        .shell-page { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
+        .shell-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+        .shell-chips .ion-card { min-width: 64px; font: inherit; appearance: none; }
+        .shell-chips .ion-card.active { box-shadow: inset 0 0 0 2px currentColor; }
+        .shell-stage {
+            flex: 1; min-height: 0; display: flex; flex-direction: column;
+            background: #fff; border: 1px dashed #b9cbe4; border-radius: 14px; overflow: hidden;
+        }
+        .shell-stage svg { width: 100%; height: 100%; min-height: 0; display: block; }
+
+        body.zoom-lab #zoom-pair-lab,
+        body.zoom-quest #zoom-pair-quest,
+        body.zoom-form #zoom-pair-form,
+        body.zoom-shell #zoom-pair-shell {
+            position: fixed;
+            top: calc(var(--bar-h) + env(safe-area-inset-top));
+            left: 0;
+            right: var(--dock);
+            bottom: env(safe-area-inset-bottom);
+            z-index: 30;
+            background: var(--bg);
+            padding: 8px 12px 12px;
+        }
+        body.zoom-lab #tab-lab .ion-pool,
+        body.zoom-quest #tab-quest .ion-pool { visibility: hidden; }
+
+        .sheet {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 80;
+            background: rgba(15, 23, 42, .35);
+            padding: 12px var(--dock) 12px 12px;
+        }
+        .sheet.open { display: flex; }
+        .sheet-card {
+            background: #fff;
+            width: min(920px, 100%);
+            margin: auto;
+            max-height: 100%;
+            overflow: auto;
+            border-radius: 16px;
+            padding: 12px 16px 16px;
+        }
+        .sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .sheet-head h2 { margin: 0; font-size: 20px; }
+        .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .settings-card h3 { margin: 8px 0; font-size: 16px; color: var(--blue); }
+        .checkbox-container { display: grid; gap: 6px; }
+        .checkbox-item {
+            display: flex; align-items: center; gap: 8px;
+            min-height: 44px; font-size: 15px;
+        }
+
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 100;
+            background: rgba(15, 23, 42, .4);
+            display: none; align-items: center; justify-content: center;
+            padding: 12px;
+        }
+        .modal-card {
+            background: #fff;
+            width: min(880px, 100%);
+            max-height: calc(100dvh - 24px);
+            overflow: hidden;
+            border-radius: 16px;
+            padding: 16px 18px 14px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .modal-card h2 { margin: 0; font-size: 16px; font-weight: 700; color: var(--green); }
+        #modal-compound-name {
+            font-size: 42px;
+            line-height: 1.1;
+            font-weight: 800;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .answer-row {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            min-width: 0;
+            overflow: hidden;
+        }
+        .modal-panel { flex: 1; min-height: 0; display: flex; }
+        .modal-formula { font-size: 32px; font-weight: 700; max-width: 100%; white-space: nowrap; overflow: hidden; }
+        .modal-formula .katex { font-size: 1em !important; }
+        .exam-note { font-size: 18px; font-weight: 700; white-space: nowrap; }
+        .electron-diagram-container {
+            flex: 1;
+            min-height: 168px;
+            max-height: 40dvh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .electron-diagram-container svg { width: 100%; height: 100%; }
+        .modal-actions { display: flex; justify-content: center; gap: 10px; }
+
+        .pen-canvas { position: fixed; inset: 0; z-index: 40; pointer-events: none; touch-action: none; }
+        .laser-canvas { position: fixed; inset: 0; z-index: 45; pointer-events: none; touch-action: none; }
+        body.pen-on .pen-canvas { pointer-events: auto; }
+        body.laser-on .laser-canvas { pointer-events: auto; }
+        .laser-dot {
+            position: fixed; width: 22px; height: 22px; margin: -11px 0 0 -11px;
+            border-radius: 50%; pointer-events: none; z-index: 48;
+            background: radial-gradient(circle, rgba(255,60,60,.98), rgba(255,0,0,0) 72%);
+        }
+        .laser-dot.hidden, .dcolors.hidden { display: none; }
+        body.pen-on { cursor: crosshair; }
+        body.laser-on { cursor: none; }
+        .teach-dock {
+            position: fixed; right: 8px; top: 50%; transform: translateY(-50%);
+            z-index: 60; display: flex; flex-direction: column; gap: 6px;
+            padding: 8px 6px; background: rgba(255,255,255,.94);
+            border: 1px solid var(--line); border-radius: 16px;
+        }
+        .dbtn {
+            width: 44px; height: 44px; border: 0; border-radius: 12px;
+            background: transparent; display: grid; place-items: center; cursor: pointer; color: #111827;
+        }
+        .dbtn svg { width: 22px; height: 22px; }
+        .dbtn.active { background: #163a86; color: #fff; }
+        #dkLaser.active { background: #e11d48; color: #fff; }
+        #dkPen.active { background: #0f8a62; color: #fff; }
+        .dcolors { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+        .dcolor {
+            width: 26px; height: 26px; border-radius: 50%; border: 2px solid #fff;
+            background: var(--sc); cursor: pointer; box-shadow: 0 0 0 1px #d7e0ec;
+        }
+        .dcolor.active { box-shadow: 0 0 0 2px #111827; }
+        .derase.active { background: #d97706; color: #3f2a00; }
+
+        @media (max-width: 820px) {
+            .brand { display: none; }
+            .topbar { gap: 2px; padding-left: 4px; padding-right: 4px; }
+            .topbar button, .zoom-btn { min-width: 44px; min-height: 44px; padding: 0 4px; }
+            .work {
+                grid-template-columns: 1fr;
+                grid-template-rows: minmax(0, 1fr) auto auto;
+            }
+            .zoom-pair, .pool-cation, .pool-anion { grid-column: 1; }
+            .ion-pool { min-height: min-content; }
+            .chip-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+            .ion-sym-badge { font-size: 14px; }
+            .settings-grid { grid-template-columns: 1fr; }
+            .answer-row { flex-direction: column; align-items: center; gap: 4px; }
+        }
+
+        @media (pointer: coarse) {
+            .topbar button, .ion-card, .cyber-btn, .zoom-btn { min-height: 44px; }
+        }
+
+    </style>
+</head>
+<body class="lang-en-active">
+
+    <header class="topbar">
+        <div class="brand">
+            <span class="lang-zh">離子拼圖</span>
+            <span class="lang-en">Ionic Puzzle</span>
+        </div>
+        <button type="button" id="btn-lang-zh" onclick="setLanguage('zh')">繁中</button>
+        <button type="button" id="btn-lang-en" class="active-lang" onclick="setLanguage('en')">EN</button>
+        <button type="button" class="nav-item active" id="nav-lab" onclick="switchTab('lab')">
+            <span class="lang-zh">實驗</span>
+            <span class="lang-en">Lab</span>
+        </button>
+        <button type="button" class="nav-item" id="nav-quest" onclick="switchTab('quest')">
+            <span class="lang-zh">闖關</span>
+            <span class="lang-en">Quest</span>
+        </button>
+        <button type="button" class="nav-item" id="nav-form" onclick="switchTab('form')">
+            <span class="lang-zh">形成</span>
+            <span class="lang-en">Form</span>
+        </button>
+        <button type="button" class="nav-item" id="nav-shell" onclick="switchTab('shell')">
+            <span class="lang-zh">外層</span>
+            <span class="lang-en">Shell</span>
+        </button>
+        <div id="quest-status-box" style="display: none;">
+            <span id="quest-score">Level 1 / 10</span>
+            <span id="quest-accuracy">100%</span>
+        </div>
+        <div class="top-actions">
+            <button type="button" id="btn-hide" onclick="toggleDesc()">
+                <span class="lang-zh">隱藏</span>
+                <span class="lang-en">Hide</span>
+            </button>
+            <button type="button" class="nav-item" id="nav-settings" onclick="switchTab('settings')" aria-label="Ions">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <div id="main-content">
+
+        <div class="view-section active" id="tab-lab">
+            <div class="work">
+                <div class="ion-pool pool-cation">
+                    <h3>Cations (+)</h3>
+                    <div class="chip-grid" id="lab-cation-list"></div>
+                </div>
+
+                <div class="zoom-pair" id="zoom-pair-lab">
+                    <div class="lesson-row">
+                        <div class="math-tex lesson-line" id="lab-equation">A<sup>y+</sup> + B<sup>x−</sup></div>
+                        <button type="button" class="zoom-btn" id="zoom-lab" onclick="toggleZoom('lab')" aria-label="Zoom">+</button>
+                    </div>
+                    <div class="desc-block">
+                        <p class="desc" id="lab-desc">
+                            <span class="lang-zh">點擊符號加入，雙擊拼圖移除。</span>
+                            <span class="lang-en">Click a symbol to add. Double-click a piece to remove.</span>
+                        </p>
+                    </div>
+                    <div class="reaction-vessel" id="vessel-lab">
+                        <div class="scale-container">
+                            <div class="scale-weight-indicator" id="weight-left">0</div>
+                            <div class="scale-weight-indicator" id="weight-right">0</div>
+                            <div class="scale-indicator-light" id="scale-light"></div>
+                            <div class="scale-beam" id="scale-beam">
+                                <div class="scale-pan scale-pan-left"><div class="scale-string-left"></div><div class="scale-string-right"></div></div>
+                                <div class="scale-pan scale-pan-right"><div class="scale-string-left"></div><div class="scale-string-right"></div></div>
+                            </div>
+                            <div class="scale-pole"></div>
+                            <div class="scale-base"></div>
+                        </div>
+                        <div class="puzzle-slot">
+                            <div class="puzzle-board" id="puzzle-board-lab">
+                                <div class="puzzle-column" id="cation-column-lab"></div>
+                                <div class="puzzle-column" id="anion-column-lab"></div>
+                            </div>
+                        </div>
+                        <canvas id="particle-canvas"></canvas>
+                        <div class="vessel-actions">
+                            <button type="button" class="cyber-btn cyber-btn-secondary" onclick="clearVessel()">
+                                <span class="lang-zh">清除</span>
+                                <span class="lang-en">Clear</span>
+                            </button>
+                            <button type="button" class="cyber-btn" id="btn-synthesize" onclick="checkSynthesis()">
+                                <span class="lang-zh">合成</span>
+                                <span class="lang-en">Synthesize</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ion-pool pool-anion">
+                    <h3>Anions (−)</h3>
+                    <div class="chip-grid" id="lab-anion-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="view-section" id="tab-quest">
+            <div class="work">
+                <div class="ion-pool pool-cation">
+                    <h3>Cations (+)</h3>
+                    <div class="chip-grid" id="quest-cation-list"></div>
+                </div>
+
+                <div class="zoom-pair" id="zoom-pair-quest">
+                    <div class="lesson-row">
+                        <div class="lesson-line" id="quest-target-display"></div>
+                        <button type="button" class="zoom-btn" id="zoom-quest" onclick="toggleZoom('quest')" aria-label="Zoom">+</button>
+                    </div>
+                    <div class="desc-block">
+                        <p class="desc" id="quest-target-desc">
+                            <span class="lang-zh">使正電荷等於負電荷。</span>
+                            <span class="lang-en">Make the positive charge equal the negative charge.</span>
+                        </p>
+                        <div class="hint-box" id="quest-hint-box"></div>
+                        <div class="lattice-container">
+                            <div class="lattice-grid" id="lattice-projection-grid"></div>
+                        </div>
+                        <p class="desc">
+                            <span class="lang-zh">陽離子與陰離子交替排列。</span>
+                            <span class="lang-en">Cations and anions alternate.</span>
+                        </p>
+                    </div>
+                    <div class="reaction-vessel">
+                        <div class="scale-container">
+                            <div class="scale-weight-indicator" id="q-weight-left">0</div>
+                            <div class="scale-weight-indicator" id="q-weight-right">0</div>
+                            <div class="scale-indicator-light" id="q-scale-light"></div>
+                            <div class="scale-beam" id="q-scale-beam">
+                                <div class="scale-pan scale-pan-left"><div class="scale-string-left"></div><div class="scale-string-right"></div></div>
+                                <div class="scale-pan scale-pan-right"><div class="scale-string-left"></div><div class="scale-string-right"></div></div>
+                            </div>
+                            <div class="scale-pole"></div>
+                            <div class="scale-base"></div>
+                        </div>
+                        <div class="puzzle-slot">
+                            <div class="puzzle-board" id="puzzle-board-quest">
+                                <div class="puzzle-column" id="cation-column-quest"></div>
+                                <div class="puzzle-column" id="anion-column-quest"></div>
+                            </div>
+                        </div>
+                        <div class="vessel-actions">
+                            <button type="button" class="cyber-btn cyber-btn-secondary" onclick="clearQuestVessel()">
+                                <span class="lang-zh">重置</span>
+                                <span class="lang-en">Reset</span>
+                            </button>
+                            <button type="button" class="cyber-btn cyber-btn-secondary" id="btn-quest-hint" onclick="showQuestHint()">
+                                <span class="lang-zh">提示</span>
+                                <span class="lang-en">Hint</span>
+                            </button>
+                            <button type="button" class="cyber-btn cyber-btn-gold" onclick="submitQuest()">
+                                <span class="lang-zh">驗證</span>
+                                <span class="lang-en">Verify</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ion-pool pool-anion">
+                    <h3>Anions (−)</h3>
+                    <div class="chip-grid" id="quest-anion-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="view-section" id="tab-form">
+            <div class="shell-page">
+                <div class="shell-chips" id="form-chips"></div>
+                <div class="zoom-pair" id="zoom-pair-form">
+                    <div class="lesson-row">
+                        <div class="lesson-line" id="form-lesson"></div>
+                        <button type="button" class="zoom-btn" id="zoom-form" onclick="toggleZoom('form')" aria-label="Zoom">+</button>
+                    </div>
+                    <div class="desc-block">
+                        <p class="desc" id="form-desc"></p>
+                    </div>
+                    <div class="shell-stage">
+                        <svg id="form-svg" viewBox="0 0 680 300"></svg>
+                        <div class="vessel-actions">
+                            <span></span>
+                            <button type="button" class="cyber-btn" id="btn-form-play" onclick="playFormation()">
+                                <span class="lang-zh">播放</span>
+                                <span class="lang-en">Play</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="view-section" id="tab-shell">
+            <div class="shell-page">
+                <div class="shell-chips" id="shell-chips"></div>
+                <div class="zoom-pair" id="zoom-pair-shell">
+                    <div class="lesson-row">
+                        <div class="lesson-line" id="shell-lesson"></div>
+                        <button type="button" class="zoom-btn" id="zoom-shell" onclick="toggleZoom('shell')" aria-label="Zoom">+</button>
+                    </div>
+                    <div class="desc-block">
+                        <p class="desc" id="shell-desc">
+                            <span class="lang-zh">最外電子層</span>
+                            <span class="lang-en">Outermost shell</span>
+                        </p>
+                    </div>
+                    <div class="shell-stage">
+                        <svg id="shell-svg" viewBox="0 0 680 300"></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="sheet" id="settings-sheet">
+        <div class="sheet-card" id="tab-settings">
+            <div class="sheet-head">
+                <h2>
+                    <span class="lang-zh">離子</span>
+                    <span class="lang-en">Ions</span>
+                </h2>
+                <button type="button" class="sheet-close" onclick="closeSettings()">
+                    <span class="lang-zh">關閉</span>
+                    <span class="lang-en">Close</span>
+                </button>
+            </div>
+            <div class="settings-grid">
+                <div class="settings-card">
+                    <h3>
+                        <span class="lang-zh">陽離子</span>
+                        <span class="lang-en">Cations</span>
+                    </h3>
+                    <button type="button" class="cyber-btn cyber-btn-secondary" onclick="selectAllIons('cations', true)">
+                        <span class="lang-zh">全選</span>
+                        <span class="lang-en">All</span>
+                    </button>
+                    <button type="button" class="cyber-btn cyber-btn-secondary" onclick="selectAllIons('cations', false)">
+                        <span class="lang-zh">全空</span>
+                        <span class="lang-en">None</span>
+                    </button>
+                    <div class="checkbox-container" id="settings-cation-container"></div>
+                </div>
+                <div class="settings-card">
+                    <h3>
+                        <span class="lang-zh">陰離子</span>
+                        <span class="lang-en">Anions</span>
+                    </h3>
+                    <button type="button" class="cyber-btn cyber-btn-secondary" onclick="selectAllIons('anions', true)">
+                        <span class="lang-zh">全選</span>
+                        <span class="lang-en">All</span>
+                    </button>
+                    <button type="button" class="cyber-btn cyber-btn-secondary" onclick="selectAllIons('anions', false)">
+                        <span class="lang-zh">全空</span>
+                        <span class="lang-en">None</span>
+                    </button>
+                    <div class="checkbox-container" id="settings-anion-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="success-modal">
+        <div class="modal-card" id="success-modal-card">
+            <h2 id="modal-title">合成成功</h2>
+            <div id="modal-compound-name"></div>
+            <div class="answer-row">
+                <div class="modal-formula" id="modal-formula-latex"></div>
+                <div class="exam-note" id="modal-exam-line"></div>
+            </div>
+            <div class="modal-panel active" id="panel-electron">
+                <div class="electron-diagram-container" id="electron-diagram-container"></div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="cyber-btn cyber-btn-secondary" id="btn-stay-study" onclick="closeSuccessModal()">
+                    <span class="lang-zh">留下</span>
+                    <span class="lang-en">Stay</span>
+                </button>
+                <button type="button" class="cyber-btn" id="btn-next-level" onclick="nextQuestLevel()">
+                    <span class="lang-zh">下一關</span>
+                    <span class="lang-en">Next</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="penCanvas" class="pen-canvas"></canvas>
+    <canvas id="laserCanvas" class="laser-canvas"></canvas>
+    <div id="laserDot" class="laser-dot hidden"></div>
+    <div class="teach-dock">
+        <button type="button" class="dbtn" id="dkLaser" aria-label="Laser pointer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M12 3v3M12 18v3M3 12h3M18 12h3"></path></svg>
+        </button>
+        <button type="button" class="dbtn" id="dkPen" aria-label="Pen">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20l4.5-1.2L19 8.3 15.7 5 5.2 15.5 4 20z"></path></svg>
+        </button>
+        <div class="dcolors hidden" id="dkColors">
+            <button type="button" class="dcolor active" data-c="#e11d48" style="--sc:#e11d48" aria-label="Red"></button>
+            <button type="button" class="dcolor" data-c="#2563eb" style="--sc:#2563eb" aria-label="Blue"></button>
+            <button type="button" class="dcolor" data-c="#059669" style="--sc:#059669" aria-label="Green"></button>
+            <button type="button" class="dcolor" data-c="#111827" style="--sc:#111827" aria-label="Black"></button>
+            <button type="button" class="dbtn derase" id="dkErase" aria-label="Eraser">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 16l8-8 6 6-8 8H4v-6z"></path></svg>
+            </button>
+        </div>
+        <button type="button" class="dbtn" id="dkClear" aria-label="Clear writing">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 7h12M9 7V5h6v2M8 7l1 13h6l1-13"></path></svg>
+        </button>
+    </div>
+
+
+    <!-- 4. 系統音效 (利用 Web Audio API 合成) -->
+    <script>
+        var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (document.getElementById('setting-sound') && !document.getElementById('setting-sound').checked) return;
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                if (type === 'add') {
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.1);
+                } else if (type === 'remove') {
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.15);
+                } else if (type === 'success') {
+                    const now = audioCtx.currentTime;
+                    const freqs = [523.25, 659.25, 783.99, 1046.50];
+                    freqs.forEach(function(f, i) {
+                        let osc = audioCtx.createOscillator();
+                        let gain = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(f, now + i * 0.05);
+                        gain.gain.setValueAtTime(0.05, now + i * 0.05);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6 + i * 0.05);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + i * 0.05);
+                        osc.stop(now + 0.6 + i * 0.05);
+                    });
+                } else if (type === 'error') {
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.25);
+                    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.25);
+                }
+            } catch (e) {
+                console.error("Audio error: ", e);
+            }
+        }
+    </script>
+
+    <!-- 5. 離子大數據庫 -->
+    <script>
+        var dbCations = [
+            { id: "c1", name: "Sodium ion", nameZh: "鈉離子", sym: "Na", charge: 1, poly: false },
+            { id: "c2", name: "Potassium ion", nameZh: "鉀離子", sym: "K", charge: 1, poly: false },
+            { id: "c3", name: "Hydrogen ion", nameZh: "氫離子", sym: "H", charge: 1, poly: false },
+            { id: "c4", name: "Ammonium ion", nameZh: "銨離子", sym: "NH4", charge: 1, poly: true },
+            { id: "c5", name: "Silver ion", nameZh: "銀離子", sym: "Ag", charge: 1, poly: false },
+            { id: "c6", name: "Copper(I) ion", nameZh: "銅(I)離子", sym: "Cu", charge: 1, poly: false },
+            { id: "c7", name: "Magnesium ion", nameZh: "鎂離子", sym: "Mg", charge: 2, poly: false },
+            { id: "c8", name: "Calcium ion", nameZh: "鈣離子", sym: "Ca", charge: 2, poly: false },
+            { id: "c9", name: "Barium ion", nameZh: "鋇離子", sym: "Ba", charge: 2, poly: false },
+            { id: "c10", name: "Zinc ion", nameZh: "鋅離子", sym: "Zn", charge: 2, poly: false },
+            { id: "c11", name: "Lead(II) ion", nameZh: "鉛(II)離子", sym: "Pb", charge: 2, poly: false },
+            { id: "c12", name: "Manganese(II) ion", nameZh: "錳(II)離子", sym: "Mn", charge: 2, poly: false, color: "Pale pink" },
+            { id: "c13", name: "Iron(II) ion", nameZh: "鐵(II)離子", sym: "Fe", charge: 2, poly: false, color: "Green" },
+            { id: "c14", name: "Cobalt(II) ion", nameZh: "鈷(II)離子", sym: "Co", charge: 2, poly: false, color: "Pink" },
+            { id: "c15", name: "Nickel(II) ion", nameZh: "鎳(II)離子", sym: "Ni", charge: 2, poly: false, color: "Green" },
+            { id: "c16", name: "Copper(II) ion", nameZh: "銅(II)離子", sym: "Cu", charge: 2, poly: false, color: "Blue" },
+            { id: "c17", name: "Aluminium ion", nameZh: "鋁離子", sym: "Al", charge: 3, poly: false },
+            { id: "c18", name: "Iron(III) ion", nameZh: "鐵(III)離子", sym: "Fe", charge: 3, poly: false, color: "Yellow" },
+            { id: "c19", name: "Chromium(III) ion", nameZh: "鉻(III)離子", sym: "Cr", charge: 3, poly: false, color: "Green" }
+        ];
+
+        var dbAnions = [
+            { id: "a1", name: "Hydride ion", nameZh: "氫負離子", sym: "H", charge: 1, poly: false },
+            { id: "a2", name: "Hydroxide ion", nameZh: "氫氧根離子", sym: "OH", charge: 1, poly: true },
+            { id: "a3", name: "Chloride ion", nameZh: "氯離子", sym: "Cl", charge: 1, poly: false },
+            { id: "a4", name: "Bromide ion", nameZh: "溴離子", sym: "Br", charge: 1, poly: false },
+            { id: "a5", name: "Iodide ion", nameZh: "碘離子", sym: "I", charge: 1, poly: false },
+            { id: "a6", name: "Nitrate ion", nameZh: "硝酸根離子", sym: "NO3", charge: 1, poly: true },
+            { id: "a7", name: "Nitrite ion", nameZh: "亞硝酸根離子", sym: "NO2", charge: 1, poly: true },
+            { id: "a8", name: "Hydrogencarbonate ion", nameZh: "碳酸氫根離子", sym: "HCO3", charge: 1, poly: true },
+            { id: "a9", name: "Hydrogensulphate ion", nameZh: "硫酸氫根離子", sym: "HSO4", charge: 1, poly: true },
+            { id: "a10", name: "Cyanide ion", nameZh: "氰根離子", sym: "CN", charge: 1, poly: true },
+            { id: "a11", name: "Chlorate ion", nameZh: "氯酸根離子", sym: "ClO3", charge: 1, poly: true },
+            { id: "a12", name: "Permanganate ion", nameZh: "高錳酸根離子", sym: "MnO4", charge: 1, poly: true, color: "Purple" },
+            { id: "a13", name: "Oxide ion", nameZh: "氧離子", sym: "O", charge: 2, poly: false },
+            { id: "a14", name: "Sulphide ion", nameZh: "硫離子", sym: "S", charge: 2, poly: false },
+            { id: "a15", name: "Sulphate ion", nameZh: "硫酸根離子", sym: "SO4", charge: 2, poly: true },
+            { id: "a16", name: "Sulphite ion", nameZh: "亞硫酸根離子", sym: "SO3", charge: 2, poly: true },
+            { id: "a17", name: "Thiosulphate ion", nameZh: "硫代硫酸根離子", sym: "S2O3", charge: 2, poly: true },
+            { id: "a18", name: "Carbonate ion", nameZh: "碳酸根離子", sym: "CO3", charge: 2, poly: true },
+            { id: "a19", name: "Chromate ion", nameZh: "鉻酸根離子", sym: "CrO4", charge: 2, poly: true, color: "Yellow" },
+            { id: "a20", name: "Dichromate ion", nameZh: "重鉻酸根離子", sym: "Cr2O7", charge: 2, poly: true, color: "Orange" },
+            { id: "a21", name: "Nitride ion", nameZh: "氮離子", sym: "N", charge: 3, poly: false },
+            { id: "a22", name: "Phosphide ion", nameZh: "磷離子", sym: "P", charge: 3, poly: false },
+            { id: "a23", name: "Phosphate ion", nameZh: "磷酸根離子", sym: "PO4", charge: 3, poly: true }
+        ];
+
+        var dbCrystals = {
+            "NaCl": {
+                nameZh: "氯化鈉 (Sodium Chloride)",
+                nameEn: "Sodium Chloride (NaCl)",
+                systemZh: "等軸晶系 (Cubic Crystal System)",
+                systemEn: "Cubic Crystal System",
+                structureZh: "面心立方晶格 (Face-Centered Cubic Lattice, FCC)",
+                structureEn: "Face-Centered Cubic Lattice (FCC)",
+                factZh: "氯化鈉（食鹽）具有極高對稱性的晶體結構。微觀下，每個鈉離子 Na+ 被 6 個氯離子 Cl- 八面體包圍，反之亦然，離子配位數為 6:6。這種均勻交替的晶格排列賦予了食鹽完美的面心立方解理性質，在外力敲擊下，它會沿著垂直平面整齊解理分裂成完美的小正方體！",
+                factEn: "Sodium chloride (table salt) has a highly symmetrical crystal structure. Microscopically, each Na+ ion is surrounded by an octahedron of 6 Cl- ions, and vice versa, with a coordination number of 6:6. This uniform alternating lattice arrangement gives salt perfect cubic cleavage properties; when struck, it cleaves cleanly along perpendicular planes into perfect tiny cubes!"
+            },
+            "CuSO4": {
+                nameZh: "硫酸銅 (Copper(II) Sulphate)",
+                nameEn: "Copper(II) Sulphate (CuSO4)",
+                systemZh: "三斜晶系 (Triclinic Crystal System)",
+                systemEn: "Triclinic Crystal System",
+                structureZh: "五水合物晶網 (Triclinic Hydrated Lattice)",
+                structureEn: "Triclinic Hydrated Lattice",
+                factZh: "硫酸銅在常溫下以五水合物 CuSO4 . 5H2O 形式存在。銅(II)離子 Cu2+ 呈現出璀璨的深天藍色（由於 d-d 電子躍遷吸收黃光所致）。其微觀晶格屬於極低對稱性的三斜晶系，在幾何學上三個晶軸長度各不相等且夾角都不是 90 度，形成了自然界中最美妙的不規則多面體晶簇！",
+                factEn: "Copper(II) sulphate exists as the pentahydrate CuSO4 . 5H2O at room temperature. The Cu2+ ions exhibit a brilliant deep sky-blue color due to d-d electronic transitions absorbing yellow light. Its microscopic lattice belongs to the triclinic system with extremely low symmetry, where the three crystal axes are unequal and none of the angles are 90 degrees, forming some of nature's most beautiful irregular polyhedral crystal clusters!"
+            },
+            "CaCO3": {
+                nameZh: "碳酸鈣 (Calcium Carbonate)",
+                nameEn: "Calcium Carbonate (CaCO3)",
+                systemZh: "三方晶系 / 斜方晶系 (Trigonal / Orthorhombic)",
+                systemEn: "Trigonal / Orthorhombic Crystal System",
+                structureZh: "方解石與霰石晶格 (Calcite / Aragonite Polymorphs)",
+                structureEn: "Calcite / Aragonite Polymorphs",
+                factZh: "碳酸鈣具有卓越的雙折射光學效應。光線穿過方解石（碳酸鈣最穩定的晶型）時會分裂成兩道折射光，讓你透過晶體能看到雙重字體現象！它是大理石、鐘乳石、珍珠和海洋貝殼的核心無機成分，其微觀拼圖比例為 1:1，但微觀卻能構築起震撼的世界地貌。",
+                factEn: "Calcium carbonate exhibits remarkable double refraction (birefringence). Light passing through calcite (the most stable polymorph of CaCO3) splits into two refracted rays, allowing you to see double images through the crystal! It is the core inorganic component of marble, stalactites, pearls, and seashells. While its puzzle ratio is a simple 1:1, its microscopic structure builds spectacular world landscapes."
+            },
+            "Al2(SO4)3": {
+                nameZh: "硫酸鋁 (Aluminium Sulphate)",
+                nameEn: "Aluminium Sulphate (Al2(SO4)3)",
+                systemZh: "單斜晶系 (Monoclinic Crystal System)",
+                systemEn: "Monoclinic Crystal System",
+                structureZh: "層狀堆積結構 (Layered Octahedral Grid)",
+                structureEn: "Layered Octahedral Grid",
+                factZh: "硫酸鋁在水中電離出 Al3+ 與 SO4 2-。在拼圖結構中，為了達到電中性，需要 2 個鋁離子對應 3 個硫酸根，拼圖高度達到 480 像素！在淨水工程中，帶 3+ 高電荷的 Al3+ 能強力吸附水中帶負電荷的膠體雜質，形成羽狀沉澱，這正是幾何多電荷互鎖帶來的微觀化學工程奇蹟。",
+                factEn: "Aluminium sulphate dissociates into Al3+ and SO4 2- in water. In the puzzle structure, to achieve electrical neutrality, 2 aluminium ions pair with 3 sulphate ions, reaching a puzzle height of 480 pixels! In water purification, the highly charged Al3+ strongly adsorbs negatively charged colloidal impurities to form flocs. This is a microscopic chemical engineering miracle brought by multi-charge geometric interlocking."
+            },
+            "KMnO4": {
+                nameZh: "高錳酸鉀 (Potassium Permanganate)",
+                nameEn: "Potassium Permanganate (KMnO4)",
+                systemZh: "斜方晶系 (Orthorhombic Crystal System)",
+                systemEn: "Orthorhombic Crystal System",
+                structureZh: "四面體配位晶格 (Permanganate Tetrahedral Grid)",
+                structureEn: "Permanganate Tetrahedral Grid",
+                factZh: "高錳酸根 MnO4- 中的錳處於最頂級的 +7 氧化態，使晶體呈現出帶有黑色的極深紫紅色澤。這是一種非常強大的氧化劑。在它的斜方晶體中，鉀離子與由 4 個氧原子緊密包圍的高錳酸根四面體整齊交錯，這在幾何拼圖上表現為完美的 1:1 剛性卡扣配合。",
+                factEn: "The manganese in permanganate MnO4- is in its highest +7 oxidation state, giving the crystal an extremely deep, almost black, purplish-red color. It is a powerful oxidizing agent. In its orthorhombic crystal lattice, potassium ions interlock orderly with the tetrahedral permanganate groups (tightly surrounded by 4 oxygen atoms), which manifests in our geometric puzzle as a perfect 1:1 rigid snap-fit."
+            },
+            "FeCl3": {
+                nameZh: "氯化鐵 (Iron(III) Chloride)",
+                nameEn: "Iron(III) Chloride (FeCl3)",
+                systemZh: "三方晶系 (Trigonal Crystal System)",
+                systemEn: "Trigonal Crystal System",
+                structureZh: "層狀銸型晶格 (Layered BiI3-type Lattice)",
+                structureEn: "Layered BiI3-type Lattice",
+                factZh: "鐵(III)離子 Fe3+ 在溶液中呈現出溫暖的黃褐色，這是由其 d 軌域部分充填電子所展現的過渡金屬典型特徵。在晶體結構中，每個鐵(III)離子與 6 個氯離子包圍。由於陰陽離子電荷比為 1:3，在互鎖拼圖中，1 個 Fe3+ 恰好契合 3 個 Cl-，是無機化學立體幾何的最典型範例。",
+                factEn: "Trivalent iron ions Fe3+ exhibit a warm yellow-brown color in solution, a typical characteristic of transition metals with partially filled d-orbitals. In its crystal structure, each iron ion is surrounded by 6 chloride ions. Since the cation-to-anion charge ratio is 1:3, in the interlocking puzzle, 1 Fe3+ fits perfectly with 3 Cl-, representing a classic textbook example of inorganic stereochemistry."
+            },
+            "FeSO4": {
+                nameZh: "硫酸鐵(II) (Iron(II) Sulphate)",
+                nameEn: "Iron(II) Sulphate (FeSO4)",
+                systemZh: "單斜晶系 (Monoclinic Crystal System)",
+                systemEn: "Monoclinic Crystal System",
+                structureZh: "綠礬晶格 (Melanterite-type Grid)",
+                structureEn: "Melanterite-type Grid",
+                factZh: "硫酸鐵(II)在古籍中被稱為綠礬。鐵(II)離子 Fe2+ 帶有淡淡的薄荷綠色。在水溶液中，鐵(II)離子極易被空氣中的氧氣氧化成黃褐色的鐵(III)離子。其微觀幾何對稱性呈現出單斜晶特點，晶胞中有一個夾角不等於 90 度，猶如一座微微傾斜但堅不可摧的微觀宮殿！",
+                factEn: "Iron(II) sulphate was known as 'green vitriol' in ancient times. The Fe2+ ions carry a pale mint-green color. In aqueous solution, Fe2+ is easily oxidized by oxygen in the air into yellowish-brown trivalent iron. Its microscopic symmetry exhibits monoclinic characteristics, where one angle of the unit cell is not equal to 90 degrees, resembling a slightly tilted but indestructible microscopic palace!"
+            },
+            "default": {
+                nameZh: "自訂離子化合物 (Custom Ionic Compound)",
+                nameEn: "Custom Ionic Compound",
+                systemZh: "離子晶體點陣 (Ionic Crystal Lattice)",
+                systemEn: "Ionic Crystal Lattice",
+                structureZh: "電荷平衡晶格 (Charge-Balanced Grid)",
+                structureEn: "Charge-Balanced Grid",
+                factZh: "離子化合物由陽離子與陰離子通過強大的靜電引力（庫崙力）緊密結合而成。在微觀上，晶體中沒有獨立的單分子存在，而是由無數個陽離子與陰離子在空間中交替排列成無限延展的規律晶格。拼圖中的凹槽與凸筍，正是庫崙引力在微觀幾何學中的視覺化具體體現！",
+                factEn: "Ionic compounds are formed by cations and anions tightly bound together by strong electrostatic forces (Coulomb forces). Microscopically, there are no independent single molecules in the crystal; instead, countless cations and anions are arranged alternately in space to form an infinitely extending regular lattice. The slots and tabs in our puzzle are the concrete visual representation of Coulomb attraction in microscopic geometry!"
+            }
+        };
+
+        for (var k in dbCrystals) {
+            if (dbCrystals[k].fact) {
+                dbCrystals[k].fact = dbCrystals[k].fact.replace("and 陰離子", "and 陰離子").replace("與陰離子", "與陰離子");
+            }
+        }
+    </script>
+
+    <!-- 6. 核心 JS 拼圖運算引擎 & 反應控制 -->
+    <script>
+        var currentLang = 'en';
+        var activeTab = 'lab';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.body.classList.toggle('lang-zh-active', lang === 'zh');
+            document.body.classList.toggle('lang-en-active', lang !== 'zh');
+            document.getElementById('btn-lang-zh').classList.toggle('active-lang', lang === 'zh');
+            document.getElementById('btn-lang-en').classList.toggle('active-lang', lang !== 'zh');
+            renderLabPools();
+            updateVesselUI();
+            initSettings();
+            if (activeTab === 'quest') {
+                loadQuestLevel();
+            }
+            renderOuter();
+            syncHideLabel();
+        }
+        var vesselCations = [];
+        var vesselAnions = [];
+        
+        var masterQuestPool = [
+            { catId: "c16", anId: "a15", name: "硫酸銅 (Copper(II) Sulphate)", formula: "CuSO4" },
+            { catId: "c1", anId: "a3", name: "氯化鈉 (Sodium Chloride)", formula: "NaCl" },
+            { catId: "c17", anId: "a15", name: "硫酸鋁 (Aluminium Sulphate)", formula: "Al2(SO4)3" },
+            { catId: "c18", anId: "a3", name: "氯化鐵 (Iron(III) Chloride)", formula: "FeCl3" },
+            { catId: "c2", anId: "a12", name: "高錳酸鉀 (Potassium Permanganate)", formula: "KMnO4" },
+            { catId: "c8", anId: "a18", name: "碳酸鈣 (Calcium Carbonate)", formula: "CaCO3" },
+            { catId: "c13", anId: "a15", name: "硫酸鐵(II) (Iron(II) Sulphate)", formula: "FeSO4" },
+            { catId: "c1", anId: "a2", name: "氫氧化鈉 (Sodium Hydroxide)", formula: "NaOH" },
+            { catId: "c4", anId: "a6", name: "硝酸銨 (Ammonium Nitrate)", formula: "NH4NO3" },
+            { catId: "c9", anId: "a3", name: "氯化鋇 (Barium Chloride)", formula: "BaCl2" },
+            { catId: "c1", anId: "a18", name: "碳酸鈉 (Sodium Carbonate)", formula: "Na2CO3" },
+            { catId: "c8", anId: "a23", name: "磷酸鈣 (Calcium Phosphate)", formula: "Ca3(PO4)2" },
+            { catId: "c5", anId: "a6", name: "硝酸銀 (Silver Nitrate)", formula: "AgNO3" },
+            { catId: "c8", anId: "a2", name: "氫氧化鈣 (Calcium Hydroxide)", formula: "Ca(OH)2" },
+            { catId: "c10", anId: "a15", name: "硫酸鋅 (Zinc Sulphate)", formula: "ZnSO4" },
+            { catId: "c4", anId: "a3", name: "氯化銨 (Ammonium Chloride)", formula: "NH4Cl" }
+        ];
+
+        var questList = [];
+        var currentQuestIndex = 0;
+        var questVesselCations = [];
+        var questVesselAnions = [];
+        var currentQuestCations = [];
+        var currentQuestAnions = [];
+        var questSuccessCount = 0;
+        var questTotalAttempts = 0;
+
+        function initQuestGame() {
+            var shuffled = masterQuestPool.slice().sort(function() {
+                return 0.5 - Math.random();
+            });
+            questList = shuffled.slice(0, 10);
+            currentQuestIndex = 0;
+            questVesselCations = [];
+            questVesselAnions = [];
+            
+            // Reset UI score/stats on load if elements are there
+            var scoreEl = document.getElementById('quest-score');
+            var accuracyEl = document.getElementById('quest-accuracy');
+            if (scoreEl) scoreEl.innerText = 'Level 1 / 10';
+            if (accuracyEl) accuracyEl.innerText = '100%';
+        }
+
+        // Run once on load to populate the first 10 random levels
+        initQuestGame();
+
+        function formatChemicalFormulaHTML(formula) {
+            return formula.replace(/(\d+)/g, '<sub>$1</sub>');
+        }
+
+        function formatChemicalFormulaLaTeX(symbol) {
+            return symbol.replace(/([a-zA-Z()]+)/g, '\\text{$1}').replace(/(\d+)/g, '_{$1}');
+        }
+
+        function formatChemicalFormulaSVG(symbol) {
+            return symbol.replace(/(\d+)/g, '<tspan baseline-shift="sub" font-size="10">$1</tspan>');
+        }
+
+        function getIonColor(ion, isCation) {
+            if (ion.color) {
+                switch(ion.color.toLowerCase()) {
+                    case 'blue':
+                        return { start: '#0052d4', end: '#4364f7', border: '#00bfff', text: '#ffffff', textSecondary: '#a5c9eb' };
+                    case 'yellow':
+                        return { start: '#f1c40f', end: '#f39c12', border: '#ffd700', text: '#111111', textSecondary: '#554400' };
+                    case 'green':
+                        if (ion.name.includes('Chromium')) {
+                            return { start: '#11998e', end: '#38ef7d', border: '#00ffcc', text: '#ffffff', textSecondary: '#d0f8eb' };
+                        }
+                        return { start: '#134e5e', end: '#71973c', border: '#7cfc00', text: '#ffffff', textSecondary: '#e2f4ce' };
+                    case 'pink':
+                        return { start: '#ec008c', end: '#fc6767', border: '#ff69b4', text: '#ffffff', textSecondary: '#ffd4f0' };
+                    case 'pale pink':
+                        return { start: '#ff9a9e', end: '#fecfef', border: '#ffb6c1', text: '#333333', textSecondary: '#663344' };
+                    case 'purple':
+                        return { start: '#4b0082', end: '#800080', border: '#ff00ff', text: '#ffffff', textSecondary: '#f8d0f7' };
+                    case 'orange':
+                        return { start: '#f857a6', end: '#ff5858', border: '#ff4500', text: '#ffffff', textSecondary: '#ffe0d8' };
+                }
+            }
+            
+            if (isCation) {
+                return { start: 'rgba(30, 80, 180, 0.45)', end: 'rgba(10, 40, 100, 0.25)', border: 'rgba(0, 168, 255, 0.6)', text: '#ffffff', textSecondary: '#a3d8f4' };
+            } else {
+                return { start: 'rgba(180, 110, 30, 0.45)', end: 'rgba(100, 50, 10, 0.25)', border: 'rgba(255, 170, 0, 0.6)', text: '#ffffff', textSecondary: '#f4d8a3' };
+            }
+        }
+
+        function generateIonSVG(ion, isCation, indexInVessel) {
+            if (indexInVessel === undefined) indexInVessel = -1;
+            var unitHeight = 80;
+            var width = 160;
+            var charge = ion.charge;
+            var height = charge * unitHeight;
+            var radius = 16;
+
+            var path = "";
+            if (isCation) {
+                path += 'M 0 0';
+                path += ' L ' + width + ' 0';
+                for (var i = 0; i < charge; i++) {
+                    var y1 = i * unitHeight + 24;
+                    var y2 = i * unitHeight + 56;
+                    path += ' L ' + width + ' ' + y1;
+                    path += ' A ' + radius + ' ' + radius + ' 0 0 0 ' + width + ' ' + y2;
+                }
+                path += ' L ' + width + ' ' + height;
+                path += ' L 0 ' + height;
+                path += ' Z';
+            } else {
+                path += 'M 0 0';
+                for (var i = 0; i < charge; i++) {
+                    var y1 = i * unitHeight + 24;
+                    var y2 = i * unitHeight + 56;
+                    path += ' L 0 ' + y1;
+                    path += ' A ' + radius + ' ' + radius + ' 0 0 0 0 ' + y2;
+                }
+                path += ' L 0 ' + height;
+                path += ' L ' + width + ' ' + height;
+                path += ' L ' + width + ' 0';
+                path += ' Z';
+            }
+
+            var color = getIonColor(ion, isCation);
+            var textY = height / 2 + 6;
+            
+            var alignmentMarkers = "";
+            for (var i = 0; i < charge; i++) {
+                var markY = i * unitHeight + 40;
+                if (isCation) {
+                    alignmentMarkers += '<circle cx="' + (width - 20) + '" cy="' + markY + '" r="5" fill="#00a8ff" opacity="0.8" />' +
+                                        '<text x="' + (width - 20) + '" y="' + (markY + 4) + '" fill="#ffffff" font-size="12" text-anchor="middle" font-family="Calibri, sans-serif" font-weight="bold">+</text>';
+                } else {
+                    alignmentMarkers += '<circle cx="20" cy="' + markY + '" r="5" fill="#ffaa00" opacity="0.8" />' +
+                                        '<text x="20" y="' + (markY + 4) + '" fill="#ffffff" font-size="12" text-anchor="middle" font-family="Calibri, sans-serif" font-weight="bold">-</text>';
+                }
+            }
+
+            var doubleClickEvent = indexInVessel >= 0 ? 'ondblclick="removeIon(' + indexInVessel + ', ' + isCation + ')"' : '';
+
+            return '<div class="ion-svg-element" ' + doubleClickEvent + ' style="width:' + width + 'px; height:' + height + 'px;" title="雙擊可從反應器中移除">' +
+                   '<svg width="' + width + '" height="' + height + '" viewBox="-15 -5 ' + (width + 30) + ' ' + (height + 10) + '">' +
+                   '<defs>' +
+                   '<linearGradient id="grad-' + ion.id + '-' + indexInVessel + '" x1="0%" y1="0%" x2="100%" y2="100%">' +
+                   '<stop offset="0%" stop-color="' + color.start + '" />' +
+                   '<stop offset="100%" stop-color="' + color.end + '" />' +
+                   '</linearGradient>' +
+                   '<filter id="glow-' + ion.id + '-' + indexInVessel + '" x="-20%" y="-20%" width="140%" height="140%">' +
+                   '<feGaussianBlur stdDeviation="3" result="blur" />' +
+                   '<feComposite in="SourceGraphic" in2="blur" operator="over" />' +
+                   '</filter>' +
+                   '</defs>' +
+                   '<path d="' + path + '" fill="url(#grad-' + ion.id + '-' + indexInVessel + ')" stroke="' + color.border + '" stroke-width="2" filter="url(#glow-' + ion.id + '-' + indexInVessel + ')" />' +
+                   alignmentMarkers +
+                   '<g transform="translate(' + (width/2) + ', ' + textY + ')">' +
+                   '<text text-anchor="middle" dominant-baseline="middle" fill="' + color.text + '" font-family="Calibri, sans-serif" font-weight="900" font-size="24">' + formatChemicalFormulaSVG(ion.sym) + '</text>' +
+                   '<text x="22" y="-16" fill="' + color.text + '" font-family="Calibri, sans-serif" font-size="14" font-weight="bold">' + (charge === 1 ? '' : charge) + (isCation ? '+' : '-') + '</text>' +
+                   '<text x="0" y="24" fill="' + color.textSecondary + '" font-family="' + (currentLang === 'zh' ? 'Noto Sans TC, sans-serif' : 'Calibri, sans-serif') + '" font-size="12" text-anchor="middle" font-weight="bold">' + (currentLang === 'zh' ? ion.nameZh : ion.name) + '</text>' +
+                   '</g>' +
+                   '</svg>' +
+                   '</div>';
+        }
+
+        function renderLabPools() {
+            var catList = document.getElementById('lab-cation-list');
+            var anList = document.getElementById('lab-anion-list');
+            catList.innerHTML = '';
+            anList.innerHTML = '';
+
+            var activeCationId = vesselCations.length > 0 ? vesselCations[0].id : null;
+            var activeAnionId = vesselAnions.length > 0 ? vesselAnions[0].id : null;
+
+            dbCations.forEach(function(c) {
+                var checkbox = document.getElementById('cb-cat-' + c.id);
+                if (checkbox && !checkbox.checked) return;
+
+                var card = document.createElement('div');
+                card.className = 'ion-card cation-hover';
+                
+                var isDisabled = activeCationId !== null && activeCationId !== c.id;
+                if (isDisabled) {
+                    card.style.opacity = '0.35';
+                    card.style.cursor = 'not-allowed';
+                    card.style.pointerEvents = 'none';
+                }
+
+                var displayName = currentLang === 'zh' ? c.nameZh : c.name;
+                card.title = displayName;
+                card.innerHTML = '<div class="ion-sym-badge">' + formatChemicalFormulaHTML(c.sym) + '<sup>' + (c.charge > 1 ? c.charge : '') + '+</sup></div>';
+                
+                if (!isDisabled) {
+                    card.onclick = function() { addIon(c, true); };
+                }
+                catList.appendChild(card);
+            });
+
+            dbAnions.forEach(function(a) {
+                var checkbox = document.getElementById('cb-ani-' + a.id);
+                if (checkbox && !checkbox.checked) return;
+
+                var card = document.createElement('div');
+                card.className = 'ion-card anion-hover';
+
+                var isDisabled = activeAnionId !== null && activeAnionId !== a.id;
+                if (isDisabled) {
+                    card.style.opacity = '0.35';
+                    card.style.cursor = 'not-allowed';
+                    card.style.pointerEvents = 'none';
+                }
+
+                var displayName = currentLang === 'zh' ? a.nameZh : a.name;
+                card.title = displayName;
+                card.innerHTML = '<div class="ion-sym-badge">' + formatChemicalFormulaHTML(a.sym) + '<sup>' + (a.charge > 1 ? a.charge : '') + '−</sup></div>';
+                
+                if (!isDisabled) {
+                    card.onclick = function() { addIon(a, false); };
+                }
+                anList.appendChild(card);
+            });
+        }
+
+        function addIon(ion, isCation) {
+            playSound('add');
+            if (isCation) {
+                if (vesselCations.length > 0 && vesselCations[0].id !== ion.id) {
+                    return;
+                }
+                vesselCations.push(ion);
+            } else {
+                if (vesselAnions.length > 0 && vesselAnions[0].id !== ion.id) {
+                    return;
+                }
+                vesselAnions.push(ion);
+            }
+            updateVesselUI();
+        }
+
+        function removeIon(index, isCation) {
+            playSound('remove');
+            if (isCation) {
+                vesselCations.splice(index, 1);
+            } else {
+                vesselAnions.splice(index, 1);
+            }
+            updateVesselUI();
+        }
+
+        function clearVessel() {
+            playSound('remove');
+            vesselCations = [];
+            vesselAnions = [];
+            updateVesselUI();
+        }
+
+        function updateVesselUI() {
+            var catCol = document.getElementById('cation-column-lab');
+            var anCol = document.getElementById('anion-column-lab');
+            var catHtml = '';
+            vesselCations.forEach(function(c, idx) {
+                catHtml += generateIonSVG(c, true, idx);
+            });
+            catCol.innerHTML = catHtml;
+
+            var anHtml = '';
+            vesselAnions.forEach(function(a, idx) {
+                anHtml += generateIonSVG(a, false, idx);
+            });
+            anCol.innerHTML = anHtml;
+
+            var totalPos = vesselCations.reduce(function(sum, c) { return sum + c.charge; }, 0);
+            var totalNeg = vesselAnions.reduce(function(sum, a) { return sum + a.charge; }, 0);
+            var netCharge = totalPos - totalNeg;
+
+            document.getElementById('weight-left').innerText = totalPos > 0 ? totalPos + '+' : '0';
+            document.getElementById('weight-right').innerText = totalNeg > 0 ? totalNeg + '-' : '0';
+
+            var beam = document.getElementById('scale-beam');
+            var light = document.getElementById('scale-light');
+
+            var angle = Math.max(-15, Math.min(15, netCharge * 4));
+            beam.style.transform = 'rotate(' + angle + 'deg)';
+
+            document.querySelectorAll('.scale-pan').forEach(function(pan) {
+                pan.style.transform = 'translate(' + (pan.classList.contains('scale-pan-left') ? '-20px, 30px' : '20px, 30px') + ' ) rotate(' + (-angle) + 'deg)';
+            });
+
+            if (netCharge === 0 && totalPos > 0) {
+                light.classList.add('balanced');
+            } else {
+                light.classList.remove('balanced');
+            }
+
+            updateEquationLaTeX();
+            renderLabPools();
+        }
+
+        function safeRenderLaTeX(elementId, texString, fallbackHtml) {
+            var el = document.getElementById(elementId);
+            if (!el) return;
+            
+            if (window.katex) {
+                try {
+                    window.katex.render(texString, el, {
+                        throwOnError: false,
+                        displayMode: false
+                    });
+                } catch (err) {
+                    el.innerHTML = fallbackHtml;
+                }
+            } else {
+                el.innerHTML = fallbackHtml;
+            }
+        }
+
+        function coloredIonTex(ion, count, isCation) {
+            var col = isCation ? '#0066cc' : '#d97706';
+            var sign = isCation ? '+' : '-';
+            var body = (count > 1 ? count : '') + formatChemicalFormulaLaTeX(ion.sym) + '^{' + (ion.charge > 1 ? ion.charge : '') + sign + '}';
+            return '{\\color{' + col + '}' + body + '}';
+        }
+
+        function coloredIonHtml(ion, count, isCation) {
+            var cls = isCation ? 'chg-pos' : 'chg-neg';
+            var sign = isCation ? '+' : '−';
+            return '<span class="' + cls + '">' + (count > 1 ? count : '') + formatChemicalFormulaHTML(ion.sym) + '<sup>' + (ion.charge > 1 ? ion.charge : '') + sign + '</sup></span>';
+        }
+
+        function setEqState(side) {
+            var el = document.getElementById('lab-equation');
+            if (!el) return;
+            if (side) {
+                el.classList.add('eq-open');
+                el.dataset.side = side;
+            } else {
+                el.classList.remove('eq-open');
+                el.removeAttribute('data-side');
+            }
+            requestAnimationFrame(fitVisibleLesson);
+        }
+
+        function updateEquationLaTeX() {
+            if (vesselCations.length === 0 && vesselAnions.length === 0) {
+                var tex = '{\\color{#0066cc}A^{y+}} + {\\color{#d97706}B^{x-}}';
+                var fallback = '<span class="chg-pos">A<sup>y+</sup></span> + <span class="chg-neg">B<sup>x−</sup></span>';
+                safeRenderLaTeX('lab-equation', tex, fallback);
+                setEqState('pos');
+                return;
+            }
+
+            var catCount = vesselCations.length;
+            var anCount = vesselAnions.length;
+
+            if (catCount === 0 || anCount === 0) {
+                var formulaLeft = '';
+                var fallbackLeft = '';
+                var side = 'pos';
+                if (catCount > 0) {
+                    var c = vesselCations[0];
+                    formulaLeft = coloredIonTex(c, catCount, true);
+                    fallbackLeft = coloredIonHtml(c, catCount, true);
+                    side = 'neg';
+                } else {
+                    var a = vesselAnions[0];
+                    formulaLeft = coloredIonTex(a, anCount, false);
+                    fallbackLeft = coloredIonHtml(a, anCount, false);
+                    side = 'pos';
+                }
+                safeRenderLaTeX('lab-equation', formulaLeft, fallbackLeft);
+                setEqState(side);
+                return;
+            }
+
+            var cat = vesselCations[0];
+            var an = vesselAnions[0];
+            var texLeft = coloredIonTex(cat, catCount, true) + ' + ' + coloredIonTex(an, anCount, false);
+            var fallbackLeft = coloredIonHtml(cat, catCount, true) + ' + ' + coloredIonHtml(an, anCount, false);
+            var totalPos = vesselCations.reduce(function(sum, c) { return sum + c.charge; }, 0);
+            var totalNeg = vesselAnions.reduce(function(sum, a) { return sum + a.charge; }, 0);
+
+            if (totalPos === totalNeg) {
+                var compoundTex = generateCompoundLaTeX(cat, an, catCount, anCount);
+                var compoundHtml = generateCompoundHTML(cat, an, catCount, anCount);
+                safeRenderLaTeX('lab-equation', texLeft + ' \\longrightarrow ' + compoundTex, fallbackLeft + ' &rarr; ' + compoundHtml);
+                setEqState(null);
+            } else {
+                safeRenderLaTeX('lab-equation', texLeft, fallbackLeft);
+                setEqState(totalPos > totalNeg ? 'pos' : 'neg');
+            }
+        }
+
+        function generateCompoundLaTeX(cat, an, catCount, anCount) {
+            var gcd = getGCD(catCount, anCount);
+            var simCat = catCount / gcd;
+            var simAn = anCount / gcd;
+            var coef = gcd > 1 ? gcd + ' ' : '';
+            
+            // Special case for Hydrogen (H+) and Hydroxide (OH-) forming Water (H2O)
+            if (cat.sym === "H" && an.sym === "OH") {
+                var hCount = simCat + simAn; // 1 + 1 = 2
+                var oCount = simAn; // 1
+                var waterPart = "H_{" + (hCount > 1 ? hCount : '') + "}O" + (oCount > 1 ? "_{" + oCount + "}" : '');
+                return coef + waterPart;
+            }
+            
+            var catPart = cat.poly && simCat > 1 ? '(' + formatChemicalFormulaLaTeX(cat.sym) + ')_{' + simCat + '}' : formatChemicalFormulaLaTeX(cat.sym) + (simCat > 1 ? '_{' + simCat + '}' : '');
+            var anPart = an.poly && simAn > 1 ? '(' + formatChemicalFormulaLaTeX(an.sym) + ')_{' + simAn + '}' : formatChemicalFormulaLaTeX(an.sym) + (simAn > 1 ? '_{' + simAn + '}' : '');
+            return coef + catPart + anPart;
+        }
+
+        function generateCompoundHTML(cat, an, catCount, anCount) {
+            var gcd = getGCD(catCount, anCount);
+            var simCat = catCount / gcd;
+            var simAn = anCount / gcd;
+            var coef = gcd > 1 ? gcd + ' ' : '';
+            
+            // Special case for Hydrogen (H+) and Hydroxide (OH-) forming Water (H2O)
+            if (cat.sym === "H" && an.sym === "OH") {
+                var hCount = simCat + simAn; // 1 + 1 = 2
+                var oCount = simAn; // 1
+                var waterPart = "H" + (hCount > 1 ? "<sub>" + hCount + "</sub>" : '') + "O" + (oCount > 1 ? "<sub>" + oCount + "</sub>" : '');
+                return coef + waterPart;
+            }
+            
+            var catPart = cat.poly && simCat > 1 ? '(' + formatChemicalFormulaHTML(cat.sym) + ')<sub>' + simCat + '</sub>' : formatChemicalFormulaHTML(cat.sym) + (simCat > 1 ? '<sub>' + simCat + '</sub>' : '');
+            var anPart = an.poly && simAn > 1 ? '(' + formatChemicalFormulaHTML(an.sym) + ')<sub>' + simAn + '</sub>' : formatChemicalFormulaHTML(an.sym) + (simAn > 1 ? '<sub>' + simAn + '</sub>' : '');
+            return coef + catPart + anPart;
+        }
+
+        function checkSynthesis() {
+            if (vesselCations.length === 0 || vesselAnions.length === 0) {
+                playSound('error');
+                var msg = currentLang === 'zh' ? "請先在反應室內添加陽離子與陰離子！" : "Please add both cations and anions to the reaction vessel first!";
+                alert(msg);
+                return;
+            }
+
+            var totalPos = vesselCations.reduce(function(sum, c) { return sum + c.charge; }, 0);
+            var totalNeg = vesselAnions.reduce(function(sum, a) { return sum + a.charge; }, 0);
+
+            if (totalPos === totalNeg) {
+                var cat = vesselCations[0];
+                var an = vesselAnions[0];
+                triggerCelebration();
+                showSuccessModal(cat, an, vesselCations.length, vesselAnions.length);
+            } else {
+                playSound('error');
+                var msg = currentLang === 'zh' ? 
+                    '電荷不平衡！正電荷為 +' + totalPos + '，負電荷為 -' + totalNeg + '。請添加或移除離子使它們達到平衡。' : 
+                    'Charge unbalanced! Positive charge is +' + totalPos + ', negative charge is -' + totalNeg + '. Please add or remove ions to balance them.';
+                alert(msg);
+            }
+        }
+
+        function renderQuestPools() {
+            var catList = document.getElementById('quest-cation-list');
+            if (catList) {
+                catList.innerHTML = '';
+                var activeCationId = questVesselCations.length > 0 ? questVesselCations[0].id : null;
+                currentQuestCations.forEach(function(c) {
+                    var cardC = document.createElement('div');
+                    cardC.className = 'ion-card cation-hover';
+                    cardC.style.justifyContent = 'center';
+                    cardC.style.minHeight = '50px';
+
+                    var isDisabled = activeCationId !== null && activeCationId !== c.id;
+                    if (isDisabled) {
+                        cardC.style.opacity = '0.35';
+                        cardC.style.cursor = 'not-allowed';
+                        cardC.style.pointerEvents = 'none';
+                    }
+
+                    cardC.title = currentLang === 'zh' ? c.nameZh : c.name;
+                    cardC.innerHTML = '<div class="ion-sym-badge">' + formatChemicalFormulaHTML(c.sym) + '<sup>' + (c.charge > 1 ? c.charge : '') + '+</sup></div>';
+                    if (!isDisabled) {
+                        cardC.onclick = function() { addQuestIon(c, true); };
+                    }
+                    catList.appendChild(cardC);
+                });
+            }
+
+            var anList = document.getElementById('quest-anion-list');
+            if (anList) {
+                anList.innerHTML = '';
+                var activeAnionId = questVesselAnions.length > 0 ? questVesselAnions[0].id : null;
+                currentQuestAnions.forEach(function(a) {
+                    var cardA = document.createElement('div');
+                    cardA.className = 'ion-card anion-hover';
+                    cardA.style.justifyContent = 'center';
+                    cardA.style.minHeight = '50px';
+
+                    var isDisabled = activeAnionId !== null && activeAnionId !== a.id;
+                    if (isDisabled) {
+                        cardA.style.opacity = '0.35';
+                        cardA.style.cursor = 'not-allowed';
+                        cardA.style.pointerEvents = 'none';
+                    }
+
+                    cardA.title = currentLang === 'zh' ? a.nameZh : a.name;
+                    cardA.innerHTML = '<div class="ion-sym-badge">' + formatChemicalFormulaHTML(a.sym) + '<sup>' + (a.charge > 1 ? a.charge : '') + '−</sup></div>';
+                    if (!isDisabled) {
+                        cardA.onclick = function() { addQuestIon(a, false); };
+                    }
+                    anList.appendChild(cardA);
+                });
+            }
+        }
+
+        function loadQuestLevel() {
+            var quest = questList[currentQuestIndex];
+            var cat = dbCations.find(function(c) { return c.id === quest.catId; });
+            var an = dbAnions.find(function(a) { return a.id === quest.anId; });
+
+            // Bilingual target compound display
+            var displayName = quest.name;
+            if (quest.name.includes(' (')) {
+                var parts = quest.name.split(' (');
+                var zhPart = parts[0];
+                // Join back any accidentally split parts of the English name, and strip ONLY the trailing parenthesized ')'
+                var enPart = parts.slice(1).join(' (');
+                if (enPart.endsWith(')')) {
+                    enPart = enPart.slice(0, -1);
+                }
+                displayName = currentLang === 'zh' ? zhPart : enPart;
+            }
+            document.getElementById('quest-target-display').innerHTML = displayName;
+            document.getElementById('quest-score').innerText = 'Level ' + (currentQuestIndex + 1) + ' / ' + questList.length;
+
+            questVesselCations = [];
+            questVesselAnions = [];
+            document.getElementById('quest-hint-box').style.display = 'none';
+
+            // Generate 3 distractor cations that are different from the correct one
+            var otherCations = dbCations.filter(function(c) { return c.id !== cat.id; });
+            var distractorCations = [];
+            while (distractorCations.length < 3 && otherCations.length > 0) {
+                var randIdx = Math.floor(Math.random() * otherCations.length);
+                distractorCations.push(otherCations.splice(randIdx, 1)[0]);
+            }
+            // Shuffle the correct cation and distractors
+            currentQuestCations = [cat].concat(distractorCations).sort(function() { return 0.5 - Math.random(); });
+
+            // Generate 3 distractor anions that are different from the correct one
+            var otherAnions = dbAnions.filter(function(a) { return a.id !== an.id; });
+            var distractorAnions = [];
+            while (distractorAnions.length < 3 && otherAnions.length > 0) {
+                var randIdx = Math.floor(Math.random() * otherAnions.length);
+                distractorAnions.push(otherAnions.splice(randIdx, 1)[0]);
+            }
+            // Shuffle the correct anion and distractors
+            currentQuestAnions = [an].concat(distractorAnions).sort(function() { return 0.5 - Math.random(); });
+
+            updateQuestVesselUI();
+        }
+
+        function addQuestIon(ion, isCation) {
+            playSound('add');
+            if (isCation) {
+                if (questVesselCations.length > 0 && questVesselCations[0].id !== ion.id) {
+                    return;
+                }
+                questVesselCations.push(ion);
+            } else {
+                if (questVesselAnions.length > 0 && questVesselAnions[0].id !== ion.id) {
+                    return;
+                }
+                questVesselAnions.push(ion);
+            }
+            updateQuestVesselUI();
+        }
+
+        function removeQuestIon(index, isCation) {
+            playSound('remove');
+            if (isCation) {
+                questVesselCations.splice(index, 1);
+            } else {
+                questVesselAnions.splice(index, 1);
+            }
+            updateQuestVesselUI();
+        }
+
+        function clearQuestVessel() {
+            playSound('remove');
+            questVesselCations = [];
+            questVesselAnions = [];
+            updateQuestVesselUI();
+        }
+
+        function updateQuestVesselUI() {
+            var catCol = document.getElementById('cation-column-quest');
+            var anCol = document.getElementById('anion-column-quest');
+            catCol.innerHTML = '';
+            anCol.innerHTML = '';
+
+            questVesselCations.forEach(function(c, idx) {
+                var el = document.createElement('div');
+                el.innerHTML = generateIonSVG(c, true, idx);
+                el.firstChild.ondblclick = function() { removeQuestIon(idx, true); };
+                catCol.appendChild(el.firstChild);
+            });
+
+            questVesselAnions.forEach(function(a, idx) {
+                var el = document.createElement('div');
+                el.innerHTML = generateIonSVG(a, false, idx);
+                el.firstChild.ondblclick = function() { removeQuestIon(idx, false); };
+                anCol.appendChild(el.firstChild);
+            });
+
+            var totalPos = questVesselCations.reduce(function(sum, c) { return sum + c.charge; }, 0);
+            var totalNeg = questVesselAnions.reduce(function(sum, a) { return sum + a.charge; }, 0);
+            var netCharge = totalPos - totalNeg;
+
+            document.getElementById('q-weight-left').innerText = totalPos > 0 ? totalPos + '+' : '0';
+            document.getElementById('q-weight-right').innerText = totalNeg > 0 ? totalNeg + '-' : '0';
+
+            var beam = document.getElementById('q-scale-beam');
+            var light = document.getElementById('q-scale-light');
+
+            var angle = Math.max(-15, Math.min(15, netCharge * 4));
+            beam.style.transform = 'rotate(' + angle + 'deg)';
+
+            document.querySelectorAll('#tab-quest .scale-pan').forEach(function(pan) {
+                pan.style.transform = 'translate(' + (pan.classList.contains('scale-pan-left') ? '-20px, 30px' : '20px, 30px') + ' ) rotate(' + (-angle) + 'deg)';
+            });
+
+            if (netCharge === 0 && totalPos > 0) {
+                light.classList.add('balanced');
+            } else {
+                light.classList.remove('balanced');
+            }
+
+            drawLatticeProjection(totalPos, totalNeg);
+            renderQuestPools();
+            requestAnimationFrame(fitVisibleLesson);
+        }
+
+        function drawLatticeProjection(posCharge, negCharge) {
+            var gridContainer = document.getElementById('lattice-projection-grid');
+            gridContainer.innerHTML = '';
+
+            if (questVesselCations.length === 0 || questVesselAnions.length === 0) {
+                gridContainer.innerHTML = '<div style="color:#64748b; text-align:center; padding-top:22px;">' + (currentLang === 'zh' ? '尚未成晶格' : 'No lattice yet') + '</div>';
+                return;
+            }
+
+            var cat = questVesselCations[0];
+            var an = questVesselAnions[0];
+
+            var catColor = getIonColor(cat, true).border;
+            var anColor = getIonColor(an, false).border;
+
+            var nodesHtml = "";
+            var totalCations = questVesselCations.length;
+            var totalAnions = questVesselAnions.length;
+            var totalItems = totalCations + totalAnions;
+
+            for (var z = 0; z < 3; z++) {
+                for (var y = 0; y < 3; y++) {
+                    for (var x = 0; x < 3; x++) {
+                        var isCatNode = (x + y + z) % 2 === 0;
+                        
+                        if (totalCations / totalItems < 0.35) {
+                            isCatNode = (x === 1 && y === 1 && z === 1) || (x+y+z === 1);
+                        } else if (totalAnions / totalItems < 0.35) {
+                            isCatNode = !((x === 1 && y === 1 && z === 1) || (x+y+z === 1));
+                        }
+
+                        var color = isCatNode ? catColor : anColor;
+                        var label = isCatNode ? cat.sym : an.sym;
+                        var size = isCatNode ? 14 : 12;
+
+                        var px = (x - 1) * 45 + (z - 1) * 15 + 90;
+                        var py = (y - 1) * 35 + (z - 1) * -10 + 60;
+                        var pz = (z - 1) * 20;
+
+                        nodesHtml += '<div style="' +
+                                     'position: absolute;' +
+                                     'left: ' + px + 'px;' +
+                                     'top: ' + py + 'px;' +
+                                     'width: ' + size + 'px;' +
+                                     'height: ' + size + 'px;' +
+                                     'border-radius: 50%;' +
+                                     'background: ' + color + ';' +
+                                     'border: 1.5px solid #ffffff;' +
+                                     'transform: translate3D(0, 0, ' + pz + 'px);' +
+                                     'display: flex;' +
+                                     'align-items: center;' +
+                                     'justify-content: center;' +
+                                     'font-family: Calibri, sans-serif;' +
+                                     'font-size: 6px;' +
+                                     'font-weight: bold;' +
+                                     'color: #ffffff;' +
+                                     'box-shadow: 0 0 8px ' + color + ';' +
+                                     'opacity: ' + (0.5 + (z * 0.25)) + ';' +
+                                     '">' + label + '</div>';
+                    }
+                }
+            }
+
+            gridContainer.innerHTML = nodesHtml;
+            if (posCharge === negCharge && posCharge > 0) {
+                gridContainer.style.transform = "rotateX(25deg) rotateY(35deg) scale(1.1)";
+            } else {
+                gridContainer.style.transform = "rotateX(15deg) rotateY(-15deg)";
+            }
+        }
+
+        function submitQuest() {
+            questTotalAttempts++;
+            var quest = questList[currentQuestIndex];
+            var cat = dbCations.find(function(c) { return c.id === quest.catId; });
+            var an = dbAnions.find(function(a) { return a.id === quest.anId; });
+
+            // Check for incorrect ion selection
+            var hasIncorrectCation = questVesselCations.some(function(c) { return c.id !== cat.id; });
+            var hasIncorrectAnion = questVesselAnions.some(function(a) { return a.id !== an.id; });
+
+            if (hasIncorrectCation || hasIncorrectAnion) {
+                playSound('error');
+                var targetName = quest.name;
+                if (quest.name.includes(' (')) {
+                    var parts = quest.name.split(' (');
+                    targetName = currentLang === 'zh' ? parts[0] : parts[1].replace(')', '');
+                }
+                var msg = currentLang === 'zh' ?
+                    '配對錯誤：反應室內包含不正確的離子！\n目標化合物為【' + targetName + '】。\n請仔細閱讀名稱，找出正確的陽離子與陰離子，並將錯誤的離子雙擊移除後重新嘗試！' :
+                    'Incorrect Pairing: The reaction vessel contains incorrect ions!\nTarget compound is [' + targetName + '].\nPlease read the name carefully to find the correct cation and anion, double click to remove the incorrect ions and try again!';
+                alert(msg);
+                return;
+            }
+
+            var totalPos = questVesselCations.reduce(function(sum, c) { return sum + c.charge; }, 0);
+            var totalNeg = questVesselAnions.reduce(function(sum, a) { return sum + a.charge; }, 0);
+
+            if (totalPos === totalNeg && totalPos > 0) {
+                var lcm = getLCM(cat.charge, an.charge);
+                var correctCations = lcm / cat.charge;
+                var correctAnions = lcm / an.charge;
+
+                if (questVesselCations.length === correctCations && questVesselAnions.length === correctAnions) {
+                    playSound('success');
+                    triggerCelebration();
+                    questSuccessCount++;
+                    updateQuestStats();
+                    showSuccessModal(cat, an, correctCations, correctAnions, true);
+                } else {
+                    playSound('error');
+                    var msg = currentLang === 'zh' ?
+                        '雖然正負電荷代數平衡，但目前使用的離子數量並非最簡比例！\n目前使用了 ' + questVesselCations.length + ':' + questVesselAnions.length + '，最簡化化學式比例應為 ' + correctCations + ':' + correctAnions + '。請重新調整拼圖使其最簡化！' :
+                        'Although charges are balanced, the current ion ratio is not simplified!\nYou used ' + questVesselCations.length + ':' + questVesselAnions.length + ', but the empirical formula ratio should be ' + correctCations + ':' + correctAnions + '. Please adjust the puzzle pieces to simplify!';
+                    alert(msg);
+                }
+            } else {
+                playSound('error');
+                var hintEnabled = !document.getElementById('setting-hint-auto') || document.getElementById('setting-hint-auto').checked;
+                if (hintEnabled) {
+                    showQuestHint();
+                } else {
+                    var msg = currentLang === 'zh' ?
+                        "電荷尚未平衡或拼圖並未契合！請仔細觀察天平並參考提示！" :
+                        "Charge is not yet balanced or the puzzle pieces do not fit! Please inspect the scale carefully or read the hint!";
+                    alert(msg);
+                }
+            }
+        }
+
+        function getGCD(a, b) {
+            return b === 0 ? a : getGCD(b, a % b);
+        }
+
+        function getLCM(a, b) {
+            return (a * b) / getGCD(a, b);
+        }
+
+        function showQuestHint() {
+            var quest = questList[currentQuestIndex];
+            var cat = dbCations.find(function(c) { return c.id === quest.catId; });
+            var an = dbAnions.find(function(a) { return a.id === quest.anId; });
+            var hintBox = document.getElementById('quest-hint-box');
+
+            var lcm = getLCM(cat.charge, an.charge);
+            var correctCations = lcm / cat.charge;
+            var correctAnions = lcm / an.charge;
+
+            var body = currentLang === 'zh'
+                ? '需要 <span class="chg-pos">' + correctCations + ' ' + formatChemicalFormulaHTML(cat.sym) + '<sup>' + (cat.charge > 1 ? cat.charge : '') + '+</sup></span> 與 <span class="chg-neg">' + correctAnions + ' ' + formatChemicalFormulaHTML(an.sym) + '<sup>' + (an.charge > 1 ? an.charge : '') + '−</sup></span>'
+                : 'Need <span class="chg-pos">' + correctCations + ' ' + formatChemicalFormulaHTML(cat.sym) + '<sup>' + (cat.charge > 1 ? cat.charge : '') + '+</sup></span> and <span class="chg-neg">' + correctAnions + ' ' + formatChemicalFormulaHTML(an.sym) + '<sup>' + (an.charge > 1 ? an.charge : '') + '−</sup></span>';
+            hintBox.innerHTML = body;
+            hintBox.style.display = 'block';
+            document.body.classList.remove('desc-hidden');
+            syncHideLabel();
+        }
+
+        function updateQuestStats() {
+            document.getElementById('quest-score').innerText = 'Level ' + (currentQuestIndex + 1) + ' / ' + questList.length;
+            var accuracy = questTotalAttempts > 0 ? Math.round((questSuccessCount / questTotalAttempts) * 100) : 100;
+            document.getElementById('quest-accuracy').innerText = accuracy + '%';
+        }
+
+        function getChineseCompoundName(cat, an) {
+            var cationName = cat.nameZh.replace('離子', '');
+            var anionName = an.nameZh;
+            var anionPart = '';
+            
+            if (anionName.endsWith('根離子')) {
+                if (anionName === '氫氧根離子') {
+                    anionPart = '氫氧化';
+                } else if (anionName === '氰根離子') {
+                    anionPart = '氰化';
+                } else {
+                    anionPart = anionName.replace('根離子', '');
+                }
+            } else if (anionName.endsWith('離子')) {
+                if (anionName === '氫負離子') {
+                    anionPart = '氫化';
+                } else if (anionName === '氧離子') {
+                    anionPart = '氧化';
+                } else {
+                    anionPart = anionName.replace('離子', '') + '化';
+                }
+            } else {
+                anionPart = anionName;
+            }
+            
+            return anionPart + cationName;
+        }
+
+        function showSuccessModal(cat, an, catCount, anCount, isQuest) {
+            if (isQuest === undefined) isQuest = false;
+            var overlay = document.getElementById('success-modal');
+            var card = document.getElementById('success-modal-card');
+            
+            // Set default modal tab and render electron diagram
+            switchModalTab('electron');
+            renderElectronDiagram(cat, an, catCount, anCount);
+            
+            var gcd = getGCD(catCount, anCount);
+            var simCat = catCount / gcd;
+            var simAn = anCount / gcd;
+            var key = cat.sym + (simCat > 1 ? simCat : '') + an.sym + (simAn > 1 ? simAn : '');
+            var crystalInfo = dbCrystals[key] || dbCrystals[cat.sym + an.sym] || dbCrystals["default"];
+
+            var compName = '';
+            if (cat.sym === "H" && an.sym === "OH") {
+                compName = currentLang === 'zh' ? '水' : 'Water';
+            } else if (crystalInfo !== dbCrystals["default"]) {
+                var rawName = currentLang === 'zh' ? crystalInfo.nameZh : crystalInfo.nameEn;
+                var cutAt = rawName.indexOf(' (');
+                compName = cutAt > 0 ? rawName.slice(0, cutAt) : rawName;
+            } else {
+                compName = currentLang === 'zh'
+                    ? getChineseCompoundName(cat, an)
+                    : cat.name.replace(' ion', '') + ' ' + an.name.replace(' ion', '');
+            }
+            document.getElementById('modal-compound-name').innerText = compName;
+            
+            var tex = generateCompoundLaTeX(cat, an, catCount, anCount);
+            var html = generateCompoundHTML(cat, an, catCount, anCount);
+            safeRenderLaTeX('modal-formula-latex', tex, html);
+
+            document.getElementById('modal-exam-line').innerHTML =
+                '<span class="chg-pos">' + catCount + ' ' + formatChemicalFormulaHTML(cat.sym) + '<sup>' + (cat.charge > 1 ? cat.charge : '') + '+</sup></span> : ' +
+                '<span class="chg-neg">' + anCount + ' ' + formatChemicalFormulaHTML(an.sym) + '<sup>' + (an.charge > 1 ? an.charge : '') + '−</sup></span>';
+
+            document.getElementById('modal-title').textContent = currentLang === 'zh' ? '合成成功' : 'Synthesis successful';
+            
+            var btnStayZh = document.querySelector('#btn-stay-study .lang-zh');
+            var btnStayEn = document.querySelector('#btn-stay-study .lang-en');
+            if (btnStayZh && btnStayEn) {
+                if (currentLang === 'zh') {
+                    btnStayZh.style.display = 'inline';
+                    btnStayEn.style.display = 'none';
+                } else {
+                    btnStayZh.style.display = 'none';
+                    btnStayEn.style.display = 'inline';
+                }
+            }
+
+            var btnNext = document.getElementById('btn-next-level');
+            if (isQuest) {
+                btnNext.style.display = 'inline-flex';
+                if (currentQuestIndex === questList.length - 1) {
+                    btnNext.textContent = currentLang === 'zh' ? '重頭' : 'Restart';
+                } else {
+                    btnNext.textContent = currentLang === 'zh' ? '下一關' : 'Next';
+                }
+            } else {
+                btnNext.style.display = 'none';
+            }
+
+            overlay.style.display = 'flex';
+            setTimeout(function() { card.classList.add('active'); }, 50);
+            requestAnimationFrame(function() {
+                fitLesson(document.getElementById('modal-compound-name'), 42);
+                fitLesson(document.getElementById('modal-formula-latex'), 32);
+            });
+        }
+
+        function closeSuccessModal() {
+            var overlay = document.getElementById('success-modal');
+            var card = document.getElementById('success-modal-card');
+            card.classList.remove('active');
+            setTimeout(function() { overlay.style.display = 'none'; }, 300);
+        }
+
+        function nextQuestLevel() {
+            closeSuccessModal();
+            if (currentQuestIndex === questList.length - 1) {
+                // If they completed all 10, restart the game with a fresh set of shuffled unique questions!
+                initQuestGame();
+            } else {
+                currentQuestIndex++;
+            }
+            loadQuestLevel();
+        }
+
+        var canvas = document.getElementById('particle-canvas');
+        var ctx = canvas.getContext('2d');
+        var particles = [];
+
+        function resizeCanvas() {
+            if (canvas && canvas.parentElement) {
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = canvas.parentElement.clientHeight;
+            }
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        function Particle(x, y, color) {
+            this.x = x;
+            this.y = y;
+            this.color = color;
+            this.size = Math.random() * 4 + 2;
+            this.speedX = (Math.random() - 0.5) * 8;
+            this.speedY = (Math.random() - 0.5) * 8 - 3;
+            this.gravity = 0.15;
+            this.opacity = 1;
+            this.decay = Math.random() * 0.02 + 0.01;
+        }
+
+        Particle.prototype.update = function() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            this.speedY += this.gravity;
+            this.opacity -= this.decay;
+        };
+
+        Particle.prototype.draw = function() {
+            ctx.save();
+            ctx.globalAlpha = this.opacity;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = this.color;
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        };
+
+        function animateParticles() {
+            if (particles.length === 0) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (var idx = particles.length - 1; idx >= 0; idx--) {
+                var p = particles[idx];
+                p.update();
+                p.draw();
+                if (p.opacity <= 0) {
+                    particles.splice(idx, 1);
+                }
+            }
+            requestAnimationFrame(animateParticles);
+        }
+
+        function triggerCelebration() {
+            if (document.getElementById('setting-particles') && !document.getElementById('setting-particles').checked) return;
+            resizeCanvas();
+            var centerX = canvas.width / 2;
+            var centerY = canvas.height / 2;
+            var colors = ['#00a8ff', '#ffaa00', '#39ff14', '#ff3366', '#e056fd', '#f9ca24'];
+
+            for (var i = 0; i < 150; i++) {
+                var color = colors[Math.floor(Math.random() * colors.length)];
+                particles.push(new Particle(centerX, centerY, color));
+            }
+            animateParticles();
+        }
+
+        function initSettings() {
+            var catSettings = document.getElementById('settings-cation-container');
+            var anSettings = document.getElementById('settings-anion-container');
+            catSettings.innerHTML = '';
+            anSettings.innerHTML = '';
+
+            dbCations.forEach(function(c) {
+                var label = document.createElement('label');
+                label.className = 'checkbox-item';
+                var formattedSym = formatChemicalFormulaHTML(c.sym) + '<sup>' + (c.charge > 1 ? c.charge : '') + '+</sup>';
+                var displayName = currentLang === 'zh' ? c.nameZh : c.name;
+                label.innerHTML = '<input type="checkbox" id="cb-cat-' + c.id + '" checked onchange="renderLabPools()">' +
+                                  '<span style="flex:1; min-width:0; line-height:1.2;">' + formattedSym + ' (' + displayName + ')</span>';
+                catSettings.appendChild(label);
+            });
+
+            dbAnions.forEach(function(a) {
+                var label = document.createElement('label');
+                label.className = 'checkbox-item';
+                var formattedSym = formatChemicalFormulaHTML(a.sym) + '<sup>' + (a.charge > 1 ? a.charge : '') + '-</sup>';
+                var displayName = currentLang === 'zh' ? a.nameZh : a.name;
+                label.innerHTML = '<input type="checkbox" id="cb-ani-' + a.id + '" checked onchange="renderLabPools()">' +
+                                  '<span style="flex:1; min-width:0; line-height:1.2;">' + formattedSym + ' (' + displayName + ')</span>';
+                anSettings.appendChild(label);
+            });
+        }
+
+        function selectAllIons(type, state) {
+            var containerId = type === 'cations' ? 'settings-cation-container' : 'settings-anion-container';
+            document.querySelectorAll('#' + containerId + ' input[type="checkbox"]').forEach(function(cb) {
+                cb.checked = state;
+            });
+            renderLabPools();
+        }
+
+        var SVGNS = 'http://www.w3.org/2000/svg';
+        var outerAtoms = [
+            { id: 'Na', sym: 'Na', charge: 1, kind: 'cat', atomOuter: 1, ionOuter: 0, before: '2, 8, 1', after: '2, 8' },
+            { id: 'K', sym: 'K', charge: 1, kind: 'cat', atomOuter: 1, ionOuter: 0, before: '2, 8, 8, 1', after: '2, 8, 8' },
+            { id: 'Mg', sym: 'Mg', charge: 2, kind: 'cat', atomOuter: 2, ionOuter: 0, before: '2, 8, 2', after: '2, 8' },
+            { id: 'Ca', sym: 'Ca', charge: 2, kind: 'cat', atomOuter: 2, ionOuter: 0, before: '2, 8, 8, 2', after: '2, 8, 8' },
+            { id: 'Al', sym: 'Al', charge: 3, kind: 'cat', atomOuter: 3, ionOuter: 0, before: '2, 8, 3', after: '2, 8' },
+            { id: 'Hp', sym: 'H', charge: 1, kind: 'cat', atomOuter: 1, ionOuter: 0, before: '1', after: '0' },
+            { id: 'Cl', sym: 'Cl', charge: 1, kind: 'an', atomOuter: 7, ionOuter: 8, before: '2, 8, 7', after: '2, 8, 8' },
+            { id: 'Br', sym: 'Br', charge: 1, kind: 'an', atomOuter: 7, ionOuter: 8, before: '2, 8, 18, 7', after: '2, 8, 18, 8' },
+            { id: 'I', sym: 'I', charge: 1, kind: 'an', atomOuter: 7, ionOuter: 8, before: '2, 8, 18, 18, 7', after: '2, 8, 18, 18, 8' },
+            { id: 'O', sym: 'O', charge: 2, kind: 'an', atomOuter: 6, ionOuter: 8, before: '2, 6', after: '2, 8' },
+            { id: 'S', sym: 'S', charge: 2, kind: 'an', atomOuter: 6, ionOuter: 8, before: '2, 8, 6', after: '2, 8, 8' },
+            { id: 'N', sym: 'N', charge: 3, kind: 'an', atomOuter: 5, ionOuter: 8, before: '2, 5', after: '2, 8' },
+            { id: 'P', sym: 'P', charge: 3, kind: 'an', atomOuter: 5, ionOuter: 8, before: '2, 8, 5', after: '2, 8, 8' },
+            { id: 'Hm', sym: 'H', charge: 1, kind: 'an', atomOuter: 1, ionOuter: 2, before: '1', after: '2' }
+        ];
+        var selectedForm = 'Na';
+        var selectedShell = 'Na';
+        var formPhase = 'before';
+        var formPlaying = false;
+        var formToken = 0;
+        var FORM = { lx: 188, ly: 136, rx: 492, ry: 136, scale: 1.7 };
+
+        function svgEl(name, attrs) {
+            var el = document.createElementNS(SVGNS, name);
+            if (attrs) {
+                for (var k in attrs) el.setAttribute(k, attrs[k]);
+            }
+            return el;
+        }
+
+        function outerById(id) {
+            for (var i = 0; i < outerAtoms.length; i++) {
+                if (outerAtoms[i].id === id) return outerAtoms[i];
+            }
+            return outerAtoms[0];
+        }
+
+        function ionSign(atom) {
+            var n = atom.charge > 1 ? atom.charge : '';
+            return atom.sym + n + (atom.kind === 'cat' ? '+' : '−');
+        }
+
+        function dseLayout(count, scale) {
+            var s = scale || 1;
+            var gap = 14 * s;
+            if (!count) return { halfW: 28 * s, halfH: 24 * s, slots: [] };
+            var counts = [0, 0, 0, 0];
+            var i;
+            for (i = 0; i < count; i++) counts[i % 4]++;
+            function span(n) { return n > 1 ? (n - 1) * gap : 0; }
+            var reachX = Math.max(30 * s, span(counts[0]) / 2 + gap, span(counts[2]) / 2 + gap);
+            var reachY = Math.max(26 * s, span(counts[1]) / 2 + gap, span(counts[3]) / 2 + gap);
+            var slots = [];
+            var placed = [0, 0, 0, 0];
+            for (i = 0; i < count; i++) {
+                var side = i % 4;
+                var k = placed[side]++;
+                var offset = (k - (counts[side] - 1) / 2) * gap;
+                var x = 0;
+                var y = 0;
+                if (side === 0) { x = offset; y = -reachY; }
+                else if (side === 1) { x = reachX; y = offset; }
+                else if (side === 2) { x = offset; y = reachY; }
+                else { x = -reachX; y = offset; }
+                slots.push({ x: x, y: y });
+            }
+            return { halfW: reachX + 16 * s, halfH: reachY + 14 * s, slots: slots };
+        }
+
+        function dseAbs(cx, cy, index, total, scale) {
+            var slot = dseLayout(total, scale).slots[index];
+            return { x: cx + slot.x, y: cy + slot.y };
+        }
+
+        function drawDseMark(parent, x, y, kind, scale) {
+            var s = scale || 1;
+            var ink = '#1e293b';
+            if (kind === 'dot') {
+                parent.appendChild(svgEl('circle', {
+                    cx: x, cy: y, r: 3.4 * s, fill: ink, 'class': 'e-mark'
+                }));
+                return;
+            }
+            var arm = 4.2 * s;
+            var g = svgEl('g', { 'class': 'e-mark' });
+            g.appendChild(svgEl('line', {
+                x1: x - arm, y1: y - arm, x2: x + arm, y2: y + arm,
+                stroke: ink, 'stroke-width': 1.7 * s, 'stroke-linecap': 'round'
+            }));
+            g.appendChild(svgEl('line', {
+                x1: x - arm, y1: y + arm, x2: x + arm, y2: y - arm,
+                stroke: ink, 'stroke-width': 1.7 * s, 'stroke-linecap': 'round'
+            }));
+            parent.appendChild(g);
+        }
+
+        function drawDseBracket(parent, cx, cy, halfW, halfH, chargeText, chargeColor, scale) {
+            var s = scale || 1;
+            var hook = 8 * s;
+            var sw = 2.2 * Math.min(s, 1.5);
+            parent.appendChild(svgEl('path', {
+                d: 'M ' + (cx - halfW + hook) + ' ' + (cy - halfH) +
+                    ' L ' + (cx - halfW) + ' ' + (cy - halfH) +
+                    ' L ' + (cx - halfW) + ' ' + (cy + halfH) +
+                    ' L ' + (cx - halfW + hook) + ' ' + (cy + halfH),
+                fill: 'none', stroke: '#334155', 'stroke-width': sw
+            }));
+            parent.appendChild(svgEl('path', {
+                d: 'M ' + (cx + halfW - hook) + ' ' + (cy - halfH) +
+                    ' L ' + (cx + halfW) + ' ' + (cy - halfH) +
+                    ' L ' + (cx + halfW) + ' ' + (cy + halfH) +
+                    ' L ' + (cx + halfW - hook) + ' ' + (cy + halfH),
+                fill: 'none', stroke: '#334155', 'stroke-width': sw
+            }));
+            if (!chargeText) return;
+            var charge = svgEl('text', {
+                x: cx + halfW + 4 * s,
+                y: cy - halfH + 14 * s,
+                fill: chargeColor || '#1e293b',
+                'font-size': Math.round(18 * s),
+                'font-weight': '700',
+                'font-family': 'Calibri, sans-serif'
+            });
+            charge.textContent = chargeText;
+            parent.appendChild(charge);
+        }
+
+        function drawDseSpecies(parent, o) {
+            var scale = o.scale || 1;
+            var marks = o.marks || [];
+            var layout = dseLayout(marks.length, scale);
+            var g = svgEl('g', { transform: 'translate(' + o.cx + ' ' + o.cy + ')' });
+            if (o.side) g.setAttribute('class', o.side);
+            var font = Math.round(18 * scale);
+            var label = svgEl('text', {
+                y: String(Math.round(font * 0.35)),
+                'text-anchor': 'middle',
+                fill: '#1e293b',
+                'font-size': String(font),
+                'font-weight': '700',
+                'font-family': 'Calibri, sans-serif'
+            });
+            label.textContent = o.sym;
+            g.appendChild(label);
+            for (var i = 0; i < marks.length; i++) {
+                if (!marks[i]) continue;
+                drawDseMark(g, layout.slots[i].x, layout.slots[i].y, marks[i], scale);
+            }
+            if (o.brackets) {
+                drawDseBracket(g, 0, 0, layout.halfW, layout.halfH, o.chargeText || '', o.chargeColor, scale);
+            }
+            if (o.caption) {
+                var cap = svgEl('text', {
+                    y: String(layout.halfH + Math.round(22 * scale)),
+                    'text-anchor': 'middle',
+                    fill: '#64748b',
+                    'font-size': String(Math.round(16 * scale)),
+                    'font-family': 'Calibri, "Noto Sans TC", sans-serif'
+                });
+                cap.textContent = o.caption;
+                g.appendChild(cap);
+            }
+            parent.appendChild(g);
+            return layout;
+        }
+
+        function formMarks(atom, role, after) {
+            var marks = [];
+            var i;
+            if (role === 'atom') {
+                var n = atom.kind === 'cat' && after ? 0 : atom.atomOuter;
+                var kind = atom.kind === 'cat' ? 'dot' : 'cross';
+                for (i = 0; i < n; i++) marks.push(kind);
+                return marks;
+            }
+            if (atom.kind === 'cat') {
+                if (!after) return marks;
+                for (i = 0; i < atom.ionOuter; i++) marks.push('dot');
+                return marks;
+            }
+            for (i = 0; i < atom.atomOuter; i++) marks.push('cross');
+            var gained = atom.ionOuter - atom.atomOuter;
+            for (i = 0; i < gained; i++) marks.push(after ? 'dot' : null);
+            return marks;
+        }
+
+        function shellMarks(atom) {
+            var marks = [];
+            var i;
+            if (atom.kind === 'cat') {
+                for (i = 0; i < atom.ionOuter; i++) marks.push('dot');
+                return marks;
+            }
+            for (i = 0; i < atom.atomOuter; i++) marks.push('cross');
+            for (i = 0; i < atom.ionOuter - atom.atomOuter; i++) marks.push('dot');
+            return marks;
+        }
+
+        function renderOuterChips(hostId, selected, which) {
+            var host = document.getElementById(hostId);
+            if (!host) return;
+            host.innerHTML = '';
+            outerAtoms.forEach(function(atom) {
+                var card = document.createElement('button');
+                card.type = 'button';
+                card.className = 'ion-card ' + (atom.kind === 'cat' ? 'cation-hover' : 'anion-hover');
+                if (atom.id === selected) card.classList.add('active');
+                card.innerHTML = '<div class="ion-sym-badge">' + ionSign(atom) + '</div>';
+                card.onclick = function() { selectOuter(which, atom.id); };
+                host.appendChild(card);
+            });
+        }
+
+        function renderForm() {
+            var atom = outerById(selectedForm);
+            var lesson = document.getElementById('form-lesson');
+            var desc = document.getElementById('form-desc');
+            if (!lesson) return;
+            var verbZh = atom.kind === 'cat' ? '失去' : '獲得';
+            var verbEn = atom.kind === 'cat' ? 'loses' : 'gains';
+            lesson.textContent = currentLang === 'zh'
+                ? atom.sym + ' ' + verbZh + ' ' + atom.charge + ' e⁻ → ' + ionSign(atom)
+                : atom.sym + ' ' + verbEn + ' ' + atom.charge + ' e⁻ → ' + ionSign(atom);
+            desc.textContent = atom.before + ' → ' + atom.after;
+            var svg = document.getElementById('form-svg');
+            svg.innerHTML = '';
+            var after = formPhase === 'after';
+            var atomCaption = currentLang === 'zh' ? '原子' : 'Atom';
+            var ionCaption = currentLang === 'zh' ? '離子' : 'Ion';
+            drawDseSpecies(svg, {
+                cx: FORM.lx, cy: FORM.ly, sym: atom.sym, side: 'atom-side', scale: FORM.scale,
+                marks: formMarks(atom, 'atom', after), caption: atomCaption
+            });
+            drawDseSpecies(svg, {
+                cx: FORM.rx, cy: FORM.ry, sym: atom.sym, scale: FORM.scale,
+                marks: formMarks(atom, 'ion', after), caption: ionCaption,
+                brackets: after,
+                chargeText: after ? ((atom.charge > 1 ? atom.charge : '') + (atom.kind === 'cat' ? '+' : '−')) : '',
+                chargeColor: atom.kind === 'cat' ? '#0066cc' : '#d97706'
+            });
+            var btn = document.getElementById('btn-form-play');
+            if (btn) btn.disabled = formPlaying;
+            requestAnimationFrame(fitVisibleLesson);
+        }
+
+        function renderShell() {
+            var atom = outerById(selectedShell);
+            var lesson = document.getElementById('shell-lesson');
+            if (!lesson) return;
+            var ion = ionSign(atom);
+            var outerCount = atom.ionOuter;
+            lesson.textContent = currentLang === 'zh'
+                ? ion + ' 最外層：' + outerCount
+                : ion + ' outer shell: ' + outerCount;
+            var svg = document.getElementById('shell-svg');
+            svg.innerHTML = '';
+            drawDseSpecies(svg, {
+                cx: 340, cy: 148, sym: atom.sym, scale: 1.85,
+                marks: shellMarks(atom), brackets: true,
+                chargeText: (atom.charge > 1 ? atom.charge : '') + (atom.kind === 'cat' ? '+' : '−'),
+                chargeColor: atom.kind === 'cat' ? '#0066cc' : '#d97706'
+            });
+            requestAnimationFrame(fitVisibleLesson);
+        }
+
+        function renderOuter() {
+            renderOuterChips('form-chips', selectedForm, 'form');
+            renderOuterChips('shell-chips', selectedShell, 'shell');
+            renderForm();
+            renderShell();
+        }
+
+        function selectOuter(which, id) {
+            if (which === 'form') {
+                selectedForm = id;
+                formPhase = 'before';
+                formPlaying = false;
+                formToken++;
+            } else {
+                selectedShell = id;
+            }
+            renderOuter();
+        }
+
+        function flyDot(svg, start, end, color, delay, fade, token, left) {
+            var dot = svgEl('circle', {
+                r: 3.4 * FORM.scale, cx: start.x, cy: start.y, fill: color
+            });
+            svg.appendChild(dot);
+            var t0 = null;
+            function frame(now) {
+                if (token !== formToken) {
+                    if (dot.parentNode) dot.parentNode.removeChild(dot);
+                    return;
+                }
+                if (t0 === null) t0 = now;
+                var elapsed = now - t0 - delay;
+                if (elapsed < 0) {
+                    requestAnimationFrame(frame);
+                    return;
+                }
+                var p = Math.min(1, elapsed / 800);
+                var ease = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+                dot.setAttribute('cx', start.x + (end.x - start.x) * ease);
+                dot.setAttribute('cy', start.y + (end.y - start.y) * ease);
+                if (fade) dot.setAttribute('opacity', String(1 - p));
+                if (p < 1) {
+                    requestAnimationFrame(frame);
+                    return;
+                }
+                left.count--;
+                if (left.count === 0 && token === formToken) {
+                    formPlaying = false;
+                    formPhase = 'after';
+                    renderForm();
+                }
+            }
+            requestAnimationFrame(frame);
+        }
+
+        function playFormation() {
+            if (formPlaying) return;
+            var atom = outerById(selectedForm);
+            if (formPhase === 'after') {
+                formPhase = 'before';
+                renderForm();
+            }
+            formPlaying = true;
+            document.getElementById('btn-form-play').disabled = true;
+            var token = ++formToken;
+            var svg = document.getElementById('form-svg');
+            var jobs = [];
+            if (atom.kind === 'cat') {
+                var dots = svg.querySelectorAll('.atom-side .e-mark');
+                for (var d = 0; d < dots.length; d++) dots[d].setAttribute('opacity', '0');
+                for (var i = 0; i < atom.atomOuter; i++) {
+                    var start = dseAbs(FORM.lx, FORM.ly, i, atom.atomOuter, FORM.scale);
+                    jobs.push({ start: start, end: { x: (FORM.lx + FORM.rx) / 2, y: start.y }, color: '#1e293b', delay: i * 350, fade: true });
+                }
+            } else {
+                var gained = atom.ionOuter - atom.atomOuter;
+                for (var j = 0; j < gained; j++) {
+                    var end = dseAbs(FORM.rx, FORM.ry, atom.atomOuter + j, atom.ionOuter, FORM.scale);
+                    jobs.push({ start: { x: (FORM.lx + FORM.rx) / 2, y: end.y }, end: end, color: '#1e293b', delay: j * 350, fade: false });
+                }
+            }
+            var left = { count: jobs.length };
+            var longest = 0;
+            for (var n = 0; n < jobs.length; n++) {
+                if (jobs[n].delay > longest) longest = jobs[n].delay;
+                flyDot(svg, jobs[n].start, jobs[n].end, jobs[n].color, jobs[n].delay, jobs[n].fade, token, left);
+            }
+            setTimeout(function() {
+                if (token !== formToken || formPhase === 'after') return;
+                formPlaying = false;
+                formPhase = 'after';
+                renderForm();
+            }, longest + 900);
+        }
+
+        function closeSettings() {
+            var sheet = document.getElementById('settings-sheet');
+            if (sheet) sheet.classList.remove('open');
+            var nav = document.getElementById('nav-settings');
+            if (nav) nav.classList.remove('active');
+        }
+
+        function switchTab(tabId) {
+            if (tabId === 'settings') {
+                document.getElementById('settings-sheet').classList.add('open');
+                document.getElementById('nav-settings').classList.add('active');
+                return;
+            }
+
+            closeSettings();
+            document.body.classList.remove('zoom-lab', 'zoom-quest', 'zoom-form', 'zoom-shell');
+            document.querySelectorAll('.view-section').forEach(function(sec) {
+                sec.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-item').forEach(function(item) {
+                item.classList.remove('active');
+            });
+
+            document.getElementById('tab-' + tabId).classList.add('active');
+            document.getElementById('nav-' + tabId).classList.add('active');
+            activeTab = tabId;
+
+            var statBox = document.getElementById('quest-status-box');
+            if (statBox) {
+                statBox.style.display = tabId === 'quest' ? 'block' : 'none';
+            }
+
+            if (tabId === 'quest') {
+                loadQuestLevel();
+            }
+            if (tabId === 'form' || tabId === 'shell') {
+                renderOuter();
+            }
+            requestAnimationFrame(fitVisibleLesson);
+        }
+
+        // ====================================================
+        // 7. 電子式 (點叉圖) 繪圖引擎 (Electron Dot-and-Cross Engine)
+        // ====================================================
+        var monoatomicIonsConfig = {
+            // 陽離子 (+)
+            "c1": { sym: "Na", shells: [2, 8] },
+            "c2": { sym: "K", shells: [2, 8, 8] },
+            "c3": { sym: "H", shells: [] }, // 空殼，僅顯示質子/原子核
+            "c5": { sym: "Ag", shells: [2, 8, 18, 18], outer: 10 },
+            "c6": { sym: "Cu", shells: [2, 8, 18], outer: 10 },
+            "c7": { sym: "Mg", shells: [2, 8] },
+            "c8": { sym: "Ca", shells: [2, 8, 8] },
+            "c9": { sym: "Ba", shells: [2, 8, 18, 18, 8] },
+            "c10": { sym: "Zn", shells: [2, 8, 18], outer: 10 },
+            "c11": { sym: "Pb", shells: [2, 8, 18, 32, 18, 2] },
+            "c12": { sym: "Mn", shells: [2, 8, 13], outer: 5 },
+            "c13": { sym: "Fe", shells: [2, 8, 14], outer: 6 },
+            "c14": { sym: "Co", shells: [2, 8, 15], outer: 7 },
+            "c15": { sym: "Ni", shells: [2, 8, 16], outer: 8 },
+            "c16": { sym: "Cu", shells: [2, 8, 17], outer: 9 },
+            "c17": { sym: "Al", shells: [2, 8] },
+            "c18": { sym: "Fe", shells: [2, 8, 13], outer: 5 },
+            "c19": { sym: "Cr", shells: [2, 8, 11], outer: 3 },
+            
+            // 陰離子 (-)
+            "a1": { sym: "H", shells: [2], valence: 1 },
+            "a3": { sym: "Cl", shells: [2, 8, 8], valence: 7 },
+            "a4": { sym: "Br", shells: [2, 8, 18, 8], valence: 7 },
+            "a5": { sym: "I", shells: [2, 8, 18, 18, 8], valence: 7 },
+            "a13": { sym: "O", shells: [2, 8], valence: 6 },
+            "a14": { sym: "S", shells: [2, 8, 8], valence: 6 },
+            "a21": { sym: "N", shells: [2, 8], valence: 5 },
+            "a22": { sym: "P", shells: [2, 8, 8], valence: 5 }
+        };
+
+        function chargeLabel(charge, isCation) {
+            return (charge > 1 ? String(charge) : '') + (isCation ? '+' : '−');
+        }
+
+        function splitPair(cx, cy, ux, uy, k1, k2) {
+            var px = -uy * 6;
+            var py = ux * 6;
+            return [
+                { x: cx + px, y: cy + py, kind: k1 },
+                { x: cx - px, y: cy - py, kind: k2 }
+            ];
+        }
+
+        function bondPairs(x1, y1, x2, y2, kinds) {
+            var n = kinds.length / 2;
+            var mx = (x1 + x2) / 2;
+            var my = (y1 + y2) / 2;
+            var dx = x2 - x1;
+            var dy = y2 - y1;
+            var len = Math.sqrt(dx * dx + dy * dy) || 1;
+            var ux = dx / len;
+            var uy = dy / len;
+            var marks = [];
+            var step = 12;
+            var start = -step * (n - 1) / 2;
+            var ki = 0;
+            var p;
+            for (p = 0; p < n; p++) {
+                marks = marks.concat(splitPair(
+                    mx + ux * (start + p * step),
+                    my + uy * (start + p * step),
+                    ux, uy, kinds[ki++], kinds[ki++]
+                ));
+            }
+            return marks;
+        }
+
+        function lonePairs(ax, ay, bx, by, nPairs, kinds) {
+            var out = Math.atan2(ay - by, ax - bx);
+            var spread = nPairs === 1 ? 0 : (Math.PI * 0.85) / (nPairs - 1);
+            var start = out - spread * (nPairs - 1) / 2;
+            var marks = [];
+            var ki = 0;
+            var p;
+            for (p = 0; p < nPairs; p++) {
+                var a = start + p * spread;
+                var k1 = kinds ? kinds[ki++] : 'dot';
+                var k2 = kinds ? kinds[ki++] : 'dot';
+                marks = marks.concat(splitPair(
+                    ax + Math.cos(a) * 22,
+                    ay + Math.sin(a) * 22,
+                    Math.cos(a), Math.sin(a), k1, k2
+                ));
+            }
+            return marks;
+        }
+
+        function modelNH4() {
+            return {
+                atoms: [
+                    { sym: 'N', x: 0, y: 0 },
+                    { sym: 'H', x: 0, y: -56 },
+                    { sym: 'H', x: 56, y: 0 },
+                    { sym: 'H', x: 0, y: 56 },
+                    { sym: 'H', x: -56, y: 0 }
+                ],
+                marks: [].concat(
+                    bondPairs(0, 0, 0, -56, ['cross', 'dot']),
+                    bondPairs(0, 0, 56, 0, ['cross', 'dot']),
+                    bondPairs(0, 0, 0, 56, ['cross', 'dot']),
+                    bondPairs(0, 0, -56, 0, ['cross', 'cross'])
+                )
+            };
+        }
+
+        function modelOH() {
+            return {
+                atoms: [{ sym: 'O', x: 0, y: 0 }, { sym: 'H', x: 54, y: 0 }],
+                marks: [].concat(
+                    bondPairs(0, 0, 54, 0, ['cross', 'dot']),
+                    lonePairs(0, 0, 54, 0, 3, ['cross', 'cross', 'cross', 'cross', 'cross', 'dot'])
+                )
+            };
+        }
+
+        function modelCN() {
+            return {
+                atoms: [{ sym: 'C', x: -36, y: 0 }, { sym: 'N', x: 36, y: 0 }],
+                marks: [].concat(
+                    lonePairs(-36, 0, 36, 0, 1, ['cross', 'cross']),
+                    lonePairs(36, 0, -36, 0, 1, ['dot', 'dot']),
+                    bondPairs(-36, 0, 36, 0, ['cross', 'cross', 'dot', 'dot', 'dot', 'dot'])
+                )
+            };
+        }
+
+        function modelNO3() {
+            var n = { x: 0, y: 0 };
+            var od = { x: 0, y: -58 };
+            var ol = { x: -52, y: 38 };
+            var orr = { x: 52, y: 38 };
+            return {
+                atoms: [
+                    { sym: 'N', x: n.x, y: n.y },
+                    { sym: 'O', x: od.x, y: od.y },
+                    { sym: 'O', x: ol.x, y: ol.y },
+                    { sym: 'O', x: orr.x, y: orr.y }
+                ],
+                marks: [].concat(
+                    bondPairs(n.x, n.y, od.x, od.y, ['cross', 'cross', 'cross', 'dot']),
+                    bondPairs(n.x, n.y, ol.x, ol.y, ['cross', 'dot']),
+                    bondPairs(n.x, n.y, orr.x, orr.y, ['cross', 'dot']),
+                    lonePairs(od.x, od.y, n.x, n.y, 2),
+                    lonePairs(ol.x, ol.y, n.x, n.y, 3),
+                    lonePairs(orr.x, orr.y, n.x, n.y, 3)
+                )
+            };
+        }
+
+        function modelNO2() {
+            var n = { x: 0, y: 0 };
+            var od = { x: 44, y: -40 };
+            var os = { x: -44, y: -40 };
+            return {
+                atoms: [
+                    { sym: 'N', x: 0, y: 0 },
+                    { sym: 'O', x: od.x, y: od.y },
+                    { sym: 'O', x: os.x, y: os.y }
+                ],
+                marks: [].concat(
+                    splitPair(0, 24, 0, 1, 'cross', 'cross'),
+                    bondPairs(n.x, n.y, od.x, od.y, ['cross', 'cross', 'dot', 'dot']),
+                    bondPairs(n.x, n.y, os.x, os.y, ['cross', 'dot']),
+                    lonePairs(od.x, od.y, n.x, n.y, 2),
+                    lonePairs(os.x, os.y, n.x, n.y, 3)
+                )
+            };
+        }
+
+        function modelCO3() {
+            var c = { x: 0, y: 0 };
+            var od = { x: 0, y: -58 };
+            var ol = { x: -52, y: 38 };
+            var orr = { x: 52, y: 38 };
+            return {
+                atoms: [
+                    { sym: 'C', x: 0, y: 0 },
+                    { sym: 'O', x: od.x, y: od.y },
+                    { sym: 'O', x: ol.x, y: ol.y },
+                    { sym: 'O', x: orr.x, y: orr.y }
+                ],
+                marks: [].concat(
+                    bondPairs(c.x, c.y, od.x, od.y, ['cross', 'cross', 'dot', 'dot']),
+                    bondPairs(c.x, c.y, ol.x, ol.y, ['cross', 'dot']),
+                    bondPairs(c.x, c.y, orr.x, orr.y, ['cross', 'dot']),
+                    lonePairs(od.x, od.y, c.x, c.y, 2),
+                    lonePairs(ol.x, ol.y, c.x, c.y, 3),
+                    lonePairs(orr.x, orr.y, c.x, c.y, 3)
+                )
+            };
+        }
+
+        function modelHCO3() {
+            var c = { x: 0, y: 0 };
+            var od = { x: 0, y: -58 };
+            var om = { x: -52, y: 38 };
+            var oh = { x: 52, y: 38 };
+            var h = { x: 100, y: 38 };
+            return {
+                atoms: [
+                    { sym: 'C', x: c.x, y: c.y },
+                    { sym: 'O', x: od.x, y: od.y },
+                    { sym: 'O', x: om.x, y: om.y },
+                    { sym: 'O', x: oh.x, y: oh.y },
+                    { sym: 'H', x: h.x, y: h.y }
+                ],
+                marks: [].concat(
+                    bondPairs(c.x, c.y, od.x, od.y, ['cross', 'cross', 'dot', 'dot']),
+                    bondPairs(c.x, c.y, om.x, om.y, ['cross', 'dot']),
+                    bondPairs(c.x, c.y, oh.x, oh.y, ['cross', 'dot']),
+                    bondPairs(oh.x, oh.y, h.x, h.y, ['dot', 'dot']),
+                    lonePairs(od.x, od.y, c.x, c.y, 2),
+                    lonePairs(om.x, om.y, c.x, c.y, 3),
+                    splitPair(oh.x, oh.y - 22, 0, -1, 'dot', 'dot'),
+                    splitPair(oh.x, oh.y + 22, 0, 1, 'dot', 'dot')
+                )
+            };
+        }
+
+        function modelCardinal(center, dativeCount) {
+            var pts = [{ x: 0, y: -58 }, { x: 58, y: 0 }, { x: 0, y: 58 }, { x: -58, y: 0 }];
+            var atoms = [{ sym: center, x: 0, y: 0 }];
+            var marks = [];
+            var i;
+            for (i = 0; i < 4; i++) {
+                atoms.push({ sym: 'O', x: pts[i].x, y: pts[i].y });
+                marks = marks.concat(bondPairs(
+                    0, 0, pts[i].x, pts[i].y,
+                    i < dativeCount ? ['cross', 'cross'] : ['cross', 'dot']
+                ));
+                marks = marks.concat(lonePairs(pts[i].x, pts[i].y, 0, 0, 3));
+            }
+            return { atoms: atoms, marks: marks };
+        }
+
+        function modelSO4() {
+            return modelCardinal('S', 2);
+        }
+
+        function modelPO4() {
+            return modelCardinal('P', 1);
+        }
+
+        function modelXO4(sym) {
+            return modelCardinal(sym, 0);
+        }
+
+        function modelSO3() {
+            var s = { x: 0, y: 0 };
+            var o1 = { x: 0, y: -58 };
+            var o2 = { x: -52, y: 40 };
+            var o3 = { x: 52, y: 40 };
+            return {
+                atoms: [
+                    { sym: 'S', x: 0, y: 0 },
+                    { sym: 'O', x: o1.x, y: o1.y },
+                    { sym: 'O', x: o2.x, y: o2.y },
+                    { sym: 'O', x: o3.x, y: o3.y }
+                ],
+                marks: [].concat(
+                    splitPair(0, 24, 0, 1, 'cross', 'cross'),
+                    bondPairs(s.x, s.y, o1.x, o1.y, ['cross', 'cross']),
+                    bondPairs(s.x, s.y, o2.x, o2.y, ['cross', 'dot']),
+                    bondPairs(s.x, s.y, o3.x, o3.y, ['cross', 'dot']),
+                    lonePairs(o1.x, o1.y, s.x, s.y, 3),
+                    lonePairs(o2.x, o2.y, s.x, s.y, 3),
+                    lonePairs(o3.x, o3.y, s.x, s.y, 3)
+                )
+            };
+        }
+
+        function modelS2O3() {
+            var pts = [
+                { sym: 'S', x: 0, y: -58, dative: true },
+                { sym: 'O', x: 58, y: 0, dative: true },
+                { sym: 'O', x: 0, y: 58, dative: false },
+                { sym: 'O', x: -58, y: 0, dative: false }
+            ];
+            var atoms = [{ sym: 'S', x: 0, y: 0 }];
+            var marks = [];
+            pts.forEach(function(p) {
+                atoms.push({ sym: p.sym, x: p.x, y: p.y });
+                marks = marks.concat(bondPairs(0, 0, p.x, p.y, p.dative ? ['cross', 'cross'] : ['cross', 'dot']));
+                marks = marks.concat(lonePairs(p.x, p.y, 0, 0, 3));
+            });
+            return { atoms: atoms, marks: marks };
+        }
+
+        function modelClO3() {
+            var cl = { x: 0, y: 0 };
+            var o1 = { x: 0, y: -58 };
+            var o2 = { x: -52, y: 40 };
+            var o3 = { x: 52, y: 40 };
+            return {
+                atoms: [
+                    { sym: 'Cl', x: 0, y: 0 },
+                    { sym: 'O', x: o1.x, y: o1.y },
+                    { sym: 'O', x: o2.x, y: o2.y },
+                    { sym: 'O', x: o3.x, y: o3.y }
+                ],
+                marks: [].concat(
+                    splitPair(0, 24, 0, 1, 'cross', 'cross'),
+                    bondPairs(cl.x, cl.y, o1.x, o1.y, ['cross', 'cross']),
+                    bondPairs(cl.x, cl.y, o2.x, o2.y, ['cross', 'cross']),
+                    bondPairs(cl.x, cl.y, o3.x, o3.y, ['cross', 'dot']),
+                    lonePairs(o1.x, o1.y, cl.x, cl.y, 3),
+                    lonePairs(o2.x, o2.y, cl.x, cl.y, 3),
+                    lonePairs(o3.x, o3.y, cl.x, cl.y, 3)
+                )
+            };
+        }
+
+        function modelHSO4() {
+            var s = { x: 0, y: 0 };
+            var o1 = { x: 0, y: -62 };
+            var o2 = { x: 62, y: 0 };
+            var o3 = { x: 0, y: 62 };
+            var oh = { x: -62, y: 0 };
+            var h = { x: -110, y: 0 };
+            return {
+                atoms: [
+                    { sym: 'S', x: s.x, y: s.y },
+                    { sym: 'O', x: o1.x, y: o1.y },
+                    { sym: 'O', x: o2.x, y: o2.y },
+                    { sym: 'O', x: o3.x, y: o3.y },
+                    { sym: 'O', x: oh.x, y: oh.y },
+                    { sym: 'H', x: h.x, y: h.y }
+                ],
+                marks: [].concat(
+                    bondPairs(s.x, s.y, o1.x, o1.y, ['cross', 'cross']),
+                    bondPairs(s.x, s.y, o2.x, o2.y, ['cross', 'cross']),
+                    bondPairs(s.x, s.y, o3.x, o3.y, ['cross', 'dot']),
+                    bondPairs(s.x, s.y, oh.x, oh.y, ['cross', 'dot']),
+                    bondPairs(oh.x, oh.y, h.x, h.y, ['dot', 'dot']),
+                    lonePairs(o1.x, o1.y, s.x, s.y, 3),
+                    lonePairs(o2.x, o2.y, s.x, s.y, 3),
+                    lonePairs(o3.x, o3.y, s.x, s.y, 3),
+                    splitPair(oh.x, oh.y - 22, 0, -1, 'dot', 'dot'),
+                    splitPair(oh.x, oh.y + 22, 0, 1, 'dot', 'dot')
+                )
+            };
+        }
+
+        function modelCr2O7() {
+            var bridge = { x: 0, y: 0 };
+            var cr1 = { x: -78, y: 0 };
+            var cr2 = { x: 78, y: 0 };
+            var left = [{ x: -78, y: -54 }, { x: -124, y: 34 }, { x: -32, y: 34 }];
+            var right = [{ x: 78, y: -54 }, { x: 32, y: 34 }, { x: 124, y: 34 }];
+            var atoms = [
+                { sym: 'O', x: bridge.x, y: bridge.y },
+                { sym: 'Cr', x: cr1.x, y: cr1.y },
+                { sym: 'Cr', x: cr2.x, y: cr2.y }
+            ];
+            var marks = [].concat(
+                bondPairs(cr1.x, cr1.y, bridge.x, bridge.y, ['cross', 'dot']),
+                bondPairs(cr2.x, cr2.y, bridge.x, bridge.y, ['cross', 'dot']),
+                splitPair(bridge.x, bridge.y - 22, 0, -1, 'dot', 'dot'),
+                splitPair(bridge.x, bridge.y + 22, 0, 1, 'dot', 'dot')
+            );
+            function addTerminal(cr, o) {
+                atoms.push({ sym: 'O', x: o.x, y: o.y });
+                marks = marks.concat(bondPairs(cr.x, cr.y, o.x, o.y, ['cross', 'dot']));
+                marks = marks.concat(lonePairs(o.x, o.y, cr.x, cr.y, 3));
+            }
+            left.forEach(function(o) { addTerminal(cr1, o); });
+            right.forEach(function(o) { addTerminal(cr2, o); });
+            return { atoms: atoms, marks: marks };
+        }
+
+        function lewisModel(id) {
+            var builders = {
+                c4: modelNH4,
+                a2: modelOH,
+                a6: modelNO3,
+                a7: modelNO2,
+                a8: modelHCO3,
+                a9: modelHSO4,
+                a10: modelCN,
+                a11: modelClO3,
+                a12: function() { return modelXO4('Mn'); },
+                a15: modelSO4,
+                a16: modelSO3,
+                a17: modelS2O3,
+                a18: modelCO3,
+                a19: function() { return modelXO4('Cr'); },
+                a20: modelCr2O7,
+                a23: modelPO4
+            };
+            return builders[id] ? builders[id]() : null;
+        }
+
+        function lewisBounds(model) {
+            var minX = Infinity;
+            var minY = Infinity;
+            var maxX = -Infinity;
+            var maxY = -Infinity;
+            function take(x, y, p) {
+                if (x - p < minX) minX = x - p;
+                if (x + p > maxX) maxX = x + p;
+                if (y - p < minY) minY = y - p;
+                if (y + p > maxY) maxY = y + p;
+            }
+            model.atoms.forEach(function(a) { take(a.x, a.y, a.sym.length > 1 ? 14 : 11); });
+            model.marks.forEach(function(m) { take(m.x, m.y, 6); });
+            return { minX: minX, minY: minY, maxX: maxX, maxY: maxY };
+        }
+
+        function monoPiece(ion, isCation) {
+            var cfg = monoatomicIonsConfig[ion.id];
+            var shells = cfg && cfg.shells ? cfg.shells : [];
+            var n = shells.length ? shells[shells.length - 1] : 0;
+            var marks = [];
+            var i;
+            if (!isCation) {
+                var own = cfg && cfg.valence ? cfg.valence : 0;
+                if (own > n) own = n;
+                for (i = 0; i < own; i++) marks.push('cross');
+                for (i = own; i < n; i++) marks.push('dot');
+            } else if (cfg && cfg.outer) {
+                for (i = 0; i < cfg.outer; i++) marks.push('dot');
+            }
+            var layout = dseLayout(marks.length, 1);
+            return {
+                kind: 'mono',
+                sym: ion.sym,
+                marks: marks,
+                layout: layout,
+                w: layout.halfW * 2 + 28,
+                h: layout.halfH * 2
+            };
+        }
+
+        function lewisPiece(model) {
+            var b = lewisBounds(model);
+            var pad = 14;
+            var halfW = (b.maxX - b.minX) / 2 + pad;
+            var halfH = (b.maxY - b.minY) / 2 + pad;
+            return {
+                kind: 'lewis',
+                model: model,
+                cx: (b.minX + b.maxX) / 2,
+                cy: (b.minY + b.maxY) / 2,
+                halfW: halfW,
+                halfH: halfH,
+                w: halfW * 2 + 28,
+                h: halfH * 2
+            };
+        }
+
+        function pieceForIon(ion) {
+            var isCation = ion.id.charAt(0) === 'c';
+            if (!ion.poly && monoatomicIonsConfig[ion.id]) return monoPiece(ion, isCation);
+            var model = lewisModel(ion.id);
+            if (model) return lewisPiece(model);
+            var layout = dseLayout(0, 1);
+            return {
+                kind: 'mono',
+                sym: ion.sym,
+                marks: [],
+                layout: layout,
+                w: layout.halfW * 2 + 36,
+                h: layout.halfH * 2
+            };
+        }
+
+        function drawPiece(parent, piece, x, y, chargeText, chargeColor) {
+            if (piece.kind === 'mono') {
+                drawDseSpecies(parent, {
+                    cx: x + piece.layout.halfW,
+                    cy: y + piece.layout.halfH,
+                    sym: piece.sym,
+                    marks: piece.marks,
+                    brackets: true,
+                    chargeText: chargeText,
+                    chargeColor: chargeColor,
+                    scale: 1
+                });
+                return;
+            }
+            var model = piece.model;
+            var g = svgEl('g', {
+                transform: 'translate(' + (x + piece.halfW - piece.cx) + ' ' + (y + piece.halfH - piece.cy) + ')'
+            });
+            model.atoms.forEach(function(a) {
+                var t = svgEl('text', {
+                    x: a.x, y: a.y + 5,
+                    'text-anchor': 'middle',
+                    fill: '#1e293b',
+                    'font-size': '16',
+                    'font-weight': '700',
+                    'font-family': 'Calibri, sans-serif'
+                });
+                t.textContent = a.sym;
+                g.appendChild(t);
+            });
+            model.marks.forEach(function(m) { drawDseMark(g, m.x, m.y, m.kind, 1); });
+            drawDseBracket(g, piece.cx, piece.cy, piece.halfW, piece.halfH, chargeText, chargeColor, 1);
+            parent.appendChild(g);
+        }
+
+        function switchModalTab(tabId) {
+            var btnElectron = document.getElementById('modal-tab-btn-electron');
+            var btnCrystal = document.getElementById('modal-tab-btn-crystal');
+            var panelElectron = document.getElementById('panel-electron');
+            var panelCrystal = document.getElementById('panel-crystal');
+            if (!btnElectron || !btnCrystal || !panelElectron || !panelCrystal) return;
+            var showElectron = tabId === 'electron';
+            btnElectron.classList.toggle('active', showElectron);
+            btnCrystal.classList.toggle('active', !showElectron);
+            panelElectron.classList.toggle('active', showElectron);
+            panelCrystal.classList.toggle('active', !showElectron);
+        }
+
+        function renderElectronDiagram(cat, an, catCount, anCount) {
+            var container = document.getElementById('electron-diagram-container');
+            if (!container) return;
+            container.innerHTML = '';
+            var pieces = [];
+            var i;
+            for (i = 0; i < catCount; i++) {
+                pieces.push({ piece: pieceForIon(cat), charge: chargeLabel(cat.charge, true), color: '#0066cc' });
+            }
+            for (i = 0; i < anCount; i++) {
+                pieces.push({ piece: pieceForIon(an), charge: chargeLabel(an.charge, false), color: '#d97706' });
+            }
+            var gapX = 10;
+            var gapY = 14;
+            var maxW = 860;
+            var rows = [[]];
+            var rowW = 0;
+            pieces.forEach(function(item) {
+                var next = rowW + (rows[rows.length - 1].length ? gapX : 0) + item.piece.w;
+                if (rows[rows.length - 1].length && next > maxW) {
+                    rows.push([item]);
+                    rowW = item.piece.w;
+                } else {
+                    rows[rows.length - 1].push(item);
+                    rowW = next;
+                }
+            });
+            var rowHeights = [];
+            var rowWidths = [];
+            var vbW = 0;
+            rows.forEach(function(row) {
+                var h = 0;
+                var w = 0;
+                row.forEach(function(item, idx) {
+                    if (item.piece.h > h) h = item.piece.h;
+                    w += item.piece.w + (idx ? gapX : 0);
+                });
+                rowHeights.push(h);
+                rowWidths.push(w);
+                if (w > vbW) vbW = w;
+            });
+            var vbH = 0;
+            rowHeights.forEach(function(h, idx) { vbH += h + (idx ? gapY : 0); });
+            var pad = 8;
+            var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('viewBox', '0 0 ' + (vbW + pad * 2) + ' ' + (vbH + pad * 2));
+            svg.setAttribute('width', '100%');
+            svg.setAttribute('height', '100%');
+            svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+            var y = pad;
+            rows.forEach(function(row, r) {
+                var x = pad + (vbW - rowWidths[r]) / 2;
+                row.forEach(function(item) {
+                    var top = y + (rowHeights[r] - item.piece.h) / 2;
+                    drawPiece(svg, item.piece, x, top, item.charge, item.color);
+                    x += item.piece.w + gapX;
+                });
+                y += rowHeights[r] + gapY;
+            });
+            container.appendChild(svg);
+        }
+
+        function fitLesson(el, maxPx) {
+            if (!el || el.clientWidth < 20) return;
+            var maxSize = maxPx || 38;
+            el.style.fontSize = maxSize + 'px';
+            var guard = 0;
+            while (el.scrollWidth > el.clientWidth + 1 && guard < 16) {
+                var size = parseFloat(window.getComputedStyle(el).fontSize) - 2;
+                if (size < 18) break;
+                el.style.fontSize = size + 'px';
+                guard++;
+            }
+        }
+
+        function fitBoards() {
+            document.querySelectorAll('.puzzle-slot').forEach(function(slot) {
+                var board = slot.querySelector('.puzzle-board');
+                if (!board) return;
+                board.style.transform = 'none';
+                var bw = board.offsetWidth;
+                var bh = board.offsetHeight;
+                var sw = slot.clientWidth;
+                var sh = slot.clientHeight;
+                if (!bw || !bh || !sw || !sh) return;
+                var scale = Math.min(1, sw / bw, sh / bh);
+                board.style.transform = scale < 1 ? 'scale(' + scale + ')' : 'none';
+            });
+        }
+
+        function fitVisibleLesson() {
+            if (document.getElementById('tab-lab').classList.contains('active')) {
+                fitLesson(document.getElementById('lab-equation'), 38);
+            }
+            if (document.getElementById('tab-quest').classList.contains('active')) {
+                fitLesson(document.getElementById('quest-target-display'), 38);
+            }
+            if (document.getElementById('tab-form').classList.contains('active')) {
+                fitLesson(document.getElementById('form-lesson'), 38);
+            }
+            if (document.getElementById('tab-shell').classList.contains('active')) {
+                fitLesson(document.getElementById('shell-lesson'), 38);
+            }
+            fitBoards();
+        }
+
+        function toggleZoom(which) {
+            var key = 'zoom-' + which;
+            var turnOn = !document.body.classList.contains(key);
+            document.body.classList.remove('zoom-lab', 'zoom-quest', 'zoom-form', 'zoom-shell');
+            if (turnOn) document.body.classList.add(key);
+            requestAnimationFrame(fitVisibleLesson);
+        }
+
+        function syncHideLabel() {
+            var hidden = document.body.classList.contains('desc-hidden');
+            var zh = document.querySelector('#btn-hide .lang-zh');
+            var en = document.querySelector('#btn-hide .lang-en');
+            if (zh) zh.textContent = hidden ? '顯示' : '隱藏';
+            if (en) en.textContent = hidden ? 'Show' : 'Hide';
+        }
+
+        function toggleDesc() {
+            document.body.classList.toggle('desc-hidden');
+            syncHideLabel();
+            requestAnimationFrame(fitVisibleLesson);
+        }
+
+        function applyDescStart() {
+            if (window.matchMedia('(max-width: 820px)').matches) {
+                document.body.classList.add('desc-hidden');
+            }
+            syncHideLabel();
+        }
+
+        var penOn = false;
+        var laserOn = false;
+        var erasing = false;
+        var penColor = '#e11d48';
+        var penDrawing = false;
+        var penLast = null;
+        var laserPts = [];
+        var laserRaf = 0;
+        var penCanvas = document.getElementById('penCanvas');
+        var penCtx = penCanvas.getContext('2d');
+        var laserCanvas = document.getElementById('laserCanvas');
+        var laserCtx = laserCanvas.getContext('2d');
+
+        function resizeInk() {
+            var dpr = window.devicePixelRatio || 1;
+            var w = Math.round(window.innerWidth * dpr);
+            var h = Math.round(window.innerHeight * dpr);
+            if (penCanvas.width !== w || penCanvas.height !== h) {
+                var prev = null;
+                if (penCanvas.width && penCanvas.height) {
+                    prev = document.createElement('canvas');
+                    prev.width = penCanvas.width;
+                    prev.height = penCanvas.height;
+                    prev.getContext('2d').drawImage(penCanvas, 0, 0);
+                }
+                penCanvas.width = w;
+                penCanvas.height = h;
+                if (prev) penCtx.drawImage(prev, 0, 0, w, h);
+            }
+            penCanvas.style.width = window.innerWidth + 'px';
+            penCanvas.style.height = window.innerHeight + 'px';
+            if (laserCanvas.width !== w || laserCanvas.height !== h) {
+                laserCanvas.width = w;
+                laserCanvas.height = h;
+            }
+            laserCanvas.style.width = window.innerWidth + 'px';
+            laserCanvas.style.height = window.innerHeight + 'px';
+        }
+
+        function setLaser(on) {
+            laserOn = on;
+            if (on) {
+                penOn = false;
+                erasing = false;
+                document.body.classList.remove('pen-on');
+                document.getElementById('dkPen').classList.remove('active');
+                document.getElementById('dkColors').classList.add('hidden');
+                document.getElementById('dkErase').classList.remove('active');
+            }
+            document.body.classList.toggle('laser-on', laserOn);
+            document.getElementById('dkLaser').classList.toggle('active', laserOn);
+            document.getElementById('laserDot').classList.toggle('hidden', !laserOn);
+            if (laserOn && !laserRaf) laserRaf = requestAnimationFrame(drawLaser);
+        }
+
+        function setPen(on) {
+            penOn = on;
+            if (on) {
+                laserOn = false;
+                document.body.classList.remove('laser-on');
+                document.getElementById('dkLaser').classList.remove('active');
+                document.getElementById('laserDot').classList.add('hidden');
+            } else {
+                erasing = false;
+                document.getElementById('dkErase').classList.remove('active');
+            }
+            document.body.classList.toggle('pen-on', penOn);
+            document.getElementById('dkPen').classList.toggle('active', penOn);
+            document.getElementById('dkColors').classList.toggle('hidden', !penOn);
+        }
+
+        function inkPoint(e) {
+            return { x: e.clientX, y: e.clientY };
+        }
+
+        function drawPenSegment(from, to) {
+            var dpr = window.devicePixelRatio || 1;
+            penCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            penCtx.lineCap = 'round';
+            penCtx.lineJoin = 'round';
+            if (erasing) {
+                penCtx.globalCompositeOperation = 'destination-out';
+                penCtx.strokeStyle = 'rgba(0,0,0,1)';
+                penCtx.lineWidth = 26;
+            } else {
+                penCtx.globalCompositeOperation = 'source-over';
+                penCtx.strokeStyle = penColor;
+                penCtx.lineWidth = 3.6;
+            }
+            penCtx.beginPath();
+            penCtx.moveTo(from.x, from.y);
+            penCtx.lineTo(to.x, to.y);
+            penCtx.stroke();
+        }
+
+        penCanvas.addEventListener('pointerdown', function(e) {
+            if (!penOn) return;
+            penDrawing = true;
+            penLast = inkPoint(e);
+            try { penCanvas.setPointerCapture(e.pointerId); } catch (err) {}
+            drawPenSegment(penLast, penLast);
+        });
+        penCanvas.addEventListener('pointermove', function(e) {
+            if (!penDrawing) return;
+            var p = inkPoint(e);
+            drawPenSegment(penLast, p);
+            penLast = p;
+        });
+        function stopPen() { penDrawing = false; penLast = null; }
+        penCanvas.addEventListener('pointerup', stopPen);
+        penCanvas.addEventListener('pointercancel', stopPen);
+
+        function drawLaser() {
+            var dpr = window.devicePixelRatio || 1;
+            laserCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            laserCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            var now = performance.now();
+            laserPts = laserPts.filter(function(p) { return now - p.t < 1600; });
+            laserCtx.lineCap = 'round';
+            for (var i = 1; i < laserPts.length; i++) {
+                var alpha = 1 - (now - laserPts[i].t) / 1600;
+                laserCtx.strokeStyle = 'rgba(255,40,40,' + Math.max(0, alpha) + ')';
+                laserCtx.lineWidth = 3;
+                laserCtx.beginPath();
+                laserCtx.moveTo(laserPts[i - 1].x, laserPts[i - 1].y);
+                laserCtx.lineTo(laserPts[i].x, laserPts[i].y);
+                laserCtx.stroke();
+            }
+            if (laserOn || laserPts.length) {
+                laserRaf = requestAnimationFrame(drawLaser);
+            } else {
+                laserRaf = 0;
+            }
+        }
+
+        laserCanvas.addEventListener('pointermove', function(e) {
+            if (!laserOn) return;
+            var dot = document.getElementById('laserDot');
+            dot.style.left = e.clientX + 'px';
+            dot.style.top = e.clientY + 'px';
+            laserPts.push({ x: e.clientX, y: e.clientY, t: performance.now() });
+            if (!laserRaf) laserRaf = requestAnimationFrame(drawLaser);
+        });
+        laserCanvas.addEventListener('pointerdown', function(e) {
+            if (!laserOn) return;
+            laserPts.push({ x: e.clientX, y: e.clientY, t: performance.now() });
+        });
+
+        document.getElementById('dkLaser').addEventListener('click', function() { setLaser(!laserOn); });
+        document.getElementById('dkPen').addEventListener('click', function() { setPen(!penOn); });
+        document.getElementById('dkErase').addEventListener('click', function() {
+            erasing = !erasing;
+            document.getElementById('dkErase').classList.toggle('active', erasing);
+            if (erasing) {
+                document.querySelectorAll('.dcolor').forEach(function(b) { b.classList.remove('active'); });
+            }
+        });
+        document.getElementById('dkClear').addEventListener('click', function() {
+            penCtx.setTransform(1, 0, 0, 1, 0, 0);
+            penCtx.clearRect(0, 0, penCanvas.width, penCanvas.height);
+        });
+        document.querySelectorAll('.dcolor').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                penColor = btn.getAttribute('data-c');
+                erasing = false;
+                document.getElementById('dkErase').classList.remove('active');
+                document.querySelectorAll('.dcolor').forEach(function(b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+            });
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                setPen(false);
+                setLaser(false);
+            }
+        });
+        window.addEventListener('resize', function() {
+            resizeInk();
+            fitVisibleLesson();
+        });
+
+        window.onload = function() {
+            initLabLangBridge();
+            resizeCanvas();
+            resizeInk();
+            applyDescStart();
+            requestAnimationFrame(fitVisibleLesson);
+        };
+
+        function initLabLangBridge() {
+            var params = new URLSearchParams(window.location.search);
+            var urlLang = params.get('lang');
+            if (urlLang === 'en' || urlLang === 'zh') {
+                setLanguage(urlLang);
+            } else {
+                setLanguage('en');
+            }
+            window.addEventListener('message', function(event) {
+                var data = event.data;
+                if (data && data.type === 'uniplus:setLang' && (data.lang === 'en' || data.lang === 'zh')) {
+                    setLanguage(data.lang);
+                }
+            });
+        }
+    </script>
+    
+    <!-- 
+      化學與數理公式極致融合解說 (Traditional Chinese Code Explanations):
+      
+      1. 幾何互鎖拼圖 (Interlocking SVG Engine):
+         在無機化學中，離子的電荷數量（如 Na+ 帶 +1 電荷，Al3+ 帶 +3 電荷，硫酸根離子帶 -2 電荷）決定了它們結合成電中性化合物時的化學式計量比例。
+         為了讓學生能在視覺上「看見」電荷的配合，我們利用 SVG 動態繪製了拼圖卡片。
+         凹槽（Slots）表示 Cation（陽離子）擁有的正電荷接收端，凳筍（Tabs）表示 Anion（陰離子）擁有的負電荷。
+         - 對於一個電荷數為 C 的 Cation，我們在卡片的右邊界上沿 y 方向均勻分七繪製了 C 個「向內彊曲」的半圓形凹槽。
+         - 對於一個電荷數為 A 的 Anion，我們在卡片的左邊界上均勻分七繪製了 A 個「向外凸出」丞「同樣向左彊曲」的半圓形凳筍。
+         當 Cation 放置在左、Anion 放置在右時，由於凹槽與凳筍的幾何曲線曲率完美一致且方向互補，它們能以 0 像素間隙完美咬合！
+         
+      2. 最小公倍數與高度平衡幾何關係 (Mathematical Height Alignment):
+         設 Cation 電荷為 C，Anion 電荷為 A。達到電荷平衡的實質，就是尋找 C 與 A 的最小公倍數 LCM(C, A)。
+         - 所需的 Cation 個數為：Num_Cat = LCM(C, A) / C
+         - 所需的 Anion 個數為：Num_Ani = LCM(C, A) / A
+         在代碼中，我們尋找拼圖每 1 個電荷單位高度設定為 60px。
+         因此，一疊陽離子的總高度為：Num_Cat * C * 60px = LCM(C, A) * 60px。
+         而一疊陰離子的總高度為：Num_Ani * A * 60px = LCM(C, A) * 60px。
+         正因為兩者的總高度在平衡時精準相等，拼圖列的項部與底部便會完美齊平，形成一個整齊的矩形區塊！
+         這種設計將抽象的電荷代數運算，變成了極其直觀的「高度拼圖齊平」空間幾何遊戲。
+      -->
+</body>
+</html>
