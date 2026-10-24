@@ -14,6 +14,19 @@ KOC.works('bio-is', 'jeff', [
     notes: 'Cell membrane lesson: phospholipids, the fluid mosaic model, membrane proteins, and how different molecules cross the membrane.'
   },
   {
+    id: 'membrane-damage',
+    title: 'Ch2 Factors that damage the cell membrane',
+    original: 'Organic solvents, detergents, pH, temperature, and mechanical stress',
+    type: 'interactive',
+    subject: 'Bio',
+    chapter: 'S3 Basic Biology Ch2 Cells — factors that damage the cell membrane',
+    submitted: '2026-10-24',
+    tags: ['Interactive', 'Cell membrane', 'Damage'],
+    elements: ['wood'],
+    src: 'content/bio-is/jeff/cell-membrane/damage.html',
+    notes: 'Interactive lab of factors that damage the cell membrane: organic solvents, detergents, extreme pH, high temperature, and mechanical stress.'
+  },
+  {
     id: 'migration-of-coloured-ions',
     title: 'MWI2_Ion migration_(Migration of Ions)',
     original: 'Migration of coloured ions',
