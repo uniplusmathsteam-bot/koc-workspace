@@ -77,5 +77,18 @@ KOC.works('bio-is', 'issac', [
     elements: ['gold'],
     src: 'content/bio-is/issac/food-nutrition/energy-calories.html',
     notes: 'Pick a food, then energy amount, nutrient, or top-5 ranking with exam-style working.'
+  },
+  {
+    id: 'food-and-humans-infographic',
+    title: 'SB01_Food and humans',
+    original: 'Food and Humans infographic',
+    type: 'interactive',
+    subject: 'Bio',
+    chapter: 'S3/S4 Senior Biology SB01 1.1 Food requirements of humans, 1.2 Summary of food tests, 1.3 Balanced diet',
+    submitted: '2026-10-27',
+    tags: ['Infographic', 'Nutrition', 'Food tests'],
+    elements: ['wood'],
+    src: 'content/bio-is/issac/food-and-humans-infographic/index.html',
+    notes: 'One-page Food and Humans revision: nutrients, deficiency and excess, and food-test GIFs.'
   }
 ]);
