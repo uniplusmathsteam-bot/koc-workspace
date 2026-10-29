@@ -1,6 +1,45 @@
 /* James · Chem KOC lead — submissions. */
 KOC.works('chem', 'james', [
   {
+    id: 'covalent-properties-sandbox',
+    title: 'MWI5_Structures and properties of substances_(ex)',
+    original: 'Covalent properties sandbox',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Structures and properties of substances MWI5',
+    submitted: '2026-10-24',
+    tags: ['Interactive', 'S3', 'Structures'],
+    elements: ['wood'],
+    src: 'content/chem/james/covalent-properties-sandbox/MWI5_Structures%20and%20properties%20of%20substances_(ex).html?v=20261024b',
+    notes: 'Compare simple molecular, giant covalent, giant ionic, and giant metallic structures and their properties. EN/中.'
+  },
+  {
+    id: 'covalent-bond-puzzle',
+    title: 'MWI4A_Covalent bond electron diagram_(ex)',
+    original: 'Covalent bond puzzle',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Covalent bond MWI4 MWI4A Covalent bond electron diagram',
+    submitted: '2026-10-24',
+    tags: ['Interactive', 'S3', 'Covalent bond'],
+    elements: ['wood', 'earth'],
+    src: 'content/chem/james/covalent-bond-puzzle/MWI4A_Covalent%20bond%20electron%20diagram_(ex).html?v=20261024b',
+    notes: 'Lab and Quest: build covalent molecules, check the octet, and read the shape. EN/中.'
+  },
+  {
+    id: 'ionic-compound-puzzle',
+    title: 'MWI3D_Naming of ionic compound_(ex)',
+    original: 'Ionic compound puzzle',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Ionic bond and metallic bond MWI3 MWI3D Naming of ionic compound',
+    submitted: '2026-10-24',
+    tags: ['Interactive', 'S3', 'Ionic compound'],
+    elements: ['wood', 'earth'],
+    src: 'content/chem/james/ionic-compound-puzzle/MWI3D_Naming%20of%20ionic%20compound_(ex).html?v=20261024a',
+    notes: 'Lab and Quest: lock cations and anions into a charge-balanced formula, then read the crystal fact. EN/中.'
+  },
+  {
     id: 'tiaogao-song-youren',
     title: '跳高高 · 送友人',
     type: 'interactive',

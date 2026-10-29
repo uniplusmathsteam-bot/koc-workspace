@@ -1,0 +1,999 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Factors that damage the cell membrane</title>
+  <style>
+    :root { --ink: #142033; --line: #d7e0ec; --navy: #163a86; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      height: 100dvh;
+      overflow: hidden;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: #03080c;
+    }
+    aside {
+      position: absolute;
+      z-index: 2;
+      top: 10px;
+      left: 10px;
+      width: min(340px, calc(100% - 20px));
+      max-height: calc(100dvh - 20px);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.96);
+    }
+    h1 { margin: 0; font-size: 20px; line-height: 1.2; }
+    .note { margin: 0; font-size: 13px; line-height: 1.35; }
+    .factors { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .factors button, .replay {
+      text-align: left;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 10px;
+      padding: 6px 8px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .factors button small { display: block; font-weight: 600; color: #4b5d73; }
+    .factors button.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .factors button.active small { color: #d6e4ff; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { border: 1px solid #c5d0de; padding: 7px 8px; vertical-align: top; }
+    th { background: #d9e8f6; text-align: left; }
+    td.dash { background: #d9d9d9; text-align: center; font-weight: 800; }
+    .control { display: none; }
+    .control.on { display: block; }
+    .control label { display: flex; justify-content: space-between; font-weight: 750; font-size: 14px; }
+    input[type="range"] { width: 100%; margin-top: 6px; }
+    .replay { margin-top: auto; text-align: center; background: var(--navy); color: #fff; border-color: var(--navy); }
+    main { position: absolute; inset: 0; }
+    canvas { width: 100%; height: 100%; display: block; }
+    @media (max-width: 720px) {
+      aside { max-height: 52dvh; }
+      h1 { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <aside>
+    <h1>Factors that damage the cell membrane</h1>
+    <p class="note">*Applications: kill harmful microorganisms (e.g. bacteria)</p>
+    <div class="factors" id="factors" role="group" aria-label="Damaging factor">
+      <button type="button" data-factor="solvent" class="active">Organic solvents<small>有機溶劑</small></button>
+      <button type="button" data-factor="detergent">Detergents<small>清潔劑</small></button>
+      <button type="button" data-factor="ph">Extreme pH</button>
+      <button type="button" data-factor="temp">High temperature</button>
+      <button type="button" data-factor="stress">Mechanical stress<small>機械應力</small></button>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Effect on Phospholipids 磷脂</th>
+          <th>Effect on Membrane Proteins 膜蛋白</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td id="lipidEffect">Dissolves the lipid bilayer</td>
+          <td id="proteinEffect">Denatures 變性 proteins</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="note"><strong>Examples.</strong> <span id="examples">Ethanol 乙醇, alcohol 酒精</span></p>
+    <div class="control on" id="speedControl">
+      <label>Animation speed <span id="speedRead">1×</span></label>
+      <input id="speedSlider" type="range" min="0.25" max="3" step="0.25" value="1" aria-label="Animation speed">
+    </div>
+    <div class="control" id="phControl">
+      <label>pH of the surrounding solution <span id="phRead">7.0</span></label>
+      <input id="phSlider" type="range" min="0" max="14" step="0.1" value="7">
+    </div>
+    <div class="control" id="tempControl">
+      <label>Temperature <span id="tempRead">37°C</span></label>
+      <input id="tempSlider" type="range" min="0" max="100" step="1" value="37">
+    </div>
+    <div class="control" id="pressureControl">
+      <label>Water pressure <span id="pressureRead">70</span></label>
+      <input id="pressureSlider" type="range" min="0" max="100" step="1" value="70" aria-label="Water pressure">
+    </div>
+    <button type="button" class="replay" id="replay">Replay this factor</button>
+  </aside>
+  <main><canvas id="view" aria-label="Three-dimensional cell membrane"></canvas></main>
+  <script src="vendor/three.min.js"></script>
+  <script src="vendor/OrbitControls.js"></script>
+  <script>
+    const FACTS = {
+      solvent: {
+        lipid: "Dissolves the lipid bilayer",
+        protein: "Denatures 變性 proteins",
+        examples: "Ethanol 乙醇, alcohol 酒精",
+        dash: false
+      },
+      detergent: {
+        lipid: "Dissolves the lipid bilayer",
+        protein: "Break down protein-lipid interactions",
+        examples: "Soap (肥皂)",
+        dash: false
+      },
+      ph: {
+        lipid: "Destabilizes 不穩定 lipid bilayer",
+        protein: "Denatures proteins",
+        examples: "Stomach acid",
+        dash: false
+      },
+      temp: {
+        lipid: "Destabilizes the lipid bilayer",
+        protein: "Denatures proteins",
+        examples: "Boiling",
+        dash: false
+      },
+      stress: {
+        lipid: "—",
+        protein: "—",
+        examples: "Pressure, too much water entering cells",
+        dash: true
+      }
+    };
+
+    const canvas = document.getElementById("view");
+    const scene = new THREE.Scene();
+    const baseBg = new THREE.Color(0x03080c);
+    scene.background = baseBg.clone();
+    scene.fog = new THREE.FogExp2(0x03080c, 0.012);
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 400);
+    camera.position.set(0, 22, 48);
+    camera.lookAt(0, 0, 0);
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    const controls = new THREE.OrbitControls(camera, canvas);
+    controls.enableDamping = true;
+    controls.target.set(0, 0, 0);
+    controls.minDistance = 12;
+    controls.maxDistance = 140;
+    scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+    const sun = new THREE.DirectionalLight(0xffffff, 1.05);
+    sun.position.set(12, 30, 16);
+    scene.add(sun);
+
+    const membrane = new THREE.Group();
+    scene.add(membrane);
+    const agents = new THREE.Group();
+    scene.add(agents);
+
+    const headMat = new THREE.MeshPhongMaterial({ color: 0x2196f3, shininess: 35 });
+    const tailMat = new THREE.MeshPhongMaterial({ color: 0xffb300, shininess: 8 });
+    const headGeo = new THREE.SphereGeometry(0.5, 16, 16);
+    const tailGeo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, -0.6, 0),
+      new THREE.Vector3(0.12, -1.3, 0),
+      new THREE.Vector3(0.2, -2.1, 0)
+    ]), 8, 0.07, 6, false);
+    const rows = 36;
+    const cols = 26;
+    const spacing = 1.9;
+    const proteinMap = [
+      { r: 5, c: 6, type: "channel", rad: 1.6, color: 0x9c27b0 },
+      { r: 12, c: 18, type: "channel", rad: 1.6, color: 0x9c27b0 },
+      { r: 24, c: 8, type: "channel", rad: 1.6, color: 0x9c27b0 },
+      { r: 30, c: 16, type: "carrier", rad: 1.6, color: 0xe91e63 },
+      { r: 16, c: 13, type: "carrier", rad: 1.6, color: 0xe91e63 },
+      { r: 28, c: 5, type: "glycoprotein", rad: 1.5, color: 0x00b0ff },
+      { r: 8, c: 16, type: "glycoprotein", rad: 1.5, color: 0x00b0ff },
+      { r: 20, c: 20, type: "receptor", rad: 1.5, color: 0x00d6a0 }
+    ];
+    function blocked(i, j) {
+      return proteinMap.some((p) => Math.hypot(i - p.r, j - p.c) < p.rad * 1.25);
+    }
+    const lipids = [];
+    for (let i = 0; i < rows; i += 1) {
+      for (let j = 0; j < cols; j += 1) {
+        if (blocked(i, j)) continue;
+        const x = (i - rows / 2) * spacing;
+        const z = (j - cols / 2) * spacing;
+        [["top", 2.1, 0], ["bot", -2.1, Math.PI]].forEach(([leaflet, y, flip]) => {
+          const unit = new THREE.Group();
+          const head = new THREE.Mesh(headGeo, headMat);
+          head.position.y = y;
+          const t1 = new THREE.Mesh(tailGeo, tailMat);
+          const t2 = new THREE.Mesh(tailGeo, tailMat);
+          t1.position.set(-0.16, y, 0);
+          t2.position.set(0.16, y, 0);
+          if (leaflet === "top") t2.rotation.y = Math.PI;
+          else {
+            t1.rotation.x = flip;
+            t2.rotation.set(flip, Math.PI, 0);
+          }
+          unit.add(head, t1, t2);
+          unit.position.set(x, 0, z);
+          membrane.add(unit);
+          lipids.push({
+            obj: unit, leaflet, rx: x, rz: z, homeY: 0,
+            seed: Math.random() * 10, taken: false, agent: null,
+            drift: new THREE.Vector3()
+          });
+        });
+      }
+    }
+
+    function hollowCylinder(height, outRad, inRad) {
+      const shape = new THREE.Shape();
+      shape.absarc(0, 0, outRad, 0, Math.PI * 2, false);
+      const hole = new THREE.Path();
+      hole.absarc(0, 0, inRad, 0, Math.PI * 2, true);
+      shape.holes.push(hole);
+      const geo = new THREE.ExtrudeGeometry(shape, { depth: height, bevelEnabled: false, curveSegments: 20, steps: 1 });
+      geo.center();
+      geo.rotateX(Math.PI / 2);
+      return geo;
+    }
+    function proteinChain(color) {
+      const group = new THREE.Group();
+      const mat = new THREE.MeshPhongMaterial({ color, shininess: 18 });
+      const bead = new THREE.SphereGeometry(0.36, 10, 8);
+      for (let i = 0; i < 14; i += 1) {
+        const t = i / 13;
+        const sphere = new THREE.Mesh(bead, mat);
+        sphere.position.set((t - 0.5) * 7.4, 0.4, Math.sin(t * Math.PI * 2.2) * 0.55);
+        group.add(sphere);
+      }
+      group.visible = false;
+      return group;
+    }
+    const proteins = [];
+    proteinMap.forEach((p) => {
+      const x = (p.r - rows / 2) * spacing;
+      const z = (p.c - cols / 2) * spacing;
+      const group = new THREE.Group();
+      let native;
+      const mat = new THREE.MeshStandardMaterial({ color: p.color, roughness: 0.4 });
+      if (p.type === "channel") native = new THREE.Mesh(hollowCylinder(4.1, p.rad * 0.9, p.rad * 0.45), mat);
+      else if (p.type === "carrier") native = new THREE.Mesh(hollowCylinder(4.1, p.rad * 0.9, p.rad * 0.45), mat);
+      else if (p.type === "receptor") native = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.95, 4.2, 18), mat);
+      else {
+        native = new THREE.Mesh(new THREE.SphereGeometry(1.05, 18, 14), mat);
+        const sugarMat = new THREE.MeshPhongMaterial({ color: 0x00e676, shininess: 30 });
+        for (let k = 0; k < 4; k += 1) {
+          const sugar = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 8), sugarMat);
+          sugar.position.set(Math.sin(k) * 0.3, 1.1 + k * 0.28, 0);
+          native.add(sugar);
+        }
+      }
+      const chain = proteinChain(p.color);
+      group.add(native, chain);
+      group.position.set(x, 0, z);
+      membrane.add(group);
+      proteins.push({ obj: group, native, chain, rx: x, rz: z, loose: 0 });
+    });
+
+    const orangeMat = new THREE.MeshPhongMaterial({ color: 0xff8c1a, specular: 0xffe0b2, shininess: 45 });
+    const blueHeadMat = new THREE.MeshPhongMaterial({ color: 0xb3e5fc, specular: 0xffffff, shininess: 70 });
+    const yellowTailMat = new THREE.MeshPhongMaterial({ color: 0xffea00, shininess: 25 });
+    const soapTail = new THREE.TubeGeometry(new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0.12, -0.55, 0),
+      new THREE.Vector3(-0.05, -1.15, 0)
+    ]), 5, 0.09, 5, false);
+    function solventMolecule() {
+      const group = new THREE.Group();
+      group.add(new THREE.Mesh(new THREE.SphereGeometry(0.78, 16, 14), orangeMat));
+      [[1.05, 0.25, 0.15, 0.42], [-0.85, 0.45, -0.2, 0.36], [0.25, -0.55, 0.9, 0.4], [-0.2, 0.15, -1.0, 0.34], [0.55, 0.85, -0.35, 0.3], [-0.4, -0.7, 0.15, 0.28]].forEach((part) => {
+        const lobe = new THREE.Mesh(new THREE.SphereGeometry(part[3], 10, 8), orangeMat);
+        lobe.position.set(part[0], part[1], part[2]);
+        group.add(lobe);
+      });
+      return group;
+    }
+    function detergentMolecule() {
+      const group = new THREE.Group();
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.72, 16, 14), blueHeadMat);
+      const tail = new THREE.Mesh(soapTail, yellowTailMat);
+      tail.rotation.x = Math.PI;
+      tail.position.y = 0.62;
+      tail.scale.set(1.35, 1.45, 1.35);
+      group.add(head, tail);
+      return group;
+    }
+    function waterMolecule() {
+      const mesh = new THREE.Mesh(new THREE.SphereGeometry(0.28, 10, 8), new THREE.MeshPhongMaterial({ color: 0x90caf9, shininess: 60 }));
+      return mesh;
+    }
+    let pressure = 70;
+    const waterMax = 4600;
+    const waterGeo = new THREE.SphereGeometry(0.95, 7, 5);
+    const waterMat = new THREE.MeshPhongMaterial({ color: 0x4fc3f7, specular: 0xe1f5fe, shininess: 50 });
+    const waterField = new THREE.InstancedMesh(waterGeo, waterMat, waterMax);
+    waterField.visible = false;
+    waterField.frustumCulled = false;
+    scene.add(waterField);
+    const waterDummy = new THREE.Object3D();
+    const waterBits = [];
+    for (let i = 0; i < waterMax; i += 1) {
+      waterBits.push({
+        x: (Math.random() - 0.5) * 64,
+        z: (Math.random() - 0.5) * 48,
+        y: -5 - Math.random() * 12,
+        vx: (Math.random() - 0.5) * 1.8,
+        vy: 0.35 + Math.random() * 0.9,
+        vz: (Math.random() - 0.5) * 1.8,
+        seed: Math.random() * 40,
+        scale: 0.55 + Math.random() * 0.45
+      });
+    }
+
+    let factor = "solvent";
+    let ph = 7;
+    let temp = 37;
+    let effectTime = 0;
+    let clock = new THREE.Clock();
+    let time = 0;
+    const molecules = [];
+    const up = new THREE.Vector3(0, 1, 0);
+    const aim = new THREE.Vector3();
+
+    function tailPoint(lipid) {
+      const sign = lipid.leaflet === "top" ? 1 : -1;
+      const p = lipid.obj.position;
+      return new THREE.Vector3(p.x, p.y + sign * 0.7, p.z);
+    }
+    function headPoint(lipid) {
+      const sign = lipid.leaflet === "top" ? 1 : -1;
+      const p = lipid.obj.position;
+      return new THREE.Vector3(p.x, p.y + sign * 2.1, p.z);
+    }
+    function nearestFree(origin) {
+      let best = null;
+      let bestD = Infinity;
+      lipids.forEach((lipid) => {
+        if (lipid.taken || lipid.obj.parent !== membrane) return;
+        const dx = lipid.obj.position.x - origin.x;
+        const dy = (lipid.leaflet === "top" ? 2.1 : -2.1) - origin.y;
+        const dz = lipid.obj.position.z - origin.z;
+        const dist = dx * dx + dy * dy + dz * dz;
+        if (dist < bestD) {
+          bestD = dist;
+          best = lipid;
+        }
+      });
+      return best;
+    }
+    function spawnCloud(kind, count) {
+      while (agents.children.length) agents.remove(agents.children[0]);
+      molecules.length = 0;
+      const halfX = rows * spacing * 0.42;
+      const halfZ = cols * spacing * 0.42;
+      for (let n = 0; n < count; n += 1) {
+        const mesh = kind === "solvent" ? solventMolecule() : kind === "detergent" ? detergentMolecule() : waterMolecule();
+        const above = Math.random() < 0.5 ? 1 : -1;
+        mesh.position.set((Math.random() - 0.5) * halfX * 2, above * (5 + Math.random() * 4), (Math.random() - 0.5) * halfZ * 2);
+        agents.add(mesh);
+        molecules.push({ mesh, kind, mode: "drift", lipid: null, holds: 0, carry: 0, vx: 0, vy: 0, vz: 0, age: 0 });
+      }
+    }
+    function resetSheet() {
+      lipids.forEach((lipid) => {
+        if (lipid.obj.parent !== membrane) membrane.attach(lipid.obj);
+        lipid.taken = false;
+        lipid.agent = null;
+        lipid.drift.set(0, 0, 0);
+        lipid.obj.position.set(lipid.rx, 0, lipid.rz);
+        lipid.obj.rotation.set(0, 0, 0);
+        lipid.obj.visible = true;
+      });
+      proteins.forEach((protein) => {
+        protein.loose = 0;
+        protein.native.visible = true;
+        protein.chain.visible = false;
+        protein.native.scale.set(1, 1, 1);
+        protein.chain.scale.set(1, 1, 1);
+        protein.obj.position.set(protein.rx, 0, protein.rz);
+        protein.obj.rotation.set(0, 0, 0);
+        protein.obj.scale.set(1, 1, 1);
+      });
+      membrane.rotation.set(0, 0, 0);
+      membrane.scale.set(1, 1, 1);
+    }
+    function paintFact() {
+      const fact = FACTS[factor];
+      const lipidCell = document.getElementById("lipidEffect");
+      const proteinCell = document.getElementById("proteinEffect");
+      lipidCell.textContent = fact.lipid;
+      proteinCell.textContent = fact.protein;
+      lipidCell.className = fact.dash ? "dash" : "";
+      proteinCell.className = fact.dash ? "dash" : "";
+      document.getElementById("examples").textContent = fact.examples;
+      document.getElementById("speedControl").classList.toggle("on", factor === "solvent" || factor === "detergent");
+      document.getElementById("phControl").classList.toggle("on", factor === "ph");
+      document.getElementById("tempControl").classList.toggle("on", factor === "temp");
+      document.getElementById("pressureControl").classList.toggle("on", factor === "stress");
+      document.querySelectorAll("#factors button").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.factor === factor);
+      });
+    }
+    function begin(next) {
+      factor = next;
+      ph = 7;
+      temp = 37;
+      document.getElementById("phSlider").value = "7";
+      document.getElementById("tempSlider").value = "37";
+      document.getElementById("phRead").textContent = "7.0";
+      document.getElementById("tempRead").textContent = "37°C";
+      resetSheet();
+      effectTime = 0;
+      riderCooldown = 0.3;
+      if (factor === "solvent" || factor === "detergent") fillSolution(factor);
+      else spawnCloud("none", 0);
+      waterField.visible = factor === "stress";
+      paintFact();
+      scene.background.copy(baseBg);
+      scene.fog.color.copy(baseBg);
+    }
+
+    function damageAmount() {
+      if (factor === "ph") return Math.max(0, (3.5 - ph) / 3.5, (ph - 10.5) / 3.5);
+      return 0;
+    }
+    // 0 = still, 1 = mosaic "slightly fluid", 2 = mosaic "medium fluid".
+    // 0–9°C stays still. 10°C is only a little fluid, and 10–20°C grows through slight.
+    // 20–30°C grows into medium. 30–50°C stays at that medium motion.
+    // Above 50°C the same motion strengthens steadily. It does not switch to a fast shake.
+    function fluidLevel(t) {
+      if (t < 10) return 0;
+      if (t <= 20) return 0.2 + ((t - 10) / 10) * 0.8;
+      if (t < 30) return 1 + (t - 20) / 10;
+      if (t <= 50) return 2;
+      return 2 + ((t - 50) / 50) * 0.7;
+    }
+    function proteinDenature(t) {
+      if (t < 60) return 0;
+      return Math.min(1, 0.22 + ((t - 60) / 40) * 0.78);
+    }
+    function backgroundForTemp() {
+      const cold = new THREE.Color(0x123a86);
+      const hot = new THREE.Color(0x8a1a16);
+      const mid = baseBg;
+      const color = new THREE.Color();
+      if (temp <= 37) color.copy(cold).lerp(mid, temp / 37);
+      else color.copy(mid).lerp(hot, (temp - 37) / 63);
+      scene.background.copy(color);
+      scene.fog.color.copy(color);
+    }
+
+    function assignJobs() {
+      if (factor !== "solvent") return;
+      for (let n = 0; n < 8; n += 1) {
+        const bit = molecules.find((item) => item.mode === "drift" && item.holds < 5);
+        const lipid = bit && nearestFree(bit.mesh.position);
+        if (!bit || !lipid) return;
+        lipid.taken = true;
+        bit.lipid = lipid;
+        bit.mode = "seek";
+        bit.carry = 0;
+        lipid.agent = bit;
+      }
+    }
+    function randomFreeLipid() {
+      let any = null;
+      const start = Math.floor(Math.random() * lipids.length);
+      for (let i = 0; i < lipids.length; i += 1) {
+        const lipid = lipids[(start + i) % lipids.length];
+        if (lipid.taken || lipid.obj.parent !== membrane) continue;
+        if (!any) any = lipid;
+        if (lipid.leaflet === "top") return lipid;
+      }
+      return any;
+    }
+    function addRider(kind) {
+      const mesh = kind === "solvent" ? solventMolecule() : detergentMolecule();
+      mesh.position.set(
+        (Math.random() - 0.5) * 64,
+        6.5 + Math.random() * 6,
+        (Math.random() - 0.5) * 48
+      );
+      agents.add(mesh);
+      molecules.push({
+        mesh, kind, mode: "flow", lipid: null, holds: 0, carry: 0,
+        vx: (Math.random() - 0.5) * 0.05,
+        vy: (Math.random() - 0.5) * 0.015,
+        vz: (Math.random() - 0.5) * 0.05,
+        age: Math.random() * 40
+      });
+    }
+    let animSpeed = 1;
+    let riderCooldown = 0.3;
+    function fillSolution(kind) {
+      spawnCloud("none", 0);
+      riderCooldown = 0.3;
+      for (let n = 0; n < 80; n += 1) {
+        const mesh = kind === "solvent" ? solventMolecule() : detergentMolecule();
+        const above = 1;
+        mesh.position.set(
+          (Math.random() - 0.5) * 64,
+          4.6 + Math.random() * 8,
+          (Math.random() - 0.5) * 48
+        );
+        agents.add(mesh);
+        molecules.push({
+          mesh, kind, mode: "flow", lipid: null, holds: 0, carry: 0,
+          vx: (Math.random() - 0.5) * 0.05,
+          vy: (Math.random() - 0.5) * 0.015,
+          vz: (Math.random() - 0.5) * 0.05,
+          age: Math.random() * 40
+        });
+      }
+    }
+    function flowOne(bit) {
+      const s = animSpeed;
+      bit.age += s;
+      bit.vx += Math.sin(bit.age * 0.02 + bit.mesh.position.z) * 0.0007 * s;
+      bit.vz += Math.cos(bit.age * 0.017 + bit.mesh.position.x) * 0.0007 * s;
+      bit.vy += Math.sin(bit.age * 0.013) * 0.00025 * s;
+      bit.vx = Math.max(-0.04, Math.min(0.04, bit.vx));
+      bit.vy = Math.max(-0.018, Math.min(0.018, bit.vy));
+      bit.vz = Math.max(-0.04, Math.min(0.04, bit.vz));
+      const p = bit.mesh.position;
+      p.x += bit.vx * s;
+      p.y += bit.vy * s;
+      p.z += bit.vz * s;
+      if (p.x > 34 || p.x < -34) bit.vx = -bit.vx;
+      if (p.z > 26 || p.z < -26) bit.vz = -bit.vz;
+      if (p.y > 13) bit.vy = -Math.abs(bit.vy || 0.01);
+      if (p.y < 4.2) {
+        p.y = 4.2;
+        bit.vy = Math.abs(bit.vy || 0.01);
+      }
+    }
+    function attractOne(kind, delta) {
+      riderCooldown -= delta * animSpeed;
+      if (riderCooldown > 0) return;
+      let seeking = 0;
+      molecules.forEach((bit) => {
+        if (bit.kind === kind && bit.mode === "seek") seeking += 1;
+      });
+      if (seeking >= 12) return;
+      const lipid = randomFreeLipid();
+      if (!lipid) return;
+      let best = null;
+      let bestD = Infinity;
+      const ly = 6;
+      molecules.forEach((bit) => {
+        if (bit.kind !== kind || bit.mode !== "flow") return;
+        const p = bit.mesh.position;
+        const dist = (p.x - lipid.rx) ** 2 + (p.y - ly) ** 2 + (p.z - lipid.rz) ** 2;
+        if (dist < bestD) {
+          bestD = dist;
+          best = bit;
+        }
+      });
+      if (!best) return;
+      lipid.taken = true;
+      best.lipid = lipid;
+      best.mode = "seek";
+      lipid.agent = best;
+      riderCooldown = 0.2;
+    }
+    function stepRider(bit) {
+      if (bit.mode === "flow") {
+        flowOne(bit);
+        return;
+      }
+      if (bit.mode === "seek") {
+        const lipid = bit.lipid;
+        const p = bit.mesh.position;
+        const dx = lipid.rx - p.x;
+        const dz = lipid.rz - p.z;
+        const horiz = Math.hypot(dx, dz) || 0.0001;
+        const s = animSpeed;
+        if (bit.kind === "solvent") {
+          if (p.y > 4.4) {
+            const step = Math.min(0.18 * s, horiz);
+            p.x += dx / horiz * step;
+            p.z += dz / horiz * step;
+            if (horiz < 0.45) p.y -= 0.24 * s;
+            return;
+          }
+          const close = Math.min(0.45 * s, 0.85);
+          p.x += dx * close;
+          p.z += dz * close;
+          p.y = Math.max(0.35, p.y - 0.24 * s);
+          if (p.y <= 0.35 && horiz < 0.45) {
+            p.set(lipid.rx, 0.35, lipid.rz);
+            bit.mesh.attach(lipid.obj);
+            lipid.obj.visible = true;
+            bit.holds = 1;
+            bit.mode = "rise";
+            if (randomFreeLipid()) addRider("solvent");
+          }
+          return;
+        }
+        const headY = 3.32;
+        const dy = headY - p.y;
+        const dist = Math.hypot(dx, dy, dz) || 0.0001;
+        const step = Math.min(0.2 * animSpeed, dist);
+        p.x += dx / dist * step;
+        p.y = Math.max(headY, p.y + dy / dist * step);
+        p.z += dz / dist * step;
+        if (dist < 0.45) {
+          p.set(lipid.rx, headY, lipid.rz);
+          bit.mesh.attach(lipid.obj);
+          lipid.obj.visible = true;
+          bit.holds = 1;
+          bit.mode = "rise";
+          if (randomFreeLipid()) addRider("detergent");
+        }
+        return;
+      }
+      if (bit.mode === "rise") {
+        bit.mesh.position.y += 0.36 * animSpeed;
+        if (bit.mesh.position.y > 24) {
+          if (bit.mesh.parent) bit.mesh.parent.remove(bit.mesh);
+          bit.mode = "gone";
+        }
+      }
+    }
+    function meetPoint(lipid) {
+      if (factor === "solvent") return tailPoint(lipid);
+      const head = headPoint(lipid);
+      const tail = tailPoint(lipid);
+      aim.copy(head).sub(tail);
+      if (aim.lengthSq() < 0.001) return head;
+      aim.normalize();
+      return head.clone().addScaledVector(aim, -0.55);
+    }
+    function stepSeek(bit) {
+      const lipid = bit.lipid;
+      if (!lipid || lipid.obj.parent !== membrane) {
+        bit.lipid = null;
+        bit.mode = "drift";
+        return;
+      }
+      const goal = meetPoint(lipid);
+      const p = bit.mesh.position;
+      const dx = goal.x - p.x;
+      const dy = goal.y - p.y;
+      const dz = goal.z - p.z;
+      const dist = Math.hypot(dx, dy, dz) || 0.0001;
+      if (factor !== "detergent") {
+        const pull = Math.min(0.07, dist);
+        lipid.obj.position.x += (p.x - goal.x) / dist * pull;
+        lipid.obj.position.y += (p.y - goal.y) / dist * pull;
+        lipid.obj.position.z += (p.z - goal.z) / dist * pull;
+      }
+      const step = Math.min(0.16, dist);
+      p.x += dx / dist * step;
+      p.y += dy / dist * step;
+      p.z += dz / dist * step;
+      if (factor === "detergent") {
+        aim.copy(headPoint(lipid)).sub(tailPoint(lipid));
+        if (aim.lengthSq() > 0.001) {
+          aim.normalize();
+          bit.mesh.quaternion.setFromUnitVectors(up, aim);
+        }
+      }
+      if (dist < 0.75) stick(bit);
+    }
+    function stick(bit) {
+      const first = bit.lipid;
+      const patch = [first];
+      patch.forEach((lipid, index) => {
+        lipid.taken = true;
+        lipid.agent = bit;
+        bit.mesh.attach(lipid.obj);
+        if (factor !== "detergent") {
+          lipid.obj.position.x += Math.cos(index * 1.4) * 1.5;
+          lipid.obj.position.z += Math.sin(index * 1.4) * 1.5;
+        }
+        lipid.obj.visible = true;
+        bit.holds += 1;
+      });
+      bit.mode = "carry";
+      bit.carry = 0;
+    }
+    function stepCarry(bit) {
+      const lipid = bit.lipid;
+      const sign = lipid.leaflet === "top" ? 1 : -1;
+      const lift = factor === "detergent" ? 0.16 : 0.08;
+      bit.mesh.position.y += sign * lift;
+      const ox = bit.mesh.position.x;
+      const oz = bit.mesh.position.z;
+      const flat = Math.hypot(ox, oz) || 1;
+      const spread = factor === "detergent" ? 0.07 : 0.025;
+      bit.mesh.position.x += (ox / flat) * spread;
+      bit.mesh.position.z += (oz / flat) * spread;
+      bit.carry += 1;
+      const done = factor === "detergent" ? 50 : 80;
+      const full = factor === "detergent" ? 1 : 5;
+      if (bit.carry > done) {
+        bit.lipid = null;
+        bit.mode = bit.holds >= full ? "away" : "drift";
+      }
+    }
+    function stepAway(bit) {
+      const sign = bit.mesh.position.y >= 0 ? 1 : -1;
+      bit.mesh.position.y += sign * 0.015;
+      if (Math.abs(bit.mesh.position.y) > 18) bit.mesh.position.y = sign * 18;
+    }
+    function drift(bit) {
+      if (factor === "stress") return;
+      const lipid = nearestFree(bit.mesh.position);
+      if (!lipid) {
+        stepAway(bit);
+        return;
+      }
+      const goalY = lipid.leaflet === "top" ? 4.2 : -4.2;
+      bit.mesh.position.x += (lipid.rx - bit.mesh.position.x) * 0.04;
+      bit.mesh.position.y += (goalY - bit.mesh.position.y) * 0.04;
+      bit.mesh.position.z += (lipid.rz - bit.mesh.position.z) * 0.04;
+    }
+    function updateStress(delta) {
+      const p = Math.max(0, Math.min(1, pressure / 100));
+      const active = Math.round(p * waterMax);
+      const stretch = 1 + p * 0.72;
+      const bulge = p * (28 + Math.sin(time * 1.15) * 1.6);
+      const dt = Math.min(delta, 0.05);
+      function curl(x, z) {
+        const u = Math.min(1, Math.hypot(x / 34, z / 25));
+        return Math.pow(Math.cos(u * Math.PI * 0.5), 0.28);
+      }
+      waterField.count = active;
+      waterField.visible = active > 0;
+      for (let i = 0; i < active; i += 1) {
+        const bit = waterBits[i];
+        const ceiling = bulge * curl(bit.x, bit.z) - 3.8;
+        bit.vx += Math.sin(time * 0.7 + bit.z * 0.11 + bit.seed) * 3.1 * dt;
+        bit.vz += Math.cos(time * 0.55 + bit.x * 0.11 + bit.seed) * 3.1 * dt;
+        bit.vy += (1.15 + p * 1.5) * dt;
+        const drag = Math.max(0.9, 1 - 1.8 * dt);
+        bit.vx = Math.max(-2.2, Math.min(2.2, bit.vx * drag));
+        bit.vy = Math.max(-0.4, Math.min(2.6, bit.vy * drag));
+        bit.vz = Math.max(-2.2, Math.min(2.2, bit.vz * drag));
+        const speed = 2.2 + p * 2.2;
+        bit.x += bit.vx * speed * dt;
+        bit.y += bit.vy * speed * dt;
+        bit.z += bit.vz * speed * dt;
+        if (bit.x > 32 || bit.x < -32) {
+          bit.vx = -bit.vx * 0.85;
+          bit.x = Math.max(-32, Math.min(32, bit.x));
+        }
+        if (bit.z > 24 || bit.z < -24) {
+          bit.vz = -bit.vz * 0.85;
+          bit.z = Math.max(-24, Math.min(24, bit.z));
+        }
+        if (bit.y > ceiling) {
+          bit.y = ceiling;
+          bit.vy = 0.2;
+          bit.vx += Math.sign(bit.x || 1) * 0.35 * dt;
+          bit.vz += Math.sign(bit.z || 1) * 0.35 * dt;
+        }
+        if (bit.y < -18) {
+          bit.y = -18;
+          bit.vy = 0.8;
+        }
+        waterDummy.position.set(bit.x * stretch, bit.y, bit.z * stretch);
+        waterDummy.scale.setScalar(bit.scale);
+        waterDummy.rotation.set(0, 0, 0);
+        waterDummy.updateMatrix();
+        waterField.setMatrixAt(i, waterDummy.matrix);
+      }
+      if (active > 0) waterField.instanceMatrix.needsUpdate = true;
+      membrane.scale.set(stretch, 1, stretch);
+      lipids.forEach((lipid) => {
+        if (lipid.obj.parent !== membrane) return;
+        const height = bulge * curl(lipid.rx, lipid.rz);
+        const slopeX = bulge * curl(lipid.rx + 1.1, lipid.rz) - height;
+        const slopeZ = bulge * curl(lipid.rx, lipid.rz + 1.1) - height;
+        lipid.obj.position.set(lipid.rx, height, lipid.rz);
+        lipid.obj.rotation.set(-Math.atan2(slopeZ, 1.1), 0, Math.atan2(slopeX, 1.1));
+      });
+      proteins.forEach((protein) => {
+        const height = bulge * curl(protein.rx, protein.rz);
+        const slopeX = bulge * curl(protein.rx + 1.1, protein.rz) - height;
+        const slopeZ = bulge * curl(protein.rx, protein.rz + 1.1) - height;
+        protein.obj.position.set(protein.rx, height, protein.rz);
+        protein.obj.rotation.set(-Math.atan2(slopeZ, 1.1), 0, Math.atan2(slopeX, 1.1));
+        protein.native.visible = true;
+        protein.chain.visible = false;
+        protein.native.scale.set(1, 1, 1);
+      });
+      if (!userMoved) {
+        camera.position.set(118, 16, 48);
+        controls.target.set(0, 8, 0);
+      }
+    }
+    function placeByFluid(obj, restX, restZ, seed, kind, level) {
+      obj.rotation.x = 0;
+      obj.rotation.z = 0;
+      if (level <= 0) {
+        obj.position.set(restX, 0, restZ);
+        return;
+      }
+      const slight = Math.min(1, level);
+      const bob = (kind === "protein" ? 0.05 : 0.12) * slight;
+      const drift = (kind === "protein" ? 0.06 : 0.05) * slight;
+      const speed = (kind === "protein" ? 0.25 : 0.35) * (0.75 + 0.25 * slight);
+      const bobSpeed = (kind === "protein" ? 0.8 : 1.1) * (0.8 + 0.2 * slight);
+      const sx = restX + Math.sin(time * speed + seed) * drift;
+      const sy = Math.sin(time * bobSpeed + seed) * bob;
+      const sz = restZ + Math.cos(time * speed + seed) * drift;
+      if (level <= 1) {
+        obj.position.set(sx, sy, sz);
+        return;
+      }
+      const blend = Math.min(1, level - 1);
+      const hot = Math.max(0, level - 2);
+      const reach = 1 + hot * 0.55;
+      const pace = 1 + hot * 0.2;
+      const wave = Math.sin(time * 3.1 + restX * 0.24) * 1.2 + Math.sin(time * 2.05 + restZ * 0.2) * 0.75;
+      const slide = 0.72 * reach;
+      const speedX = (kind === "protein" ? 0.55 : 0.9) * pace;
+      const speedZ = (kind === "protein" ? 0.45 : 0.7) * pace;
+      const mx = restX + Math.sin(time * speedX + seed) * slide;
+      const my = wave * (1 + hot * 0.12);
+      const mz = restZ + Math.cos(time * speedZ + seed) * slide * 0.65;
+      obj.position.set(
+        sx * (1 - blend) + mx * blend,
+        sy * (1 - blend) + my * blend,
+        sz * (1 - blend) + mz * blend
+      );
+    }
+    function updateTemperature() {
+      const level = fluidLevel(temp);
+      const denature = proteinDenature(temp);
+      lipids.forEach((lipid) => {
+        if (lipid.obj.parent !== membrane) return;
+        placeByFluid(lipid.obj, lipid.rx, lipid.rz, lipid.seed, "lipid", level);
+      });
+      proteins.forEach((protein) => {
+        placeByFluid(protein.obj, protein.rx, protein.rz, protein.rx * 0.17, "protein", level);
+        protein.native.visible = denature < 0.98;
+        protein.chain.visible = denature > 0;
+        protein.native.scale.setScalar(denature >= 1 ? 0.001 : 1 - denature);
+        protein.chain.scale.setScalar(denature > 0 ? 0.62 + denature * 0.38 : 0.001);
+        protein.chain.rotation.y = time * (0.22 + denature * 0.35);
+      });
+    }
+    function updateShiver(amount) {
+      lipids.forEach((lipid) => {
+        if (lipid.taken || lipid.obj.parent !== membrane) return;
+        const wobble = amount * 0.85;
+        lipid.obj.position.set(
+          lipid.rx + Math.sin(time * 18 + lipid.seed) * wobble,
+          Math.sin(time * 22 + lipid.seed * 2) * wobble * 0.65,
+          lipid.rz + Math.cos(time * 16 + lipid.seed) * wobble
+        );
+        lipid.obj.rotation.z = Math.sin(time * 14 + lipid.seed) * amount * 0.35;
+      });
+      proteins.forEach((protein) => {
+        const showLine = amount > 0.18;
+        protein.native.visible = !showLine;
+        protein.chain.visible = showLine;
+        protein.chain.rotation.y = time * (0.4 + amount);
+        protein.obj.position.set(
+          protein.rx + Math.sin(time * 10 + protein.rx) * amount * 0.2,
+          0,
+          protein.rz
+        );
+      });
+    }
+    function updateDissolve(delta) {
+      if (factor === "solvent" || factor === "detergent") {
+        attractOne(factor, delta);
+        molecules.forEach((bit) => {
+          if (bit.kind === factor && bit.mode !== "gone") stepRider(bit);
+        });
+        for (let i = molecules.length - 1; i >= 0; i -= 1) {
+          if (molecules[i].mode === "gone") molecules.splice(i, 1);
+        }
+        proteins.forEach((protein) => {
+          protein.native.visible = false;
+          protein.chain.visible = true;
+          protein.chain.rotation.y += 0.008 * animSpeed;
+          protein.obj.position.y = 0;
+        });
+        return;
+      }
+      assignJobs();
+      const removed = lipids.filter((lipid) => lipid.taken).length / lipids.length;
+      molecules.forEach((bit) => {
+        if (bit.mode === "drift") drift(bit);
+        else if (bit.mode === "seek") stepSeek(bit);
+        else if (bit.mode === "carry") stepCarry(bit);
+        else stepAway(bit);
+      });
+      if (factor === "solvent") {
+        const amount = Math.min(1, effectTime / 2.2);
+        proteins.forEach((protein) => {
+          const showLine = amount > 0.35;
+          protein.native.visible = !showLine;
+          protein.chain.visible = showLine;
+          protein.chain.rotation.y += 0.01;
+        });
+      } else {
+        proteins.forEach((protein) => {
+          protein.native.visible = true;
+          protein.chain.visible = false;
+          protein.loose = Math.min(6, protein.loose + removed * 0.03);
+          protein.obj.position.y = protein.loose;
+        });
+      }
+    }
+
+    let userMoved = false;
+    controls.addEventListener("start", () => { userMoved = true; });
+    function frameCamera() {
+      if (userMoved) return;
+      membrane.position.set(0, 0, 0);
+      agents.position.set(0, 0, 0);
+      controls.target.set(0, 0, 0);
+      camera.position.set(0, 22, 48);
+      controls.update();
+    }
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      const w = Math.max(2, rect.width);
+      const h = Math.max(2, rect.height);
+      if (canvas.width !== Math.round(w * renderer.getPixelRatio())) {
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      }
+      frameCamera();
+    }
+    function frame() {
+      resize();
+      const delta = Math.min(clock.getDelta(), 0.05);
+      time += delta;
+      effectTime += delta;
+      if (factor === "temp") backgroundForTemp();
+      else {
+        scene.background.copy(baseBg);
+        scene.fog.color.copy(baseBg);
+      }
+      if (factor === "solvent" || factor === "detergent") updateDissolve(delta);
+      else if (factor === "temp") updateTemperature();
+      else if (factor === "ph") updateShiver(Math.min(1, damageAmount()));
+      else if (factor === "stress") updateStress(delta);
+      controls.update();
+      renderer.render(scene, camera);
+      requestAnimationFrame(frame);
+    }
+
+    document.getElementById("factors").addEventListener("click", (event) => {
+      const btn = event.target.closest("button");
+      if (!btn) return;
+      begin(btn.dataset.factor);
+    });
+    document.getElementById("replay").addEventListener("click", () => begin(factor));
+    document.getElementById("phSlider").addEventListener("input", (event) => {
+      ph = Number(event.target.value);
+      document.getElementById("phRead").textContent = ph.toFixed(1);
+    });
+    document.getElementById("tempSlider").addEventListener("input", (event) => {
+      temp = Number(event.target.value);
+      document.getElementById("tempRead").textContent = `${temp}°C`;
+    });
+    document.getElementById("speedSlider").addEventListener("input", (event) => {
+      animSpeed = Number(event.target.value);
+      const shown = Number.isInteger(animSpeed) ? String(animSpeed) : animSpeed.toFixed(2).replace(/0$/, "");
+      document.getElementById("speedRead").textContent = `${shown}×`;
+    });
+    document.getElementById("pressureSlider").addEventListener("input", (event) => {
+      pressure = Number(event.target.value);
+      document.getElementById("pressureRead").textContent = String(pressure);
+    });
+    begin("solvent");
+    requestAnimationFrame(frame);
+  </script>
+</body>
+</html>

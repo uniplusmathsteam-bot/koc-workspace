@@ -1,0 +1,2774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Food and Humans</title>
+  <style>
+    :root {
+      --card: #fffdf8;
+      --ink: #241f1a;
+      --line: #e7dccb;
+      --moss: #2f4a3c;
+      --wash: #f6f0e4;
+      --brand-gold: #e8c96a;
+      --brand-gold-wash: #f5e6b8;
+      --media-col: 280px;
+      --media-frame-h: 220px;
+      --media-frame-h-lg: 280px;
+      --media-frame-h-sm: 190px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+      background:
+        radial-gradient(900px 420px at 50% -80px, #f7f1e6, transparent 70%),
+        #e5ddd0;
+    }
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 32px auto 56px;
+    }
+    .mast {
+      background:
+        linear-gradient(180deg, var(--brand-gold-wash) 0, var(--card) 132px);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: 18px 28px 28px 44px;
+      margin-bottom: 18px;
+      box-shadow: 0 16px 40px rgba(55, 40, 18, 0.05);
+    }
+    .brand-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px 16px;
+      margin: 0 0 22px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(36, 31, 26, 0.08);
+    }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--moss);
+      color: #f7f3ea;
+      flex: none;
+    }
+    .brand-mark svg { display: block; }
+    .brand-series {
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--moss);
+    }
+    .brand-tag {
+      margin-left: auto;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: #6a5f52;
+    }
+    .mast-subtitle {
+      margin: -6px 0 16px;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5c5348;
+    }
+    h1 {
+      margin: 0 0 14px;
+      font-size: 56px;
+      line-height: 0.92;
+      letter-spacing: -0.03em;
+    }
+    h1::after {
+      content: "";
+      display: block;
+      width: 72px;
+      height: 4px;
+      margin-top: 16px;
+      border-radius: 4px;
+      background: var(--moss);
+    }
+    .lead {
+      margin: 0 0 10px;
+      max-width: 40em;
+      font-size: 22px;
+      line-height: 1.35;
+    }
+    .lead:last-child { margin-bottom: 0; }
+    section {
+      --chapter-accent: var(--moss);
+      --chapter-wash: var(--wash);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 22px 18px 18px 28px;
+      margin-bottom: 14px;
+      box-shadow:
+        inset 5px 0 0 var(--chapter-accent),
+        0 10px 28px rgba(55, 40, 18, 0.04);
+    }
+    section.chapter-molecule {
+      --chapter-accent: #2f4a3c;
+      --chapter-wash: #eef3ef;
+    }
+    section.chapter-nutrient {
+      --chapter-accent: #3d5a6c;
+      --chapter-wash: #eef2f5;
+    }
+    section.chapter-health {
+      --chapter-accent: #9a6b2f;
+      --chapter-wash: #f8f0e4;
+    }
+    section.chapter-lab {
+      --chapter-accent: #2f4d7a;
+      --chapter-wash: #ebf0f8;
+    }
+    section.chapter-diet {
+      --chapter-accent: #8a4a32;
+      --chapter-wash: #f7ebe4;
+    }
+    section.chapter-poster {
+      --chapter-accent: var(--brand-gold);
+      --chapter-wash: #faf3df;
+      background: linear-gradient(180deg, #fffdf8 0, var(--chapter-wash) 100%);
+    }
+    section.chapter .num { background: var(--chapter-accent); }
+    section.chapter h3 { color: var(--chapter-accent); }
+    section.chapter .key-idea { background: var(--chapter-wash); }
+    section.chapter > .copy > ul > li::before,
+    section.chapter .copy > ul > li::before { background: var(--chapter-accent); }
+    section.at-a-glance {
+      padding-top: 20px;
+    }
+    .key-idea-label {
+      display: inline-block;
+      margin: 0 0 10px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: var(--brand-gold);
+      color: var(--ink);
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .key-idea--hero {
+      border: 1px solid rgba(36, 31, 26, 0.06);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    }
+    .key-idea--hero ul {
+      margin: 0;
+      padding-left: 1.15em;
+      list-style: disc;
+    }
+    .key-idea--hero li {
+      margin: 0 0 6px;
+      font-size: 17px;
+      line-height: 1.4;
+    }
+    .key-idea--hero li:last-child { margin-bottom: 0; }
+    .glance-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+      margin: 0 0 4px;
+    }
+    .cheat-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+      line-height: 1.35;
+    }
+    .cheat-table th,
+    .cheat-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+    .cheat-table th {
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--chapter-accent, var(--moss));
+      background: var(--chapter-wash, var(--wash));
+    }
+    .cheat-table tr:last-child td { border-bottom: 0; }
+    .cheat-table td:first-child { font-weight: 600; }
+    .page-footer {
+      margin-top: 6px;
+      padding: 22px 28px 24px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow:
+        inset 5px 0 0 var(--moss),
+        0 10px 28px rgba(55, 40, 18, 0.04);
+    }
+    .why-matters {
+      margin: 0 0 14px;
+      padding: 14px 16px;
+      background: var(--wash);
+      border-radius: 16px;
+    }
+    .why-matters ul {
+      margin: 8px 0 0;
+      padding-left: 1.15em;
+    }
+    .why-matters li {
+      margin: 0 0 6px;
+      font-size: 17px;
+      line-height: 1.45;
+    }
+    .why-matters li:last-child { margin-bottom: 0; }
+    .page-credit {
+      margin: 0;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      color: #7a7064;
+    }
+    .mast:has(> .gif-slot),
+    section:has(> .gif-slot) {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) var(--media-col);
+      column-gap: 22px;
+      align-items: start;
+    }
+    .gif-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) var(--media-col);
+      column-gap: 22px;
+      align-items: stretch;
+      margin: 0 0 12px;
+    }
+    .gif-row > .type-card {
+      align-self: stretch;
+      align-content: start;
+    }
+    .gif-row:last-child { margin-bottom: 0; }
+    .copy { min-width: 0; }
+    .gif-slot {
+      margin: 0;
+      padding: 0;
+      min-width: 0;
+    }
+    .gif-slot:has(> img):not(.media-stack),
+    .gif-slot:has(> video):not(.media-stack) {
+      height: var(--media-frame-h);
+      display: grid;
+      place-items: center;
+      background: var(--wash);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .gif-slot > img,
+    .gif-slot > video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      border-radius: 0;
+    }
+    .type-grid .gif-row { margin: 0; }
+    .share-row {
+      grid-template-columns: minmax(0, 1fr) var(--media-col);
+      align-items: stretch;
+    }
+    .share-row > .gif-slot:has(> img:only-child):not(.media-stack),
+    .share-row > .gif-slot:has(> video:only-child):not(.media-stack) {
+      height: var(--media-frame-h-lg);
+      align-self: center;
+    }
+    .card-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+    .media-stack {
+      display: grid;
+      gap: 12px;
+      align-self: center;
+      background: transparent;
+      height: auto;
+      overflow: visible;
+    }
+    .media-stack > img,
+    .media-stack > video {
+      width: 100%;
+      height: var(--media-frame-h-sm);
+      object-fit: contain;
+      display: block;
+      background: var(--wash);
+      border-radius: 16px;
+      box-sizing: border-box;
+    }
+    .media-labeled {
+      margin: 0;
+      display: grid;
+      gap: 6px;
+    }
+    .media-label {
+      margin: 0;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--moss);
+    }
+    .media-caption {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.35;
+    }
+    .media-labeled img,
+    .media-labeled video {
+      width: 100%;
+      height: var(--media-frame-h-sm);
+      object-fit: contain;
+      display: block;
+      background: var(--wash);
+      border-radius: 16px;
+      box-sizing: border-box;
+    }
+    .media-placeholder {
+      height: var(--media-frame-h-lg);
+      min-height: var(--media-frame-h-lg);
+      margin: 0;
+      padding: 12px;
+      border: 1px dashed #c9baa6;
+      border-radius: 16px;
+      background: #fffdf8;
+      display: grid;
+      place-content: center;
+      text-align: center;
+      color: #7a6f62;
+      font-size: 15px;
+      line-height: 1.35;
+    }
+    .deficiency-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) var(--media-col);
+      column-gap: 22px;
+      align-items: start;
+      margin: 0 0 18px;
+    }
+    .deficiency-row:last-child { margin-bottom: 0; }
+    .sec {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .num {
+      flex: none;
+      min-width: 36px;
+      height: 36px;
+      padding: 0 8px;
+      border-radius: 12px;
+      background: var(--moss);
+      color: #f7f3ea;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      display: grid;
+      place-items: center;
+    }
+    h2 { margin: 0; font-size: 28px; letter-spacing: -0.02em; }
+    h3 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 6px 0 10px;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--moss);
+    }
+    h3::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+    ul, ol { margin: 0 0 16px; padding-left: 1.15em; }
+    li { margin: 0 0 8px; font-size: 18px; line-height: 1.45; }
+    section > ul { list-style: none; padding-left: 0; }
+    section > ul > li {
+      position: relative;
+      padding-left: 16px;
+    }
+    section > ul > li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.62em;
+      width: 6px;
+      height: 6px;
+      border-radius: 2px;
+      background: var(--moss);
+    }
+    .group {
+      list-style: none;
+      margin: 0 0 16px;
+      padding: 12px 16px 4px 18px;
+      background: var(--wash);
+      border-radius: 16px;
+    }
+    .group > li { padding-left: 0; }
+    .group > li::before { content: none; }
+    .group ul {
+      margin: 8px 0 4px;
+      padding: 2px 0 2px 14px;
+      border-left: 2px solid #ddd2c0;
+      list-style: none;
+    }
+    .group ul li { font-size: 17px; }
+    ol {
+      list-style: none;
+      padding-left: 0;
+      counter-reset: step;
+    }
+    ol li {
+      counter-increment: step;
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 11px 0;
+      border-top: 1px solid var(--line);
+    }
+    ol li:last-child { border-bottom: 1px solid var(--line); }
+    ol li::before {
+      content: counter(step, decimal-leading-zero);
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--moss);
+      padding-top: 3px;
+    }
+    ol.steps {
+      margin: 0;
+      padding: 0;
+    }
+    ol.steps li {
+      grid-template-columns: 22px 1fr;
+      gap: 8px;
+      padding: 0 0 6px;
+      border: none;
+    }
+    ol.steps li:last-child { border: none; margin-bottom: 0; }
+    ol.steps li::before { content: counter(step) "."; }
+    .bullets {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .bullets li {
+      position: relative;
+      margin: 0 0 6px;
+      padding-left: 16px;
+    }
+    .bullets li:last-child { margin-bottom: 0; }
+    .type-card > .bullets {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      align-self: center;
+    }
+    .bullets li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.55em;
+      width: 6px;
+      height: 6px;
+      border-radius: 2px;
+      background: var(--moss);
+    }
+    .key-idea {
+      margin: 0 0 16px;
+      padding: 14px 16px;
+      background: var(--wash);
+      border-radius: 16px;
+    }
+    .key-idea p {
+      margin: 0 0 8px;
+      font-size: 18px;
+      line-height: 1.45;
+    }
+    .key-idea p:last-child { margin-bottom: 0; }
+    .type-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin: 0 0 16px;
+    }
+    .carb-family {
+      --family: #8a6420;
+      --family-wash: #f8f0dc;
+      --family-ink: #6d5018;
+      margin: 0;
+      padding: 16px 14px 14px;
+      border: 1px solid #e4d3ae;
+      border-radius: 20px;
+      background: linear-gradient(180deg, var(--family-wash) 0, #fffdf8 78px);
+      box-shadow: inset 5px 0 0 var(--family);
+    }
+    .carb-di {
+      --family: #8d4a32;
+      --family-wash: #f7ebe4;
+      --family-ink: #6e3a26;
+      border-color: #e4cfc4;
+    }
+    .carb-poly {
+      --family: #2f4a3c;
+      --family-wash: #e7efe9;
+      --family-ink: #24382e;
+      border-color: #c9d7cc;
+    }
+    .family-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 0 0 12px;
+      padding: 0 6px;
+    }
+    .family-thumb {
+      flex: none;
+      width: 108px;
+      height: 68px;
+      margin-left: auto;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .family-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+    }
+    .family-head h3 {
+      margin: 0;
+      color: var(--family-ink);
+    }
+    .family-head h3::after { content: none; }
+    .family-note {
+      margin: 3px 0 0;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+      font-size: 15px;
+      font-weight: 400;
+      letter-spacing: 0;
+      text-transform: none;
+      color: var(--ink);
+      line-height: 1.35;
+    }
+    .section-note {
+      margin: -4px 0 12px;
+      font-size: 16px;
+      line-height: 1.4;
+      color: var(--ink);
+    }
+    .food-cue-grid .type-card {
+      background: var(--wash);
+    }
+    .sugar-art {
+      flex: none;
+      display: block;
+      color: var(--family);
+    }
+    .family-cards {
+      display: grid;
+      gap: 10px;
+    }
+    .carb-family .type-card {
+      background: #fffdf8;
+      border: 1px solid rgba(36, 31, 26, 0.06);
+    }
+    .carb-family .examples { color: var(--family-ink); }
+    .steroid-family {
+      --family: #5a3d5c;
+      --family-wash: #f3eaf1;
+      --family-ink: #4a324c;
+      border-color: #dccfdb;
+    }
+    .props ol.steps {
+      margin: 3px 0 0;
+    }
+    .props ol.steps li {
+      font-size: 16px;
+      line-height: 1.4;
+      margin: 0;
+    }
+    .compare-table th.kind-mono {
+      color: #6d5018;
+      box-shadow: inset 0 -3px 0 #d4a84b;
+    }
+    .compare-table th.kind-di {
+      color: #6e3a26;
+      box-shadow: inset 0 -3px 0 #c4846a;
+    }
+    .compare-table th.kind-poly {
+      color: #24382e;
+      box-shadow: inset 0 -3px 0 #6d8f7c;
+    }
+    .type-card {
+      display: grid;
+      grid-template-columns: minmax(148px, 210px) minmax(0, 1fr);
+      column-gap: 22px;
+      align-items: start;
+      margin: 0;
+      padding: 14px 16px 12px;
+      background: var(--wash);
+      border-radius: 16px;
+    }
+    .type-card h4 {
+      grid-column: 1;
+      grid-row: 1;
+      margin: 0 0 4px;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+    }
+    .examples {
+      grid-column: 1;
+      grid-row: 2;
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.4;
+    }
+    .props {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      align-self: center;
+      margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 28px;
+    }
+    .props div { margin-top: 0; }
+    .props dt {
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--moss);
+    }
+    .props dd {
+      margin: 3px 0 0;
+      font-size: 16px;
+      line-height: 1.4;
+    }
+    .water-grid .props {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .water-grid .props div {
+      width: 100%;
+    }
+    .water-intro .gif-slot > img,
+    .water-grid .gif-slot > img {
+      width: 100%;
+      height: var(--media-frame-h);
+      object-fit: contain;
+      object-position: center;
+    }
+    .scroll {
+      overflow-x: auto;
+      margin: 0 0 16px;
+    }
+    .compare-table {
+      width: 100%;
+      min-width: 640px;
+      border-collapse: collapse;
+      font-size: 16px;
+      line-height: 1.4;
+    }
+    .compare-table th,
+    .compare-table td {
+      text-align: left;
+      vertical-align: top;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .compare-table th {
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--moss);
+    }
+    .compare-table td .bullets {
+      margin: 0;
+      padding: 0;
+    }
+    .compare-table td .bullets > li {
+      font-size: 16px;
+      line-height: 1.4;
+    }
+    .compare-table td .bullets > li.shot-row {
+      display: grid;
+      grid-template-columns: minmax(11rem, 1fr) 200px;
+      gap: 8px 14px;
+      align-items: center;
+    }
+    .compare-table td .bullets > li.shot-row > span,
+    .compare-table td .bullets > li.shot-row > div {
+      grid-column: 1;
+      grid-row: 1;
+      min-width: 11rem;
+    }
+    .compare-table td .bullets > li.shot-row > img {
+      width: 200px;
+      height: 132px;
+      object-fit: contain;
+      background: #fff;
+      border-radius: 12px;
+      grid-column: 2;
+      grid-row: 1;
+    }
+    .compare-table td .bullets > li.shot-row:has(> div > ul.bullets) {
+      padding-left: 0;
+    }
+    .compare-table td .bullets > li.shot-row:has(> div > ul.bullets)::before {
+      content: none;
+    }
+    .compare-table td .shot-row > div > ul.bullets {
+      margin: 0;
+      padding: 0;
+      border: none;
+    }
+    .compare-table td .shot-row > div > ul.bullets > li {
+      font-size: 16px;
+      padding-left: 16px;
+    }
+    .compare-table td .shot-row > div > ul.bullets > li::before {
+      width: 6px;
+      height: 6px;
+      top: 0.55em;
+    }
+    .deficiency-row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .compare-table td .bullets ul,
+    .copy .bullets > li > ul {
+      margin: 6px 0 4px;
+      padding: 2px 0 2px 14px;
+      border-left: 2px solid #ddd2c0;
+      list-style: none;
+    }
+    .compare-table td .bullets ul li,
+    .copy .bullets > li > ul li {
+      position: relative;
+      margin: 0 0 4px;
+      padding-left: 14px;
+      font-size: 15px;
+      line-height: 1.35;
+    }
+    .compare-table td .bullets ul li::before,
+    .copy .bullets > li > ul li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.52em;
+      width: 5px;
+      height: 5px;
+      border-radius: 2px;
+      background: var(--moss);
+    }
+    .compare-table .size-media {
+      margin: 10px 0 0;
+      min-height: 140px;
+    }
+    .compare-table .size-media img,
+    .compare-table .size-media video {
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      max-height: 180px;
+      object-fit: contain;
+      display: block;
+      border-radius: 12px;
+      background: #fff;
+    }
+    .nutri-row { min-width: 760px; }
+    @media (max-width: 800px) {
+      .mast, section {
+        grid-template-columns: 1fr;
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+      .mast:has(> .gif-slot),
+      section:has(> .gif-slot),
+      .gif-row {
+        grid-template-columns: 1fr;
+      }
+      .gif-slot { margin-top: 8px; }
+      :root {
+        --media-frame-h: 200px;
+        --media-frame-h-lg: 240px;
+        --media-frame-h-sm: 172px;
+      }
+      .type-card { grid-template-columns: 1fr; row-gap: 8px; }
+      .type-card h4,
+      .examples,
+      .props,
+      .type-card > .bullets { grid-column: 1; grid-row: auto; }
+      h1 { font-size: 40px; }
+      .lead, .key-idea p, li { font-size: 17px; }
+      .type-card h4 { font-size: 18px; }
+      .family-head { align-items: flex-start; }
+      .sugar-art { margin-top: 2px; }
+      .family-thumb { width: 88px; height: 56px; }
+      .deficiency-row { grid-template-columns: 1fr; }
+      .deficiency-row .media-placeholder { margin-top: 10px; }
+      .brand-tag { margin-left: 0; width: 100%; }
+      .glance-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Edit the words under each heading. -->
+  <div class="page">
+    <header class="mast">
+      <div class="copy">
+      <div class="brand-bar">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 36 40" width="22" height="24" focusable="false">
+            <polygon points="18,3 32,11.5 32,28.5 18,37 4,28.5 4,11.5" fill="currentColor" fill-opacity="0.22" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span class="brand-series">BB02 · Molecules of Life</span>
+        <span class="brand-tag">Nutrients · Tests · Balance</span>
+      </div>
+      <h1>Food and Humans</h1>
+      <p class="mast-subtitle">One-page revision from Ch5 notes</p>
+      <p class="lead">Organic molecules contain C–C or C–H bonds. Carbon dioxide is not organic.</p>
+      <p class="lead">Seven nutrient groups: carbohydrates, lipids, proteins, dietary fibre, vitamins, minerals and ions, and water. Nucleic acids carry genetic information. They are not an energy food.</p>
+      <div class="scroll">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Examples</th>
+              <th>Nature</th>
+              <th>Energy</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Primary foods</td>
+              <td>Carbohydrates, proteins</td>
+              <td>Organic</td>
+              <td>About 17 kJ/g</td>
+            </tr>
+            <tr>
+              <td>Primary foods</td>
+              <td>Lipids</td>
+              <td>Organic</td>
+              <td>About 37 kJ/g, about twice the others</td>
+            </tr>
+            <tr>
+              <td>Protective foods</td>
+              <td>Dietary fibre, vitamins</td>
+              <td>Organic</td>
+              <td>No energy value</td>
+            </tr>
+            <tr>
+              <td>Protective foods</td>
+              <td>Minerals, ions, water</td>
+              <td>Inorganic</td>
+              <td>No energy value</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      </div>
+    </header>
+
+    <section class="chapter chapter-poster at-a-glance" id="at-a-glance">
+      <div class="copy">
+      <p class="key-idea-label">Key idea</p>
+      <div class="key-idea key-idea--hero">
+        <ul>
+          <li>Seven nutrient groups fuel, build, and protect the body; nucleic acids carry information but are not energy food.</li>
+          <li>Condensation builds molecules and loses water; hydrolysis breaks them down and gains water.</li>
+          <li>Too little or too much of a nutrient causes disease; food tests show positive results as colour changes or spots.</li>
+          <li>A balanced diet matches energy in with energy out for your age, activity, and life stage.</li>
+        </ul>
+      </div>
+      <div class="glance-grid">
+        <div>
+          <h3>Food test colours</h3>
+          <table class="cheat-table">
+            <thead>
+              <tr>
+                <th scope="col">Test</th>
+                <th scope="col">Positive</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Clinistix (glucose)</td><td>Pink → purple</td></tr>
+              <tr><td>Benedict’s</td><td>Brick-red precipitate</td></tr>
+              <tr><td>Iodine (starch)</td><td>Brown → blue-black</td></tr>
+              <tr><td>Albustix (protein)</td><td>Yellow → blue-green</td></tr>
+              <tr><td>Biuret</td><td>Blue → violet</td></tr>
+              <tr><td>Grease-spot (lipid)</td><td>Translucent spot; disappears in solvent</td></tr>
+              <tr><td>DCPIP (vitamin C)</td><td>Blue → colourless</td></tr>
+              <tr><td>Burning (energy)</td><td>Longer flame; bigger temperature rise</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <h3>Energy at a glance</h3>
+          <table class="cheat-table">
+            <thead>
+              <tr>
+                <th scope="col">Nutrient</th>
+                <th scope="col">About</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Carbohydrate</td><td>~17 kJ/g</td></tr>
+              <tr><td>Protein</td><td>~17 kJ/g</td></tr>
+              <tr><td>Lipid</td><td>~37 kJ/g — double before adding to carb or protein in burning test</td></tr>
+              <tr><td>Fibre, vitamins, minerals, water</td><td>No energy value</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      </div>
+    </section>
+
+    <section class="chapter chapter-molecule">
+      <div class="copy">
+      <div class="sec"><span class="num">01</span><h2>Hydrolysis vs condensation</h2></div>
+      <h3>Types</h3>
+      <div class="gif-row">
+        <article class="type-card">
+          <h4>Condensation</h4>
+          <p class="examples">Build-up. Lose water.</p>
+          <dl class="props">
+            <div>
+              <dt>Glycosidic bond</dt>
+              <dd>Glucose + glucose − H₂O → maltose.</dd>
+              <dd>C₆H₁₂O₆ + C₆H₁₂O₆ − H₂O → C₁₂H₂₂O₁₁.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot" aria-label="Condensation of two glucose molecules">
+          <img src="condensation.gif" alt="Two glucose molecules join by condensation and release water.">
+        </aside>
+      </div>
+      <div class="gif-row">
+        <article class="type-card">
+          <h4>Hydrolysis</h4>
+          <p class="examples">Breakdown. Gain water.</p>
+          <dl class="props">
+            <div>
+              <dt>Examples</dt>
+              <dd>Maltose → glucose + glucose.</dd>
+              <dd>Starch can be hydrolysed to maltose.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot" aria-label="Hydrolysis of maltose">
+          <img src="hydrolysis.gif" alt="Maltose is split by hydrolysis into two glucose molecules.">
+        </aside>
+      </div>
+      </div>
+    </section>
+
+    <section class="chapter chapter-molecule">
+      <div class="copy">
+      <div class="sec"><span class="num">02</span><h2>Carbohydrate</h2></div>
+      <div class="key-idea">
+        <p>C, H and O, with H:O = 2:1. Glucose is C₆H₁₂O₆.</p>
+        <p>About 17 kJ/g.</p>
+      </div>
+      <h3>Compare</h3>
+      <div class="scroll">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th class="kind-mono">Monosaccharide</th>
+              <th class="kind-di">Disaccharide</th>
+              <th class="kind-poly">Polysaccharide</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>Solubility</th>
+              <td>Soluble</td>
+              <td>Soluble</td>
+              <td>Insoluble</td>
+            </tr>
+            <tr>
+              <th>Taste</th>
+              <td>Sweet</td>
+              <td>Sweet</td>
+              <td>Not sweet</td>
+            </tr>
+            <tr>
+              <th>Reducing sugar</th>
+              <td>Yes</td>
+              <td>Yes, except sucrose</td>
+              <td>No</td>
+            </tr>
+            <tr>
+              <th>Size</th>
+              <td>
+                One sugar unit
+                <figure class="size-media">
+                  <img src="images/monosaccharide.png" alt="A single glucose molecule.">
+                </figure>
+              </td>
+              <td>
+                Two sugar units. At least one is glucose.
+                <figure class="size-media">
+                  <img src="images/disaccharide-formation.gif" alt="Two glucose molecules join by a glycosidic bond to form a disaccharide.">
+                </figure>
+              </td>
+              <td>
+                A long chain
+                <figure class="size-media">
+                  <img src="images/polysaccharide-formation.gif" alt="Sugar units join into a longer carbohydrate chain.">
+                </figure>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Types</h3>
+      <div class="type-grid">
+        <div class="carb-family carb-mono">
+          <header class="family-head">
+            <svg class="sugar-art" viewBox="0 0 36 40" width="36" height="40" aria-hidden="true">
+              <polygon points="18,3 32,11.5 32,28.5 18,37 4,28.5 4,11.5" fill="currentColor" fill-opacity="0.18" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+            <div>
+              <h3>Monosaccharide</h3>
+              <p class="family-note">One sugar unit. Soluble, sweet, and reducing.</p>
+            </div>
+          </header>
+          <div class="family-cards">
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Glucose</h4>
+          <p class="examples">Monosaccharide</p>
+          <dl class="props">
+            <div>
+              <dt>Properties</dt>
+              <dd>Main respiratory fuel.</dd>
+              <dd>Fast: absorbed and used directly for energy.</dd>
+              <dd>Reducing sugar.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Honey, a source of glucose">
+          <img src="images/glucose.jpg" alt="Honey on a dipper.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Fructose</h4>
+          <p class="examples">Monosaccharide</p>
+          <dl class="props">
+            <div>
+              <dt>Properties</dt>
+              <dd>Single sugar unit.</dd>
+              <dd>Reducing sugar.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Mango, a source of fructose">
+          <img src="images/fructose.jpg" alt="Cut mango.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Galactose</h4>
+          <p class="examples">Monosaccharide</p>
+          <dl class="props">
+            <div>
+              <dt>Properties</dt>
+              <dd>Single sugar unit.</dd>
+              <dd>Reducing sugar.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Yogurt, a source of galactose">
+          <img src="images/galactose.png" alt="A bowl of yogurt.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Ribose</h4>
+          <p class="examples">Monosaccharide</p>
+          <dl class="props">
+            <div>
+              <dt>Role</dt>
+              <dd>The sugar in RNA.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="RNA, which contains ribose">
+          <img src="images/ribose.png" alt="An RNA strand with adenine, uracil, cytosine and guanine.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Deoxyribose</h4>
+          <p class="examples">Monosaccharide</p>
+          <dl class="props">
+            <div>
+              <dt>Role</dt>
+              <dd>The sugar in DNA.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="DNA, which contains deoxyribose">
+          <img src="images/deoxyribose.jpg" alt="A DNA double helix.">
+        </aside>
+        </div>
+          </div>
+        </div>
+        <div class="carb-family carb-di">
+          <header class="family-head">
+            <svg class="sugar-art" viewBox="0 0 78 40" width="78" height="40" aria-hidden="true">
+              <polygon points="18,3 32,11.5 32,28.5 18,37 4,28.5 4,11.5" fill="currentColor" fill-opacity="0.18" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <line x1="32" y1="20" x2="46" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <polygon points="60,3 74,11.5 74,28.5 60,37 46,28.5 46,11.5" fill="currentColor" fill-opacity="0.18" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+            <div>
+              <h3>Disaccharide</h3>
+              <p class="family-note">Two sugar units. Soluble and sweet. Reducing, except sucrose.</p>
+            </div>
+          </header>
+          <div class="family-cards">
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Maltose</h4>
+          <p class="examples">Disaccharide. Glucose + glucose</p>
+          <dl class="props">
+            <div>
+              <dt>Properties</dt>
+              <dd>Made by condensation. A glycosidic bond.</dd>
+              <dd>Can be formed by hydrolysis of starch.</dd>
+              <dd>Reducing sugar.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Sweet potato, a source of maltose">
+          <img src="images/maltose.jpg" alt="Roasted sweet potatoes.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Sucrose</h4>
+          <p class="examples">Disaccharide. Glucose + fructose</p>
+          <dl class="props">
+            <div>
+              <dt>Properties</dt>
+              <dd>Non-reducing. The exception among disaccharides.</dd>
+              <dd>Transport form of sugar in plants.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Sugarcane, a source of sucrose">
+          <img src="images/sucrose.jpg" alt="Cut sugarcane.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Lactose</h4>
+          <p class="examples">Disaccharide. Glucose + galactose</p>
+          <dl class="props">
+            <div>
+              <dt>Properties</dt>
+              <dd>Reducing sugar.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Milk and cheese, sources of lactose">
+          <img src="images/lactose.png" alt="Milk, cheese and other dairy foods.">
+        </aside>
+        </div>
+          </div>
+        </div>
+        <div class="carb-family carb-poly">
+          <header class="family-head">
+            <svg class="sugar-art" viewBox="0 0 116 32" width="116" height="32" aria-hidden="true">
+              <polygon points="12,6 21,11 21,21 12,26 3,21 3,11" fill="currentColor" fill-opacity="0.18" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+              <line x1="21" y1="16" x2="25" y2="16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+              <polygon points="34,6 43,11 43,21 34,26 25,21 25,11" fill="currentColor" fill-opacity="0.18" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+              <line x1="43" y1="16" x2="47" y2="16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+              <polygon points="56,6 65,11 65,21 56,26 47,21 47,11" fill="currentColor" fill-opacity="0.18" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+              <line x1="65" y1="16" x2="69" y2="16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+              <polygon points="78,6 87,11 87,21 78,26 69,21 69,11" fill="currentColor" fill-opacity="0.18" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+              <circle cx="96" cy="16" r="1.35" fill="currentColor"/>
+              <circle cx="102" cy="16" r="1.35" fill="currentColor"/>
+              <circle cx="108" cy="16" r="1.35" fill="currentColor"/>
+            </svg>
+            <div>
+              <h3>Polysaccharide</h3>
+              <p class="family-note">A long chain. Insoluble, not sweet, and non-reducing.</p>
+            </div>
+          </header>
+          <div class="family-cards">
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Glycogen</h4>
+          <p class="examples">Polysaccharide</p>
+          <dl class="props">
+            <div>
+              <dt>Role</dt>
+              <dd>Storage form in animals.</dd>
+            </div>
+            <div>
+              <dt>Properties</dt>
+              <dd>Insoluble. Not sweet. Non-reducing.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Glycogen stored in the liver and muscles">
+          <img src="images/glycogen.png" alt="Glycogen stored in the liver and in muscles.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Starch</h4>
+          <p class="examples">Polysaccharide</p>
+          <dl class="props">
+            <div>
+              <dt>Role</dt>
+              <dd>Storage form in plants.</dd>
+            </div>
+            <div>
+              <dt>Properties</dt>
+              <dd>Hydrolysis can produce maltose.</dd>
+              <dd>Insoluble. Not sweet. Non-reducing.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Plant foods that store starch">
+          <img src="images/starch.jpg" alt="Rice, corn, potatoes, starch powder and wheat.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Cellulose</h4>
+          <p class="examples">Polysaccharide</p>
+          <dl class="props">
+            <div>
+              <dt>In plants</dt>
+              <dd>Supports the cell wall. Plants do not make it for human health.</dd>
+            </div>
+            <div>
+              <dt>In humans</dt>
+              <dd>Eaten as dietary fibre.</dd>
+              <dd>No energy value. Humans have no enzyme to digest it.</dd>
+              <dd>Gives a sense of fullness and helps gut peristalsis.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Cellulose in a plant cell wall">
+          <img src="images/cellulose.jpg" alt="Cellulose fibres giving a plant cell wall its structure.">
+        </aside>
+        </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </section>
+
+    <section class="chapter chapter-molecule">
+      <div class="copy">
+      <div class="sec"><span class="num">03</span><h2>Lipid</h2></div>
+      <div class="key-idea">
+        <p>C, H and O. Some also contain P. H:O is greater than 2:1, so there is much more hydrogen than in a carbohydrate.</p>
+        <p>About 37 kJ/g. Double a lipid result before adding it to carbohydrate or protein energy.</p>
+      </div>
+      <h3>Types</h3>
+      <div class="type-grid">
+        <div class="gif-row">
+<article class="type-card">
+          <h4>Triglyceride</h4>
+          <p class="examples">1 glycerol + 3 fatty acids</p>
+          <dl class="props">
+            <div>
+              <dt>Properties</dt>
+              <dd>Insoluble in water. Non-polar.</dd>
+              <dd>Solid: fat.</dd>
+              <dd>Liquid: oil.</dd>
+            </div>
+            <div>
+              <dt>Roles</dt>
+              <dd>Energy storage (2× the energy of carbohydrate or protein per gram).</dd>
+              <dd>Protects organs.</dd>
+              <dd>Insulates nerves.</dd>
+              <dd>Waterproofing.</dd>
+              <dd>Subcutaneous fat: shock absorber and reduces heat loss.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot" aria-label="Triglyceride formed from fatty acids">
+          <img src="triglyceride.gif" alt="Glycerol and three fatty acids form a triglyceride.">
+        </aside>
+        </div>
+        <div class="gif-row">
+<article class="type-card">
+          <h4>Phospholipid</h4>
+          <p class="examples">1 glycerol + 2 fatty acids + phosphate</p>
+          <dl class="props">
+            <div>
+              <dt>Properties</dt>
+              <dd>
+                <ol class="steps">
+                  <li>Hydrophilic (polar) head.</li>
+                  <li>Hydrophobic (non-polar) tails.</li>
+                  <li>Tails meet tails, so the membrane is a bilayer.</li>
+                  <li>Helps the fluidity of cell membranes.</li>
+                </ol>
+              </dd>
+            </div>
+            <div>
+              <dt>Example</dt>
+              <dd>Cell membrane (phospholipid + protein).</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot" aria-label="Phospholipid bilayer">
+          <img src="images/phospholipid.gif" alt="Phospholipid molecules form a bilayer. The tails wiggle and one molecule changes place.">
+        </aside>
+        </div>
+        <div class="carb-family steroid-family">
+          <header class="family-head">
+            <svg class="sugar-art" viewBox="0 0 70 40" width="70" height="40" aria-hidden="true">
+              <polygon points="8,8 20,8 26,18 20,28 8,28 2,18" fill="currentColor" fill-opacity="0.18" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+              <polygon points="20,8 32,8 38,18 32,28 20,28 14,18" fill="currentColor" fill-opacity="0.18" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+              <polygon points="32,8 44,8 50,18 44,28 32,28 26,18" fill="currentColor" fill-opacity="0.18" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+              <polygon points="44,8 58,12 58,24 44,28 38,18" fill="currentColor" fill-opacity="0.18" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            </svg>
+            <div>
+              <h3>Steroid</h3>
+              <p class="family-note">Four carbon rings. Insoluble in water. Non-polar.</p>
+            </div>
+            <aside class="family-thumb" aria-label="Steroid hormone">
+              <img src="images/steroid.png" alt="A syringe, as used for a steroid hormone.">
+            </aside>
+          </header>
+          <div class="family-cards">
+            <div class="gif-row">
+              <article class="type-card">
+                <h4>Cholesterol</h4>
+                <p class="examples">Steroid</p>
+                <dl class="props">
+                  <div>
+                    <dt>Roles</dt>
+                    <dd>Part of the cell membrane.</dd>
+                    <dd>A precursor of sex hormones.</dd>
+                  </div>
+                </dl>
+              </article>
+              <aside class="gif-slot" aria-label="Cholesterol and heart disease">
+                <img src="images/cholesterol.gif" alt="Cholesterol can build up in arteries and affect the heart.">
+              </aside>
+            </div>
+            <div class="gif-row">
+              <article class="type-card">
+                <h4>Sex hormones</h4>
+                <p class="examples">Steroid. Made from cholesterol</p>
+                <dl class="props">
+                  <div>
+                    <dt>Role</dt>
+                    <dd>Chemical signals.</dd>
+                  </div>
+                </dl>
+              </article>
+              <aside class="gif-slot photo-slot" aria-label="Estrogen and testosterone">
+                <img src="images/sex-hormones.png" alt="Estrogen and testosterone, two steroid sex hormones.">
+              </aside>
+            </div>
+          </div>
+        </div>
+        <div class="gif-row share-row">
+          <div class="card-stack">
+        <article class="type-card">
+          <h4>Saturated fatty acid</h4>
+          <p class="examples">Animal fats</p>
+          <dl class="props">
+            <div>
+              <dt>Properties</dt>
+              <dd>Solid at room temperature.</dd>
+              <dd>Less healthy.</dd>
+              <dd>Clots and blocks blood vessels more easily.</dd>
+              <dd>Raises the risk of cardiovascular disease.</dd>
+            </div>
+          </dl>
+        </article>
+        <article class="type-card">
+          <h4>Unsaturated fatty acid</h4>
+          <p class="examples">Plant oils</p>
+          <dl class="props">
+            <div>
+              <dt>Properties</dt>
+              <dd>Liquid at room temperature.</dd>
+              <dd>More healthy.</dd>
+            </div>
+          </dl>
+        </article>
+        <article class="type-card">
+          <h4>Trans fatty acid</h4>
+          <p class="examples">Unsaturated fat forced toward saturated form</p>
+          <dl class="props">
+            <div>
+              <dt>Properties</dt>
+              <dd>The least healthy of the three.</dd>
+              <dd>The body’s enzymes are not suited to hydrolyse it.</dd>
+            </div>
+          </dl>
+        </article>
+          </div>
+        <aside class="gif-slot photo-slot" aria-label="Fatty acid foods">
+          <img src="images/fatty-acids.jpg" alt="Fried and baked foods.">
+        </aside>
+        </div>
+      </div>
+      </div>
+    </section>
+
+    <section class="chapter chapter-molecule">
+      <div class="copy">
+      <div class="sec"><span class="num">04</span><h2>Protein</h2></div>
+      <div class="key-idea">
+        <p>C, H, O and N. Some also contain S. About 17 kJ/g.</p>
+        <p>A whole protein is not absorbed. Hydrolysis releases amino acids, which enter capillary blood.</p>
+        <p>Denaturation is irreversible.</p>
+      </div>
+      <h3>Types</h3>
+      <div class="type-grid">
+        <div class="gif-row share-row">
+          <div class="card-stack">
+            <article class="type-card">
+              <h4>Amino acid</h4>
+              <p class="examples">20 types, 20 side chains</p>
+              <dl class="props">
+                <div>
+                  <dt>Parts</dt>
+                  <dd>Amino group, which contains N.</dd>
+                  <dd>Carboxyl group.</dd>
+                  <dd>Side chain, R. The side chain makes the type.</dd>
+                </div>
+                <div>
+                  <dt>Essential</dt>
+                  <dd>Only from food. All 20 types matter.</dd>
+                  <dd>A vegetarian diet can miss some of the 9 essential amino acids. Those proteins are incomplete.</dd>
+                </div>
+                <div>
+                  <dt>Non-essential</dt>
+                  <dd>The body can make them.</dd>
+                </div>
+              </dl>
+            </article>
+            <article class="type-card">
+              <h4>From dipeptide to protein</h4>
+              <ol class="steps">
+                <li>Dipeptide. Two amino acids join by a peptide bond. One water leaves.</li>
+                <li>Polypeptide. A chain. Inactive until it folds. DNA sets the order.</li>
+                <li>Protein. The chain folds into a 3D shape. Hydrogen bonds hold it. The order decides the shape and the job. Heat or the wrong pH undoes the shape. That is irreversible.</li>
+              </ol>
+            </article>
+          </div>
+          <aside class="gif-slot media-stack" aria-label="Peptide bond and protein folding">
+            <figure class="media-labeled">
+              <p class="media-label">Condensation. Peptide bond</p>
+              <img src="images/peptide-bond.gif" alt="Two amino acids join by a peptide bond and release water.">
+              <figcaption class="media-caption">Two amino acids join. One water leaves. This builds a dipeptide, then a longer chain.</figcaption>
+            </figure>
+            <figure class="media-labeled">
+              <p class="media-label">Folding</p>
+              <img src="images/protein-folding.gif" alt="An unfolded protein collapses into a folded three-dimensional shape.">
+              <figcaption class="media-caption">The chain folds into a 3D shape. That shape sets the protein’s job. Heat or the wrong pH can unfold it.</figcaption>
+            </figure>
+          </aside>
+        </div>
+      </div>
+      <h3>Jobs</h3>
+      <div class="type-grid">
+        <div class="gif-row">
+<article class="type-card">
+          <h4>Membrane proteins</h4>
+          <p class="examples">Channels, receptors, carriers, antigens</p>
+          <dl class="props">
+            <div>
+              <dt>Role</dt>
+              <dd>Sit in the cell membrane with phospholipids.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Membrane proteins">
+          <img src="images/membrane-protein.png" alt="Channel, receptor, carrier and antigen proteins in a cell membrane.">
+        </aside>
+        </div>
+        <div class="gif-row">
+<article class="type-card">
+          <h4>Growth and repair</h4>
+          <p class="examples">Muscle, skin, nails</p>
+          <dl class="props">
+            <div>
+              <dt>Role</dt>
+              <dd>Builds and repairs tissues.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Growth and repair of tissue">
+          <img src="images/growth-repair.png" alt="Protein chains building muscle, skin and nails.">
+        </aside>
+        </div>
+        <div class="gif-row">
+<article class="type-card">
+          <h4>Enzymes</h4>
+          <p class="examples">Catalysts</p>
+          <dl class="props">
+            <div>
+              <dt>Role</dt>
+              <dd>Speed reactions.</dd>
+              <dd>The active site needs the right 3D shape.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Enzyme">
+          <img src="images/enzyme.png" alt="An enzyme binding its substrate at the active site and speeding the reaction.">
+        </aside>
+        </div>
+        <div class="gif-row">
+<article class="type-card">
+          <h4>Hormones</h4>
+          <p class="examples">Chemical signals</p>
+          <dl class="props">
+            <div>
+              <dt>Role</dt>
+              <dd>Bind a receptor and cause a response.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Hormone">
+          <img src="images/hormone.jpg" alt="A hormone binding a receptor and switching on a response.">
+        </aside>
+        </div>
+        <div class="gif-row">
+<article class="type-card">
+          <h4>Antibodies</h4>
+          <p class="examples">Immune defence</p>
+          <dl class="props">
+            <div>
+              <dt>Role</dt>
+              <dd>Antibodies and antigens are proteins.</dd>
+              <dd>Antibiotics are not proteins.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Antibody">
+          <img src="images/antibody.png" alt="An antibody binding an antigen so an immune cell can destroy it.">
+        </aside>
+        </div>
+      </div>
+      </div>
+    </section>
+
+    <section class="chapter chapter-molecule">
+      <div class="copy">
+      <div class="sec"><span class="num">05</span><h2>Nucleic acid</h2></div>
+      <div class="key-idea">
+        <p>Organic: C, H, O, N and P.</p>
+        <p>The base sequence of DNA sets the amino-acid sequence of a polypeptide, and that sets the protein’s shape and job.</p>
+      </div>
+      <h3>Types</h3>
+      <div class="type-grid">
+        <div class="gif-row">
+<article class="type-card">
+          <h4>Nucleotide</h4>
+          <p class="examples">Basic unit</p>
+          <dl class="props">
+            <div>
+              <dt>Parts</dt>
+              <dd>5-carbon sugar.</dd>
+              <dd>Phosphate group. It is negatively charged.</dd>
+              <dd>Nitrogenous base.</dd>
+            </div>
+            <div>
+              <dt>Properties</dt>
+              <dd>Sugar and phosphate bond into the sugar–phosphate backbone.</dd>
+              <dd>Found in the nucleus and the cytoplasm.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Nucleotide">
+          <img src="images/nucleotide.png" alt="A nucleotide: phosphate, pentose sugar and a nitrogenous base.">
+        </aside>
+        </div>
+        <div class="gif-row share-row">
+          <div class="card-stack">
+<article class="type-card">
+          <h4>DNA</h4>
+          <p class="examples">Deoxyribonucleic acid</p>
+          <dl class="props">
+            <div>
+              <dt>Composition</dt>
+              <dd>Deoxyribose.</dd>
+              <dd>Double-stranded polymer of nucleotides.</dd>
+              <dd>Bases: A–T and C–G.</dd>
+            </div>
+            <div>
+              <dt>Structure</dt>
+              <dd>Double helix, held by hydrogen bonds.</dd>
+              <dd>Adenine–thymine: 2 hydrogen bonds.</dd>
+              <dd>Cytosine–guanine: 3 hydrogen bonds.</dd>
+              <dd>A% equals T%. C and G share the rest equally.</dd>
+            </div>
+            <div>
+              <dt>Role</dt>
+              <dd>Stores genetic information.</dd>
+              <dd>Carries the genetic code.</dd>
+            </div>
+            <div>
+              <dt>Place and stability</dt>
+              <dd>Mainly in the nucleus.</dd>
+              <dd>More stable than RNA.</dd>
+            </div>
+          </dl>
+        </article>
+<article class="type-card">
+          <h4>RNA</h4>
+          <p class="examples">mRNA and tRNA</p>
+          <dl class="props">
+            <div>
+              <dt>Composition</dt>
+              <dd>Ribose.</dd>
+              <dd>Single-stranded polymer of nucleotides.</dd>
+              <dd>Bases: A–U and C–G.</dd>
+            </div>
+            <div>
+              <dt>Role</dt>
+              <dd>Takes part in protein synthesis.</dd>
+              <dd>Helps regulate gene expression.</dd>
+            </div>
+            <div>
+              <dt>Place and stability</dt>
+              <dd>Nucleus and cytoplasm.</dd>
+              <dd>Less stable than DNA.</dd>
+            </div>
+          </dl>
+        </article>
+          </div>
+        <aside class="gif-slot photo-slot media-stack" aria-label="DNA and mRNA">
+          <img src="images/dna-rna.gif" alt="DNA is transcribed to mRNA, which is then translated into a polypeptide.">
+          <img src="images/dna-rna.png" alt="DNA is transcribed to mRNA, which is translated into protein.">
+        </aside>
+        </div>
+      </div>
+      </div>
+    </section>
+
+    <section class="chapter chapter-nutrient">
+      <div class="copy">
+      <div class="sec"><span class="num">06</span><h2>Minerals</h2></div>
+      <div class="key-idea">
+        <p>Inorganic. No energy value. Needed in small amounts.</p>
+        <p>They regulate metabolic reactions and help build body tissues.</p>
+      </div>
+      <h3>Types</h3>
+      <div class="type-grid">
+        <div class="gif-row">
+<article class="type-card">
+          <h4>Calcium</h4>
+          <p class="examples">Ca²⁺</p>
+          <dl class="props">
+            <div>
+              <dt>Roles</dt>
+              <dd>A component of bones and teeth.</dd>
+              <dd>Muscle contraction.</dd>
+              <dd>Nerve impulses.</dd>
+              <dd>Blood clotting.</dd>
+              <dd>Enzyme activation.</dd>
+            </div>
+            <div>
+              <dt>Storage</dt>
+              <dd>About 99% is in bones and teeth.</dd>
+            </div>
+            <div>
+              <dt>Absorption</dt>
+              <dd>Absorbed directly.</dd>
+              <dd>Vitamin D increases absorption.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Calcium sources">
+          <img src="images/calcium.png" alt="Milk, cheese, almonds, beans, leafy greens and fish, sources of calcium.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Iron</h4>
+          <p class="examples">Fe²⁺</p>
+          <dl class="props">
+            <div>
+              <dt>Roles</dt>
+              <dd>Oxygen transport, as part of haemoglobin in red blood cells.</dd>
+              <dd>Enzyme activation.</dd>
+            </div>
+            <div>
+              <dt>Storage</dt>
+              <dd>Stored in the liver.</dd>
+            </div>
+            <div>
+              <dt>Absorption</dt>
+              <dd>Absorbed directly.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Iron in haemoglobin">
+          <img src="images/iron.png" alt="Haemoglobin inside a red blood cell, which carries oxygen using iron.">
+        </aside>
+        </div>
+      </div>
+      </div>
+    </section>
+
+    <section class="chapter chapter-nutrient">
+      <div class="copy">
+      <div class="sec"><span class="num">07</span><h2>Inorganic ions</h2></div>
+      <div class="key-idea">
+        <p>Inorganic. No energy value.</p>
+      </div>
+      <h3>Types</h3>
+      <div class="type-grid">
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Nitrate</h4>
+          <p class="examples">NO₃⁻</p>
+          <dl class="props">
+            <div>
+              <dt>Roles</dt>
+              <dd>Protein synthesis in plants. The nitrogen goes into the amino group.</dd>
+              <dd>Chlorophyll production.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Nitrate fertiliser">
+          <img src="images/nitrate.png" alt="A bag of nitrogen fertiliser, a source of nitrate for plants.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Magnesium</h4>
+          <p class="examples">Mg²⁺</p>
+          <dl class="props">
+            <div>
+              <dt>Roles</dt>
+              <dd>Chlorophyll production.</dd>
+              <dd>Enzyme activation in animals.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Magnesium in chlorophyll">
+          <img src="images/magnesium.png" alt="A chlorophyll molecule with a magnesium atom at its centre.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Phosphorus</h4>
+          <p class="examples">Phosphate group</p>
+          <dl class="props">
+            <div>
+              <dt>Roles</dt>
+              <dd>Part of phosphate groups, including phospholipids.</dd>
+              <dd>Formation of bones and teeth.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Phosphorus food sources">
+          <img src="images/phosphorus.jpg" alt="Fish, nuts, seeds, beans, eggs, cheese and seafood, sources of phosphorus.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Iodine</h4>
+          <p class="examples">I⁻</p>
+          <dl class="props">
+            <div>
+              <dt>Roles</dt>
+              <dd>Thyroid hormone synthesis.</dd>
+              <dd>Regulation of metabolism.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Iodine supplement">
+          <img src="images/iodine.png" alt="A bottle of iodine food-supplement tablets.">
+        </aside>
+        </div>
+      </div>
+      </div>
+    </section>
+
+    <section class="chapter chapter-nutrient">
+      <div class="copy">
+      <div class="sec"><span class="num">08</span><h2>Vitamins</h2></div>
+      <div class="key-idea">
+        <p>Organic. No energy value. Needed in small amounts.</p>
+        <p>They regulate metabolic reactions and help build tissues.</p>
+        <p>Heat destroys water-soluble vitamins.</p>
+      </div>
+      <h3>Compare</h3>
+      <div class="scroll">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Vitamin A</th>
+              <th>Vitamin C</th>
+              <th>Vitamin D</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>Solubility</th>
+              <td>Fat-soluble</td>
+              <td>Water-soluble</td>
+              <td>Fat-soluble</td>
+            </tr>
+            <tr>
+              <th>Polarity</th>
+              <td>Non-polar</td>
+              <td>Polar</td>
+              <td>Non-polar</td>
+            </tr>
+            <tr>
+              <th>Absorption</th>
+              <td>With fats, in the small intestine</td>
+              <td>In the small intestine</td>
+              <td>Made in skin in sunlight. Also absorbed with fats.</td>
+            </tr>
+            <tr>
+              <th>Storage</th>
+              <td>Liver and fat tissue</td>
+              <td>Little is stored. Excess leaves in urine.</td>
+              <td>Liver and fat tissue</td>
+            </tr>
+            <tr>
+              <th>Test</th>
+              <td>None in these notes</td>
+              <td>DCPIP: blue to colourless</td>
+              <td>None in these notes</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Types</h3>
+      <div class="type-grid">
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Vitamin A</h4>
+          <p class="examples">Fat-soluble</p>
+          <dl class="props">
+            <div>
+              <dt>Roles</dt>
+              <dd>Needed to form visual purple.</dd>
+              <dd>Vision in dim light, in rod cells.</dd>
+              <dd>Health of skin and of the linings of the gut and the breathing system.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Vitamin A source">
+          <img src="images/vitamin-a.png" alt="A carrot, a food source of vitamin A.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Vitamin C</h4>
+          <p class="examples">Water-soluble. C for connective tissue.</p>
+          <dl class="props">
+            <div>
+              <dt>Roles</dt>
+              <dd>Growth and repair of connective tissue.</dd>
+              <dd>Healing wounds.</dd>
+              <dd>Healthy skin and gums.</dd>
+            </div>
+            <div>
+              <dt>Test</dt>
+              <dd>DCPIP turns from blue to colourless.</dd>
+              <dd>A higher concentration needs fewer drops.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Vitamin C source">
+          <img src="images/vitamin-c.jpg" alt="Lemons, a food source of vitamin C.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Vitamin D</h4>
+          <p class="examples">Fat-soluble</p>
+          <dl class="props">
+            <div>
+              <dt>Roles</dt>
+              <dd>Helps absorption of calcium and phosphate.</dd>
+              <dd>Not a component of bones and teeth.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Vitamin D from sunlight">
+          <img src="images/vitamin-d.png" alt="Sunlight over a field, the source of vitamin D made in the skin.">
+        </aside>
+        </div>
+      </div>
+      </div>
+    </section>
+
+    <section class="chapter chapter-nutrient">
+      <div class="copy">
+      <div class="sec"><span class="num">09</span><h2>Dietary fibre</h2></div>
+      <div class="key-idea">
+        <p>Organic, but no energy value for humans. There is no human enzyme to digest it.</p>
+        <p>Plants make cellulose to support the cell wall. Humans happen to eat it, and call it dietary fibre.</p>
+      </div>
+      <h3>Types</h3>
+      <div class="type-grid">
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Insoluble fibre</h4>
+          <p class="examples">Cellulose in plant cell walls</p>
+          <dl class="props">
+            <div>
+              <dt>Properties</dt>
+              <dd>Does not dissolve in water.</dd>
+              <dd>Only plants have cellulose cell walls.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Insoluble fibre foods">
+          <img src="images/insoluble-fibre.jpg" alt="Foods that provide insoluble fibre, including whole grains, nuts, beans and wheat bran.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Soluble fibre</h4>
+          <p class="examples">Pectin in plant cells</p>
+          <dl class="props">
+            <div>
+              <dt>Properties</dt>
+              <dd>Dissolves in water.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Soluble fibre foods">
+          <img src="images/soluble-fibre.png" alt="Foods that provide soluble fibre: barley, oats, beans, figs, prunes and sweet potatoes.">
+        </aside>
+        </div>
+      </div>
+      <h3>Properties</h3>
+      <div class="type-grid">
+        <article class="type-card">
+          <h4>What it does</h4>
+          <dl class="props">
+            <div>
+              <dt>Roles</dt>
+              <dd>Helps gut peristalsis.</dd>
+              <dd>Absorbs water and adds bulk to faeces.</dd>
+              <dd>A sense of fullness without an energy intake, which can help weight loss.</dd>
+            </div>
+          </dl>
+        </article>
+      </div>
+      </div>
+    </section>
+
+    <section class="chapter chapter-nutrient">
+      <div class="copy">
+      <div class="sec"><span class="num">10</span><h2>Water</h2></div>
+      <div class="gif-row water-intro">
+        <div class="key-idea">
+          <p>Inorganic. No energy value.</p>
+        </div>
+        <aside class="gif-slot photo-slot" aria-label="Water has no energy value">
+          <img src="images/water-inorganic.png" alt="Water poured into a glass. Water is inorganic and has no energy value.">
+        </aside>
+      </div>
+      <h3>Properties</h3>
+      <div class="type-grid water-grid">
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Reactant</h4>
+          <dl class="props">
+            <div>
+              <dt>Examples</dt>
+              <dd>Hydrolysis.</dd>
+              <dd>Photosynthesis.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Water as a reactant in photosynthesis">
+          <img src="images/water-reactant.png" alt="Photosynthesis equation: carbon dioxide and water, with light, make sugar and oxygen.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Solvent</h4>
+          <dl class="props">
+            <div>
+              <dt>Role</dt>
+              <dd>The medium for chemical reactions in organisms.</dd>
+              <dd>Example: cytoplasm.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Cytoplasm as a water solvent">
+          <img src="images/water-solvent.png" alt="Cytoplasm, a jelly-like substance that is about 80 percent water.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Support</h4>
+          <dl class="props">
+            <div>
+              <dt>Animals</dt>
+              <dd>Support and buoyancy.</dd>
+            </div>
+            <div>
+              <dt>Plants</dt>
+              <dd>Water in the vacuole keeps the stem upright by turgidity.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Water supporting a plant">
+          <img src="images/water-support.jpg" alt="Water fills a plant from the roots through the stem, holding the shoot upright.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Transport</h4>
+          <dl class="props">
+            <div>
+              <dt>Humans</dt>
+              <dd>Blood is mostly water and circulates around the body.</dd>
+            </div>
+            <div>
+              <dt>Plants</dt>
+              <dd>Water carries sugars and dissolved minerals from roots to leaves.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Blood carrying cells through a vessel">
+          <img src="images/water-transport.gif" alt="Red blood cells moving through a blood vessel. Blood is mostly water and transports materials.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>High latent heat</h4>
+          <dl class="props">
+            <div>
+              <dt>Role</dt>
+              <dd>A good cooling agent.</dd>
+              <dd>Sweat absorbs a lot of heat as it evaporates.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Water evaporating from skin">
+          <img src="images/water-latent-heat.png" alt="Water on the skin surface evaporates as water vapour, taking heat away.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>High specific heat</h4>
+          <dl class="props">
+            <div>
+              <dt>Role</dt>
+              <dd>Temperature changes little even when a lot of energy is added.</dd>
+              <dd>Helps keep the internal environment steady.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot photo-slot" aria-label="Measuring the temperature of water">
+          <img src="images/water-specific-heat.png" alt="A thermometer in a beaker of water, used to show that water's temperature changes little when energy is added.">
+        </aside>
+        </div>
+      </div>
+      </div>
+    </section>
+
+    <section class="chapter chapter-health">
+      <div class="copy">
+      <div class="sec"><span class="num">11</span><h2>Deficiency and excess</h2></div>
+      <div class="key-idea">
+        <p>Too little and too much can both cause disease. Malnutrition includes undernutrition and overnutrition.</p>
+      </div>
+      <h3>Too little</h3>
+      <div class="deficiency-row">
+        <div class="scroll">
+          <table class="compare-table nutri-row">
+            <thead>
+              <tr>
+                <th>Nutrient</th>
+                <th>Deficiency</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Carbohydrate</td>
+                <td>
+                  <ul class="bullets">
+                    <li class="shot-row"><span>Low blood sugar</span>
+                      <img src="images/low-blood-sugar.png" alt="Low blood sugar">
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td>Lipid</td>
+                <td>
+                  <ul class="bullets">
+                    <li class="shot-row">
+                      <div>
+                        <ul class="bullets">
+                          <li>Dry skin</li>
+                          <li>Sex-hormone imbalance</li>
+                        </ul>
+                      </div>
+                      <img src="images/dry-skin.jpg" alt="Dry skin">
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td>Protein</td>
+                <td>
+                  <ul class="bullets">
+                    <li class="shot-row"><span>Kwashiorkor</span>
+                      <img src="images/kwashiorkor.png" alt="Kwashiorkor">
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td>Dietary fibre</td>
+                <td>
+                  <ul class="bullets">
+                    <li class="shot-row"><span>Constipation</span>
+                      <img src="images/constipation.jpg" alt="Constipation">
+                    </li>
+                    <li class="shot-row"><span>Higher risk of colorectal cancer</span>
+                      <img src="images/colorectal-cancer.png" alt="Colorectal cancer">
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td>Calcium</td>
+                <td>
+                  <ul class="bullets">
+                    <li class="shot-row">
+                      <div>Rickets (children)
+                        <ul>
+                          <li>Soft bones and bow legs.</li>
+                        </ul>
+                      </div>
+                      <img src="images/rickets.png" alt="Rickets, with soft bowed bones">
+                    </li>
+                    <li class="shot-row">
+                      <div>Osteoporosis (adults)
+                        <ul>
+                          <li>Weak bones that fracture easily.</li>
+                        </ul>
+                      </div>
+                      <img src="images/osteoporosis.png" alt="Healthy bone beside osteoporotic bone">
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td>Iron</td>
+                <td>
+                  <ul class="bullets">
+                    <li class="shot-row">
+                      <div>Anaemia
+                        <ul>
+                          <li>Fatigue.</li>
+                          <li>Pale skin.</li>
+                          <li>Less haemoglobin to carry oxygen.</li>
+                        </ul>
+                      </div>
+                      <img src="images/anaemia.jpg" alt="Normal blood beside anaemia, with fewer red blood cells">
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td>Iodine</td>
+                <td>
+                  <ul class="bullets">
+                    <li class="shot-row">
+                      <div>Goitre
+                        <ul>
+                          <li>Enlarged thyroid gland in the neck.</li>
+                        </ul>
+                      </div>
+                      <img src="images/goitre.png" alt="Goitre, an enlarged thyroid in the neck">
+                    </li>
+                    <li class="shot-row">
+                      <div>Hypothyroidism
+                        <ul>
+                          <li>Low thyroid hormone.</li>
+                          <li>Slow metabolism.</li>
+                        </ul>
+                      </div>
+                      <img src="images/hypothyroidism.png" alt="Enlarged thyroid gland">
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td>Vitamin A</td>
+                <td>
+                  <ul class="bullets">
+                    <li class="shot-row">
+                      <div>Vitamin A deficiency
+                        <ul>
+                          <li>Night blindness.</li>
+                          <li>Dry eyes and skin.</li>
+                          <li>Thickened cornea.</li>
+                        </ul>
+                      </div>
+                      <img src="images/vitamin-a-deficiency.jpg" alt="Dry eye surface from vitamin A deficiency">
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td>Vitamin C</td>
+                <td>
+                  <ul class="bullets">
+                    <li class="shot-row">
+                      <div>Scurvy
+                        <ul>
+                          <li>Weak connective tissue.</li>
+                          <li>Poor healing.</li>
+                        </ul>
+                      </div>
+                      <img src="images/scurvy.png" alt="Scurvy, with bleeding gums and spots on the legs">
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td>Vitamin D</td>
+                <td>
+                  <ul class="bullets">
+                    <li class="shot-row">
+                      <div>Rickets (children)
+                        <ul>
+                          <li>Soft bones and bow legs.</li>
+                        </ul>
+                      </div>
+                      <img src="images/rickets.png" alt="Rickets, with soft bowed bones">
+                    </li>
+                    <li class="shot-row">
+                      <div>Osteoporosis (later in life)
+                        <ul>
+                          <li>Weak bones.</li>
+                        </ul>
+                      </div>
+                      <img src="images/osteoporosis.png" alt="Healthy bone beside osteoporotic bone">
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <h3>Too much</h3>
+      <div class="deficiency-row">
+        <div class="scroll">
+          <table class="compare-table nutri-row">
+            <thead>
+              <tr>
+                <th>Nutrient</th>
+                <th>Excess</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Carbohydrate</td>
+                <td>
+                  <ul class="bullets">
+                    <li class="shot-row">
+                      <div>
+                        <ul class="bullets">
+                          <li>Obesity</li>
+                          <li>Diabetes</li>
+                        </ul>
+                      </div>
+                      <img src="images/obesity-diabetes.png" alt="Obesity leading to type 2 diabetes">
+                    </li>
+                    <li>Cardiovascular disease</li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td>Lipid</td>
+                <td>
+                  <ul class="bullets">
+                    <li class="shot-row"><span>Obesity</span>
+                      <img src="images/obesity-diabetes.png" alt="Obesity leading to type 2 diabetes">
+                    </li>
+                    <li>Atherosclerosis
+                      <ul>
+                        <li>Plaque in arteries.</li>
+                      </ul>
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td>Protein</td>
+                <td>
+                  <ul class="bullets">
+                    <li class="shot-row">
+                      <div>Liver damage
+                        <ul>
+                          <li>From deamination of excess amino acids.</li>
+                        </ul>
+                      </div>
+                      <img src="images/liver-damage.png" alt="Damaged liver">
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td>Calcium</td>
+                <td>
+                  <ul class="bullets">
+                    <li class="shot-row"><span>Kidney stones</span>
+                      <img src="images/kidney-stones.png" alt="Kidney stones">
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td>Iron</td>
+                <td>
+                  <ul class="bullets">
+                    <li class="shot-row"><span>Liver damage</span>
+                      <img src="images/liver-damage.png" alt="Damaged liver">
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td>Iodine</td>
+                <td>
+                  <ul class="bullets">
+                    <li class="shot-row"><span>Thyroid problems</span>
+                      <img src="images/thyroid.png" alt="Thyroid gland">
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <h3>Eating disorders</h3>
+      <ul class="bullets">
+        <li>Anorexia nervosa
+          <ul>
+            <li>Restricted food intake from fear of weight gain.</li>
+            <li>Undernutrition.</li>
+          </ul>
+        </li>
+        <li>Bulimia nervosa</li>
+        <li>Obesity
+          <ul>
+            <li>Calorie intake stays above output over time.</li>
+            <li>Overnutrition.</li>
+          </ul>
+        </li>
+      </ul>
+      </div>
+    </section>
+
+    <section class="chapter chapter-lab">
+      <div class="copy">
+      <div class="sec"><span class="num">12</span><h2>Food test</h2></div>
+      <div class="key-idea">
+        <p>A positive result is a colour change, or a spot that appears and then disappears.</p>
+      </div>
+      <h3>Tests</h3>
+      <div class="type-grid">
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Glucose</h4>
+          <p class="examples">Clinistix</p>
+          <dl class="props">
+            <div>
+              <dt>How</dt>
+              <dd>
+                <ol class="steps">
+                  <li>Dip the paper in the sample.</li>
+                </ol>
+              </dd>
+            </div>
+            <div>
+              <dt>Positive</dt>
+              <dd>Pink to purple.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot" aria-label="Glucose test strip">
+          <img src="images/glucose-test.gif" alt="Glucose test strip changing colour.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Reducing sugar</h4>
+          <p class="examples">Benedict’s test</p>
+          <dl class="props">
+            <div>
+              <dt>How</dt>
+              <dd>
+                <ol class="steps">
+                  <li>Add an equal volume of Benedict’s solution, for example 5 cm³.</li>
+                  <li>Boil, or use a hot water bath, for about 5 minutes.</li>
+                  <li>Look for a precipitate.</li>
+                </ol>
+              </dd>
+            </div>
+            <div>
+              <dt>Positive</dt>
+              <dd>Brick-red precipitate. More precipitate means more reducing sugar.</dd>
+              <dd>Green, yellow, or orange-red means less.</dd>
+              <dd>The test does not name which reducing sugar it is.</dd>
+              <dd>The sugar needs at least one glucose. Sucrose is non-reducing, so it does not give this result.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot" aria-label="Benedict test">
+          <img src="images/benedict.gif" alt="Benedict’s test turning brick-red.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Starch</h4>
+          <p class="examples">Iodine test</p>
+          <dl class="props">
+            <div>
+              <dt>How</dt>
+              <dd>
+                <ol class="steps">
+                  <li>Boil the leaf to destroy the cell membrane.</li>
+                  <li>Hot alcohol removes chlorophyll.</li>
+                  <li>Wash with water to remove the alcohol.</li>
+                  <li>Then add iodine solution.</li>
+                </ol>
+              </dd>
+            </div>
+            <div>
+              <dt>Positive</dt>
+              <dd>Brown to blue-black.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot" aria-label="Iodine test">
+          <img src="images/iodine-test.gif" alt="Iodine test for starch turning blue-black.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Protein paper</h4>
+          <p class="examples">Albustix</p>
+          <dl class="props">
+            <div>
+              <dt>How</dt>
+              <dd>
+                <ol class="steps">
+                  <li>Dip the paper in the sample.</li>
+                </ol>
+              </dd>
+            </div>
+            <div>
+              <dt>Positive</dt>
+              <dd>Yellow to blue-green.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot" aria-label="Albustix protein paper">
+          <img src="images/albustix.gif" alt="Albustix paper changing from yellow to blue-green.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Protein solution</h4>
+          <p class="examples">Biuret test</p>
+          <dl class="props">
+            <div>
+              <dt>How</dt>
+              <dd>
+                <ol class="steps">
+                  <li>Add Biuret reagent: sodium hydroxide plus copper sulfate.</li>
+                  <li>Shake gently.</li>
+                </ol>
+              </dd>
+            </div>
+            <div>
+              <dt>Positive</dt>
+              <dd>Blue to violet.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot" aria-label="Biuret test">
+          <img src="images/biuret.gif" alt="Biuret test turning from blue to violet.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Lipid</h4>
+          <p class="examples">Grease-spot test</p>
+          <dl class="props">
+            <div>
+              <dt>How</dt>
+              <dd>
+                <ol class="steps">
+                  <li>Drop the sample on filter paper.</li>
+                  <li>Look for a translucent spot in the light.</li>
+                  <li>Then drip on an organic solvent such as alcohol.</li>
+                </ol>
+              </dd>
+            </div>
+            <div>
+              <dt>Positive</dt>
+              <dd>A translucent spot that disappears in the solvent.</dd>
+              <dd>No spot means no lipid.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot" aria-label="Grease-spot test">
+          <img src="images/grease-spot.gif" alt="Grease-spot test for lipid.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Vitamin C</h4>
+          <p class="examples">DCPIP test</p>
+          <dl class="props">
+            <div>
+              <dt>How</dt>
+              <dd>
+                <ol class="steps">
+                  <li>Add the sample drop by drop to DCPIP.</li>
+                  <li>Mix, and watch the colour.</li>
+                </ol>
+              </dd>
+            </div>
+            <div>
+              <dt>Positive</dt>
+              <dd>Blue to colourless.</dd>
+              <dd>Fewer drops means a higher vitamin C concentration.</dd>
+            </div>
+            <div>
+              <dt>Heat</dt>
+              <dd>Heat destroys vitamin C.</dd>
+              <dd>Hot lemon tea needs more drops than cold lemon tea to decolourise the same volume of DCPIP.</dd>
+            </div>
+            <div>
+              <dt>Comparing</dt>
+              <dd>The same amount of vitamin C decolourises the same volume of DCPIP.</dd>
+              <dd>If the DCPIP volumes differ, scale the drop count to the same volume before comparing.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot" aria-label="DCPIP test">
+          <img src="images/dcpip.gif" alt="DCPIP turning from blue to colourless.">
+        </aside>
+        </div>
+        <div class="gif-row">
+        <article class="type-card">
+          <h4>Energy</h4>
+          <p class="examples">Burning test</p>
+          <dl class="props">
+            <div>
+              <dt>How</dt>
+              <dd>
+                <ol class="steps">
+                  <li>How long the flame lasts.</li>
+                  <li>Temperature change: final water temperature minus the start.</li>
+                  <li>A bigger temperature rise in a fixed time means more energy.</li>
+                </ol>
+              </dd>
+            </div>
+            <div>
+              <dt>Lipids</dt>
+              <dd>Double the lipid value before you add it to carbohydrate or protein.</dd>
+              <dd>Energy per gram is about twice as high.</dd>
+            </div>
+            <div>
+              <dt>Errors</dt>
+              <dd>Heat lost to the surroundings is not all used to heat the water.</dd>
+              <dd>Incomplete combustion leaves chemical energy in the food.</dd>
+              <dd>Both errors underestimate the energy.</dd>
+            </div>
+          </dl>
+        </article>
+        <aside class="gif-slot" aria-label="Food energy burning test">
+          <img src="images/burning-test.gif" alt="Burning food to measure energy.">
+        </aside>
+        </div>
+      </div>
+      </div>
+    </section>
+
+    <section class="chapter chapter-diet">
+      <div class="copy">
+      <div class="sec"><span class="num">13</span><h2>Who needs more</h2></div>
+      <div class="key-idea">
+        <p>A balanced diet matches energy input from food with energy output from activity.</p>
+        <p>If input is greater than output, the body stores the extra as fat. Biomass rises, so weight rises.</p>
+        <p>If output is greater than input, the body breaks down stores such as glycogen and fat. Biomass falls, so weight falls.</p>
+      </div>
+      <h3>Groups</h3>
+      <div class="type-grid">
+        <article class="type-card">
+          <h4>Child</h4>
+          <ul class="bullets">
+            <li>Energy. A larger surface-area-to-volume ratio means more heat loss.</li>
+            <li>Protein, for rapid growth such as muscle.</li>
+          </ul>
+        </article>
+        <article class="type-card">
+          <h4>Foetus and pregnancy</h4>
+          <ul class="bullets">
+            <li>Protein, to form muscle and tissues.</li>
+            <li>Calcium and vitamin D, to grow bones and teeth.</li>
+            <li>Iron, for blood and haemoglobin.</li>
+            <li>Dietary fibre in pregnancy, to prevent constipation.</li>
+          </ul>
+        </article>
+        <article class="type-card">
+          <h4>Elderly</h4>
+          <ul class="bullets">
+            <li>More calcium and vitamin D, to prevent osteoporosis.</li>
+            <li>Less energy if less active.</li>
+          </ul>
+        </article>
+        <article class="type-card">
+          <h4>Office worker</h4>
+          <ul class="bullets">
+            <li>Less energy. The work is sedentary.</li>
+            <li>More dietary fibre and water, to prevent constipation.</li>
+          </ul>
+        </article>
+        <article class="type-card">
+          <h4>Physical worker</h4>
+          <ul class="bullets">
+            <li>Energy, to support muscle movement.</li>
+          </ul>
+        </article>
+        <article class="type-card">
+          <h4>Indoor life</h4>
+          <ul class="bullets">
+            <li>Vitamin D. There is not enough sunlight.</li>
+          </ul>
+        </article>
+        <article class="type-card">
+          <h4>Male</h4>
+          <ul class="bullets">
+            <li>Energy and protein. More muscle.</li>
+            <li>Less subcutaneous fat, so more heat is lost.</li>
+          </ul>
+        </article>
+        <article class="type-card">
+          <h4>Female at puberty</h4>
+          <ul class="bullets">
+            <li>Iron, because of blood loss in menstruation.</li>
+          </ul>
+        </article>
+      </div>
+      <h3>Food cues</h3>
+      <p class="section-note">Short summary: common foods that match each nutrient group.</p>
+      <div class="type-grid food-cue-grid">
+        <article class="type-card">
+          <h4>Carbohydrate</h4>
+          <p class="examples">Bread, grains, potato, banana, sweet fruit</p>
+        </article>
+        <article class="type-card">
+          <h4>Lipid</h4>
+          <p class="examples">Butter, fatty fish, plant oils, fat in meat</p>
+          <dl class="props">
+            <div>
+              <dt>Note</dt>
+              <dd>Skimmed milk has no lipid.</dd>
+            </div>
+          </dl>
+        </article>
+        <article class="type-card">
+          <h4>Protein</h4>
+          <p class="examples">Meat, chicken breast, protein powder, milk, skimmed milk</p>
+        </article>
+        <article class="type-card">
+          <h4>Cell membrane</h4>
+          <p class="examples">Phospholipid plus protein</p>
+        </article>
+        <article class="type-card">
+          <h4>Minerals and ions</h4>
+          <p class="examples">Sports drinks</p>
+        </article>
+        <article class="type-card">
+          <h4>Vitamins and minerals</h4>
+          <p class="examples">Green vegetables, carrots, fresh fruit and vegetables</p>
+        </article>
+        <article class="type-card">
+          <h4>Dietary fibre</h4>
+          <p class="examples">Plant foods</p>
+        </article>
+      </div>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <p class="key-idea-label">Why it matters</p>
+      <div class="why-matters">
+        <ul>
+          <li>Food tests give quick evidence for glucose, starch, protein, lipid, and vitamin C in samples—you use colour and spot changes, not guesswork.</li>
+          <li>Knowing kJ/g and doubling lipids in the burning test helps you compare energy fairly in prac write-ups.</li>
+          <li>Deficiency and excess links diet to real symptoms; matching groups (child, pregnancy, elderly) to needs supports a balanced diet argument in exams.</li>
+        </ul>
+      </div>
+      <p class="page-credit">Food and human notes · Ch5 · v2026 · BB02 Molecules of Life</p>
+    </footer>
+  </div>
+</body>
+</html>
