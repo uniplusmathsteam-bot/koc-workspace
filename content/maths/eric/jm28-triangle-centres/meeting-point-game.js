@@ -32,21 +32,25 @@
     median: {
       centre: "Centroid",
       line: "medians",
+      how: "three medians (each vertex to the mid-point of the opposite side)",
       tip: "Draw three medians (vertex → mid-point of the opposite side). Release freely — find where they meet.",
     },
     altitude: {
       centre: "Orthocentre",
       line: "altitudes",
+      how: "three altitudes (from each vertex perpendicular to the opposite side)",
       tip: "Draw three altitudes (vertex ⊥ opposite side).",
     },
     bisector: {
       centre: "In-centre",
       line: "angle bisectors",
+      how: "three angle bisectors (splitting each vertex angle in half)",
       tip: "Draw three angle bisectors from the vertices. They meet at a point inside the triangle.",
     },
     perp: {
       centre: "Circumcentre",
       line: "perpendicular bisectors",
+      how: "three perpendicular bisectors (through each side’s mid-point at right angles)",
       tip: "Draw three perpendicular bisectors from the side mid-points. Acute → inside; right → on a side; obtuse → outside.",
     },
   };
@@ -138,11 +142,11 @@
 
   var ALL_MODES = ["median", "altitude", "bisector", "perp"];
   var ENCOURAGE_OK = [
-    "Great work — that centre is clear. Keep going!",
-    "Nice! You're reading the triangle well. On to the next one.",
-    "Spot on! Momentum looks good — stay with it.",
-    "Excellent meeting point. Ready for another challenge?",
-    "Well done! Keep that careful drawing going.",
+    "I'm proud of how carefully you drew that — your meeting point shines. Let's keep walking this path together.",
+    "That was lovely work. You're really listening to the triangle; I'm right here cheering you on for the next one.",
+    "Yes — you found it with such calm focus. Hold onto that feeling; the next centre is waiting for you.",
+    "Beautifully done. Every clear centre you find makes the next one kinder. Shall we try another?",
+    "Well spotted, and so patiently drawn. I'm glad you're here learning this — keep going at your pace.",
   ];
 
   var state = {
@@ -708,22 +712,37 @@
   function pickEncourageOk() {
     var idx = Math.min(ENCOURAGE_OK.length - 1, Math.max(0, (state.combo || 1) - 1));
     if (state.combo >= 3) {
-      return "Combo ×" + state.combo + "! Brilliant — keep that focus going.";
+      return (
+        "Combo ×" + state.combo +
+        " — your care is stacking up, and it shows. I'm with you; let's gently take the next step."
+      );
     }
     return ENCOURAGE_OK[idx % ENCOURAGE_OK.length];
   }
 
   function comfortWrongMsg(confusedMode) {
-    var need = MODE_META[state.mode] ? MODE_META[state.mode].centre : "target centre";
+    var needMeta = MODE_META[state.mode];
+    var need = needMeta ? needMeta.centre : "target centre";
+    var needHow = needMeta && needMeta.how ? needMeta.how : "the three special lines for this centre";
     if (confusedMode && MODE_META[confusedMode]) {
-      var seemed = MODE_META[confusedMode].centre;
+      var seemedMeta = MODE_META[confusedMode];
+      var seemed = seemedMeta.centre;
+      var seemedHow = seemedMeta.how || seemedMeta.line;
       return (
-        "You seem to be answering the " + seemed + " instead of the " + need +
-        ". That's a common mix-up — take a breath, check the answer key, then you'll get it."
+        "It looks as if your lines were heading toward the " + seemed +
+        ", while this question asked for the " + need +
+        ". For the " + need + ", lean on " + needHow +
+        " — not " + seemedHow +
+        ", which belong to the " + seemed +
+        ". Mixing them up is how many learners grow; peek at the key with kindness to yourself, " +
+        "and we'll meet this centre again soon so the idea can settle warmly."
       );
     }
     return (
-      "Not quite the " + need + " this time. No stress — study the key below and try the next question."
+      "This one didn't quite land on the " + need +
+      " yet — and that is okay. Remember to use " + needHow +
+      ". Sit with the answer key for a moment; I'm still in your corner, " +
+      "and the next try is a fresh chance to feel it click."
     );
   }
 
@@ -1086,9 +1105,12 @@
     state.stars = 0;
     state.combo = 0;
     state.retryMode = state.mode;
+    var skipMeta = MODE_META[state.mode];
     state.finishMsg =
-      "Skipped the " + (MODE_META[state.mode] ? MODE_META[state.mode].centre : "centre") +
-      ". That's okay — peek at the key, then we'll practise it again soon.";
+      "You set this " + (skipMeta ? skipMeta.centre : "centre") +
+      " aside for now — that takes honesty, and I respect it. When you're ready, remember " +
+      (skipMeta && skipMeta.how ? skipMeta.how : "its three special lines") +
+      ". Glance at the key gently; we'll come back to it together so nothing feels left behind.";
     var dead = loseLife();
     state.running = false;
     clearTimers();

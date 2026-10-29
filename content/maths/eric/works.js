@@ -88,7 +88,7 @@ KOC.works('maths', 'eric', [
     tags: ['Interactive', 'Geometry', 'Game', 'S3'],
     elements: ['fire'],
     cover: 'content/maths/eric/covers/jm28.svg',
-    src: 'content/maths/eric/jm28-triangle-centres/games.html?jmGame=1&v=20261029-coach',
+    src: 'content/maths/eric/jm28-triangle-centres/games.html?jmGame=1&v=20261029-heart',
     notes: 'Geometry Arena: Meeting Point, Centre Snap, Angle Pair Spot, Condition Check.'
   },
   {
