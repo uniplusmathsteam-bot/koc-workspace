@@ -471,10 +471,33 @@
     });
   }
 
+  /**
+   * After a correct answer: prefer a different centre next so the run feels fresh
+   * (still random among remaining non-matching modes).
+   */
+  function preferFreshNextMode() {
+    var next = state.levelIdx + 1;
+    if (next >= LEVELS.length) return;
+    var cur = state.mode;
+    if (LEVELS[next].mode !== cur) return;
+    var candidates = [];
+    var i;
+    for (i = next + 1; i < LEVELS.length; i++) {
+      if (LEVELS[i].mode !== cur) candidates.push(i);
+    }
+    if (!candidates.length) return;
+    var pick = candidates[Math.floor(Math.random() * candidates.length)];
+    var tmp = LEVELS[next];
+    LEVELS[next] = LEVELS[pick];
+    LEVELS[pick] = tmp;
+  }
+
   function advanceToNextLevel() {
     if (state.retryMode) {
       bringModeToNext(state.retryMode);
       state.retryMode = null;
+    } else {
+      preferFreshNextMode();
     }
     startLevel(state.levelIdx + 1);
   }
@@ -710,39 +733,36 @@
   }
 
   function pickEncourageOk() {
-    var idx = Math.min(ENCOURAGE_OK.length - 1, Math.max(0, (state.combo || 1) - 1));
     if (state.combo >= 3) {
       return (
         "Combo ×" + state.combo +
-        " — your care is stacking up, and it shows. I'm with you; let's gently take the next step."
+        " — what steady care. I'm really proud of you; let's keep this warm streak going."
       );
     }
-    return ENCOURAGE_OK[idx % ENCOURAGE_OK.length];
+    return ENCOURAGE_OK[Math.floor(Math.random() * ENCOURAGE_OK.length)];
   }
 
+  /**
+   * Heartfelt + targeted teaching: which lines find the required centre,
+   * vs what the drawing looks like — then soft encouragement.
+   */
   function comfortWrongMsg(confusedMode) {
-    var needMeta = MODE_META[state.mode];
-    var need = needMeta ? needMeta.centre : "target centre";
-    var needHow = needMeta && needMeta.how ? needMeta.how : "the three special lines for this centre";
+    var meta = MODE_META[state.mode];
+    var need = meta ? meta.centre : "target centre";
+    var needHow = meta ? meta.how : "the three special lines for that centre";
     if (confusedMode && MODE_META[confusedMode]) {
-      var seemedMeta = MODE_META[confusedMode];
-      var seemed = seemedMeta.centre;
-      var seemedHow = seemedMeta.how || seemedMeta.line;
+      var wrong = MODE_META[confusedMode];
       return (
-        "It looks as if your lines were heading toward the " + seemed +
-        ", while this question asked for the " + need +
-        ". For the " + need + ", lean on " + needHow +
-        " — not " + seemedHow +
-        ", which belong to the " + seemed +
-        ". Mixing them up is how many learners grow; peek at the key with kindness to yourself, " +
-        "and we'll meet this centre again soon so the idea can settle warmly."
+        "I'm glad you tried — your drawing shows real care. To find the " + need +
+        ", we actually use " + needHow +
+        ", not " + wrong.how + " (those meet at the " + wrong.centre +
+        "). Have a kind look at the answer key; mistakes like this are how the picture becomes clear, and I'll walk the next step with you."
       );
     }
     return (
-      "This one didn't quite land on the " + need +
-      " yet — and that is okay. Remember to use " + needHow +
-      ". Sit with the answer key for a moment; I'm still in your corner, " +
-      "and the next try is a fresh chance to feel it click."
+      "This one didn't click yet, and that is perfectly human. Remember: the " + need +
+      " grows from " + needHow +
+      ". Softly check the key below — you're not alone in this, and every try is teaching your eye."
     );
   }
 
@@ -1105,12 +1125,14 @@
     state.stars = 0;
     state.combo = 0;
     state.retryMode = state.mode;
-    var skipMeta = MODE_META[state.mode];
-    state.finishMsg =
-      "You set this " + (skipMeta ? skipMeta.centre : "centre") +
-      " aside for now — that takes honesty, and I respect it. When you're ready, remember " +
-      (skipMeta && skipMeta.how ? skipMeta.how : "its three special lines") +
-      ". Glance at the key gently; we'll come back to it together so nothing feels left behind.";
+    var sm = MODE_META[state.mode];
+    state.finishMsg = sm
+      ? (
+        "Skipping is okay — rest is part of learning. When you're ready, the " + sm.centre +
+        " comes from " + sm.how +
+        ". Glance at the key; we'll meet this centre again soon, gently."
+      )
+      : "Skipping is okay. Peek at the key — we'll practise this centre again soon.";
     var dead = loseLife();
     state.running = false;
     clearTimers();
