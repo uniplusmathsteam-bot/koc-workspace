@@ -129,5 +129,18 @@ KOC.works('maths', 'eric', [
     cover: 'content/maths/eric/covers/jm31.svg',
     src: 'content/maths/eric/jm31-central-tendency/index.html?jmTools=1&v=20261023-arcs1',
     notes: 'Number-line balance for mean, missions, weighted-share bar, and shift/stretch twin lines.'
+  },
+  {
+    id: 'jm31-central-tendency-concept',
+    title: 'JM31 · Measures of Central Tendency Concept',
+    type: 'interactive',
+    chapter: 'S3 JM31',
+    submitted: '2026-10-30',
+    status: 'pending',
+    tags: ['Interactive', 'Statistics', 'Concept', 'S3'],
+    elements: ['wood'],
+    cover: 'content/maths/eric/covers/jm31.svg',
+    src: 'content/maths/eric/jm31-central-tendency-concept/index.html?v=20261030-concept',
+    notes: 'Two concept decks: mean, median and mode, then weighted mean, a missing value, the 50th percentile, and the same change applied to every value.'
   }
 ]);
