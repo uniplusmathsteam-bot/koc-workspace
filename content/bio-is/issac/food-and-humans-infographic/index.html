@@ -255,14 +255,95 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr) var(--media-col);
       column-gap: 22px;
-      align-items: stretch;
+      align-items: start;
       margin: 0 0 12px;
     }
     .gif-row > .type-card {
-      align-self: stretch;
+      align-self: start;
       align-content: start;
     }
     .gif-row:last-child { margin-bottom: 0; }
+    .gif-row.compact .gif-slot:has(> img):not(.media-stack) {
+      align-items: start;
+      padding: 6px;
+    }
+    .gif-row.compact .gif-slot > img {
+      width: auto;
+      max-width: 100%;
+      max-height: 180px;
+      margin-inline: 0;
+    }
+    .gif-row.thumb {
+      grid-template-columns: minmax(0, 1fr) 132px;
+      column-gap: 14px;
+      align-items: center;
+    }
+    .gif-row.thumb .gif-slot:has(> img):not(.media-stack) {
+      padding: 4px;
+    }
+    .gif-row.thumb .gif-slot > img {
+      width: auto;
+      max-width: 132px;
+      max-height: 108px;
+      margin-inline: 0;
+    }
+    .inline-thumb {
+      grid-column: 1;
+      grid-row: 3;
+      margin: 8px 0 0;
+    }
+    .inline-thumb img {
+      width: 100%;
+      max-width: 140px;
+      max-height: 100px;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      border-radius: 10px;
+    }
+    .inline-thumb figcaption {
+      margin: 4px 0 0;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--moss);
+    }
+    .pair-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 12px;
+      margin: 0 0 12px;
+    }
+    .pair-row > .gif-row {
+      margin: 0;
+      grid-template-columns: minmax(0, 1fr) minmax(96px, 42%);
+      column-gap: 12px;
+      align-items: start;
+    }
+    .pair-row .type-card {
+      grid-template-columns: 1fr;
+      row-gap: 6px;
+      padding: 12px;
+    }
+    .pair-row .type-card h4,
+    .pair-row .examples,
+    .pair-row .props,
+    .pair-row .type-card > .bullets {
+      grid-column: 1;
+      grid-row: auto;
+    }
+    .pair-row .gif-slot:has(> img):not(.media-stack) {
+      padding: 6px;
+      align-items: start;
+    }
+    .pair-row .gif-slot > img {
+      width: auto;
+      max-width: 100%;
+      max-height: 150px;
+      margin-inline: 0;
+    }
     .copy { min-width: 0; }
     .gif-slot {
       margin: 0;
@@ -325,7 +406,9 @@
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
     }
-    .type-grid .gif-row { margin: 0; }
+    .type-grid .gif-row,
+    .type-grid .pair-row,
+    .family-cards .pair-row { margin: 0; }
     .share-row {
       grid-template-columns: minmax(0, 1fr) var(--media-col);
       align-items: stretch;
@@ -353,6 +436,9 @@
     .share-row > .gif-slot:has(> video:only-child):not(.media-stack) {
       height: auto;
       align-self: center;
+    }
+    .share-row > .gif-slot.media-top:has(> img:only-child) {
+      align-self: start;
     }
     .card-stack {
       display: flex;
@@ -611,6 +697,18 @@
       --family-ink: #24382e;
       border-color: #c9d7cc;
     }
+    .nucleic-dna {
+      --family: #2f4d7a;
+      --family-wash: #ebf0f8;
+      --family-ink: #243656;
+      border-color: #c9d4e6;
+    }
+    .nucleic-rna {
+      --family: #6d5018;
+      --family-wash: #f8f0dc;
+      --family-ink: #6d5018;
+      border-color: #e4d3ae;
+    }
     .family-head {
       display: flex;
       align-items: center;
@@ -762,6 +860,22 @@
       object-fit: contain;
       object-position: center;
     }
+    .water-intro.thumb .gif-slot > img {
+      width: auto;
+      max-width: 132px;
+      max-height: 108px;
+    }
+    .water-grid .gif-row.compact .gif-slot > img {
+      width: auto;
+      max-width: 100%;
+      max-height: 180px;
+    }
+    .water-grid .gif-slot > img.portrait {
+      width: auto;
+      max-width: 240px;
+      max-height: 420px;
+      margin-inline: auto;
+    }
     .scroll {
       overflow-x: auto;
       margin: 0 0 16px;
@@ -801,12 +915,29 @@
       grid-template-columns: minmax(11rem, 1fr) 280px;
       gap: 8px 14px;
       align-items: center;
+      padding-left: 0;
+    }
+    .compare-table td .bullets > li.shot-row::before {
+      content: none;
     }
     .compare-table td .bullets > li.shot-row > span,
     .compare-table td .bullets > li.shot-row > div {
       grid-column: 1;
       grid-row: 1;
       min-width: 11rem;
+      position: relative;
+      padding-left: 16px;
+    }
+    .compare-table td .bullets > li.shot-row > span::before,
+    .compare-table td .bullets > li.shot-row > div::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.55em;
+      width: 6px;
+      height: 6px;
+      border-radius: 2px;
+      background: var(--moss);
     }
     .compare-table td .bullets > li.shot-row > img {
       width: 280px;
@@ -822,8 +953,12 @@
     .compare-table td .bullets > li.shot-row:has(> div > ul.bullets) {
       padding-left: 0;
     }
-    .compare-table td .bullets > li.shot-row:has(> div > ul.bullets)::before {
+    .compare-table td .bullets > li.shot-row:has(> div > ul.bullets)::before,
+    .compare-table td .bullets > li.shot-row:has(> div > ul.bullets) > div::before {
       content: none;
+    }
+    .compare-table td .bullets > li.shot-row:has(> div > ul.bullets) > div {
+      padding-left: 0;
     }
     .compare-table td .shot-row > div > ul.bullets {
       margin: 0;
@@ -875,9 +1010,9 @@
     .compare-table .size-media img,
     .compare-table .size-media video {
       width: 100%;
-      max-width: 420px;
+      max-width: none;
       height: auto;
-      max-height: 360px;
+      max-height: none;
       object-fit: contain;
       object-position: center;
       display: block;
@@ -893,7 +1028,12 @@
       }
       .mast:has(> .gif-slot),
       section:has(> .gif-slot),
-      .gif-row {
+      .gif-row,
+      .gif-row.thumb,
+      .pair-row > .gif-row {
+        grid-template-columns: 1fr;
+      }
+      .pair-row {
         grid-template-columns: 1fr;
       }
       .gif-slot { margin-top: 8px; }
@@ -1143,19 +1283,19 @@
               <td>
                 One sugar unit
                 <figure class="size-media">
-                  <img loading="lazy" decoding="async" src="images/monosaccharide.gif?v=20261031b" alt="One sugar unit. A monosaccharide monomer.">
+                  <img loading="lazy" decoding="async" src="images/monosaccharide.gif?v=20261031c" alt="One sugar unit. A monosaccharide monomer.">
                 </figure>
               </td>
               <td>
                 Two sugar units. At least one is glucose.
                 <figure class="size-media">
-                  <img loading="lazy" decoding="async" src="images/disaccharide-formation.gif?v=20261031b" alt="Two glucose units join by condensation to form maltose.">
+                  <img loading="lazy" decoding="async" src="images/disaccharide-formation.gif?v=20261031c" alt="Two glucose units join by condensation to form maltose.">
                 </figure>
               </td>
               <td>
                 A long chain
                 <figure class="size-media">
-                  <img loading="lazy" decoding="async" src="images/polysaccharide-formation.gif?v=20261031b" alt="Condensation builds a polysaccharide chain. Hydrolysis breaks it down.">
+                  <img loading="lazy" decoding="async" src="images/polysaccharide-formation.gif?v=20261031c" alt="Condensation builds a polysaccharide chain. Hydrolysis breaks it down.">
                 </figure>
               </td>
             </tr>
@@ -1175,7 +1315,7 @@
             </div>
           </header>
           <div class="family-cards">
-        <div class="gif-row">
+        <div class="gif-row compact">
         <article class="type-card">
           <h4>Glucose</h4>
           <p class="examples">Monosaccharide</p>
@@ -1192,6 +1332,7 @@
           <img loading="lazy" decoding="async" src="images/glucose.jpg" alt="An athlete squeezing glucose energy gel into his mouth.">
         </aside>
         </div>
+        <div class="pair-row">
         <div class="gif-row">
         <article class="type-card">
           <h4>Fructose</h4>
@@ -1224,6 +1365,8 @@
           <img loading="lazy" decoding="async" src="images/galactose.png" alt="A bowl of yogurt.">
         </aside>
         </div>
+        </div>
+        <div class="pair-row">
         <div class="gif-row">
         <article class="type-card">
           <h4>Ribose</h4>
@@ -1254,6 +1397,7 @@
           <img loading="lazy" decoding="async" src="images/deoxyribose.jpg" alt="A DNA double helix.">
         </aside>
         </div>
+        </div>
           </div>
         </div>
         <div class="carb-family carb-di">
@@ -1273,6 +1417,10 @@
         <article class="type-card">
           <h4>Maltose</h4>
           <p class="examples">Disaccharide. Glucose + glucose</p>
+          <figure class="inline-thumb">
+            <img loading="lazy" decoding="async" src="images/maltose.jpg" alt="Roasted sweet potatoes.">
+            <figcaption>Source</figcaption>
+          </figure>
           <dl class="props">
             <div>
               <dt>Properties</dt>
@@ -1282,18 +1430,11 @@
             </div>
           </dl>
         </article>
-        <aside class="gif-slot media-stack" aria-label="Maltose source and glycosidic bond">
-          <figure class="media-labeled">
-            <p class="media-label">Source</p>
-            <img loading="lazy" decoding="async" src="images/maltose.jpg" alt="Roasted sweet potatoes.">
-          </figure>
-          <figure class="media-labeled">
-            <p class="media-label">Glycosidic bond</p>
+        <aside class="gif-slot photo-slot" aria-label="Glycosidic bond">
             <img loading="lazy" decoding="async" src="images/glycosidic-bond.png" alt="A glycosidic bond joining two alpha-D-glucose molecules.">
-          </figure>
         </aside>
         </div>
-        <div class="gif-row">
+        <div class="gif-row compact">
         <article class="type-card">
           <h4>Sucrose</h4>
           <p class="examples">Disaccharide. Glucose + fructose</p>
@@ -1309,7 +1450,7 @@
           <img loading="lazy" decoding="async" src="images/sucrose.jpg" alt="Cut sugarcane.">
         </aside>
         </div>
-        <div class="gif-row">
+        <div class="gif-row thumb">
         <article class="type-card">
           <h4>Lactose</h4>
           <p class="examples">Disaccharide. Glucose + galactose</p>
@@ -1346,7 +1487,7 @@
             </div>
           </header>
           <div class="family-cards">
-        <div class="gif-row">
+        <div class="gif-row compact">
         <article class="type-card">
           <h4>Glycogen</h4>
           <p class="examples">Polysaccharide</p>
@@ -1365,7 +1506,7 @@
           <img loading="lazy" decoding="async" src="images/glycogen.png" alt="Glycogen stored in the liver and in muscles.">
         </aside>
         </div>
-        <div class="gif-row">
+        <div class="gif-row compact">
         <article class="type-card">
           <h4>Starch</h4>
           <p class="examples">Polysaccharide</p>
@@ -1505,7 +1646,7 @@
                 <img loading="lazy" decoding="async" src="images/cholesterol.gif" alt="Cholesterol can build up in arteries and affect the heart.">
               </aside>
             </div>
-            <div class="gif-row">
+            <div class="gif-row compact">
               <article class="type-card">
                 <h4>Sex hormones</h4>
                 <p class="examples">Steroid. Made from cholesterol</p>
@@ -1638,10 +1779,10 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Membrane proteins">
-          <img loading="lazy" decoding="async" src="images/membrane-protein.png" alt="Channel, receptor, carrier and antigen proteins in a cell membrane.">
+          <img loading="lazy" decoding="async" src="images/membrane-protein.png?v=20261031c" alt="Channel, receptor, carrier and antigen proteins in a cell membrane.">
         </aside>
         </div>
-        <div class="gif-row">
+        <div class="gif-row compact">
 <article class="type-card">
           <h4>Growth and repair</h4>
           <p class="examples">Muscle, skin, nails</p>
@@ -1653,7 +1794,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Growth and repair of tissue">
-          <img loading="lazy" decoding="async" src="images/growth-repair.png" alt="Protein chains building muscle, skin and nails.">
+          <img loading="lazy" decoding="async" src="images/growth-repair.png?v=20261031c" alt="Protein chains building muscle, skin and nails.">
         </aside>
         </div>
         <div class="gif-row">
@@ -1672,7 +1813,7 @@
           <img loading="lazy" decoding="async" src="images/enzyme.png" alt="An enzyme binding its substrate at the active site and speeding the reaction.">
         </aside>
         </div>
-        <div class="gif-row">
+        <div class="gif-row compact">
 <article class="type-card">
           <h4>Hormones</h4>
           <p class="examples">Chemical signals</p>
@@ -1687,7 +1828,7 @@
           <img loading="lazy" decoding="async" src="images/hormone.jpg" alt="A hormone binding a receptor and switching on a response.">
         </aside>
         </div>
-        <div class="gif-row">
+        <div class="gif-row compact">
 <article class="type-card">
           <h4>Antibodies</h4>
           <p class="examples">Immune defence</p>
@@ -1740,62 +1881,111 @@
         </div>
         <div class="gif-row share-row">
           <div class="card-stack">
-<article class="type-card">
-          <h4>DNA</h4>
-          <p class="examples">Deoxyribonucleic acid</p>
-          <dl class="props">
-            <div>
-              <dt>Composition</dt>
-              <dd>Deoxyribose.</dd>
-              <dd>Double-stranded polymer of nucleotides.</dd>
-              <dd>Bases: A–T and C–G.</dd>
+            <div class="carb-family nucleic-dna">
+              <header class="family-head">
+                <div>
+                  <h3>DNA</h3>
+                  <p class="family-note">Deoxyribonucleic acid</p>
+                </div>
+              </header>
+              <div class="family-cards">
+                <article class="type-card">
+                  <h4>Composition</h4>
+                  <dl class="props">
+                    <div>
+                      <dt>Parts</dt>
+                      <dd>Deoxyribose.</dd>
+                      <dd>Double-stranded polymer of nucleotides.</dd>
+                      <dd>Bases: A–T and C–G.</dd>
+                    </div>
+                  </dl>
+                </article>
+                <article class="type-card">
+                  <h4>Structure</h4>
+                  <dl class="props">
+                    <div>
+                      <dt>Shape</dt>
+                      <dd>Double helix, held by hydrogen bonds.</dd>
+                      <dd>Adenine–thymine: 2 hydrogen bonds.</dd>
+                      <dd>Cytosine–guanine: 3 hydrogen bonds.</dd>
+                      <dd>A% equals T%. C and G share the rest equally.</dd>
+                    </div>
+                  </dl>
+                </article>
+                <article class="type-card">
+                  <h4>Role</h4>
+                  <dl class="props">
+                    <div>
+                      <dt>Job</dt>
+                      <dd>Stores genetic information.</dd>
+                      <dd>Carries the genetic code.</dd>
+                    </div>
+                  </dl>
+                </article>
+                <article class="type-card">
+                  <h4>Place and stability</h4>
+                  <dl class="props">
+                    <div>
+                      <dt>Where</dt>
+                      <dd>Mainly in the nucleus.</dd>
+                      <dd>More stable than RNA.</dd>
+                    </div>
+                  </dl>
+                </article>
+              </div>
             </div>
-            <div>
-              <dt>Structure</dt>
-              <dd>Double helix, held by hydrogen bonds.</dd>
-              <dd>Adenine–thymine: 2 hydrogen bonds.</dd>
-              <dd>Cytosine–guanine: 3 hydrogen bonds.</dd>
-              <dd>A% equals T%. C and G share the rest equally.</dd>
+            <div class="carb-family nucleic-rna">
+              <header class="family-head">
+                <div>
+                  <h3>RNA</h3>
+                  <p class="family-note">mRNA and tRNA</p>
+                </div>
+              </header>
+              <div class="family-cards">
+                <article class="type-card">
+                  <h4>Composition</h4>
+                  <dl class="props">
+                    <div>
+                      <dt>Parts</dt>
+                      <dd>Ribose.</dd>
+                      <dd>Single-stranded polymer of nucleotides.</dd>
+                      <dd>Bases: A–U and C–G.</dd>
+                    </div>
+                  </dl>
+                </article>
+                <article class="type-card">
+                  <h4>Role</h4>
+                  <dl class="props">
+                    <div>
+                      <dt>Job</dt>
+                      <dd>Takes part in protein synthesis.</dd>
+                      <dd>Helps regulate gene expression.</dd>
+                    </div>
+                  </dl>
+                </article>
+                <article class="type-card">
+                  <h4>Place and stability</h4>
+                  <dl class="props">
+                    <div>
+                      <dt>Where</dt>
+                      <dd>Nucleus and cytoplasm.</dd>
+                      <dd>Less stable than DNA.</dd>
+                    </div>
+                  </dl>
+                </article>
+              </div>
             </div>
-            <div>
-              <dt>Role</dt>
-              <dd>Stores genetic information.</dd>
-              <dd>Carries the genetic code.</dd>
-            </div>
-            <div>
-              <dt>Place and stability</dt>
-              <dd>Mainly in the nucleus.</dd>
-              <dd>More stable than RNA.</dd>
-            </div>
-          </dl>
-        </article>
-<article class="type-card">
-          <h4>RNA</h4>
-          <p class="examples">mRNA and tRNA</p>
-          <dl class="props">
-            <div>
-              <dt>Composition</dt>
-              <dd>Ribose.</dd>
-              <dd>Single-stranded polymer of nucleotides.</dd>
-              <dd>Bases: A–U and C–G.</dd>
-            </div>
-            <div>
-              <dt>Role</dt>
-              <dd>Takes part in protein synthesis.</dd>
-              <dd>Helps regulate gene expression.</dd>
-            </div>
-            <div>
-              <dt>Place and stability</dt>
-              <dd>Nucleus and cytoplasm.</dd>
-              <dd>Less stable than DNA.</dd>
-            </div>
-          </dl>
-        </article>
           </div>
-        <aside class="gif-slot photo-slot media-stack" aria-label="DNA and mRNA">
-          <img loading="lazy" decoding="async" src="images/dna-rna.gif" alt="DNA is transcribed to mRNA, which is then translated into a polypeptide.">
-          <img loading="lazy" decoding="async" src="images/dna-rna.png" alt="DNA is transcribed to mRNA, which is translated into protein.">
-        </aside>
+          <aside class="gif-slot media-stack media-top" aria-label="DNA base pairing and from DNA to protein">
+            <figure class="media-labeled">
+              <p class="media-label">Base pairing</p>
+              <img loading="lazy" decoding="async" src="images/dna-base-pairing.png?v=20261031" alt="DNA base pairing: A pairs with T by 2 hydrogen bonds, G pairs with C by 3 hydrogen bonds.">
+            </figure>
+            <figure class="media-labeled">
+              <p class="media-label">Transcription and translation</p>
+              <img loading="lazy" decoding="async" src="images/dna-to-protein.gif?v=20261031" alt="From DNA to protein, shown at double speed.">
+            </figure>
+          </aside>
         </div>
       </div>
       </div>
@@ -1874,6 +2064,7 @@
       </div>
       <h3>Types</h3>
       <div class="type-grid">
+        <div class="pair-row">
         <div class="gif-row">
         <article class="type-card">
           <h4>Nitrate</h4>
@@ -1906,6 +2097,8 @@
           <img loading="lazy" decoding="async" src="images/magnesium.png" alt="A chlorophyll molecule with a magnesium atom at its centre.">
         </aside>
         </div>
+        </div>
+        <div class="pair-row">
         <div class="gif-row">
         <article class="type-card">
           <h4>Phosphorus</h4>
@@ -1937,6 +2130,7 @@
         <aside class="gif-slot photo-slot" aria-label="Iodine supplement">
           <img loading="lazy" decoding="async" src="images/iodine.png" alt="A bottle of iodine food-supplement tablets.">
         </aside>
+        </div>
         </div>
       </div>
       </div>
@@ -1997,7 +2191,7 @@
       </div>
       <h3>Types</h3>
       <div class="type-grid">
-        <div class="gif-row">
+        <div class="gif-row compact">
         <article class="type-card">
           <h4>Vitamin A</h4>
           <p class="examples">Fat-soluble</p>
@@ -2036,7 +2230,7 @@
           <img loading="lazy" decoding="async" src="images/vitamin-c.jpg" alt="Lemons, a food source of vitamin C.">
         </aside>
         </div>
-        <div class="gif-row">
+        <div class="gif-row compact">
         <article class="type-card">
           <h4>Vitamin D</h4>
           <p class="examples">Fat-soluble</p>
@@ -2065,6 +2259,7 @@
       </div>
       <h3>Types</h3>
       <div class="type-grid">
+        <div class="pair-row">
         <div class="gif-row">
         <article class="type-card">
           <h4>Insoluble fibre</h4>
@@ -2096,6 +2291,7 @@
           <img loading="lazy" decoding="async" src="images/soluble-fibre.png" alt="Foods that provide soluble fibre: barley, oats, beans, figs, prunes and sweet potatoes.">
         </aside>
         </div>
+        </div>
       </div>
       <h3>Properties</h3>
       <div class="type-grid">
@@ -2117,7 +2313,7 @@
     <section class="chapter chapter-nutrient" id="s10">
       <div class="copy">
       <div class="sec"><span class="num">10</span><h2>Water</h2></div>
-      <div class="gif-row water-intro">
+      <div class="gif-row thumb water-intro">
         <div class="key-idea">
           <p>Inorganic. No energy value.</p>
         </div>
@@ -2127,7 +2323,7 @@
       </div>
       <h3>Properties</h3>
       <div class="type-grid water-grid">
-        <div class="gif-row">
+        <div class="gif-row compact">
         <article class="type-card">
           <h4>Reactant</h4>
           <dl class="props">
@@ -2142,7 +2338,7 @@
           <img loading="lazy" decoding="async" src="images/water-reactant.png" alt="Photosynthesis equation: carbon dioxide and water, with light, make sugar and oxygen.">
         </aside>
         </div>
-        <div class="gif-row">
+        <div class="gif-row compact">
         <article class="type-card">
           <h4>Solvent</h4>
           <dl class="props">
@@ -2154,7 +2350,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Cytoplasm as a water solvent">
-          <img loading="lazy" decoding="async" src="images/water-solvent.png" alt="Cytoplasm, a jelly-like substance that is about 80 percent water.">
+          <img loading="lazy" decoding="async" src="images/water-solvent.gif?v=20261031" alt="Salt dissolving in water, showing water as a solvent.">
         </aside>
         </div>
         <div class="gif-row">
@@ -2172,10 +2368,10 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Water supporting a plant">
-          <img loading="lazy" decoding="async" src="images/water-support.jpg" alt="Water fills a plant from the roots through the stem, holding the shoot upright.">
+          <img loading="lazy" decoding="async" class="portrait" src="images/water-support.gif?v=20261031" alt="Water in plant cells keeps turgor pressure, so the shoot stays upright.">
         </aside>
         </div>
-        <div class="gif-row">
+        <div class="gif-row compact">
         <article class="type-card">
           <h4>Transport</h4>
           <dl class="props">
@@ -2205,7 +2401,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Water evaporating from skin">
-          <img loading="lazy" decoding="async" src="images/water-latent-heat.png" alt="Water on the skin surface evaporates as water vapour, taking heat away.">
+          <img loading="lazy" decoding="async" class="portrait" src="images/water-latent-heat.gif?v=20261031" alt="Sweat evaporates from the skin and takes heat with it.">
         </aside>
         </div>
         <div class="gif-row">
@@ -2220,7 +2416,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Measuring the temperature of water">
-          <img loading="lazy" decoding="async" src="images/water-specific-heat.png" alt="A thermometer in a beaker of water, used to show that water's temperature changes little when energy is added.">
+          <img loading="lazy" decoding="async" src="images/water-specific-heat.gif?v=20261031" alt="Water's high specific heat: its temperature changes little when energy is added.">
         </aside>
         </div>
       </div>
