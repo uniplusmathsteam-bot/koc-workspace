@@ -13,10 +13,11 @@
       --wash: #f6f0e4;
       --brand-gold: #e8c96a;
       --brand-gold-wash: #f5e6b8;
-      --media-col: 280px;
-      --media-frame-h: 220px;
-      --media-frame-h-lg: 280px;
-      --media-frame-h-sm: 190px;
+      --media-col: 420px;
+      --media-frame-h: 420px;
+      --media-frame-h-lg: 520px;
+      --media-frame-h-sm: 320px;
+      --media-max-h: 560px;
     }
     * { box-sizing: border-box; }
     body {
@@ -28,7 +29,7 @@
         #e5ddd0;
     }
     .page {
-      width: min(1180px, calc(100% - 32px));
+      width: min(1280px, calc(100% - 32px));
       margin: 32px auto 56px;
     }
     .mast {
@@ -62,7 +63,7 @@
     .brand-mark svg { display: block; }
     .brand-series {
       font-family: "Avenir Next", "Segoe UI", sans-serif;
-      font-size: 13px;
+      font-size: 16px;
       font-weight: 700;
       letter-spacing: 0.12em;
       text-transform: uppercase;
@@ -71,7 +72,7 @@
     .brand-tag {
       margin-left: auto;
       font-family: "Avenir Next", "Segoe UI", sans-serif;
-      font-size: 12px;
+      font-size: 15px;
       font-weight: 600;
       letter-spacing: 0.06em;
       color: #6a5f52;
@@ -79,14 +80,14 @@
     .mast-subtitle {
       margin: -6px 0 16px;
       font-family: "Avenir Next", "Segoe UI", sans-serif;
-      font-size: 15px;
+      font-size: 18px;
       font-weight: 600;
       letter-spacing: 0.04em;
       color: #5c5348;
     }
     h1 {
       margin: 0 0 14px;
-      font-size: 56px;
+      font-size: 68px;
       line-height: 0.92;
       letter-spacing: -0.03em;
     }
@@ -102,11 +103,12 @@
     .lead {
       margin: 0 0 10px;
       max-width: 40em;
-      font-size: 22px;
+      font-size: 26px;
       line-height: 1.35;
     }
     .lead:last-child { margin-bottom: 0; }
     section {
+      scroll-margin-top: 58px;
       --chapter-accent: var(--moss);
       --chapter-wash: var(--wash);
       background: var(--card);
@@ -159,7 +161,7 @@
       background: var(--brand-gold);
       color: var(--ink);
       font-family: "Avenir Next", "Segoe UI", sans-serif;
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 800;
       letter-spacing: 0.14em;
       text-transform: uppercase;
@@ -175,7 +177,7 @@
     }
     .key-idea--hero li {
       margin: 0 0 6px;
-      font-size: 17px;
+      font-size: 21px;
       line-height: 1.4;
     }
     .key-idea--hero li:last-child { margin-bottom: 0; }
@@ -188,7 +190,7 @@
     .cheat-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 15px;
+      font-size: 18px;
       line-height: 1.35;
     }
     .cheat-table th,
@@ -200,7 +202,7 @@
     }
     .cheat-table th {
       font-family: "Avenir Next", "Segoe UI", sans-serif;
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 700;
       letter-spacing: 0.1em;
       text-transform: uppercase;
@@ -231,14 +233,14 @@
     }
     .why-matters li {
       margin: 0 0 6px;
-      font-size: 17px;
+      font-size: 21px;
       line-height: 1.45;
     }
     .why-matters li:last-child { margin-bottom: 0; }
     .page-credit {
       margin: 0;
       font-family: "Avenir Next", "Segoe UI", sans-serif;
-      font-size: 12px;
+      font-size: 15px;
       letter-spacing: 0.04em;
       color: #7a7064;
     }
@@ -269,29 +271,87 @@
     }
     .gif-slot:has(> img):not(.media-stack),
     .gif-slot:has(> video):not(.media-stack) {
-      height: var(--media-frame-h);
-      display: grid;
-      place-items: center;
+      height: auto;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background: var(--wash);
       border-radius: 16px;
-      overflow: hidden;
+      overflow: visible;
+      padding: 8px;
     }
     .gif-slot > img,
     .gif-slot > video {
       width: 100%;
-      height: 100%;
+      height: auto;
+      max-height: var(--media-max-h);
       object-fit: contain;
+      object-position: center;
       display: block;
       border-radius: 0;
+    }
+    .gif-slot > img.portrait {
+      width: auto;
+      max-width: 240px;
+      max-height: 420px;
+      margin-inline: auto;
+    }
+    .section-nav {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      margin: 0 0 14px;
+      padding: 8px 2px;
+      background: rgba(255, 253, 248, 0.94);
+      border-bottom: 1px solid var(--line);
+    }
+    .section-nav a {
+      flex: 0 0 auto;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: var(--wash);
+      color: var(--ink);
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+    }
+    .section-nav a:hover { background: var(--brand-gold-wash); }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
     }
     .type-grid .gif-row { margin: 0; }
     .share-row {
       grid-template-columns: minmax(0, 1fr) var(--media-col);
       align-items: stretch;
     }
+    .share-row > .gif-slot.media-stack {
+      align-self: start;
+      justify-self: stretch;
+    }
+    .media-stack .media-labeled {
+      padding: 10px 10px 12px;
+      background: #fffdf8;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      height: auto;
+      align-content: start;
+    }
+    .media-stack .media-labeled img {
+      width: 100%;
+      height: auto;
+      max-height: none;
+      background: #fffdf8;
+      border-radius: 12px;
+    }
     .share-row > .gif-slot:has(> img:only-child):not(.media-stack),
     .share-row > .gif-slot:has(> video:only-child):not(.media-stack) {
-      height: var(--media-frame-h-lg);
+      height: auto;
       align-self: center;
     }
     .card-stack {
@@ -303,7 +363,8 @@
     .media-stack {
       display: grid;
       gap: 12px;
-      align-self: center;
+      align-self: start;
+      align-content: start;
       background: transparent;
       height: auto;
       overflow: visible;
@@ -311,8 +372,10 @@
     .media-stack > img,
     .media-stack > video {
       width: 100%;
-      height: var(--media-frame-h-sm);
+      height: auto;
+      max-height: var(--media-frame-h-sm);
       object-fit: contain;
+      object-position: center;
       display: block;
       background: var(--wash);
       border-radius: 16px;
@@ -326,7 +389,7 @@
     .media-label {
       margin: 0;
       font-family: "Avenir Next", "Segoe UI", sans-serif;
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 600;
       letter-spacing: 0.14em;
       text-transform: uppercase;
@@ -334,14 +397,16 @@
     }
     .media-caption {
       margin: 0;
-      font-size: 15px;
+      font-size: 18px;
       line-height: 1.35;
     }
     .media-labeled img,
     .media-labeled video {
       width: 100%;
-      height: var(--media-frame-h-sm);
+      height: auto;
+      max-height: var(--media-frame-h-lg);
       object-fit: contain;
+      object-position: center;
       display: block;
       background: var(--wash);
       border-radius: 16px;
@@ -359,7 +424,7 @@
       place-content: center;
       text-align: center;
       color: #7a6f62;
-      font-size: 15px;
+      font-size: 18px;
       line-height: 1.35;
     }
     .deficiency-row {
@@ -378,27 +443,27 @@
     }
     .num {
       flex: none;
-      min-width: 36px;
-      height: 36px;
+      min-width: 42px;
+      height: 42px;
       padding: 0 8px;
       border-radius: 12px;
       background: var(--moss);
       color: #f7f3ea;
       font-family: "Avenir Next", "Segoe UI", sans-serif;
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 600;
       letter-spacing: 0.04em;
       display: grid;
       place-items: center;
     }
-    h2 { margin: 0; font-size: 28px; letter-spacing: -0.02em; }
+    h2 { margin: 0; font-size: 36px; letter-spacing: -0.02em; }
     h3 {
       display: flex;
       align-items: center;
       gap: 12px;
       margin: 6px 0 10px;
       font-family: "Avenir Next", "Segoe UI", sans-serif;
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 600;
       letter-spacing: 0.16em;
       text-transform: uppercase;
@@ -411,7 +476,7 @@
       background: var(--line);
     }
     ul, ol { margin: 0 0 16px; padding-left: 1.15em; }
-    li { margin: 0 0 8px; font-size: 18px; line-height: 1.45; }
+    li { margin: 0 0 8px; font-size: 22px; line-height: 1.45; }
     section > ul { list-style: none; padding-left: 0; }
     section > ul > li {
       position: relative;
@@ -442,7 +507,7 @@
       border-left: 2px solid #ddd2c0;
       list-style: none;
     }
-    .group ul li { font-size: 17px; }
+    .group ul li { font-size: 20px; }
     ol {
       list-style: none;
       padding-left: 0;
@@ -461,7 +526,7 @@
     ol li::before {
       content: counter(step, decimal-leading-zero);
       font-family: "Avenir Next", "Segoe UI", sans-serif;
-      font-size: 13px;
+      font-size: 16px;
       font-weight: 600;
       letter-spacing: 0.04em;
       color: var(--moss);
@@ -513,7 +578,7 @@
     }
     .key-idea p {
       margin: 0 0 8px;
-      font-size: 18px;
+      font-size: 22px;
       line-height: 1.45;
     }
     .key-idea p:last-child { margin-bottom: 0; }
@@ -555,16 +620,17 @@
     }
     .family-thumb {
       flex: none;
-      width: 108px;
-      height: 68px;
+      width: 160px;
+      height: auto;
       margin-left: auto;
       border-radius: 12px;
-      overflow: hidden;
+      overflow: visible;
       background: #fff;
     }
     .family-thumb img {
       width: 100%;
-      height: 100%;
+      height: auto;
+      max-height: 120px;
       object-fit: contain;
       object-position: center;
       display: block;
@@ -577,7 +643,7 @@
     .family-note {
       margin: 3px 0 0;
       font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
-      font-size: 15px;
+      font-size: 18px;
       font-weight: 400;
       letter-spacing: 0;
       text-transform: none;
@@ -586,7 +652,7 @@
     }
     .section-note {
       margin: -4px 0 12px;
-      font-size: 16px;
+      font-size: 19px;
       line-height: 1.4;
       color: var(--ink);
     }
@@ -617,7 +683,7 @@
       margin: 3px 0 0;
     }
     .props ol.steps li {
-      font-size: 16px;
+      font-size: 20px;
       line-height: 1.4;
       margin: 0;
     }
@@ -635,7 +701,7 @@
     }
     .type-card {
       display: grid;
-      grid-template-columns: minmax(148px, 210px) minmax(0, 1fr);
+      grid-template-columns: minmax(180px, 250px) minmax(0, 1fr);
       column-gap: 22px;
       align-items: start;
       margin: 0;
@@ -647,14 +713,14 @@
       grid-column: 1;
       grid-row: 1;
       margin: 0 0 4px;
-      font-size: 20px;
+      font-size: 26px;
       letter-spacing: -0.02em;
     }
     .examples {
       grid-column: 1;
       grid-row: 2;
       margin: 0;
-      font-size: 16px;
+      font-size: 19px;
       line-height: 1.4;
     }
     .props {
@@ -669,7 +735,7 @@
     .props div { margin-top: 0; }
     .props dt {
       font-family: "Avenir Next", "Segoe UI", sans-serif;
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 600;
       letter-spacing: 0.14em;
       text-transform: uppercase;
@@ -677,7 +743,7 @@
     }
     .props dd {
       margin: 3px 0 0;
-      font-size: 16px;
+      font-size: 20px;
       line-height: 1.4;
     }
     .water-grid .props {
@@ -691,7 +757,8 @@
     .water-intro .gif-slot > img,
     .water-grid .gif-slot > img {
       width: 100%;
-      height: var(--media-frame-h);
+      height: auto;
+      max-height: var(--media-max-h);
       object-fit: contain;
       object-position: center;
     }
@@ -703,7 +770,7 @@
       width: 100%;
       min-width: 640px;
       border-collapse: collapse;
-      font-size: 16px;
+      font-size: 19px;
       line-height: 1.4;
     }
     .compare-table th,
@@ -715,7 +782,7 @@
     }
     .compare-table th {
       font-family: "Avenir Next", "Segoe UI", sans-serif;
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 600;
       letter-spacing: 0.12em;
       text-transform: uppercase;
@@ -726,12 +793,12 @@
       padding: 0;
     }
     .compare-table td .bullets > li {
-      font-size: 16px;
+      font-size: 19px;
       line-height: 1.4;
     }
     .compare-table td .bullets > li.shot-row {
       display: grid;
-      grid-template-columns: minmax(11rem, 1fr) 200px;
+      grid-template-columns: minmax(11rem, 1fr) 280px;
       gap: 8px 14px;
       align-items: center;
     }
@@ -742,9 +809,11 @@
       min-width: 11rem;
     }
     .compare-table td .bullets > li.shot-row > img {
-      width: 200px;
-      height: 132px;
+      width: 280px;
+      height: auto;
+      max-height: 220px;
       object-fit: contain;
+      object-position: center;
       background: #fff;
       border-radius: 12px;
       grid-column: 2;
@@ -762,7 +831,7 @@
       border: none;
     }
     .compare-table td .shot-row > div > ul.bullets > li {
-      font-size: 16px;
+      font-size: 19px;
       padding-left: 16px;
     }
     .compare-table td .shot-row > div > ul.bullets > li::before {
@@ -785,7 +854,7 @@
       position: relative;
       margin: 0 0 4px;
       padding-left: 14px;
-      font-size: 15px;
+      font-size: 18px;
       line-height: 1.35;
     }
     .compare-table td .bullets ul li::before,
@@ -806,10 +875,11 @@
     .compare-table .size-media img,
     .compare-table .size-media video {
       width: 100%;
-      max-width: 260px;
+      max-width: 420px;
       height: auto;
-      max-height: 180px;
+      max-height: 360px;
       object-fit: contain;
+      object-position: center;
       display: block;
       border-radius: 12px;
       background: #fff;
@@ -828,18 +898,30 @@
       }
       .gif-slot { margin-top: 8px; }
       :root {
-        --media-frame-h: 200px;
-        --media-frame-h-lg: 240px;
-        --media-frame-h-sm: 172px;
+        --media-col: 100%;
+        --media-frame-h: 320px;
+        --media-frame-h-lg: 400px;
+        --media-frame-h-sm: 280px;
+        --media-max-h: 420px;
+      }
+      .compare-table td .bullets > li.shot-row {
+        grid-template-columns: minmax(11rem, 1fr);
+      }
+      .compare-table td .bullets > li.shot-row > img {
+        width: 100%;
+        max-width: 420px;
+        max-height: 320px;
+        grid-column: 1;
+        grid-row: auto;
       }
       .type-card { grid-template-columns: 1fr; row-gap: 8px; }
       .type-card h4,
       .examples,
       .props,
       .type-card > .bullets { grid-column: 1; grid-row: auto; }
-      h1 { font-size: 40px; }
-      .lead, .key-idea p, li { font-size: 17px; }
-      .type-card h4 { font-size: 18px; }
+      h1 { font-size: 48px; }
+      .lead, .key-idea p, li { font-size: 20px; }
+      .type-card h4 { font-size: 22px; }
       .family-head { align-items: flex-start; }
       .sugar-art { margin-top: 2px; }
       .family-thumb { width: 88px; height: 56px; }
@@ -865,7 +947,7 @@
         <span class="brand-tag">Nutrients · Tests · Balance</span>
       </div>
       <h1>Food and Humans</h1>
-      <p class="mast-subtitle">One-page revision from Ch5 notes</p>
+      <p class="mast-subtitle">Ch5 · BB02 Molecules of Life</p>
       <p class="lead">Organic molecules contain C–C or C–H bonds. Carbon dioxide is not organic.</p>
       <p class="lead">Seven nutrient groups: carbohydrates, lipids, proteins, dietary fibre, vitamins, minerals and ions, and water. Nucleic acids carry genetic information. They are not an energy food.</p>
       <div class="scroll">
@@ -908,6 +990,23 @@
       </div>
       </div>
     </header>
+
+    <nav class="section-nav" aria-label="Sections">
+      <a href="#at-a-glance">Glance</a>
+      <a href="#s01">01 Hydrolysis</a>
+      <a href="#s02">02 Carbohydrate</a>
+      <a href="#s03">03 Lipid</a>
+      <a href="#s04">04 Protein</a>
+      <a href="#s05">05 Nucleic acid</a>
+      <a href="#s06">06 Minerals</a>
+      <a href="#s07">07 Ions</a>
+      <a href="#s08">08 Vitamins</a>
+      <a href="#s09">09 Fibre</a>
+      <a href="#s10">10 Water</a>
+      <a href="#s11">11 Deficiency</a>
+      <a href="#s12">12 Food test</a>
+      <a href="#s13">13 Who needs more</a>
+    </nav>
 
     <section class="chapter chapter-poster at-a-glance" id="at-a-glance">
       <div class="copy">
@@ -963,7 +1062,7 @@
       </div>
     </section>
 
-    <section class="chapter chapter-molecule">
+    <section class="chapter chapter-molecule" id="s01">
       <div class="copy">
       <div class="sec"><span class="num">01</span><h2>Hydrolysis vs condensation</h2></div>
       <h3>Types</h3>
@@ -980,7 +1079,7 @@
           </dl>
         </article>
         <aside class="gif-slot" aria-label="Condensation of two glucose molecules">
-          <img src="condensation.gif" alt="Two glucose molecules join by condensation and release water.">
+          <img loading="lazy" decoding="async" src="condensation.gif" alt="Two glucose molecules join by condensation and release water.">
         </aside>
       </div>
       <div class="gif-row">
@@ -996,13 +1095,13 @@
           </dl>
         </article>
         <aside class="gif-slot" aria-label="Hydrolysis of maltose">
-          <img src="hydrolysis.gif" alt="Maltose is split by hydrolysis into two glucose molecules.">
+          <img loading="lazy" decoding="async" src="hydrolysis.gif" alt="Maltose is split by hydrolysis into two glucose molecules.">
         </aside>
       </div>
       </div>
     </section>
 
-    <section class="chapter chapter-molecule">
+    <section class="chapter chapter-molecule" id="s02">
       <div class="copy">
       <div class="sec"><span class="num">02</span><h2>Carbohydrate</h2></div>
       <div class="key-idea">
@@ -1044,19 +1143,19 @@
               <td>
                 One sugar unit
                 <figure class="size-media">
-                  <img src="images/monosaccharide.png" alt="A single glucose molecule.">
+                  <img loading="lazy" decoding="async" src="images/monosaccharide.gif?v=20261031b" alt="One sugar unit. A monosaccharide monomer.">
                 </figure>
               </td>
               <td>
                 Two sugar units. At least one is glucose.
                 <figure class="size-media">
-                  <img src="images/disaccharide-formation.gif" alt="Two glucose molecules join by a glycosidic bond to form a disaccharide.">
+                  <img loading="lazy" decoding="async" src="images/disaccharide-formation.gif?v=20261031b" alt="Two glucose units join by condensation to form maltose.">
                 </figure>
               </td>
               <td>
                 A long chain
                 <figure class="size-media">
-                  <img src="images/polysaccharide-formation.gif" alt="Sugar units join into a longer carbohydrate chain.">
+                  <img loading="lazy" decoding="async" src="images/polysaccharide-formation.gif?v=20261031b" alt="Condensation builds a polysaccharide chain. Hydrolysis breaks it down.">
                 </figure>
               </td>
             </tr>
@@ -1089,8 +1188,8 @@
             </div>
           </dl>
         </article>
-        <aside class="gif-slot photo-slot" aria-label="Honey, a source of glucose">
-          <img src="images/glucose.jpg" alt="Honey on a dipper.">
+        <aside class="gif-slot photo-slot" aria-label="Glucose energy gel">
+          <img loading="lazy" decoding="async" src="images/glucose.jpg" alt="An athlete squeezing glucose energy gel into his mouth.">
         </aside>
         </div>
         <div class="gif-row">
@@ -1106,7 +1205,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Mango, a source of fructose">
-          <img src="images/fructose.jpg" alt="Cut mango.">
+          <img loading="lazy" decoding="async" src="images/fructose.jpg" alt="Cut mango.">
         </aside>
         </div>
         <div class="gif-row">
@@ -1122,7 +1221,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Yogurt, a source of galactose">
-          <img src="images/galactose.png" alt="A bowl of yogurt.">
+          <img loading="lazy" decoding="async" src="images/galactose.png" alt="A bowl of yogurt.">
         </aside>
         </div>
         <div class="gif-row">
@@ -1137,7 +1236,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="RNA, which contains ribose">
-          <img src="images/ribose.png" alt="An RNA strand with adenine, uracil, cytosine and guanine.">
+          <img loading="lazy" decoding="async" src="images/ribose.png" alt="An RNA strand with adenine, uracil, cytosine and guanine.">
         </aside>
         </div>
         <div class="gif-row">
@@ -1152,7 +1251,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="DNA, which contains deoxyribose">
-          <img src="images/deoxyribose.jpg" alt="A DNA double helix.">
+          <img loading="lazy" decoding="async" src="images/deoxyribose.jpg" alt="A DNA double helix.">
         </aside>
         </div>
           </div>
@@ -1183,8 +1282,15 @@
             </div>
           </dl>
         </article>
-        <aside class="gif-slot photo-slot" aria-label="Sweet potato, a source of maltose">
-          <img src="images/maltose.jpg" alt="Roasted sweet potatoes.">
+        <aside class="gif-slot media-stack" aria-label="Maltose source and glycosidic bond">
+          <figure class="media-labeled">
+            <p class="media-label">Source</p>
+            <img loading="lazy" decoding="async" src="images/maltose.jpg" alt="Roasted sweet potatoes.">
+          </figure>
+          <figure class="media-labeled">
+            <p class="media-label">Glycosidic bond</p>
+            <img loading="lazy" decoding="async" src="images/glycosidic-bond.png" alt="A glycosidic bond joining two alpha-D-glucose molecules.">
+          </figure>
         </aside>
         </div>
         <div class="gif-row">
@@ -1200,7 +1306,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Sugarcane, a source of sucrose">
-          <img src="images/sucrose.jpg" alt="Cut sugarcane.">
+          <img loading="lazy" decoding="async" src="images/sucrose.jpg" alt="Cut sugarcane.">
         </aside>
         </div>
         <div class="gif-row">
@@ -1215,7 +1321,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Milk and cheese, sources of lactose">
-          <img src="images/lactose.png" alt="Milk, cheese and other dairy foods.">
+          <img loading="lazy" decoding="async" src="images/lactose.png" alt="Milk, cheese and other dairy foods.">
         </aside>
         </div>
           </div>
@@ -1256,7 +1362,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Glycogen stored in the liver and muscles">
-          <img src="images/glycogen.png" alt="Glycogen stored in the liver and in muscles.">
+          <img loading="lazy" decoding="async" src="images/glycogen.png" alt="Glycogen stored in the liver and in muscles.">
         </aside>
         </div>
         <div class="gif-row">
@@ -1276,7 +1382,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Plant foods that store starch">
-          <img src="images/starch.jpg" alt="Rice, corn, potatoes, starch powder and wheat.">
+          <img loading="lazy" decoding="async" src="images/starch.jpg" alt="Rice, corn, potatoes, starch powder and wheat.">
         </aside>
         </div>
         <div class="gif-row">
@@ -1297,7 +1403,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Cellulose in a plant cell wall">
-          <img src="images/cellulose.jpg" alt="Cellulose fibres giving a plant cell wall its structure.">
+          <img loading="lazy" decoding="async" src="images/cellulose.jpg" alt="Cellulose fibres giving a plant cell wall its structure.">
         </aside>
         </div>
           </div>
@@ -1306,7 +1412,7 @@
       </div>
     </section>
 
-    <section class="chapter chapter-molecule">
+    <section class="chapter chapter-molecule" id="s03">
       <div class="copy">
       <div class="sec"><span class="num">03</span><h2>Lipid</h2></div>
       <div class="key-idea">
@@ -1337,7 +1443,7 @@
           </dl>
         </article>
         <aside class="gif-slot" aria-label="Triglyceride formed from fatty acids">
-          <img src="triglyceride.gif" alt="Glycerol and three fatty acids form a triglyceride.">
+          <img loading="lazy" decoding="async" src="triglyceride.gif" alt="Glycerol and three fatty acids form a triglyceride.">
         </aside>
         </div>
         <div class="gif-row">
@@ -1363,7 +1469,7 @@
           </dl>
         </article>
         <aside class="gif-slot" aria-label="Phospholipid bilayer">
-          <img src="images/phospholipid.gif" alt="Phospholipid molecules form a bilayer. The tails wiggle and one molecule changes place.">
+          <img loading="lazy" decoding="async" src="images/phospholipid.gif" alt="Phospholipid molecules form a bilayer. The tails wiggle and one molecule changes place.">
         </aside>
         </div>
         <div class="carb-family steroid-family">
@@ -1379,7 +1485,7 @@
               <p class="family-note">Four carbon rings. Insoluble in water. Non-polar.</p>
             </div>
             <aside class="family-thumb" aria-label="Steroid hormone">
-              <img src="images/steroid.png" alt="A syringe, as used for a steroid hormone.">
+              <img loading="lazy" decoding="async" src="images/steroid.png" alt="A syringe, as used for a steroid hormone.">
             </aside>
           </header>
           <div class="family-cards">
@@ -1396,7 +1502,7 @@
                 </dl>
               </article>
               <aside class="gif-slot" aria-label="Cholesterol and heart disease">
-                <img src="images/cholesterol.gif" alt="Cholesterol can build up in arteries and affect the heart.">
+                <img loading="lazy" decoding="async" src="images/cholesterol.gif" alt="Cholesterol can build up in arteries and affect the heart.">
               </aside>
             </div>
             <div class="gif-row">
@@ -1411,7 +1517,7 @@
                 </dl>
               </article>
               <aside class="gif-slot photo-slot" aria-label="Estrogen and testosterone">
-                <img src="images/sex-hormones.png" alt="Estrogen and testosterone, two steroid sex hormones.">
+                <img loading="lazy" decoding="async" src="images/sex-hormones.png" alt="Estrogen and testosterone, two steroid sex hormones.">
               </aside>
             </div>
           </div>
@@ -1455,14 +1561,14 @@
         </article>
           </div>
         <aside class="gif-slot photo-slot" aria-label="Fatty acid foods">
-          <img src="images/fatty-acids.jpg" alt="Fried and baked foods.">
+          <img loading="lazy" decoding="async" src="images/fatty-acids.jpg" alt="Fried and baked foods.">
         </aside>
         </div>
       </div>
       </div>
     </section>
 
-    <section class="chapter chapter-molecule">
+    <section class="chapter chapter-molecule" id="s04">
       <div class="copy">
       <div class="sec"><span class="num">04</span><h2>Protein</h2></div>
       <div class="key-idea">
@@ -1507,12 +1613,12 @@
           <aside class="gif-slot media-stack" aria-label="Peptide bond and protein folding">
             <figure class="media-labeled">
               <p class="media-label">Condensation. Peptide bond</p>
-              <img src="images/peptide-bond.gif" alt="Two amino acids join by a peptide bond and release water.">
+              <img loading="lazy" decoding="async" src="images/peptide-bond.gif?v=20261031" alt="Two amino acids join by a peptide bond and release water.">
               <figcaption class="media-caption">Two amino acids join. One water leaves. This builds a dipeptide, then a longer chain.</figcaption>
             </figure>
             <figure class="media-labeled">
               <p class="media-label">Folding</p>
-              <img src="images/protein-folding.gif" alt="An unfolded protein collapses into a folded three-dimensional shape.">
+              <img loading="lazy" decoding="async" src="images/protein-folding.gif?v=20261031" alt="An unfolded protein collapses into a folded three-dimensional shape.">
               <figcaption class="media-caption">The chain folds into a 3D shape. That shape sets the protein’s job. Heat or the wrong pH can unfold it.</figcaption>
             </figure>
           </aside>
@@ -1532,7 +1638,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Membrane proteins">
-          <img src="images/membrane-protein.png" alt="Channel, receptor, carrier and antigen proteins in a cell membrane.">
+          <img loading="lazy" decoding="async" src="images/membrane-protein.png" alt="Channel, receptor, carrier and antigen proteins in a cell membrane.">
         </aside>
         </div>
         <div class="gif-row">
@@ -1547,7 +1653,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Growth and repair of tissue">
-          <img src="images/growth-repair.png" alt="Protein chains building muscle, skin and nails.">
+          <img loading="lazy" decoding="async" src="images/growth-repair.png" alt="Protein chains building muscle, skin and nails.">
         </aside>
         </div>
         <div class="gif-row">
@@ -1563,7 +1669,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Enzyme">
-          <img src="images/enzyme.png" alt="An enzyme binding its substrate at the active site and speeding the reaction.">
+          <img loading="lazy" decoding="async" src="images/enzyme.png" alt="An enzyme binding its substrate at the active site and speeding the reaction.">
         </aside>
         </div>
         <div class="gif-row">
@@ -1578,7 +1684,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Hormone">
-          <img src="images/hormone.jpg" alt="A hormone binding a receptor and switching on a response.">
+          <img loading="lazy" decoding="async" src="images/hormone.jpg" alt="A hormone binding a receptor and switching on a response.">
         </aside>
         </div>
         <div class="gif-row">
@@ -1594,14 +1700,14 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Antibody">
-          <img src="images/antibody.png" alt="An antibody binding an antigen so an immune cell can destroy it.">
+          <img loading="lazy" decoding="async" src="images/antibody.png" alt="An antibody binding an antigen so an immune cell can destroy it.">
         </aside>
         </div>
       </div>
       </div>
     </section>
 
-    <section class="chapter chapter-molecule">
+    <section class="chapter chapter-molecule" id="s05">
       <div class="copy">
       <div class="sec"><span class="num">05</span><h2>Nucleic acid</h2></div>
       <div class="key-idea">
@@ -1629,7 +1735,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Nucleotide">
-          <img src="images/nucleotide.png" alt="A nucleotide: phosphate, pentose sugar and a nitrogenous base.">
+          <img loading="lazy" decoding="async" src="images/nucleotide.png" alt="A nucleotide: phosphate, pentose sugar and a nitrogenous base.">
         </aside>
         </div>
         <div class="gif-row share-row">
@@ -1687,15 +1793,15 @@
         </article>
           </div>
         <aside class="gif-slot photo-slot media-stack" aria-label="DNA and mRNA">
-          <img src="images/dna-rna.gif" alt="DNA is transcribed to mRNA, which is then translated into a polypeptide.">
-          <img src="images/dna-rna.png" alt="DNA is transcribed to mRNA, which is translated into protein.">
+          <img loading="lazy" decoding="async" src="images/dna-rna.gif" alt="DNA is transcribed to mRNA, which is then translated into a polypeptide.">
+          <img loading="lazy" decoding="async" src="images/dna-rna.png" alt="DNA is transcribed to mRNA, which is translated into protein.">
         </aside>
         </div>
       </div>
       </div>
     </section>
 
-    <section class="chapter chapter-nutrient">
+    <section class="chapter chapter-nutrient" id="s06">
       <div class="copy">
       <div class="sec"><span class="num">06</span><h2>Minerals</h2></div>
       <div class="key-idea">
@@ -1729,7 +1835,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Calcium sources">
-          <img src="images/calcium.png" alt="Milk, cheese, almonds, beans, leafy greens and fish, sources of calcium.">
+          <img loading="lazy" decoding="async" src="images/calcium.png" alt="Milk, cheese, almonds, beans, leafy greens and fish, sources of calcium.">
         </aside>
         </div>
         <div class="gif-row">
@@ -1753,14 +1859,14 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Iron in haemoglobin">
-          <img src="images/iron.png" alt="Haemoglobin inside a red blood cell, which carries oxygen using iron.">
+          <img loading="lazy" decoding="async" src="images/iron.png" alt="Haemoglobin inside a red blood cell, which carries oxygen using iron.">
         </aside>
         </div>
       </div>
       </div>
     </section>
 
-    <section class="chapter chapter-nutrient">
+    <section class="chapter chapter-nutrient" id="s07">
       <div class="copy">
       <div class="sec"><span class="num">07</span><h2>Inorganic ions</h2></div>
       <div class="key-idea">
@@ -1781,7 +1887,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Nitrate fertiliser">
-          <img src="images/nitrate.png" alt="A bag of nitrogen fertiliser, a source of nitrate for plants.">
+          <img loading="lazy" decoding="async" src="images/nitrate.png" alt="A bag of nitrogen fertiliser, a source of nitrate for plants.">
         </aside>
         </div>
         <div class="gif-row">
@@ -1797,7 +1903,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Magnesium in chlorophyll">
-          <img src="images/magnesium.png" alt="A chlorophyll molecule with a magnesium atom at its centre.">
+          <img loading="lazy" decoding="async" src="images/magnesium.png" alt="A chlorophyll molecule with a magnesium atom at its centre.">
         </aside>
         </div>
         <div class="gif-row">
@@ -1813,7 +1919,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Phosphorus food sources">
-          <img src="images/phosphorus.jpg" alt="Fish, nuts, seeds, beans, eggs, cheese and seafood, sources of phosphorus.">
+          <img loading="lazy" decoding="async" src="images/phosphorus.jpg" alt="Fish, nuts, seeds, beans, eggs, cheese and seafood, sources of phosphorus.">
         </aside>
         </div>
         <div class="gif-row">
@@ -1829,14 +1935,14 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Iodine supplement">
-          <img src="images/iodine.png" alt="A bottle of iodine food-supplement tablets.">
+          <img loading="lazy" decoding="async" src="images/iodine.png" alt="A bottle of iodine food-supplement tablets.">
         </aside>
         </div>
       </div>
       </div>
     </section>
 
-    <section class="chapter chapter-nutrient">
+    <section class="chapter chapter-nutrient" id="s08">
       <div class="copy">
       <div class="sec"><span class="num">08</span><h2>Vitamins</h2></div>
       <div class="key-idea">
@@ -1905,7 +2011,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Vitamin A source">
-          <img src="images/vitamin-a.png" alt="A carrot, a food source of vitamin A.">
+          <img loading="lazy" decoding="async" src="images/vitamin-a.png" alt="A carrot, a food source of vitamin A.">
         </aside>
         </div>
         <div class="gif-row">
@@ -1927,7 +2033,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Vitamin C source">
-          <img src="images/vitamin-c.jpg" alt="Lemons, a food source of vitamin C.">
+          <img loading="lazy" decoding="async" src="images/vitamin-c.jpg" alt="Lemons, a food source of vitamin C.">
         </aside>
         </div>
         <div class="gif-row">
@@ -1943,14 +2049,14 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Vitamin D from sunlight">
-          <img src="images/vitamin-d.png" alt="Sunlight over a field, the source of vitamin D made in the skin.">
+          <img loading="lazy" decoding="async" src="images/vitamin-d.png" alt="Sunlight over a field, the source of vitamin D made in the skin.">
         </aside>
         </div>
       </div>
       </div>
     </section>
 
-    <section class="chapter chapter-nutrient">
+    <section class="chapter chapter-nutrient" id="s09">
       <div class="copy">
       <div class="sec"><span class="num">09</span><h2>Dietary fibre</h2></div>
       <div class="key-idea">
@@ -1972,7 +2078,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Insoluble fibre foods">
-          <img src="images/insoluble-fibre.jpg" alt="Foods that provide insoluble fibre, including whole grains, nuts, beans and wheat bran.">
+          <img loading="lazy" decoding="async" src="images/insoluble-fibre.jpg" alt="Foods that provide insoluble fibre, including whole grains, nuts, beans and wheat bran.">
         </aside>
         </div>
         <div class="gif-row">
@@ -1987,7 +2093,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Soluble fibre foods">
-          <img src="images/soluble-fibre.png" alt="Foods that provide soluble fibre: barley, oats, beans, figs, prunes and sweet potatoes.">
+          <img loading="lazy" decoding="async" src="images/soluble-fibre.png" alt="Foods that provide soluble fibre: barley, oats, beans, figs, prunes and sweet potatoes.">
         </aside>
         </div>
       </div>
@@ -2008,7 +2114,7 @@
       </div>
     </section>
 
-    <section class="chapter chapter-nutrient">
+    <section class="chapter chapter-nutrient" id="s10">
       <div class="copy">
       <div class="sec"><span class="num">10</span><h2>Water</h2></div>
       <div class="gif-row water-intro">
@@ -2016,7 +2122,7 @@
           <p>Inorganic. No energy value.</p>
         </div>
         <aside class="gif-slot photo-slot" aria-label="Water has no energy value">
-          <img src="images/water-inorganic.png" alt="Water poured into a glass. Water is inorganic and has no energy value.">
+          <img loading="lazy" decoding="async" src="images/water-inorganic.png" alt="Water poured into a glass. Water is inorganic and has no energy value.">
         </aside>
       </div>
       <h3>Properties</h3>
@@ -2033,7 +2139,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Water as a reactant in photosynthesis">
-          <img src="images/water-reactant.png" alt="Photosynthesis equation: carbon dioxide and water, with light, make sugar and oxygen.">
+          <img loading="lazy" decoding="async" src="images/water-reactant.png" alt="Photosynthesis equation: carbon dioxide and water, with light, make sugar and oxygen.">
         </aside>
         </div>
         <div class="gif-row">
@@ -2048,7 +2154,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Cytoplasm as a water solvent">
-          <img src="images/water-solvent.png" alt="Cytoplasm, a jelly-like substance that is about 80 percent water.">
+          <img loading="lazy" decoding="async" src="images/water-solvent.png" alt="Cytoplasm, a jelly-like substance that is about 80 percent water.">
         </aside>
         </div>
         <div class="gif-row">
@@ -2066,7 +2172,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Water supporting a plant">
-          <img src="images/water-support.jpg" alt="Water fills a plant from the roots through the stem, holding the shoot upright.">
+          <img loading="lazy" decoding="async" src="images/water-support.jpg" alt="Water fills a plant from the roots through the stem, holding the shoot upright.">
         </aside>
         </div>
         <div class="gif-row">
@@ -2084,7 +2190,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Blood carrying cells through a vessel">
-          <img src="images/water-transport.gif" alt="Red blood cells moving through a blood vessel. Blood is mostly water and transports materials.">
+          <img loading="lazy" decoding="async" src="images/water-transport.gif" alt="Red blood cells moving through a blood vessel. Blood is mostly water and transports materials.">
         </aside>
         </div>
         <div class="gif-row">
@@ -2099,7 +2205,7 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Water evaporating from skin">
-          <img src="images/water-latent-heat.png" alt="Water on the skin surface evaporates as water vapour, taking heat away.">
+          <img loading="lazy" decoding="async" src="images/water-latent-heat.png" alt="Water on the skin surface evaporates as water vapour, taking heat away.">
         </aside>
         </div>
         <div class="gif-row">
@@ -2114,14 +2220,14 @@
           </dl>
         </article>
         <aside class="gif-slot photo-slot" aria-label="Measuring the temperature of water">
-          <img src="images/water-specific-heat.png" alt="A thermometer in a beaker of water, used to show that water's temperature changes little when energy is added.">
+          <img loading="lazy" decoding="async" src="images/water-specific-heat.png" alt="A thermometer in a beaker of water, used to show that water's temperature changes little when energy is added.">
         </aside>
         </div>
       </div>
       </div>
     </section>
 
-    <section class="chapter chapter-health">
+    <section class="chapter chapter-health" id="s11">
       <div class="copy">
       <div class="sec"><span class="num">11</span><h2>Deficiency and excess</h2></div>
       <div class="key-idea">
@@ -2143,7 +2249,7 @@
                 <td>
                   <ul class="bullets">
                     <li class="shot-row"><span>Low blood sugar</span>
-                      <img src="images/low-blood-sugar.png" alt="Low blood sugar">
+                      <img loading="lazy" decoding="async" src="images/low-blood-sugar.png" alt="Low blood sugar">
                     </li>
                   </ul>
                 </td>
@@ -2159,7 +2265,7 @@
                           <li>Sex-hormone imbalance</li>
                         </ul>
                       </div>
-                      <img src="images/dry-skin.jpg" alt="Dry skin">
+                      <img loading="lazy" decoding="async" src="images/dry-skin.jpg" alt="Dry skin">
                     </li>
                   </ul>
                 </td>
@@ -2169,7 +2275,7 @@
                 <td>
                   <ul class="bullets">
                     <li class="shot-row"><span>Kwashiorkor</span>
-                      <img src="images/kwashiorkor.png" alt="Kwashiorkor">
+                      <img loading="lazy" decoding="async" src="images/kwashiorkor.png" alt="Kwashiorkor">
                     </li>
                   </ul>
                 </td>
@@ -2179,10 +2285,10 @@
                 <td>
                   <ul class="bullets">
                     <li class="shot-row"><span>Constipation</span>
-                      <img src="images/constipation.jpg" alt="Constipation">
+                      <img loading="lazy" decoding="async" src="images/constipation.jpg" alt="Constipation">
                     </li>
                     <li class="shot-row"><span>Higher risk of colorectal cancer</span>
-                      <img src="images/colorectal-cancer.png" alt="Colorectal cancer">
+                      <img loading="lazy" decoding="async" src="images/colorectal-cancer.png" alt="Colorectal cancer">
                     </li>
                   </ul>
                 </td>
@@ -2197,7 +2303,7 @@
                           <li>Soft bones and bow legs.</li>
                         </ul>
                       </div>
-                      <img src="images/rickets.png" alt="Rickets, with soft bowed bones">
+                      <img loading="lazy" decoding="async" src="images/rickets.png" alt="Rickets, with soft bowed bones">
                     </li>
                     <li class="shot-row">
                       <div>Osteoporosis (adults)
@@ -2205,7 +2311,7 @@
                           <li>Weak bones that fracture easily.</li>
                         </ul>
                       </div>
-                      <img src="images/osteoporosis.png" alt="Healthy bone beside osteoporotic bone">
+                      <img loading="lazy" decoding="async" src="images/osteoporosis.png" alt="Healthy bone beside osteoporotic bone">
                     </li>
                   </ul>
                 </td>
@@ -2222,7 +2328,7 @@
                           <li>Less haemoglobin to carry oxygen.</li>
                         </ul>
                       </div>
-                      <img src="images/anaemia.jpg" alt="Normal blood beside anaemia, with fewer red blood cells">
+                      <img loading="lazy" decoding="async" src="images/anaemia.jpg" alt="Normal blood beside anaemia, with fewer red blood cells">
                     </li>
                   </ul>
                 </td>
@@ -2237,7 +2343,7 @@
                           <li>Enlarged thyroid gland in the neck.</li>
                         </ul>
                       </div>
-                      <img src="images/goitre.png" alt="Goitre, an enlarged thyroid in the neck">
+                      <img loading="lazy" decoding="async" src="images/goitre.png" alt="Goitre, an enlarged thyroid in the neck">
                     </li>
                     <li class="shot-row">
                       <div>Hypothyroidism
@@ -2246,7 +2352,7 @@
                           <li>Slow metabolism.</li>
                         </ul>
                       </div>
-                      <img src="images/hypothyroidism.png" alt="Enlarged thyroid gland">
+                      <img loading="lazy" decoding="async" src="images/hypothyroidism.png" alt="Enlarged thyroid gland">
                     </li>
                   </ul>
                 </td>
@@ -2263,7 +2369,7 @@
                           <li>Thickened cornea.</li>
                         </ul>
                       </div>
-                      <img src="images/vitamin-a-deficiency.jpg" alt="Dry eye surface from vitamin A deficiency">
+                      <img loading="lazy" decoding="async" src="images/vitamin-a-deficiency.jpg" alt="Dry eye surface from vitamin A deficiency">
                     </li>
                   </ul>
                 </td>
@@ -2279,7 +2385,7 @@
                           <li>Poor healing.</li>
                         </ul>
                       </div>
-                      <img src="images/scurvy.png" alt="Scurvy, with bleeding gums and spots on the legs">
+                      <img loading="lazy" decoding="async" src="images/scurvy.png" alt="Scurvy, with bleeding gums and spots on the legs">
                     </li>
                   </ul>
                 </td>
@@ -2294,7 +2400,7 @@
                           <li>Soft bones and bow legs.</li>
                         </ul>
                       </div>
-                      <img src="images/rickets.png" alt="Rickets, with soft bowed bones">
+                      <img loading="lazy" decoding="async" src="images/rickets.png" alt="Rickets, with soft bowed bones">
                     </li>
                     <li class="shot-row">
                       <div>Osteoporosis (later in life)
@@ -2302,7 +2408,7 @@
                           <li>Weak bones.</li>
                         </ul>
                       </div>
-                      <img src="images/osteoporosis.png" alt="Healthy bone beside osteoporotic bone">
+                      <img loading="lazy" decoding="async" src="images/osteoporosis.png" alt="Healthy bone beside osteoporotic bone">
                     </li>
                   </ul>
                 </td>
@@ -2333,7 +2439,7 @@
                           <li>Diabetes</li>
                         </ul>
                       </div>
-                      <img src="images/obesity-diabetes.png" alt="Obesity leading to type 2 diabetes">
+                      <img loading="lazy" decoding="async" src="images/obesity-diabetes.png" alt="Obesity leading to type 2 diabetes">
                     </li>
                     <li>Cardiovascular disease</li>
                   </ul>
@@ -2344,7 +2450,7 @@
                 <td>
                   <ul class="bullets">
                     <li class="shot-row"><span>Obesity</span>
-                      <img src="images/obesity-diabetes.png" alt="Obesity leading to type 2 diabetes">
+                      <img loading="lazy" decoding="async" src="images/obesity-diabetes.png" alt="Obesity leading to type 2 diabetes">
                     </li>
                     <li>Atherosclerosis
                       <ul>
@@ -2364,7 +2470,7 @@
                           <li>From deamination of excess amino acids.</li>
                         </ul>
                       </div>
-                      <img src="images/liver-damage.png" alt="Damaged liver">
+                      <img loading="lazy" decoding="async" src="images/liver-damage.png" alt="Damaged liver">
                     </li>
                   </ul>
                 </td>
@@ -2374,7 +2480,7 @@
                 <td>
                   <ul class="bullets">
                     <li class="shot-row"><span>Kidney stones</span>
-                      <img src="images/kidney-stones.png" alt="Kidney stones">
+                      <img loading="lazy" decoding="async" src="images/kidney-stones.png" alt="Kidney stones">
                     </li>
                   </ul>
                 </td>
@@ -2384,7 +2490,7 @@
                 <td>
                   <ul class="bullets">
                     <li class="shot-row"><span>Liver damage</span>
-                      <img src="images/liver-damage.png" alt="Damaged liver">
+                      <img loading="lazy" decoding="async" src="images/liver-damage.png" alt="Damaged liver">
                     </li>
                   </ul>
                 </td>
@@ -2394,7 +2500,7 @@
                 <td>
                   <ul class="bullets">
                     <li class="shot-row"><span>Thyroid problems</span>
-                      <img src="images/thyroid.png" alt="Thyroid gland">
+                      <img loading="lazy" decoding="async" src="images/thyroid.png" alt="Thyroid gland">
                     </li>
                   </ul>
                 </td>
@@ -2422,7 +2528,7 @@
       </div>
     </section>
 
-    <section class="chapter chapter-lab">
+    <section class="chapter chapter-lab" id="s12">
       <div class="copy">
       <div class="sec"><span class="num">12</span><h2>Food test</h2></div>
       <div class="key-idea">
@@ -2450,7 +2556,7 @@
           </dl>
         </article>
         <aside class="gif-slot" aria-label="Glucose test strip">
-          <img src="images/glucose-test.gif" alt="Glucose test strip changing colour.">
+          <img loading="lazy" decoding="async" src="images/glucose-test.gif" alt="Glucose test strip changing colour.">
         </aside>
         </div>
         <div class="gif-row">
@@ -2478,7 +2584,7 @@
           </dl>
         </article>
         <aside class="gif-slot" aria-label="Benedict test">
-          <img src="images/benedict.gif" alt="Benedict’s test turning brick-red.">
+          <img loading="lazy" decoding="async" src="images/benedict.gif" alt="Benedict’s test turning brick-red.">
         </aside>
         </div>
         <div class="gif-row">
@@ -2504,7 +2610,7 @@
           </dl>
         </article>
         <aside class="gif-slot" aria-label="Iodine test">
-          <img src="images/iodine-test.gif" alt="Iodine test for starch turning blue-black.">
+          <img loading="lazy" decoding="async" src="images/iodine-test.gif" alt="Iodine test for starch turning blue-black.">
         </aside>
         </div>
         <div class="gif-row">
@@ -2527,7 +2633,7 @@
           </dl>
         </article>
         <aside class="gif-slot" aria-label="Albustix protein paper">
-          <img src="images/albustix.gif" alt="Albustix paper changing from yellow to blue-green.">
+          <img loading="lazy" decoding="async" src="images/albustix.gif" alt="Albustix paper changing from yellow to blue-green.">
         </aside>
         </div>
         <div class="gif-row">
@@ -2551,7 +2657,7 @@
           </dl>
         </article>
         <aside class="gif-slot" aria-label="Biuret test">
-          <img src="images/biuret.gif" alt="Biuret test turning from blue to violet.">
+          <img loading="lazy" decoding="async" src="images/biuret.gif" alt="Biuret test turning from blue to violet.">
         </aside>
         </div>
         <div class="gif-row">
@@ -2577,7 +2683,7 @@
           </dl>
         </article>
         <aside class="gif-slot" aria-label="Grease-spot test">
-          <img src="images/grease-spot.gif" alt="Grease-spot test for lipid.">
+          <img loading="lazy" decoding="async" src="images/grease-spot.gif" alt="Grease-spot test for lipid.">
         </aside>
         </div>
         <div class="gif-row">
@@ -2612,7 +2718,7 @@
           </dl>
         </article>
         <aside class="gif-slot" aria-label="DCPIP test">
-          <img src="images/dcpip.gif" alt="DCPIP turning from blue to colourless.">
+          <img loading="lazy" decoding="async" src="images/dcpip.gif" alt="DCPIP turning from blue to colourless.">
         </aside>
         </div>
         <div class="gif-row">
@@ -2644,14 +2750,14 @@
           </dl>
         </article>
         <aside class="gif-slot" aria-label="Food energy burning test">
-          <img src="images/burning-test.gif" alt="Burning food to measure energy.">
+          <img loading="lazy" decoding="async" class="portrait" src="images/burning-test.gif" alt="Burning food to measure energy.">
         </aside>
         </div>
       </div>
       </div>
     </section>
 
-    <section class="chapter chapter-diet">
+    <section class="chapter chapter-diet" id="s13">
       <div class="copy">
       <div class="sec"><span class="num">13</span><h2>Who needs more</h2></div>
       <div class="key-idea">
@@ -2767,8 +2873,25 @@
           <li>Deficiency and excess links diet to real symptoms; matching groups (child, pregnancy, elderly) to needs supports a balanced diet argument in exams.</li>
         </ul>
       </div>
-      <p class="page-credit">Food and human notes · Ch5 · v2026 · BB02 Molecules of Life</p>
+      <p class="page-credit">Ch5 · BB02 Molecules of Life</p>
     </footer>
   </div>
+  <script>
+    (function () {
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      document.querySelectorAll("img[src*='.gif']").forEach(function (img) {
+        function freeze() {
+          if (!img.naturalWidth) return;
+          var canvas = document.createElement("canvas");
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          canvas.getContext("2d").drawImage(img, 0, 0);
+          img.src = canvas.toDataURL("image/png");
+        }
+        if (img.complete && img.naturalWidth) freeze();
+        else img.addEventListener("load", freeze, { once: true });
+      });
+    })();
+  </script>
 </body>
 </html>

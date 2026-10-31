@@ -22,6 +22,6 @@ KOC.manifest([
   'content/phy/jerry/works.js',
 
   'content/bio-is/jeff/works.js?v=20261024-damage',
-  'content/bio-is/issac/works.js?v=20261027-food',
+  'content/bio-is/issac/works.js?v=20261031-food',
   'content/bio-is/javin/works.js?v=20261012a'
 ]);
