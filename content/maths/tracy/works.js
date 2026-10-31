@@ -27,6 +27,32 @@ KOC.works('maths', 'tracy', [
     notes: 'Index cards, Magnitude Express, and Signal Room.'
   },
   {
+    id: 'jm25-factorization-games',
+    title: 'JM25 · Games',
+    type: 'interactive',
+    chapter: 'S3 JM25',
+    submitted: '2026-10-31',
+    status: 'pending',
+    tags: ['Interactive', 'Factorization', 'Game', 'S3'],
+    elements: ['fire'],
+    cover: 'content/maths/tracy/s3-cover.svg',
+    src: 'https://unikoc5.github.io/s3-maths/topics/factorization_polynomials/games-only.html',
+    notes: 'Factor Blaster and Cross Method Snake.'
+  },
+  {
+    id: 'jm28-triangle-centres-concept',
+    title: 'JM28 · Concept & Formula',
+    type: 'interactive',
+    chapter: 'S3 JM28',
+    submitted: '2026-10-31',
+    status: 'pending',
+    tags: ['Interactive', 'Triangles', 'Concept', 'S3'],
+    elements: ['wood'],
+    cover: 'content/maths/tracy/s3-cover.svg',
+    src: 'https://unikoc5.github.io/s3-maths/topics/triangle_centres/animation-only.html',
+    notes: 'Concept animations for the four triangle centres and the two bisector lemmas.'
+  },
+  {
     id: 'jm28-triangle-centres-special-lines',
     title: 'JM28 · Special Lines',
     type: 'interactive',
@@ -77,6 +103,32 @@ KOC.works('maths', 'tracy', [
     cover: 'content/maths/tracy/s3-cover.svg',
     src: 'https://unikoc5.github.io/s3-maths/topics/quadrilaterals/comics-only.html',
     notes: 'Quadrilaterals comics page.'
+  },
+  {
+    id: 'jm31-central-tendency-concept',
+    title: 'JM31 · Concept & Formula',
+    type: 'interactive',
+    chapter: 'S3 JM31',
+    submitted: '2026-10-31',
+    status: 'pending',
+    tags: ['Interactive', 'Statistics', 'Concept', 'S3'],
+    elements: ['wood'],
+    cover: 'content/maths/tracy/s3-cover.svg',
+    src: 'https://unikoc5.github.io/s3-maths/topics/central_tendency/concept-only.html',
+    notes: 'Concept animations for mean, median, mode, and which average to use.'
+  },
+  {
+    id: 'jm31-central-tendency-games',
+    title: 'JM31 · Games',
+    type: 'interactive',
+    chapter: 'S3 JM31',
+    submitted: '2026-10-31',
+    status: 'pending',
+    tags: ['Interactive', 'Statistics', 'Game', 'S3'],
+    elements: ['fire'],
+    cover: 'content/maths/tracy/s3-cover.svg',
+    src: 'https://unikoc5.github.io/s3-maths/topics/central_tendency/games-only.html',
+    notes: 'Objection! The Average Trial.'
   },
   {
     id: 'jm34-trigonometry-concept',
