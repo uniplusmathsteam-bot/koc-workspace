@@ -754,8 +754,23 @@
       line-height: 1.4;
       color: var(--ink);
     }
+    .food-cue-grid {
+      grid-template-columns: 1fr 1fr;
+    }
     .food-cue-grid .type-card {
       background: var(--wash);
+      grid-template-columns: 1fr;
+      row-gap: 6px;
+    }
+    .food-cue-grid .type-card h4,
+    .food-cue-grid .examples,
+    .food-cue-grid .props,
+    .food-cue-grid .type-card > .bullets {
+      grid-column: 1;
+      grid-row: auto;
+    }
+    .food-cue-grid .props {
+      align-self: start;
     }
     .sugar-art {
       flex: none;
@@ -1054,6 +1069,7 @@
         grid-column: 1;
         grid-row: auto;
       }
+      .food-cue-grid { grid-template-columns: 1fr; }
       .type-card { grid-template-columns: 1fr; row-gap: 8px; }
       .type-card h4,
       .examples,
