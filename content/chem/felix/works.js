@@ -25,60 +25,8 @@ KOC.works('chem', 'felix', [
     tags: ['MC', 'Multiple choice', 'Word worksheet', 'Microscopic world I', 'Isotope', 'MW1B'],
     src: 'content/chem/felix/mw1b-isotope-sets-2-5/index.html',
     notes: 'Four isotope MC Word worksheets (Sets 2-5). Open the card to download each .docx — questions with marked answers and an answer key.'
-  },
+  },
 
-  {
-    id: 'mw1a-atomic-structure-set-2',
-    title: 'MW1A atomic structure - Set 2.docx',
-    original: 'MW1A atomic structure - Set 2.docx',
-    type: 'interactive',
-    subject: 'Chem',
-    chapter: 'S3 Microscopic world I Atom MWI1 MWI1A Atomic structure',
-    submitted: '2026-11-01',
-    tags: ['MC', 'Atomic structure', 'Word worksheet', 'Microscopic world I', 'MW1A'],
-    elements: ['wood'],
-    src: 'content/chem/felix/mw1a-atomic-structure-set-2/index.html',
-    notes: 'MC practice Set 2 on atomic structure (19 questions: easy 8 / medium 7 / difficult 4) with answer key. Download the .docx to use in Word.'
-  },
-  {
-    id: 'mw1a-atomic-structure-set-3',
-    title: 'MW1A atomic structure - Set 3.docx',
-    original: 'MW1A atomic structure - Set 3.docx',
-    type: 'interactive',
-    subject: 'Chem',
-    chapter: 'S3 Microscopic world I Atom MWI1 MWI1A Atomic structure',
-    submitted: '2026-11-01',
-    tags: ['MC', 'Atomic structure', 'Word worksheet', 'Microscopic world I', 'MW1A'],
-    elements: ['wood'],
-    src: 'content/chem/felix/mw1a-atomic-structure-set-3/index.html',
-    notes: 'MC practice Set 3 on atomic structure (19 questions: easy 8 / medium 7 / difficult 4) with answer key. Download the .docx to use in Word.'
-  },
-  {
-    id: 'mw1a-atomic-structure-set-4',
-    title: 'MW1A atomic structure - Set 4.docx',
-    original: 'MW1A atomic structure - Set 4.docx',
-    type: 'interactive',
-    subject: 'Chem',
-    chapter: 'S3 Microscopic world I Atom MWI1 MWI1A Atomic structure',
-    submitted: '2026-11-01',
-    tags: ['MC', 'Atomic structure', 'Word worksheet', 'Microscopic world I', 'MW1A'],
-    elements: ['wood'],
-    src: 'content/chem/felix/mw1a-atomic-structure-set-4/index.html',
-    notes: 'MC practice Set 4 on atomic structure (19 questions: easy 8 / medium 7 / difficult 4) with answer key. Download the .docx to use in Word.'
-  },
-  {
-    id: 'mw1a-atomic-structure-set-5',
-    title: 'MW1A atomic structure - Set 5.docx',
-    original: 'MW1A atomic structure - Set 5.docx',
-    type: 'interactive',
-    subject: 'Chem',
-    chapter: 'S3 Microscopic world I Atom MWI1 MWI1A Atomic structure',
-    submitted: '2026-11-01',
-    tags: ['MC', 'Atomic structure', 'Word worksheet', 'Microscopic world I', 'MW1A'],
-    elements: ['wood'],
-    src: 'content/chem/felix/mw1a-atomic-structure-set-5/index.html',
-    notes: 'MC practice Set 5 on atomic structure (19 questions: easy 8 / medium 7 / difficult 4) with answer key. Download the .docx to use in Word.'
-  },
   {
     id: 'earth4b-lime-cycle-mc',
     title: 'Earth4B_Lime cycle_(ex)',
