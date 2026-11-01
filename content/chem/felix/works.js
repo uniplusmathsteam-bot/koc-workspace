@@ -1,6 +1,58 @@
 /* Felix - Chem KOC - submissions. */
 KOC.works('chem', 'felix', [
   {
+    id: 'earth4b-lime-cycle-set-5',
+    title: 'Earth4B lime cycle - Set 5.docx',
+    original: 'Earth4B lime cycle - Set 5.docx',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Planet Earth Earth4B Lime cycle',
+    submitted: '2026-11-01',
+    tags: ['MC', 'Lime cycle', 'Word worksheet', 'Planet Earth', 'Earth4B'],
+    elements: ['gold'],
+    src: 'content/chem/felix/earth4b-lime-cycle-set-5/index.html',
+    notes: 'MC practice Set 5 on the lime cycle. Download the .docx to use in Word - 10 questions with easy/medium/difficult bands and an answer key citing topic-01-planet-earth.pdf.'
+  },
+  {
+    id: 'earth4b-lime-cycle-set-4',
+    title: 'Earth4B lime cycle - Set 4.docx',
+    original: 'Earth4B lime cycle - Set 4.docx',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Planet Earth Earth4B Lime cycle',
+    submitted: '2026-11-01',
+    tags: ['MC', 'Lime cycle', 'Word worksheet', 'Planet Earth', 'Earth4B'],
+    elements: ['gold'],
+    src: 'content/chem/felix/earth4b-lime-cycle-set-4/index.html',
+    notes: 'MC practice Set 4 on the lime cycle. Download the .docx to use in Word - 10 questions with easy/medium/difficult bands and an answer key citing topic-01-planet-earth.pdf.'
+  },
+  {
+    id: 'earth4b-lime-cycle-set-3',
+    title: 'Earth4B lime cycle - Set 3.docx',
+    original: 'Earth4B lime cycle - Set 3.docx',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Planet Earth Earth4B Lime cycle',
+    submitted: '2026-11-01',
+    tags: ['MC', 'Lime cycle', 'Word worksheet', 'Planet Earth', 'Earth4B'],
+    elements: ['gold'],
+    src: 'content/chem/felix/earth4b-lime-cycle-set-3/index.html',
+    notes: 'MC practice Set 3 on the lime cycle. Download the .docx to use in Word - 10 questions with easy/medium/difficult bands and an answer key citing topic-01-planet-earth.pdf.'
+  },
+  {
+    id: 'earth4b-lime-cycle-set-2',
+    title: 'Earth4B lime cycle - Set 2.docx',
+    original: 'Earth4B lime cycle - Set 2.docx',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Planet Earth Earth4B Lime cycle',
+    submitted: '2026-11-01',
+    tags: ['MC', 'Lime cycle', 'Word worksheet', 'Planet Earth', 'Earth4B'],
+    elements: ['gold'],
+    src: 'content/chem/felix/earth4b-lime-cycle-set-2/index.html',
+    notes: 'MC practice Set 2 on the lime cycle. Download the .docx to use in Word - 10 questions with easy/medium/difficult bands and an answer key citing topic-01-planet-earth.pdf.'
+  },
+  {
     id: 'earth4a-extraction-of-metals-set-5',
     title: 'Earth4A extraction of metals - Set 5.docx',
     original: 'Earth4A extraction of metals - Set 5.docx',
