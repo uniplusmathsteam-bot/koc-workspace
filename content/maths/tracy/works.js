@@ -92,6 +92,19 @@ KOC.works('maths', 'tracy', [
     notes: 'Quadrilaterals concept page.'
   },
   {
+    id: 'jm29-quadrilaterals-games',
+    title: 'JM29 · Quadrilaterals Games',
+    type: 'interactive',
+    chapter: 'S3 JM29',
+    submitted: '2026-10-14',
+    status: 'pending',
+    tags: ['Interactive', 'Quadrilaterals', 'Game', 'S3'],
+    elements: ['fire'],
+    cover: 'content/maths/tracy/s3-cover.svg',
+    src: 'https://unikoc5.github.io/s3-maths/topics/quadrilaterals/games-only.html',
+    notes: 'Quadrilaterals games page.'
+  },
+  {
     id: 'jm29-quadrilaterals-comics',
     title: 'JM29 · Quadrilaterals Comics',
     type: 'interactive',
@@ -118,19 +131,6 @@ KOC.works('maths', 'tracy', [
     notes: 'Quadrilaterals survival kit: properties, proofs, mid-point and intercept theorems.'
   },
   {
-    id: 'jm30-probability-summary',
-    title: 'JM30 · Summary',
-    type: 'interactive',
-    chapter: 'S3 JM30',
-    submitted: '2026-11-01',
-    status: 'pending',
-    tags: ['Interactive', 'Probability', 'Summary', 'S3'],
-    elements: ['gold'],
-    cover: 'content/maths/tracy/s3-cover.svg',
-    src: 'https://unikoc5.github.io/s3-maths/topics/probability/summary-only.html',
-    notes: 'Probability survival kit: formula, tree diagrams, and expected value.'
-  },
-  {
     id: 'jm31-central-tendency-concept',
     title: 'JM31 · Concept & Formula',
     type: 'interactive',
@@ -155,45 +155,6 @@ KOC.works('maths', 'tracy', [
     cover: 'content/maths/tracy/s3-cover.svg',
     src: 'https://unikoc5.github.io/s3-maths/topics/central_tendency/games-only.html',
     notes: 'Objection! The Average Trial.'
-  },
-  {
-    id: 'jm31-central-tendency-summary',
-    title: 'JM31 · Summary',
-    type: 'interactive',
-    chapter: 'S3 JM31',
-    submitted: '2026-11-01',
-    status: 'pending',
-    tags: ['Interactive', 'Statistics', 'Summary', 'S3'],
-    elements: ['gold'],
-    cover: 'content/maths/tracy/s3-cover.svg',
-    src: 'https://unikoc5.github.io/s3-maths/topics/central_tendency/summary-only.html',
-    notes: 'Averages survival kit: mean, median, mode, and choosing an average.'
-  },
-  {
-    id: 'jm32-area-volume-hot-drop',
-    title: 'JM32 · Game 1 · Hot Drop',
-    type: 'interactive',
-    chapter: 'S3 JM32',
-    submitted: '2026-11-01',
-    status: 'pending',
-    tags: ['Interactive', 'Volume', 'Game', 'S3'],
-    elements: ['fire'],
-    cover: 'content/maths/tracy/s3-cover.svg',
-    src: 'https://unikoc5.github.io/s3-maths/topics/area_volume/hot-drop-only.html',
-    notes: 'Hot Drop: Cooling Pool Night Shift.'
-  },
-  {
-    id: 'jm32-area-volume-summary',
-    title: 'JM32 · Summary',
-    type: 'interactive',
-    chapter: 'S3 JM32',
-    submitted: '2026-11-01',
-    status: 'pending',
-    tags: ['Interactive', 'Volume', 'Summary', 'S3'],
-    elements: ['gold'],
-    cover: 'content/maths/tracy/s3-cover.svg',
-    src: 'https://unikoc5.github.io/s3-maths/topics/area_volume/summary-only.html',
-    notes: 'Areas and Volumes survival kit: pyramids, cones, spheres, frustums, and similar solids.'
   },
   {
     id: 'jm34-trigonometry-concept',
@@ -251,4 +212,4 @@ KOC.works('maths', 'tracy', [
     url: 'https://youmind.ai/',
     notes: 'Script and storyboard still live in YouMind. Link included for review before I export the final assets into this repo.'
   }
-], { order: 'list' });
+]);
