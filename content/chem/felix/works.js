@@ -1,6 +1,54 @@
 /* Felix - Chem KOC - submissions. */
 KOC.works('chem', 'felix', [
   {
+    id: 'earth4a-extraction-of-metals-set-5',
+    title: 'Earth4A extraction of metals - Set 5.docx',
+    original: 'Earth4A extraction of metals - Set 5.docx',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Rocks Earth4 Earth4A Extraction of metals',
+    submitted: '2026-11-01',
+    tags: ['MC', 'Multiple choice', 'Word worksheet', 'Planet Earth', 'Extraction of metals', 'Earth4A'],
+    src: 'content/chem/felix/earth4a-extraction-of-metals-set-5/index.html',
+    notes: 'Multiple-choice practice on extraction of metals (Earth4A). Download the .docx to use in Word — questions with marked answers and an answer key.'
+  },
+  {
+    id: 'earth4a-extraction-of-metals-set-4',
+    title: 'Earth4A extraction of metals - Set 4.docx',
+    original: 'Earth4A extraction of metals - Set 4.docx',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Rocks Earth4 Earth4A Extraction of metals',
+    submitted: '2026-11-01',
+    tags: ['MC', 'Multiple choice', 'Word worksheet', 'Planet Earth', 'Extraction of metals', 'Earth4A'],
+    src: 'content/chem/felix/earth4a-extraction-of-metals-set-4/index.html',
+    notes: 'Multiple-choice practice on extraction of metals (Earth4A). Download the .docx to use in Word — questions with marked answers and an answer key.'
+  },
+  {
+    id: 'earth4a-extraction-of-metals-set-3',
+    title: 'Earth4A extraction of metals - Set 3.docx',
+    original: 'Earth4A extraction of metals - Set 3.docx',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Rocks Earth4 Earth4A Extraction of metals',
+    submitted: '2026-11-01',
+    tags: ['MC', 'Multiple choice', 'Word worksheet', 'Planet Earth', 'Extraction of metals', 'Earth4A'],
+    src: 'content/chem/felix/earth4a-extraction-of-metals-set-3/index.html',
+    notes: 'Multiple-choice practice on extraction of metals (Earth4A). Download the .docx to use in Word — questions with marked answers and an answer key.'
+  },
+  {
+    id: 'earth4a-extraction-of-metals-set-2',
+    title: 'Earth4A extraction of metals - Set 2.docx',
+    original: 'Earth4A extraction of metals - Set 2.docx',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Rocks Earth4 Earth4A Extraction of metals',
+    submitted: '2026-11-01',
+    tags: ['MC', 'Multiple choice', 'Word worksheet', 'Planet Earth', 'Extraction of metals', 'Earth4A'],
+    src: 'content/chem/felix/earth4a-extraction-of-metals-set-2/index.html',
+    notes: 'Multiple-choice practice on extraction of metals (Earth4A). Download the .docx to use in Word — questions with marked answers and an answer key.'
+  },
+  {
     id: 'mw1b-isotope-set-5',
     title: 'MW1B isotope - Set 5.docx',
     original: 'MW1B isotope - Set 5.docx',
