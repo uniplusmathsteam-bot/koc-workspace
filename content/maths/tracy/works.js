@@ -251,4 +251,4 @@ KOC.works('maths', 'tracy', [
     url: 'https://youmind.ai/',
     notes: 'Script and storyboard still live in YouMind. Link included for review before I export the final assets into this repo.'
   }
-]);
+], { order: 'list' });
