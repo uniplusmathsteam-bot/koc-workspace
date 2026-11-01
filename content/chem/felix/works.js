@@ -1,5 +1,54 @@
-﻿/* Felix - Chem KOC - submissions. */
+/* Felix - Chem KOC - submissions. */
 KOC.works('chem', 'felix', [
+  {
+    id: 'mw1b-isotope-set-5',
+    title: 'MW1B isotope - Set 5.docx',
+    original: 'MW1B isotope - Set 5.docx',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Microscopic world I Isotopes relative atomic mass',
+    submitted: '2026-11-01',
+    tags: ['MC', 'Multiple choice', 'Word worksheet', 'Microscopic world I', 'Isotope', 'MW1B'],
+    src: 'content/chem/felix/mw1b-isotope-set-5/index.html',
+    notes: 'Multiple-choice practice on isotopes (MW1B). Download the .docx to use in Word — questions with marked answers and an answer key.'
+  },
+  {
+    id: 'mw1b-isotope-set-4',
+    title: 'MW1B isotope - Set 4.docx',
+    original: 'MW1B isotope - Set 4.docx',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Microscopic world I Isotopes relative atomic mass',
+    submitted: '2026-11-01',
+    tags: ['MC', 'Multiple choice', 'Word worksheet', 'Microscopic world I', 'Isotope', 'MW1B'],
+    src: 'content/chem/felix/mw1b-isotope-set-4/index.html',
+    notes: 'Multiple-choice practice on isotopes (MW1B). Download the .docx to use in Word — questions with marked answers and an answer key.'
+  },
+  {
+    id: 'mw1b-isotope-set-3',
+    title: 'MW1B isotope - Set 3.docx',
+    original: 'MW1B isotope - Set 3.docx',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Microscopic world I Isotopes relative atomic mass',
+    submitted: '2026-11-01',
+    tags: ['MC', 'Multiple choice', 'Word worksheet', 'Microscopic world I', 'Isotope', 'MW1B'],
+    src: 'content/chem/felix/mw1b-isotope-set-3/index.html',
+    notes: 'Multiple-choice practice on isotopes (MW1B). Download the .docx to use in Word — questions with marked answers and an answer key.'
+  },
+  {
+    id: 'mw1b-isotope-set-2',
+    title: 'MW1B isotope - Set 2.docx',
+    original: 'MW1B isotope - Set 2.docx',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S3 Microscopic world I Isotopes relative atomic mass',
+    submitted: '2026-11-01',
+    tags: ['MC', 'Multiple choice', 'Word worksheet', 'Microscopic world I', 'Isotope', 'MW1B'],
+    src: 'content/chem/felix/mw1b-isotope-set-2/index.html',
+    notes: 'Multiple-choice practice on isotopes (MW1B). Download the .docx to use in Word — questions with marked answers and an answer key.'
+  },
+
   {
     id: 'topic-02-part-5-set-2',
     title: 'Topic 02 Part 5 set 2.docx',
