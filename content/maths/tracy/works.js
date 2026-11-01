@@ -92,19 +92,6 @@ KOC.works('maths', 'tracy', [
     notes: 'Quadrilaterals concept page.'
   },
   {
-    id: 'jm29-quadrilaterals-games',
-    title: 'JM29 · Quadrilaterals Games',
-    type: 'interactive',
-    chapter: 'S3 JM29',
-    submitted: '2026-10-14',
-    status: 'pending',
-    tags: ['Interactive', 'Quadrilaterals', 'Game', 'S3'],
-    elements: ['fire'],
-    cover: 'content/maths/tracy/s3-cover.svg',
-    src: 'https://unikoc5.github.io/s3-maths/topics/quadrilaterals/games-only.html',
-    notes: 'Quadrilaterals games page.'
-  },
-  {
     id: 'jm29-quadrilaterals-comics',
     title: 'JM29 · Quadrilaterals Comics',
     type: 'interactive',
@@ -212,4 +199,4 @@ KOC.works('maths', 'tracy', [
     url: 'https://youmind.ai/',
     notes: 'Script and storyboard still live in YouMind. Link included for review before I export the final assets into this repo.'
   }
-]);
+], { order: 'list' });

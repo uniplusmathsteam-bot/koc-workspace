@@ -10,6 +10,7 @@ window.KOC = (function () {
 
   var subjects = [];
   var worksBySubjectKoc = {};   // "subject/koc" -> [work]
+  var listOrderedKocs = {};     // "subject/koc" -> true when works.js asks for { order: 'list' }
   var pendingFiles = [];
   var missingFiles = [];
 
@@ -110,10 +111,11 @@ window.KOC = (function () {
 
   function reviews(map) { baseReviews = map || {}; }
 
-  function works(subjectId, kocId, list) {
+  function works(subjectId, kocId, list, options) {
     worksBySubjectKoc[subjectId + '/' + kocId] = (list || []).map(function (w, i) {
       return normalise(w, subjectId, kocId, i);
     });
+    listOrderedKocs[subjectId + '/' + kocId] = !!(options && options.order === 'list');
   }
 
   function normalise(w, subjectId, kocId, i) {
@@ -589,14 +591,21 @@ window.KOC = (function () {
     });
   }
 
-  function applyRange(list) {
+  function applyRange(list, keepOrder) {
     var now = new Date();
-    return sortByDate(list.filter(function (work) {
+    var kept = list.filter(function (work) {
       return inRange(work, range, now) && hasElement(work, element);
-    }));
+    });
+    return keepOrder ? kept : sortByDate(kept);
   }
 
-  function rangeBar(list) {
+  function keepsListOrder(list) {
+    return list.length > 0 && list.every(function (w) {
+      return listOrderedKocs[w.subjectId + '/' + w.kocId];
+    });
+  }
+
+  function rangeBar(list, listOrder) {
     var now = new Date();
     var modes = [['all', 'All'], ['day', 'Day'], ['week', 'Week'], ['month', 'Month']];
     return '<div class="toolbar" role="toolbar" aria-label="Sort by date">' +
@@ -608,7 +617,7 @@ window.KOC = (function () {
         return '<button type="button" class="chip" data-range="' + mode[0] + '" aria-pressed="' +
           (range === mode[0] ? 'true' : 'false') + '">' + mode[1] + ' ' + count + '</button>';
       }).join('') +
-      '<span class="hint">Newest first</span></div>' +
+      '<span class="hint">' + (listOrder ? 'In list order' : 'Newest first') + '</span></div>' +
       elementBar(list);
   }
 
@@ -1089,20 +1098,22 @@ window.KOC = (function () {
   function renderKoc(k) {
     var list = worksOfKoc(k.id);
     var r = rollup(list);
-    var shown = applyRange(list);
+    var listOrder = keepsListOrder(list);
+    var shown = applyRange(list, listOrder);
 
     var body = !list.length
       ? '<div class="empty"><strong>No submissions yet</strong>' +
           'Work appears here once ' + esc(k.name) + ' adds a card to their <code>works.js</code> file.' +
         '</div>'
-      : rangeBar(list) + (shown.length
+      : rangeBar(list, listOrder) + (shown.length
           ? '<div class="grid">' + shown.map(function (w) {
               return workCard(w, findSubject(w.subjectId));
             }).join('') + '</div>'
           : emptyRange());
 
     el('view').innerHTML =
-      head(k.icon, k.name, 'All work claimed by this KOC, regardless of subject. Sorted by date.', [
+      head(k.icon, k.name, 'All work claimed by this KOC, regardless of subject. ' +
+        (listOrder ? 'In the order this KOC chose.' : 'Sorted by date.'), [
         '<span>' + plural(shown.length, 'submission') + '</span>'
       ]) + body;
   }
