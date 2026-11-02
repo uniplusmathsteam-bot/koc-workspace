@@ -118,6 +118,19 @@ KOC.works('maths', 'tracy', [
     notes: 'Quadrilaterals survival kit: properties, proofs, mid-point and intercept theorems.'
   },
   {
+    id: 'jm30-probability-summary',
+    title: 'JM30 · Summary',
+    type: 'interactive',
+    chapter: 'S3 JM30',
+    submitted: '2026-11-01',
+    status: 'pending',
+    tags: ['Interactive', 'Probability', 'Summary', 'S3'],
+    elements: ['gold'],
+    cover: 'content/maths/tracy/s3-cover.svg',
+    src: 'https://unikoc5.github.io/s3-maths/topics/probability/summary-only.html',
+    notes: 'Probability survival kit: formula, tree diagrams, and expected value.'
+  },
+  {
     id: 'jm31-central-tendency-concept',
     title: 'JM31 · Concept & Formula',
     type: 'interactive',
@@ -142,6 +155,19 @@ KOC.works('maths', 'tracy', [
     cover: 'content/maths/tracy/s3-cover.svg',
     src: 'https://unikoc5.github.io/s3-maths/topics/central_tendency/games-only.html',
     notes: 'Objection! The Average Trial.'
+  },
+  {
+    id: 'jm31-central-tendency-summary',
+    title: 'JM31 · Summary',
+    type: 'interactive',
+    chapter: 'S3 JM31',
+    submitted: '2026-11-01',
+    status: 'pending',
+    tags: ['Interactive', 'Statistics', 'Summary', 'S3'],
+    elements: ['gold'],
+    cover: 'content/maths/tracy/s3-cover.svg',
+    src: 'https://unikoc5.github.io/s3-maths/topics/central_tendency/summary-only.html',
+    notes: 'Averages survival kit: mean, median, mode, and choosing an average.'
   },
   {
     id: 'jm34-trigonometry-concept',
