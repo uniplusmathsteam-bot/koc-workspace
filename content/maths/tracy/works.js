@@ -92,6 +92,19 @@ KOC.works('maths', 'tracy', [
     notes: 'Quadrilaterals concept page.'
   },
   {
+    id: 'jm29-quadrilaterals-games',
+    title: 'JM29 · Games',
+    type: 'interactive',
+    chapter: 'S3 JM29',
+    submitted: '2026-11-05',
+    status: 'pending',
+    tags: ['Interactive', 'Quadrilaterals', 'Game', 'S3'],
+    elements: ['fire'],
+    cover: 'content/maths/tracy/s3-cover.svg',
+    src: 'https://unikoc5.github.io/s3-maths/topics/quadrilaterals/games-only.html',
+    notes: 'The Search for the True Princesses and Proof Pipes.'
+  },
+  {
     id: 'jm29-quadrilaterals-comics',
     title: 'JM29 · Quadrilaterals Comics',
     type: 'interactive',
@@ -168,6 +181,45 @@ KOC.works('maths', 'tracy', [
     cover: 'content/maths/tracy/s3-cover.svg',
     src: 'https://unikoc5.github.io/s3-maths/topics/central_tendency/summary-only.html',
     notes: 'Averages survival kit: mean, median, mode, and choosing an average.'
+  },
+  {
+    id: 'jm32-area-volume-hot-drop',
+    title: 'JM32 · Game 1 · Hot Drop',
+    type: 'interactive',
+    chapter: 'S3 JM32',
+    submitted: '2026-11-05',
+    status: 'pending',
+    tags: ['Interactive', 'Volume', 'Game', 'S3'],
+    elements: ['fire'],
+    cover: 'content/maths/tracy/s3-cover.svg',
+    src: 'https://unikoc5.github.io/s3-maths/topics/area_volume/hot-drop-only.html',
+    notes: 'Hot Drop: Cooling Pool Night Shift.'
+  },
+  {
+    id: 'jm32-area-volume-ratio-solitaire',
+    title: 'JM32 · Game 2 · Ratio Solitaire',
+    type: 'interactive',
+    chapter: 'S3 JM32',
+    submitted: '2026-11-05',
+    status: 'pending',
+    tags: ['Interactive', 'Volume', 'Game', 'S3'],
+    elements: ['fire'],
+    cover: 'content/maths/tracy/s3-cover.svg',
+    src: 'https://unikoc5.github.io/s3-maths/topics/area_volume/ratio-solitaire-only.html',
+    notes: 'Ratio Solitaire: area ratio, volume ratio, same height or base.'
+  },
+  {
+    id: 'jm32-area-volume-summary',
+    title: 'JM32 · Summary',
+    type: 'interactive',
+    chapter: 'S3 JM32',
+    submitted: '2026-11-05',
+    status: 'pending',
+    tags: ['Interactive', 'Volume', 'Summary', 'S3'],
+    elements: ['gold'],
+    cover: 'content/maths/tracy/s3-cover.svg',
+    src: 'https://unikoc5.github.io/s3-maths/topics/area_volume/summary-only.html',
+    notes: 'Areas and Volumes survival kit: pyramids, cones, spheres, frustums, and similar solids.'
   },
   {
     id: 'jm34-trigonometry-concept',
