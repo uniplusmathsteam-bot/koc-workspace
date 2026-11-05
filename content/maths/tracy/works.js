@@ -183,8 +183,8 @@ KOC.works('maths', 'tracy', [
     notes: 'Averages survival kit: mean, median, mode, and choosing an average.'
   },
   {
-    id: 'jm32-area-volume-hot-drop',
-    title: 'JM32 · Game 1 · Hot Drop',
+    id: 'jm32-area-volume-games',
+    title: 'JM32 · Games',
     type: 'interactive',
     chapter: 'S3 JM32',
     submitted: '2026-11-05',
@@ -192,21 +192,8 @@ KOC.works('maths', 'tracy', [
     tags: ['Interactive', 'Volume', 'Game', 'S3'],
     elements: ['fire'],
     cover: 'content/maths/tracy/s3-cover.svg',
-    src: 'https://unikoc5.github.io/s3-maths/topics/area_volume/hot-drop-only.html',
-    notes: 'Hot Drop: Cooling Pool Night Shift.'
-  },
-  {
-    id: 'jm32-area-volume-ratio-solitaire',
-    title: 'JM32 · Game 2 · Ratio Solitaire',
-    type: 'interactive',
-    chapter: 'S3 JM32',
-    submitted: '2026-11-05',
-    status: 'pending',
-    tags: ['Interactive', 'Volume', 'Game', 'S3'],
-    elements: ['fire'],
-    cover: 'content/maths/tracy/s3-cover.svg',
-    src: 'https://unikoc5.github.io/s3-maths/topics/area_volume/ratio-solitaire-only.html',
-    notes: 'Ratio Solitaire: area ratio, volume ratio, same height or base.'
+    src: 'https://unikoc5.github.io/s3-maths/topics/area_volume/games-only.html',
+    notes: 'Hot Drop and Ratio Solitaire.'
   },
   {
     id: 'jm32-area-volume-summary',
