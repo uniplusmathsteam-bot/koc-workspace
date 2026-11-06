@@ -9,27 +9,48 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
   <link rel="stylesheet" href="https://unikoc5.github.io/s3-maths/slides/law_of_indices/_manim-deck.css?v=20260926i">
   <style>
-    .coord .m-title { font-size: 36px !important; }
-    .coord .m-sub { font-size: 22px; }
-    .plane { width: 620px; max-width: 100%; height: 230px; margin: 0 auto; }
+    .coord .m-title { font-size: 44px !important; }
+    .coord .m-head { padding-top: 22px !important; padding-bottom: 6px !important; }
+    .coord .m-sub, .coord .m-sub.lead { font-size: 28px !important; }
+    .coord .m-eq { font-size: 30px !important; }
+    .coord .m-result, .coord .m-result.box-final, .coord .box-final { font-size: 32px !important; }
+    .coord .mini-note { font-size: 26px !important; color: #e6c260; }
+    .plane { position: relative; width: 680px; max-width: 100%; height: 210px; margin: 0 auto; }
     .plane svg { width: 100%; height: 100%; }
     .axis { stroke: #64748b; stroke-width: 1.6; fill: none; }
-    .run { stroke: #4fc3f7; stroke-width: 4; fill: none; stroke-linecap: round; }
-    .rise { stroke: #ffd54f; stroke-width: 4; fill: none; stroke-linecap: round; }
+    .hx { stroke: #4fc3f7; stroke-width: 4; fill: none; stroke-linecap: round; }
+    .vy { stroke: #ffd54f; stroke-width: 4; fill: none; stroke-linecap: round; }
     .hyp { stroke: #81c784; stroke-width: 4.5; fill: none; stroke-linecap: round; }
-    .ghost { stroke: #94a3b8; stroke-width: 2; stroke-dasharray: 7 6; fill: none; }
-    .dot { fill: #f8fafc; }
     .dot-a { fill: #4fc3f7; } .dot-b { fill: #ffd54f; } .dot-c { fill: #81c784; }
-    .lbl { font-family: "Times New Roman", Times, serif; font-size: 18px; fill: #e2e8f0; }
-    .lbl-a { fill: #4fc3f7; } .lbl-b { fill: #ffd54f; } .lbl-c { fill: #81c784; }
-    .draw { stroke-dasharray: 520; stroke-dashoffset: 0; }
-    .fragment.visible .draw { animation: drawline 0.65s ease forwards; }
-    @keyframes drawline { from { stroke-dashoffset: 520; } to { stroke-dashoffset: 0; } }
-    .eq-row { display: flex; flex-wrap: wrap; gap: 10px 16px; justify-content: center; align-items: center; }
-    .mini-note { font-size: 20px !important; color: #e6c260; }
+    .lbl { font-family: "Times New Roman", Times, serif; font-size: 20px; fill: #e2e8f0; }
+    .pin {
+      position: absolute; font-family: "Times New Roman", Times, serif;
+      font-size: 26px; line-height: 1; white-space: nowrap;
+    }
+    .pin-a { color: #4fc3f7; } .pin-b { color: #ffd54f; } .pin-c { color: #81c784; }
+    .fx1 { left: 18%; top: 58%; color: #4fc3f7; }
+    .fragment.visible.fx1 { animation: d1 .7s ease forwards; }
+    @keyframes d1 { from { left: 14%; top: 48%; } to { left: 16%; top: 78%; } }
+    .fx2 { left: 78%; top: 2%; color: #ffd54f; }
+    .fragment.visible.fx2 { animation: d2 .7s ease forwards; }
+    @keyframes d2 { from { left: 80%; top: 2%; } to { left: 74%; top: 78%; } }
+    .fy1 { left: 14%; top: 52%; color: #4fc3f7; }
+    .fragment.visible.fy1 { animation: d3 .7s ease forwards; }
+    @keyframes d3 { from { left: 22%; top: 52%; } to { left: 79%; top: 68%; } }
+    .fy2 { left: 84%; top: 0; color: #ffd54f; }
+    .fragment.visible.fy2 { animation: d4 .7s ease forwards; }
+    @keyframes d4 { from { left: 86%; top: 6%; } to { left: 79%; top: 8%; } }
+    .capx { left: 38%; top: 84%; color: #e2e8f0; font-size: 24px; }
+    .capy { left: 86%; top: 36%; color: #e2e8f0; font-size: 24px; }
+    #pause-flag {
+      position: fixed; right: 18px; bottom: 12px; z-index: 40;
+      color: #e6c260; font: 22px "Times New Roman", Times, serif;
+    }
+    body.is-paused * { animation-play-state: paused !important; }
   </style>
 </head>
 <body class="coord">
+  <div id="pause-flag"></div>
   <div class="reveal">
     <div class="slides">
 
@@ -40,87 +61,109 @@
         </header>
         <div class="m-stage">
           <div class="story-stack">
-            <p class="m-sub lead fragment enter-wipe">Any two points on a straight line sit on the same right triangle.</p>
+            <p class="m-sub lead fragment enter-wipe">Two points determine a right triangle. The coordinates of those points are the only ingredients.</p>
             <div class="plane fragment enter-fade">
-              <svg viewBox="0 0 640 250" aria-hidden="true">
-                <line class="axis" x1="40" y1="210" x2="600" y2="210"/>
-                <line class="axis" x1="70" y1="20" x2="70" y2="230"/>
-                <line class="hyp" x1="120" y1="190" x2="500" y2="50"/>
-                <circle class="dot-a" cx="120" cy="190" r="6"/>
-                <circle class="dot-b" cx="500" cy="50" r="6"/>
-                <text class="lbl lbl-a" x="96" y="214">A</text>
-                <text class="lbl lbl-b" x="512" y="46">B</text>
+              <svg viewBox="0 0 640 220" aria-hidden="true">
+                <line class="axis" x1="40" y1="180" x2="600" y2="180"/>
+                <line class="axis" x1="70" y1="16" x2="70" y2="200"/>
+                <line class="hyp" x1="120" y1="160" x2="500" y2="40"/>
+                <circle class="dot-a" cx="120" cy="160" r="6"/>
+                <circle class="dot-b" cx="500" cy="40" r="6"/>
               </svg>
+              <span class="pin pin-a" style="left:8%;top:62%">A(x₁, y₁)</span>
+              <span class="pin pin-b" style="left:80%;top:4%">B(x₂, y₂)</span>
             </div>
-            <p class="m-sub note-proc fragment enter-fade">Drop straight across, then straight up. Both formulas are just that triangle.</p>
           </div>
         </div>
       </section>
 
       <section>
         <header class="m-head">
-          <h2 class="m-title">Where the distance formula comes from</h2>
+          <h2 class="m-title">Where each coordinate goes</h2>
           <div class="m-line"></div>
         </header>
         <div class="m-stage">
           <div class="story-stack">
             <div class="plane">
-              <svg viewBox="0 0 640 230">
-                <line class="axis" x1="36" y1="190" x2="610" y2="190"/>
-                <line class="axis" x1="70" y1="16" x2="70" y2="210"/>
-                <line class="hyp draw" x1="130" y1="168" x2="470" y2="42"/>
-                <circle class="dot-a" cx="130" cy="168" r="6"/>
-                <circle class="dot-b" cx="470" cy="42" r="6"/>
-                <text class="lbl lbl-a" x="108" y="188">A</text>
-                <text class="lbl lbl-b" x="482" y="40">B</text>
+              <svg viewBox="0 0 640 210">
+                <line class="axis" x1="36" y1="168" x2="610" y2="168"/>
+                <line class="axis" x1="70" y1="12" x2="70" y2="196"/>
+                <line class="hyp" x1="130" y1="150" x2="470" y2="36"/>
+                <circle class="dot-a" cx="130" cy="150" r="6"/>
+                <circle class="dot-b" cx="470" cy="36" r="6"/>
                 <g class="fragment">
-                  <line class="run draw" x1="130" y1="168" x2="470" y2="168"/>
-                  <text class="lbl lbl-a" x="250" y="188">run</text>
+                  <line class="hx" x1="130" y1="150" x2="470" y2="150"/>
                 </g>
                 <g class="fragment">
-                  <line class="rise draw" x1="470" y1="168" x2="470" y2="42"/>
-                  <text class="lbl lbl-b" x="482" y="112">rise</text>
-                </g>
-                <g class="fragment">
-                  <path class="ghost" d="M452 168 H470 V150"/>
+                  <line class="vy" x1="470" y1="150" x2="470" y2="36"/>
+                  <path d="M452 150 H470 V132" fill="none" stroke="#e6c260" stroke-width="2"/>
                 </g>
               </svg>
+              <span class="pin pin-a" style="left:6%;top:58%">A(x₁, y₁)</span>
+              <span class="pin pin-b" style="left:76%;top:0%">B(x₂, y₂)</span>
+              <span class="pin fragment fx1">x₁</span>
+              <span class="pin fragment fx2">x₂</span>
+              <span class="pin fragment fy1">y₁</span>
+              <span class="pin fragment fy2">y₂</span>
+              <span class="pin fragment capx">x₂ − x₁</span>
+              <span class="pin fragment capy">y₂ − y₁</span>
             </div>
-            <p class="m-sub note-proc fragment enter-fade">Pythagoras on those two legs — that is the whole derivation.</p>
+            <p class="m-sub fragment enter-fade">x₁ and x₂ move onto the horizontal side. y₁ and y₂ move onto the vertical side. One pair at a time.</p>
             <div class="m-result fragment enter-bounce box-final">\(AB=\sqrt{(x_2-x_1)^2+(y_2-y_1)^2}\)</div>
-            <p class="m-sub fragment enter-fade">\(A(2,11),\; B(-4,3):\quad 6^2+8^2=100,\quad AB=10\)</p>
-            <p class="m-sub mini-note fragment enter-fade">Horizontal: the rise is 0, so the length is just \(|x_2-x_1|\). Vertical: just \(|y_2-y_1|\). If \(a^2+b^2=c^2\) on the three sides, the angle is right.</p>
           </div>
         </div>
       </section>
 
       <section>
         <header class="m-head">
-          <h2 class="m-title">Slope is the same triangle</h2>
+          <h2 class="m-title">Put the numbers in, one at a time</h2>
+          <div class="m-line"></div>
+        </header>
+        <div class="m-stage">
+          <div class="story-stack">
+            <p class="m-sub">\(A(2,11),\ B(-4,3)\)</p>
+            <div class="work-fixed-frame">
+              <div class="stage-pane fragment" data-replace="1">\(AB=\sqrt{(x_2-x_1)^2+(y_2-y_1)^2}\)</div>
+              <div class="stage-pane fragment" data-replace="1">\(x_1=2\)</div>
+              <div class="stage-pane fragment" data-replace="1">\(y_1=11\)</div>
+              <div class="stage-pane fragment" data-replace="1">\(x_2=-4\)</div>
+              <div class="stage-pane fragment" data-replace="1">\(y_2=3\)</div>
+              <div class="stage-pane fragment" data-replace="1">\(AB=\sqrt{(-4-2)^2+(3-11)^2}\)</div>
+              <div class="stage-pane fragment" data-replace="1">\(AB=\sqrt{(-6)^2+(-8)^2}\)</div>
+              <div class="stage-pane fragment" data-replace="1">\(AB=\sqrt{36+64}=\sqrt{100}\)</div>
+              <div class="stage-pane fragment" data-replace="1">\(AB=10\)</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <header class="m-head">
+          <h2 class="m-title">Slope uses the same two changes</h2>
           <div class="m-line"></div>
         </header>
         <div class="m-stage">
           <div class="story-stack">
             <div class="plane">
-              <svg viewBox="0 0 640 220">
-                <line class="axis" x1="40" y1="180" x2="300" y2="180"/>
-                <line class="axis" x1="60" y1="20" x2="60" y2="200"/>
-                <line class="run" x1="90" y1="160" x2="250" y2="160"/>
-                <line class="rise" x1="250" y1="160" x2="250" y2="50"/>
-                <line class="hyp" x1="90" y1="160" x2="250" y2="50"/>
-                <text class="lbl lbl-a" x="140" y="200">run &gt; 0</text>
-                <text class="lbl lbl-b" x="258" y="110">rise &gt; 0</text>
+              <svg viewBox="0 0 640 200">
+                <line class="axis" x1="30" y1="165" x2="290" y2="165"/>
+                <line class="axis" x1="50" y1="16" x2="50" y2="185"/>
+                <line class="hx" x1="80" y1="145" x2="230" y2="145"/>
+                <line class="vy" x1="230" y1="145" x2="230" y2="40"/>
+                <line class="hyp" x1="80" y1="145" x2="230" y2="40"/>
+                <text class="lbl" x="110" y="188" fill="#4fc3f7">x₂ − x₁ &gt; 0</text>
+                <text class="lbl" x="238" y="100" fill="#ffd54f">y₂ − y₁ &gt; 0</text>
                 <g class="fragment">
-                  <line class="axis" x1="340" y1="110" x2="610" y2="110"/>
-                  <line class="run" x1="380" y1="50" x2="540" y2="50"/>
-                  <line class="rise" x1="540" y1="50" x2="540" y2="170" stroke="#e57373"/>
-                  <line class="hyp" x1="380" y1="50" x2="540" y2="170" stroke="#e57373"/>
-                  <text class="lbl" x="430" y="42" fill="#e57373">rise &lt; 0</text>
+                  <line class="axis" x1="340" y1="100" x2="610" y2="100"/>
+                  <line class="hx" x1="370" y1="45" x2="530" y2="45"/>
+                  <line class="vy" x1="530" y1="45" x2="530" y2="165" stroke="#e57373"/>
+                  <line class="hyp" x1="370" y1="45" x2="530" y2="165" stroke="#e57373"/>
+                  <text class="lbl" x="390" y="30" fill="#e57373">y₂ − y₁ &lt; 0</text>
                 </g>
               </svg>
             </div>
-            <div class="m-result fragment enter-bounce box-final">\(m=\dfrac{y_2-y_1}{x_2-x_1}=\dfrac{\text{rise}}{\text{run}}\)</div>
-            <p class="m-sub note-sem fragment enter-fade">Uphill is positive. Downhill is negative. The ratio is the same at every pair of points, because those little triangles are copies of each other.</p>
+            <div class="m-result fragment enter-bounce box-final">\(m=\dfrac{y_2-y_1}{x_2-x_1}\)</div>
+            <p class="m-sub note-sem fragment enter-fade">Change in y over change in x. Uphill is positive. Downhill is negative. The ratio is the same for every pair of points on the line.</p>
           </div>
         </div>
       </section>
@@ -133,20 +176,20 @@
         <div class="m-stage">
           <div class="story-stack">
             <div class="plane">
-              <svg viewBox="0 0 640 200">
+              <svg viewBox="0 0 640 180">
                 <g class="fragment">
-                  <line class="axis" x1="40" y1="100" x2="280" y2="100"/>
-                  <line class="hyp" x1="70" y1="70" x2="250" y2="70"/>
-                  <text class="lbl lbl-c" x="90" y="150">rise = 0, so m = 0</text>
+                  <line class="axis" x1="40" y1="90" x2="280" y2="90"/>
+                  <line class="hyp" x1="70" y1="60" x2="250" y2="60"/>
+                  <text class="lbl" x="70" y="140" fill="#81c784">y₂ − y₁ = 0, so m = 0</text>
                 </g>
                 <g class="fragment">
-                  <line class="axis" x1="430" y1="20" x2="430" y2="180"/>
-                  <line class="hyp" x1="430" y1="30" x2="430" y2="160" stroke="#e57373"/>
-                  <text class="lbl" x="455" y="100" fill="#e57373">run = 0</text>
+                  <line class="axis" x1="450" y1="16" x2="450" y2="165"/>
+                  <line class="hyp" x1="450" y1="28" x2="450" y2="150" stroke="#e57373"/>
+                  <text class="lbl" x="470" y="95" fill="#e57373">x₂ − x₁ = 0</text>
                 </g>
               </svg>
             </div>
-            <p class="m-sub fragment enter-fade">A horizontal line has slope \(0\). A vertical line has undefined slope — the run is \(0\), so you cannot divide.</p>
+            <p class="m-sub fragment enter-fade">A horizontal line has slope 0. A vertical line has undefined slope, because the change in x is 0 and you cannot divide.</p>
             <p class="m-sub mini-note fragment enter-fade">On a polygon, sort the sides by looking: uphill, downhill, flat, or straight up and down.</p>
           </div>
         </div>
@@ -159,11 +202,26 @@
         </header>
         <div class="m-stage">
           <div class="story-stack">
-            <p class="m-sub fragment enter-wipe">\(A(10,-7),\; B(3,2),\; C(-4,11)\)</p>
+            <div class="plane" style="height:168px">
+              <svg viewBox="0 0 640 180">
+                <line class="axis" x1="30" y1="150" x2="610" y2="150"/>
+                <line class="axis" x1="250" y1="12" x2="250" y2="168"/>
+                <text class="lbl" x="590" y="146">x</text>
+                <text class="lbl" x="256" y="18">y</text>
+                <line class="hyp" x1="118" y1="28" x2="530" y2="158"/>
+                <g class="fragment">
+                  <circle class="dot-c" cx="138" cy="34" r="6"/>
+                  <circle class="dot-b" cx="334" cy="94" r="6"/>
+                  <circle class="dot-a" cx="510" cy="152" r="6"/>
+                  <text class="lbl" x="96" y="28" fill="#81c784">C(−4, 11)</text>
+                  <text class="lbl" x="342" y="88" fill="#ffd54f">B(3, 2)</text>
+                  <text class="lbl" x="518" y="168" fill="#4fc3f7">A(10, −7)</text>
+                </g>
+              </svg>
+            </div>
             <p class="m-sub fragment enter-fade">\(m_{AB}=\dfrac{2-(-7)}{3-10}=\dfrac{9}{-7}\)</p>
             <p class="m-sub fragment enter-fade">\(m_{BC}=\dfrac{11-2}{-4-3}=\dfrac{9}{-7}\)</p>
-            <div class="m-result fragment enter-bounce box-final">equal slopes \(\Rightarrow\) \(A\), \(B\), \(C\) are collinear</div>
-            <p class="m-sub note-warn fragment enter-fade">If the two slopes differ, the path bends. Those three points are not one straight line.</p>
+            <div class="m-result fragment enter-bounce box-final">same slope, so A, B and C lie on one line</div>
           </div>
         </div>
       </section>
@@ -175,34 +233,34 @@
         </header>
         <div class="m-stage">
           <div class="story-stack">
-            <p class="m-sub fragment enter-wipe">Between the intercepts \((-8,0)\) and \((0,2)\), rise \(=2\), run \(=8\).</p>
+            <p class="m-sub fragment enter-wipe">Between \((-8,0)\) and \((0,2)\), the change in y is 2 and the change in x is 8.</p>
             <div class="m-eq fragment enter-fade">\(m=\dfrac{2-0}{0-(-8)}=\dfrac{1}{4}\)</div>
-            <p class="m-sub note-proc fragment enter-fade">The other way: a point and a slope already are the line. \(m\) says how \(y\) must change when \(x\) changes.</p>
+            <p class="m-sub note-proc fragment enter-fade">The other way: a point and a slope already fix the line. The slope says how y changes when x changes.</p>
             <p class="m-sub fragment enter-fade">Through \((6,2)\) with \(m=-\dfrac{2}{3}\): \(\;y-2=\left(-\dfrac{2}{3}\right)(x-6)\)</p>
-            <p class="m-sub fragment enter-fade">\(x=0\) hits the \(y\)-axis at \((0,6)\). \(y=0\) hits the \(x\)-axis at \((9,0)\).</p>
-            <p class="m-sub mini-note fragment enter-fade">A point on the \(y\)-axis is \((0,q)\). Put it into the same slope equation and solve for \(q\).</p>
+            <p class="m-sub fragment enter-fade">\(x=0\) gives \((0,6)\). \(y=0\) gives \((9,0)\).</p>
+            <p class="m-sub mini-note fragment enter-fade">A point on the y-axis is \((0,q)\). Put it into the same equation and solve for \(q\).</p>
           </div>
         </div>
       </section>
 
       <section>
         <header class="m-head">
-          <h2 class="m-title">Inclination is just the slope angle</h2>
+          <h2 class="m-title">Inclination is the same ratio</h2>
           <div class="m-line"></div>
         </header>
         <div class="m-stage">
           <div class="story-stack">
             <div class="plane">
-              <svg viewBox="0 0 640 210">
-                <line class="axis" x1="40" y1="170" x2="600" y2="170"/>
-                <line class="hyp" x1="80" y1="170" x2="280" y2="120"/>
-                <line class="hyp fragment" x1="340" y1="170" x2="520" y2="40" stroke="#ffd54f"/>
-                <text class="lbl lbl-c" x="150" y="110">gentle</text>
-                <text class="lbl lbl-b fragment" x="500" y="80">steeper</text>
+              <svg viewBox="0 0 640 190">
+                <line class="axis" x1="40" y1="155" x2="600" y2="155"/>
+                <line class="hyp" x1="80" y1="155" x2="280" y2="105"/>
+                <line class="hyp fragment" x1="340" y1="155" x2="520" y2="30" stroke="#ffd54f"/>
+                <text class="lbl" x="140" y="95" fill="#81c784">gentle</text>
+                <text class="lbl fragment" x="500" y="55" fill="#ffd54f">steeper</text>
               </svg>
             </div>
-            <div class="m-result fragment enter-bounce box-final">\(m=\tan\theta=\dfrac{\text{rise}}{\text{run}}\)</div>
-            <p class="m-sub note-sem fragment enter-fade">\(\theta\) is the angle with the positive \(x\)-axis. Among uphill lines, steeper means a larger slope. Downhill lines stay negative. No extra tangent work — the ratio you already have is \(\tan\theta\).</p>
+            <div class="m-result fragment enter-bounce box-final">\(m=\tan\theta=\dfrac{y_2-y_1}{x_2-x_1}\)</div>
+            <p class="m-sub note-sem fragment enter-fade">\(\theta\) is the angle with the positive x-axis. Among uphill lines, steeper means a larger slope. Downhill lines stay negative.</p>
           </div>
         </div>
       </section>
@@ -214,5 +272,27 @@
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
   <script src="https://unikoc5.github.io/s3-maths/slides/law_of_indices/_manim-boot.js?v=20260926i"></script>
   <script src="https://unikoc5.github.io/s3-maths/shared/manim-deck-nav.js?v=20260926i"></script>
+  <script>
+    (function () {
+      var paused = false;
+      function setPaused(on) {
+        paused = on;
+        document.body.classList.toggle("is-paused", on);
+        var flag = document.getElementById("pause-flag");
+        if (flag) flag.textContent = on ? "Paused" : "";
+      }
+      window.addEventListener("keydown", function (e) {
+        if (e.code !== "Space" && e.key !== " ") return;
+        e.preventDefault();
+        e.stopPropagation();
+        setPaused(!paused);
+      }, true);
+      function disarm() {
+        try { if (window.Reveal && Reveal.configure) Reveal.configure({ keyboard: { 32: null } }); } catch (err) {}
+      }
+      if (window.Reveal && Reveal.on) Reveal.on("ready", disarm);
+      setTimeout(disarm, 400);
+    })();
+  </script>
 </body>
 </html>
