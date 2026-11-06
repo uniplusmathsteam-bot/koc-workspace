@@ -11,7 +11,7 @@
   <style>
     .coord .m-title { font-size: 44px !important; }
     .coord .m-head { padding-top: 18px !important; padding-bottom: 4px !important; }
-    .coord .m-stage { justify-content: flex-start !important; padding-top: 4px !important; padding-bottom: 8px !important; }
+    .coord .m-stage { justify-content: center !important; padding-top: 4px !important; padding-bottom: 8px !important; }
     .coord .story-stack { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; }
     .coord .m-sub, .coord .m-eq { margin: 2px 0 !important; }
     body.coord .reveal .m-stage .fragment:not(.visible) {
@@ -25,7 +25,13 @@
       visibility: hidden !important;
     }
     .pair { display: flex; gap: 12px; width: 100%; justify-content: center; }
-    .pair .plane { width: 280px; height: 130px; }
+    .pair .plane { width: 320px; height: 190px; flex: 0 0 320px; }
+    body.coord .reveal .m-stage .pair .plane.fragment:not(.visible) {
+      width: 320px !important;
+      height: 190px !important;
+      flex: 0 0 320px !important;
+    }
+    .perp-lower { margin-top: 22px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
     .coord .m-sub, .coord .m-sub.lead { font-size: 28px !important; }
     .coord .m-eq { font-size: 30px !important; }
     .coord .m-result, .coord .m-result.box-final, .coord .box-final { font-size: 32px !important; }
@@ -111,7 +117,7 @@
               </div>
             </div>
             <p class="m-sub fragment enter-fade">The first line climbs 2 for every 1 across, so \(m=2\). A quarter turn of that step is 2 across and 1 down, so \(m=-\dfrac12\).</p>
-            <div class="fragment" id="perp-done">
+            <div class="fragment perp-lower" id="perp-done">
               <div class="plane" style="height:88px;width:240px">
                 <svg viewBox="0 0 280 120">
                   <line class="hyp" x1="120" y1="100" x2="160" y2="20"/>
