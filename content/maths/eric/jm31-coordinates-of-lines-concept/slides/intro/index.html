@@ -19,10 +19,11 @@
     .pt.a { left: 2%; top: 62%; color: #4fc3f7; }
     .pt.b { left: 76%; top: 4%; color: #ffd54f; }
     .chip { margin: 0; }
-    .reveal .fragment.visible.x-drag .c-x1 { animation: toX1 .8s ease forwards !important; }
-    .reveal .fragment.visible.x-drag .c-x2 { animation: toX2 .8s ease forwards !important; }
-    .reveal .fragment.visible.y-drag .c-y1 { animation: toY1 .8s ease forwards !important; }
-    .reveal .fragment.visible.y-drag .c-y2 { animation: toY2 .8s ease forwards !important; }
+    .c-x1, .c-x2, .c-y1, .c-y2 { opacity: 0; }
+    .c-x1.go { animation: toX1 .85s ease forwards; }
+    .c-x2.go { animation: toX2 .85s ease forwards; }
+    .c-y1.go { animation: toY1 .85s ease forwards; }
+    .c-y2.go { animation: toY2 .85s ease forwards; }
     @keyframes toX1 { from { left: 8%; top: 64%; opacity: 1; } to { left: 30%; top: 76%; opacity: 1; } }
     @keyframes toX2 { from { left: 80%; top: 6%; opacity: 1; } to { left: 62%; top: 76%; opacity: 1; } }
     @keyframes toY1 { from { left: 14%; top: 64%; opacity: 1; } to { left: 76%; top: 56%; opacity: 1; } }
@@ -87,14 +88,12 @@
               </svg>
               <span class="pt a">\(A(x_1,y_1)\)</span>
               <span class="pt b">\(B(x_2,y_2)\)</span>
-              <div class="fragment x-drag">
-                <span class="chip c-x1">\(x_1\)</span>
-                <span class="chip c-x2">\(x_2\)</span>
-              </div>
-              <div class="fragment y-drag">
-                <span class="chip c-y1">\(y_1\)</span>
-                <span class="chip c-y2">\(y_2\)</span>
-              </div>
+              <span class="chip c-x1">\(x_1\)</span>
+              <span class="chip c-x2">\(x_2\)</span>
+              <span class="chip c-y1">\(y_1\)</span>
+              <span class="chip c-y2">\(y_2\)</span>
+              <span class="fragment" data-drag="x"></span>
+              <span class="fragment" data-drag="y"></span>
             </div>
             <p class="m-eq fragment">\(AB=\sqrt{(x_2-x_1)^2+(y_2-y_1)^2}\)</p>
             <p class="m-sub fragment">\(\Delta x=x_2-x_1,\ \Delta y=y_2-y_1,\ \text{so } AB=\sqrt{\Delta x^2+\Delta y^2}\)</p>
@@ -282,7 +281,33 @@
       function disarm() {
         try { if (window.Reveal && Reveal.configure) Reveal.configure({ keyboard: { 32: null } }); } catch (err) {}
       }
-      if (window.Reveal && Reveal.on) Reveal.on("ready", disarm);
+      function runDrag(which) {
+        var names = which === "x" ? [".c-x1", ".c-x2"] : [".c-y1", ".c-y2"];
+        names.forEach(function (sel) {
+          document.querySelectorAll(sel).forEach(function (el) {
+            el.classList.remove("go");
+            void el.offsetWidth;
+            el.classList.add("go");
+          });
+        });
+      }
+      function clearDrag(which) {
+        var names = which === "x" ? [".c-x1", ".c-x2"] : [".c-y1", ".c-y2"];
+        names.forEach(function (sel) {
+          document.querySelectorAll(sel).forEach(function (el) { el.classList.remove("go"); });
+        });
+      }
+      if (window.Reveal && Reveal.on) {
+        Reveal.on("ready", disarm);
+        Reveal.on("fragmentshown", function (ev) {
+          var kind = ev.fragment && ev.fragment.getAttribute("data-drag");
+          if (kind) runDrag(kind);
+        });
+        Reveal.on("fragmenthidden", function (ev) {
+          var kind = ev.fragment && ev.fragment.getAttribute("data-drag");
+          if (kind) clearDrag(kind);
+        });
+      }
       setTimeout(disarm, 400);
     })();
   </script>
