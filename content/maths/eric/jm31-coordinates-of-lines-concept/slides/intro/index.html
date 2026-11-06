@@ -11,12 +11,10 @@
   <style>
     .coord .m-title { font-size: 44px !important; }
     .coord .m-head { padding-top: 18px !important; padding-bottom: 4px !important; }
-    .coord .m-stage { justify-content: flex-start !important; align-items: center !important; padding-top: 10px !important; padding-bottom: 8px !important; }
+    .coord .m-stage { justify-content: center !important; padding-top: 4px !important; padding-bottom: 8px !important; }
     .coord .story-stack { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-    body.coord .reveal .slides section .m-stage .fragment,
-    body.coord .reveal .slides section .m-stage .fragment:not(.visible) {
+    body.coord .reveal .slides section .fragment:not(.visible) {
       position: static !important;
-      display: block !important;
       width: auto !important;
       height: auto !important;
       max-height: none !important;
@@ -25,21 +23,17 @@
       overflow: visible !important;
       clip: unset !important;
       clip-path: none !important;
-      transform: none !important;
-      animation: none !important;
       inset: auto !important;
       top: auto !important;
       left: auto !important;
-    }
-    body.coord .reveal .slides section .m-stage .fragment:not(.visible) {
+      transform: none !important;
       opacity: 0 !important;
       visibility: hidden !important;
     }
-    body.coord .reveal .slides section .m-stage svg .fragment,
-    body.coord .reveal .slides section .m-stage svg .fragment:not(.visible) {
-      display: inline !important;
+    body.coord .reveal .fragment.visible {
+      animation: none !important;
+      transform: none !important;
     }
-    .plane, .plane svg { overflow: visible; }
     body.coord .fragment[data-drag] {
       position: absolute !important;
       width: 0 !important;
@@ -49,8 +43,7 @@
     }
     .pair { display: flex; gap: 18px; width: 100%; justify-content: center; }
     .pair .plane { width: 300px; height: 190px; flex: 0 0 300px; }
-    body.coord .reveal .slides section .m-stage .pair .plane.fragment:not(.visible) {
-      display: block !important;
+    body.coord .reveal .m-stage .pair .plane.fragment:not(.visible) {
       width: 300px !important;
       height: 190px !important;
       flex: 0 0 300px !important;
@@ -149,21 +142,21 @@
           <div class="story-stack">
             <div class="pair">
               <div class="plane">
-                <svg viewBox="-70 0 390 200">
-                  <line class="axis" x1="28" y1="178" x2="300" y2="178"/>
-                  <line class="axis" x1="48" y1="16" x2="48" y2="190"/>
-                  <line class="hx" x1="70" y1="145" x2="190" y2="145"/>
-                  <line class="vy" x1="190" y1="145" x2="190" y2="45"/>
-                  <line class="hyp" x1="70" y1="145" x2="190" y2="45"/>
-                  <circle class="dot-a" cx="70" cy="145" r="5"/>
-                  <circle class="dot-b" cx="190" cy="45" r="5"/>
+                <svg viewBox="0 0 320 200">
+                  <line class="axis" x1="36" y1="178" x2="308" y2="178"/>
+                  <line class="axis" x1="110" y1="16" x2="110" y2="190"/>
+                  <line class="hx" x1="140" y1="145" x2="250" y2="145"/>
+                  <line class="vy" x1="250" y1="145" x2="250" y2="45"/>
+                  <line class="hyp" x1="140" y1="145" x2="250" y2="45"/>
+                  <circle class="dot-a" cx="140" cy="145" r="5"/>
+                  <circle class="dot-b" cx="250" cy="45" r="5"/>
                   <g class="fragment">
-                    <text class="lbl" x="66" y="141" text-anchor="end" fill="#4fc3f7">(x₁, y₁)</text>
-                    <text class="lbl" x="198" y="40" fill="#ffd54f">(x₂, y₂)</text>
+                    <text class="lbl" x="132" y="149" text-anchor="end" fill="#4fc3f7">(x₁, y₁)</text>
+                    <text class="lbl" x="258" y="40" fill="#ffd54f">(x₂, y₂)</text>
                   </g>
                   <g class="fragment">
-                    <text class="lbl" x="86" y="164" fill="#4fc3f7">Δx &gt; 0</text>
-                    <text class="lbl" x="198" y="100" fill="#ffd54f">Δy &gt; 0</text>
+                    <text class="lbl" x="158" y="164" fill="#4fc3f7">Δx &gt; 0</text>
+                    <text class="lbl" x="258" y="100" fill="#ffd54f">Δy &gt; 0</text>
                   </g>
                 </svg>
               </div>
