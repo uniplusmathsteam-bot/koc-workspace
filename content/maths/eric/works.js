@@ -142,5 +142,18 @@ KOC.works('maths', 'eric', [
     cover: 'content/maths/eric/covers/jm31.svg',
     src: 'content/maths/eric/jm31-central-tendency-concept/index.html?v=20261030-concept',
     notes: 'Two concept decks: mean, median and mode, then weighted mean, a missing value, the 50th percentile, and the same change applied to every value.'
+  },
+  {
+    id: 'jm31-coordinates-of-lines-concept',
+    title: 'JM31 Coordinates of Lines — Concept',
+    type: 'interactive',
+    chapter: 'S3 JM31',
+    submitted: '2026-11-06',
+    status: 'pending',
+    tags: ['Interactive', 'Coordinates', 'Concept', 'S3'],
+    elements: ['wood'],
+    cover: 'content/maths/eric/covers/jm31.svg',
+    src: 'content/maths/eric/jm31-coordinates-of-lines-concept/index.html?v=20261106-write-check',
+    notes: 'Coordinates of lines concept window. Published to verify write access.'
   }
 ]);
