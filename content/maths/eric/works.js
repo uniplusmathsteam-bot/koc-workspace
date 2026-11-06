@@ -145,15 +145,15 @@ KOC.works('maths', 'eric', [
   },
   {
     id: 'jm31-coordinates-of-lines-concept',
-    title: 'JM31 Coordinates of Lines — Concept',
+    title: 'JM33 Coordinates of Lines — Concept',
     type: 'interactive',
-    chapter: 'S3 JM31',
+    chapter: 'S3 JM33',
     submitted: '2026-11-06',
     status: 'pending',
     tags: ['Interactive', 'Coordinates', 'Concept', 'S3'],
     elements: ['wood'],
     cover: 'content/maths/eric/covers/jm31.svg',
-    src: 'content/maths/eric/jm31-coordinates-of-lines-concept/index.html?v=20261106-write-check',
-    notes: 'Coordinates of lines concept window. Published to verify write access.'
+    src: 'content/maths/eric/jm31-coordinates-of-lines-concept/index.html?v=20261106-coord10',
+    notes: 'JM33 coordinates of straight lines: distance, slope, parallel and perpendicular, midpoint and area.'
   }
 ]);
