@@ -11,23 +11,45 @@
   <style>
     .coord .m-title { font-size: 44px !important; }
     .coord .m-head { padding-top: 18px !important; padding-bottom: 4px !important; }
-    .coord .m-stage { justify-content: center !important; padding-top: 8px !important; padding-bottom: 28px !important; }
-    .coord .story-stack { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .coord .m-stage { justify-content: flex-start !important; padding-top: 6px !important; padding-bottom: 12px !important; }
+    .coord .story-stack { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    body.coord .reveal .m-stage .fragment:not(.visible) {
+      position: relative !important;
+      width: auto !important;
+      height: auto !important;
+      margin: 0 !important;
+      overflow: visible !important;
+      clip: auto !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+    }
+    body.coord .fragment[data-drag] {
+      position: absolute !important;
+      width: 0 !important;
+      height: 0 !important;
+      overflow: hidden !important;
+      margin: 0 !important;
+    }
     .pair { display: flex; gap: 18px; width: 100%; justify-content: center; }
     .pair .plane { width: 300px; height: 190px; }
     .pt, .chip { position: absolute; font-size: 22px; line-height: 1; white-space: nowrap; z-index: 2; }
-    .pt.a { left: 2%; top: 62%; color: #4fc3f7; }
-    .pt.b { left: 76%; top: 4%; color: #ffd54f; }
+    .pt.a { left: 31%; top: 62%; transform: translate(-104%, -55%); color: #4fc3f7; }
+    .pt.b { left: 74.5%; top: 18%; transform: translate(6px, -60%); color: #ffd54f; }
     .chip { margin: 0; }
     .c-x1, .c-x2, .c-y1, .c-y2 { opacity: 0; }
+    .minus { position: absolute; opacity: 0; font-size: 26px; color: #e2e8f0; z-index: 2; }
+    .mx { left: 44%; top: 73%; }
+    .my { left: 80%; top: 40%; }
     .c-x1.go { animation: toX1 .85s ease forwards; }
     .c-x2.go { animation: toX2 .85s ease forwards; }
     .c-y1.go { animation: toY1 .85s ease forwards; }
     .c-y2.go { animation: toY2 .85s ease forwards; }
-    @keyframes toX1 { from { left: 8%; top: 64%; opacity: 1; } to { left: 30%; top: 76%; opacity: 1; } }
-    @keyframes toX2 { from { left: 80%; top: 6%; opacity: 1; } to { left: 62%; top: 76%; opacity: 1; } }
-    @keyframes toY1 { from { left: 14%; top: 64%; opacity: 1; } to { left: 76%; top: 56%; opacity: 1; } }
-    @keyframes toY2 { from { left: 82%; top: 6%; opacity: 1; } to { left: 76%; top: 16%; opacity: 1; } }
+    .mx.go, .my.go { animation: showMinus .25s ease .55s forwards; }
+    @keyframes showMinus { to { opacity: 1; } }
+    @keyframes toX1 { from { left: 22%; top: 58%; opacity: 1; } to { left: 36%; top: 73%; opacity: 1; } }
+    @keyframes toX2 { from { left: 78%; top: 12%; opacity: 1; } to { left: 48%; top: 73%; opacity: 1; } }
+    @keyframes toY1 { from { left: 24%; top: 60%; opacity: 1; } to { left: 76%; top: 40%; opacity: 1; } }
+    @keyframes toY2 { from { left: 80%; top: 12%; opacity: 1; } to { left: 84%; top: 40%; opacity: 1; } }
     .coord .m-sub, .coord .m-sub.lead { font-size: 28px !important; }
     .coord .m-eq { font-size: 30px !important; }
     .coord .m-result, .coord .m-result.box-final, .coord .box-final { font-size: 32px !important; }
@@ -89,8 +111,10 @@
               <span class="pt a">\(A(x_1,y_1)\)</span>
               <span class="pt b">\(B(x_2,y_2)\)</span>
               <span class="chip c-x1">\(x_1\)</span>
+              <span class="minus mx">−</span>
               <span class="chip c-x2">\(x_2\)</span>
               <span class="chip c-y1">\(y_1\)</span>
+              <span class="minus my">−</span>
               <span class="chip c-y2">\(y_2\)</span>
               <span class="fragment" data-drag="x"></span>
               <span class="fragment" data-drag="y"></span>
@@ -115,19 +139,19 @@
             <div class="pair">
               <div class="plane">
                 <svg viewBox="0 0 320 200">
-                  <line class="axis" x1="28" y1="160" x2="300" y2="160"/>
-                  <line class="axis" x1="48" y1="16" x2="48" y2="184"/>
+                  <line class="axis" x1="28" y1="178" x2="300" y2="178"/>
+                  <line class="axis" x1="48" y1="16" x2="48" y2="190"/>
                   <line class="hx" x1="70" y1="145" x2="190" y2="145"/>
                   <line class="vy" x1="190" y1="145" x2="190" y2="45"/>
                   <line class="hyp" x1="70" y1="145" x2="190" y2="45"/>
                   <circle class="dot-a" cx="70" cy="145" r="5"/>
                   <circle class="dot-b" cx="190" cy="45" r="5"/>
                   <g class="fragment">
-                    <text class="lbl" x="74" y="168" fill="#4fc3f7">(x₁, y₁)</text>
+                    <text class="lbl" x="68" y="149" text-anchor="end" fill="#4fc3f7">(x₁, y₁)</text>
                     <text class="lbl" x="198" y="40" fill="#ffd54f">(x₂, y₂)</text>
                   </g>
                   <g class="fragment">
-                    <text class="lbl" x="96" y="188" fill="#4fc3f7">Δx &gt; 0</text>
+                    <text class="lbl" x="86" y="164" fill="#4fc3f7">Δx &gt; 0</text>
                     <text class="lbl" x="198" y="100" fill="#ffd54f">Δy &gt; 0</text>
                   </g>
                 </svg>
@@ -195,22 +219,25 @@
         </header>
         <div class="m-stage">
           <div class="story-stack">
-            <div class="plane fragment" style="height:170px">
-              <svg viewBox="0 0 640 170">
-                <line class="axis" x1="40" y1="142" x2="610" y2="142"/>
-                <line class="axis" x1="250" y1="10" x2="250" y2="160"/>
-                <line class="hyp" x1="130" y1="40" x2="500" y2="136"/>
-                <circle class="dot-c" cx="145" cy="46" r="6"/>
-                <circle class="dot-b" cx="315" cy="90" r="6"/>
-                <circle class="dot-a" cx="485" cy="130" r="6"/>
-                <text class="lbl" x="70" y="34" fill="#81c784">C(−4, 11)</text>
-                <text class="lbl" x="324" y="78" fill="#ffd54f">B(3, 2)</text>
-                <text class="lbl" x="500" y="154" fill="#4fc3f7">A(10, −7)</text>
-              </svg>
+            <p class="m-sub fragment">\(A(10,-7),\ B(3,2),\ C(-4,11)\)</p>
+            <p class="m-sub fragment">\(m_{AB}=\dfrac{\Delta y}{\Delta x}=\dfrac{2-(-7)}{3-10}=\dfrac{9}{-7}\)</p>
+            <p class="m-sub fragment">\(m_{BC}=\dfrac{11-2}{-4-3}=\dfrac{9}{-7}\)</p>
+            <div class="fragment">
+              <div class="plane" style="height:130px">
+                <svg viewBox="0 0 640 140">
+                  <line class="axis" x1="40" y1="118" x2="610" y2="118"/>
+                  <line class="axis" x1="250" y1="8" x2="250" y2="132"/>
+                  <line class="hyp" x1="130" y1="28" x2="500" y2="112"/>
+                  <circle class="dot-c" cx="145" cy="34" r="5"/>
+                  <circle class="dot-b" cx="315" cy="72" r="5"/>
+                  <circle class="dot-a" cx="485" cy="108" r="5"/>
+                  <text class="lbl" x="78" y="26" fill="#81c784">C(−4, 11)</text>
+                  <text class="lbl" x="324" y="64" fill="#ffd54f">B(3, 2)</text>
+                  <text class="lbl" x="430" y="132" fill="#4fc3f7">A(10, −7)</text>
+                </svg>
+              </div>
+              <div class="m-result box-final">same slope, so A, B and C lie on this line</div>
             </div>
-            <p class="m-sub fragment enter-fade">\(m_{AB}=\dfrac{\Delta y}{\Delta x}=\dfrac{2-(-7)}{3-10}=\dfrac{9}{-7}\)</p>
-            <p class="m-sub fragment enter-fade">\(m_{BC}=\dfrac{11-2}{-4-3}=\dfrac{9}{-7}\)</p>
-            <div class="m-result fragment enter-bounce box-final">same slope, so A, B and C lie on this line</div>
           </div>
         </div>
       </section>
@@ -290,12 +317,16 @@
             el.classList.add("go");
           });
         });
+        var mark = document.querySelector(which === "x" ? ".mx" : ".my");
+        if (mark) { mark.classList.remove("go"); void mark.offsetWidth; mark.classList.add("go"); }
       }
       function clearDrag(which) {
         var names = which === "x" ? [".c-x1", ".c-x2"] : [".c-y1", ".c-y2"];
         names.forEach(function (sel) {
           document.querySelectorAll(sel).forEach(function (el) { el.classList.remove("go"); });
         });
+        var mark = document.querySelector(which === "x" ? ".mx" : ".my");
+        if (mark) mark.classList.remove("go");
       }
       if (window.Reveal && Reveal.on) {
         Reveal.on("ready", disarm);
