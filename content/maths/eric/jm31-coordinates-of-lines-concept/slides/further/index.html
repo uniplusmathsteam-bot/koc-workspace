@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Coordinates · Parallel, midpoint, area</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.1/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.1/dist/theme/black.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="https://unikoc5.github.io/s3-maths/slides/law_of_indices/_manim-deck.css?v=20260926i">
+  <style>
+    .coord .m-title { font-size: 34px !important; }
+    .coord .m-sub { font-size: 22px; }
+    .plane { width: 640px; max-width: 100%; height: 220px; margin: 0 auto; }
+    .plane svg { width: 100%; height: 100%; }
+    .axis { stroke: #64748b; stroke-width: 1.6; fill: none; }
+    .run { stroke: #4fc3f7; stroke-width: 4; fill: none; stroke-linecap: round; }
+    .rise { stroke: #ffd54f; stroke-width: 4; fill: none; stroke-linecap: round; }
+    .hyp { stroke: #81c784; stroke-width: 4.5; fill: none; stroke-linecap: round; }
+    .ghost { stroke: #94a3b8; stroke-width: 2; stroke-dasharray: 7 6; fill: none; }
+    .dot-a { fill: #4fc3f7; } .dot-b { fill: #ffd54f; } .dot-c { fill: #81c784; }
+    .lbl { font-family: "Times New Roman", Times, serif; font-size: 18px; fill: #e2e8f0; }
+    .lbl-a { fill: #4fc3f7; } .lbl-b { fill: #ffd54f; } .lbl-c { fill: #81c784; }
+    .draw { stroke-dasharray: 520; stroke-dashoffset: 520; }
+    .fragment.visible .draw { animation: drawline 0.65s ease forwards; }
+    @keyframes drawline { to { stroke-dashoffset: 0; } }
+    .spin-origin { transform-box: view-box; transform-origin: 200px 150px; }
+    .fragment.visible .spin-origin { animation: quarter 0.8s ease forwards; }
+    @keyframes quarter { to { transform: rotate(90deg); } }
+    .mini-note { font-size: 20px !important; color: #e6c260; }
+    .card-row { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+    .job {
+      min-width: 220px; max-width: 280px; padding: 10px 14px; border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.16); background: rgba(15,23,42,0.35);
+      font-family: "Times New Roman", Times, serif; font-size: 20px; line-height: 1.35;
+    }
+  </style>
+</head>
+<body class="coord">
+  <div class="reveal">
+    <div class="slides">
+
+      <section>
+        <header class="m-head">
+          <h2 class="m-title">Parallel lines keep the same tilt</h2>
+          <div class="m-line"></div>
+        </header>
+        <div class="m-stage">
+          <div class="story-stack">
+            <div class="plane">
+              <svg viewBox="0 0 640 210">
+                <line class="axis" x1="30" y1="180" x2="610" y2="180"/>
+                <line class="hyp draw" x1="60" y1="160" x2="280" y2="50"/>
+                <g class="fragment">
+                  <line class="hyp draw" x1="300" y1="180" x2="520" y2="70" stroke="#ffd54f"/>
+                </g>
+                <text class="lbl lbl-c" x="80" y="40">same rise, same run</text>
+              </svg>
+            </div>
+            <div class="m-result fragment enter-bounce box-final">parallel \(\iff m_1=m_2\)</div>
+            <p class="m-sub note-sem fragment enter-fade">The vertical gap never closes, so the lines never meet. Two vertical lines are parallel too — both slopes are undefined, and that still counts.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <header class="m-head">
+          <h2 class="m-title">A quarter turn makes a perpendicular</h2>
+          <div class="m-line"></div>
+        </header>
+        <div class="m-stage">
+          <div class="story-stack">
+            <div class="plane">
+              <svg viewBox="0 0 640 210">
+                <line class="axis" x1="40" y1="170" x2="300" y2="170"/>
+                <line class="axis" x1="70" y1="20" x2="70" y2="190"/>
+                <g>
+                  <line class="run" x1="90" y1="150" x2="150" y2="150"/>
+                  <line class="rise" x1="150" y1="150" x2="150" y2="40"/>
+                  <line class="hyp" x1="90" y1="150" x2="150" y2="40"/>
+                </g>
+                <text class="lbl lbl-a" x="100" y="168">1</text>
+                <text class="lbl lbl-b" x="156" y="100">2</text>
+                <g class="fragment">
+                  <line class="ghost" x1="360" y1="40" x2="560" y2="40"/>
+                  <line class="run" x1="400" y1="40" x2="520" y2="40"/>
+                  <line class="rise" x1="400" y1="40" x2="400" y2="100" stroke="#e57373"/>
+                  <line class="hyp" x1="400" y1="100" x2="520" y2="40" stroke="#e57373"/>
+                  <text class="lbl" x="440" y="32" fill="#4fc3f7">2</text>
+                  <text class="lbl" x="360" y="78" fill="#e57373">−1</text>
+                </g>
+              </svg>
+            </div>
+            <p class="m-sub fragment enter-fade">Run \(1\), rise \(2\) gives \(m=2\). A quarter turn swaps the legs and flips a sign: run \(2\), rise \(-1\), so \(m=-\dfrac{1}{2}\).</p>
+            <div class="m-result fragment enter-bounce box-final">\(m_1 m_2=-1\)</div>
+            <p class="m-sub note-warn fragment enter-fade">Horizontal and vertical are perpendicular, but one slope is undefined. Do not multiply in that case — see it.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <header class="m-head">
+          <h2 class="m-title">Moving a point, as coordinates</h2>
+          <div class="m-line"></div>
+        </header>
+        <div class="m-stage">
+          <div class="story-stack">
+            <p class="m-sub fragment enter-wipe">\(A(4,-2)\) rotated \(90^\circ\) clockwise about the origin.</p>
+            <p class="m-sub fragment enter-fade">\((x,y)\rightarrow(y,-x)\), so \(B=(-2,-4)\). One quarter turn swaps the coordinates and changes a sign.</p>
+            <p class="m-sub fragment enter-fade">Slide \(B\) up by \(t\): \(C=(-2,-4+t)\). \(A\), \(O\) and \(C\) are collinear when the slopes from \(O\) match.</p>
+            <p class="m-sub fragment enter-fade">\(\dfrac{-4+t}{-2}=\dfrac{-2}{4}\Rightarrow t=5\)</p>
+            <p class="m-sub mini-note fragment enter-fade">\(180^\circ\): \((x,y)\rightarrow(-x,-y)\). Reflect in the \(x\)-axis: \((x,-y)\). Translate up by \(t\): add \(t\) to \(y\). That is the whole list these questions use.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <header class="m-head">
+          <h2 class="m-title">The midpoint is halfway along both legs</h2>
+          <div class="m-line"></div>
+        </header>
+        <div class="m-stage">
+          <div class="story-stack">
+            <p class="m-sub fragment enter-wipe">\(A(5,-2)\) to \(B(-11,2)\). Half the run and half the rise land on the average.</p>
+            <div class="m-result fragment enter-bounce box-final">\(M=\left(\dfrac{x_1+x_2}{2},\,\dfrac{y_1+y_2}{2}\right)=(-3,0)\)</div>
+            <p class="m-sub fragment enter-fade">If \(M\) is known and one end is known, the other end is the point the same distance past \(M\): \(B=2M-A\).</p>
+            <p class="m-sub fragment enter-fade">\(M(-5,12)\), \(A(-3,10)\) \(\Rightarrow\) \(B=(-7,14)\).</p>
+            <p class="m-sub mini-note fragment enter-fade">Diagonals of a parallelogram share a midpoint. In coordinates, that shared midpoint is the test.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <header class="m-head">
+          <h2 class="m-title">A ratio cuts the segment into shares</h2>
+          <div class="m-line"></div>
+        </header>
+        <div class="m-stage">
+          <div class="story-stack">
+            <div class="plane">
+              <svg viewBox="0 0 640 160">
+                <line class="hyp" x1="60" y1="80" x2="580" y2="80"/>
+                <circle class="dot-a" cx="60" cy="80" r="6"/>
+                <circle class="dot-b" cx="580" cy="80" r="6"/>
+                <g class="fragment">
+                  <circle class="dot-c" cx="233" cy="80" r="7"/>
+                  <line class="ghost" x1="233" y1="58" x2="233" y2="102"/>
+                </g>
+                <text class="lbl lbl-a" x="48" y="112">A</text>
+                <text class="lbl lbl-c fragment" x="210" y="48">1 share</text>
+                <text class="lbl lbl-b" x="560" y="112">B</text>
+                <text class="lbl fragment" x="360" y="112">2 shares</text>
+              </svg>
+            </div>
+            <p class="m-sub fragment enter-fade">\(AM:MB=1:2\) means 1 share of the way from \(A\) toward \(B\), out of 3.</p>
+            <div class="m-result fragment enter-bounce box-final">\(AM:MB=m:n \Rightarrow \left(\dfrac{nx_1+mx_2}{m+n},\,\dfrac{ny_1+my_2}{m+n}\right)\)</div>
+            <p class="m-sub mini-note fragment enter-fade">The midpoint is the special case \(1:1\). If a question gives \(CM:MD\), those two numbers are \(m\) and \(n\). Same formula.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <header class="m-head">
+          <h2 class="m-title">Area is base times height, read off the axes</h2>
+          <div class="m-line"></div>
+        </header>
+        <div class="m-stage">
+          <div class="story-stack">
+            <div class="plane">
+              <svg viewBox="0 0 640 210">
+                <line class="axis" x1="40" y1="170" x2="600" y2="170"/>
+                <line class="axis" x1="80" y1="20" x2="80" y2="190"/>
+                <line class="hyp" x1="140" y1="170" x2="500" y2="170"/>
+                <line class="hyp" x1="140" y1="170" x2="280" y2="50"/>
+                <line class="hyp" x1="500" y1="170" x2="280" y2="50"/>
+                <g class="fragment">
+                  <line class="rise draw" x1="280" y1="170" x2="280" y2="50"/>
+                  <text class="lbl lbl-b" x="292" y="120">height</text>
+                </g>
+                <text class="lbl lbl-a" x="270" y="192">base</text>
+              </svg>
+            </div>
+            <div class="m-result fragment enter-bounce box-final">area \(=\dfrac{1}{2}\times\text{base}\times\text{height}\)</div>
+            <p class="m-sub fragment enter-fade">On the \(x\)-axis the height is the \(y\)-coordinate. If the base is horizontal but higher up, the height is the difference of the \(y\)-coordinates.</p>
+            <p class="m-sub mini-note fragment enter-fade">A trapezium with the two parallel sides horizontal: average those two lengths, then multiply by the vertical gap.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <header class="m-head">
+          <h2 class="m-title">The coordinate tests</h2>
+          <div class="m-line"></div>
+        </header>
+        <div class="m-stage">
+          <div class="story-stack">
+            <p class="m-sub fragment enter-wipe">A perpendicular bisector does both jobs: it passes through the midpoint, and \(m_1 m_2=-1\).</p>
+            <p class="m-sub note-sem fragment enter-fade">Every point on it is the same distance from the two ends. Equal distance is the same test.</p>
+            <div class="card-row">
+              <div class="job fragment enter-pop"><b>Collinear</b><br>the two slopes agree</div>
+              <div class="job fragment enter-pop"><b>Median / centroid</b><br>midpoint of a side; \(G\) averages the three vertices, and sits \(2:1\) from the vertex</div>
+              <div class="job fragment enter-pop"><b>Altitude</b><br>perpendicular to the opposite side</div>
+              <div class="job fragment enter-pop"><b>Perp. bisector</b><br>midpoint and \(m_1 m_2=-1\)</div>
+            </div>
+            <p class="m-sub mini-note fragment enter-fade">You already know which centre sits inside an acute or obtuse triangle. Here you only need the coordinate check.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <header class="m-head">
+          <h2 class="m-title">What to reach for</h2>
+          <div class="m-line"></div>
+        </header>
+        <div class="m-stage">
+          <div class="story-stack">
+            <div class="m-eq fragment enter-pop">\(AB=\sqrt{(x_2-x_1)^2+(y_2-y_1)^2}\)</div>
+            <div class="m-eq fragment enter-pop">\(m=\dfrac{y_2-y_1}{x_2-x_1}\qquad m_1=m_2\qquad m_1 m_2=-1\)</div>
+            <div class="m-eq fragment enter-pop">\(M=\left(\dfrac{x_1+x_2}{2},\dfrac{y_1+y_2}{2}\right)\)</div>
+            <div class="m-result fragment enter-bounce box-final">length, tilt, parallel, perpendicular, halfway, ratio, area</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.1/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <script src="https://unikoc5.github.io/s3-maths/slides/law_of_indices/_manim-boot.js?v=20260926i"></script>
+  <script src="https://unikoc5.github.io/s3-maths/shared/manim-deck-nav.js?v=20260926i"></script>
+</body>
+</html>
