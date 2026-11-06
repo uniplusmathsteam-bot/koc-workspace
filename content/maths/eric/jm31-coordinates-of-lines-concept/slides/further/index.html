@@ -38,7 +38,6 @@
   </style>
 </head>
 <body class="coord">
-  <div id="pause-flag"></div>
   <div class="reveal">
     <div class="slides">
 
@@ -56,7 +55,7 @@
                 <g class="fragment">
                   <line class="hyp" x1="300" y1="165" x2="520" y2="60" stroke="#ffd54f"/>
                 </g>
-                <text class="lbl" x="70" y="28" fill="#81c784">same change in x, same change in y</text>
+                <text class="lbl" x="70" y="28" fill="#81c784">same Δx, same Δy</text>
               </svg>
             </div>
             <div class="m-result fragment enter-bounce box-final">parallel means \(m_1=m_2\)</div>
@@ -80,10 +79,10 @@
                 <line class="hyp" x1="250" y1="210" x2="350" y2="10"/>
                 <line class="hyp fragment" x1="160" y1="40" x2="440" y2="180" stroke="#ffd54f"/>
                 <path class="fragment" d="M300 110 L316 78 L348 94 L332 126 Z" fill="none" stroke="#e6c260" stroke-width="2"/>
-                <text class="lbl" x="360" y="36" fill="#81c784">change in y = 2</text>
-                <text class="lbl" x="300" y="200" fill="#4fc3f7">change in x = 1</text>
-                <text class="lbl fragment" x="450" y="120" fill="#ffd54f">change in x = 2</text>
-                <text class="lbl fragment" x="150" y="28" fill="#e57373">change in y = −1</text>
+                <text class="lbl" x="360" y="28" fill="#81c784">Δy = 2</text>
+                <text class="lbl" x="250" y="206" fill="#4fc3f7">Δx = 1</text>
+                <text class="lbl fragment" x="455" y="150" fill="#ffd54f">Δx = 2</text>
+                <text class="lbl fragment" x="120" y="28" fill="#e57373">Δy = −1</text>
               </svg>
             </div>
             <p class="m-sub fragment enter-fade">The green line climbs 2 for every 1 across, so \(m=2\). Turn that step a quarter turn: 2 across and 1 down, so \(m=-\dfrac{1}{2}\).</p>
@@ -235,18 +234,20 @@
   <script src="https://unikoc5.github.io/s3-maths/shared/manim-deck-nav.js?v=20260926i"></script>
   <script>
     (function () {
-      var paused = false;
-      function setPaused(on) {
-        paused = on;
-        document.body.classList.toggle("is-paused", on);
-        var flag = document.getElementById("pause-flag");
-        if (flag) flag.textContent = on ? "Paused" : "";
+      function moving() {
+        return document.getAnimations().some(function (a) { return a.playState === "running"; });
+      }
+      function paused() {
+        return document.getAnimations().some(function (a) { return a.playState === "paused"; });
       }
       window.addEventListener("keydown", function (e) {
         if (e.code !== "Space" && e.key !== " ") return;
         e.preventDefault();
         e.stopPropagation();
-        setPaused(!paused);
+        var anims = document.getAnimations();
+        if (moving()) anims.forEach(function (a) { if (a.playState === "running") a.pause(); });
+        else if (paused()) anims.forEach(function (a) { if (a.playState === "paused") a.play(); });
+        else if (window.Reveal && Reveal.next) Reveal.next();
       }, true);
       function disarm() {
         try { if (window.Reveal && Reveal.configure) Reveal.configure({ keyboard: { 32: null } }); } catch (err) {}
