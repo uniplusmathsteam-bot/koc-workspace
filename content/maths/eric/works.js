@@ -153,7 +153,7 @@ KOC.works('maths', 'eric', [
     tags: ['Interactive', 'Coordinates', 'Concept', 'S3'],
     elements: ['wood'],
     cover: 'content/maths/eric/covers/jm31.svg',
-    src: 'content/maths/eric/jm31-coordinates-of-lines-concept/index.html?v=20261106-coord10',
+    src: 'content/maths/eric/jm31-coordinates-of-lines-concept/index.html?v=20261106-coord11',
     notes: 'JM33 coordinates of straight lines: distance, slope, parallel and perpendicular, midpoint and area.'
   }
 ]);
