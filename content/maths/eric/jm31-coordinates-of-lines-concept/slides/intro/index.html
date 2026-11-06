@@ -40,23 +40,13 @@
     .pt, .chip { position: absolute; font-size: 22px; line-height: 1; white-space: nowrap; z-index: 2; }
     .pt.a { left: 31%; top: 62%; transform: translate(-104%, -55%); color: #4fc3f7; }
     .pt.b { left: 74.5%; top: 18%; transform: translate(6px, -60%); color: #ffd54f; }
-    .chip { margin: 0; }
-    .c-x1, .c-x2, .c-y1, .c-y2 { opacity: 0; }
-    .minus { position: absolute; opacity: 0; font-size: 26px; color: #e2e8f0; z-index: 2; }
-    .mx { left: 44%; top: 73%; }
-    .my { left: 80%; top: 40%; }
-    .c-x1.go { animation: toX1 .85s ease forwards; }
-    .c-x2.go { animation: toX2 .85s ease forwards; }
-    .c-y1.go { animation: toY1 .85s ease forwards; }
-    .c-y2.go { animation: toY2 .85s ease forwards; }
-    .mx.go, .my.go { animation: showMinus .25s ease .55s forwards; }
-    @keyframes showMinus { to { opacity: 1; } }
-    .mx { left: 43%; top: 73%; }
-    .my { left: 80.5%; top: 40%; }
-    @keyframes toX2 { from { left: 78%; top: 12%; opacity: 1; } to { left: 37%; top: 73%; opacity: 1; } }
-    @keyframes toX1 { from { left: 22%; top: 58%; opacity: 1; } to { left: 46%; top: 73%; opacity: 1; } }
-    @keyframes toY2 { from { left: 80%; top: 12%; opacity: 1; } to { left: 75%; top: 40%; opacity: 1; } }
-    @keyframes toY1 { from { left: 24%; top: 60%; opacity: 1; } to { left: 84%; top: 40%; opacity: 1; } }
+    .leg-box {
+      position: absolute; z-index: 2; margin: 0; opacity: 0;
+      white-space: nowrap; font-size: 22px; line-height: 1;
+    }
+    .leg-x { left: 52.3%; top: 70%; transform: translateX(-50%); }
+    .leg-y { left: 76%; top: 32%; }
+    .leg-box.on { opacity: 1; }
     .coord .m-sub, .coord .m-sub.lead { font-size: 28px !important; }
     .coord .m-eq { font-size: 30px !important; }
     .coord .m-result, .coord .m-result.box-final, .coord .box-final { font-size: 32px !important; }
@@ -117,12 +107,8 @@
               </svg>
               <span class="pt a">\(A(x_1,y_1)\)</span>
               <span class="pt b">\(B(x_2,y_2)\)</span>
-              <span class="chip c-x1">\(x_1\)</span>
-              <span class="minus mx">−</span>
-              <span class="chip c-x2">\(x_2\)</span>
-              <span class="chip c-y1">\(y_1\)</span>
-              <span class="minus my">−</span>
-              <span class="chip c-y2">\(y_2\)</span>
+              <span class="leg-box leg-x">\(x_1-x_2\)</span>
+              <span class="leg-box leg-y">\(y_1-y_2\)</span>
               <span class="fragment" data-drag="x"></span>
               <span class="fragment" data-drag="y"></span>
             </div>
@@ -316,24 +302,12 @@
         try { if (window.Reveal && Reveal.configure) Reveal.configure({ keyboard: { 32: null } }); } catch (err) {}
       }
       function runDrag(which) {
-        var names = which === "x" ? [".c-x1", ".c-x2"] : [".c-y1", ".c-y2"];
-        names.forEach(function (sel) {
-          document.querySelectorAll(sel).forEach(function (el) {
-            el.classList.remove("go");
-            void el.offsetWidth;
-            el.classList.add("go");
-          });
-        });
-        var mark = document.querySelector(which === "x" ? ".mx" : ".my");
-        if (mark) { mark.classList.remove("go"); void mark.offsetWidth; mark.classList.add("go"); }
+        var el = document.querySelector(which === "x" ? ".leg-x" : ".leg-y");
+        if (el) el.classList.add("on");
       }
       function clearDrag(which) {
-        var names = which === "x" ? [".c-x1", ".c-x2"] : [".c-y1", ".c-y2"];
-        names.forEach(function (sel) {
-          document.querySelectorAll(sel).forEach(function (el) { el.classList.remove("go"); });
-        });
-        var mark = document.querySelector(which === "x" ? ".mx" : ".my");
-        if (mark) mark.classList.remove("go");
+        var el = document.querySelector(which === "x" ? ".leg-x" : ".leg-y");
+        if (el) el.classList.remove("on");
       }
       if (window.Reveal && Reveal.on) {
         Reveal.on("ready", disarm);
