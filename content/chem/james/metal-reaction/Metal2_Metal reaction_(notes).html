@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Metal2_Metal reaction_(notes)</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: #111827;
+    background: #eef3f8;
+    padding-left: env(safe-area-inset-left);
+    padding-right: calc(64px + env(safe-area-inset-right));
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  button { font-family: inherit; cursor: pointer; }
+  .topbar {
+    position: relative;
+    z-index: 55;
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: calc(52px + env(safe-area-inset-top));
+    padding: env(safe-area-inset-top) 12px 0;
+  }
+  .topbar h1 {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    font-size: 18px;
+    font-weight: 650;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .nav {
+    min-width: 64px;
+    min-height: 44px;
+    padding: 0 12px;
+    border: 1px solid #d7e0ec;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 16px;
+    color: #111827;
+  }
+  .nav:disabled { opacity: 0.35; cursor: default; }
+  #metalList {
+    position: relative;
+    z-index: 56;
+    flex: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px 12px 0;
+  }
+  .metal {
+    flex: none;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 12px;
+    border: 1px solid #d7e0ec;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 22px;
+    font-weight: 650;
+    color: #111827;
+  }
+  .metal[aria-pressed="true"] {
+    background: #163a86;
+    color: #fff;
+    border-color: #163a86;
+  }
+  #hideBtn[aria-pressed="true"] { background: #163a86; color: #fff; }
+  main {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 8px 12px 8px;
+    overflow: hidden;
+  }
+  #stage {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid #d7e0ec;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  body.zoomed #stage { position: fixed; z-index: 30; margin: 0; }
+  .stage-head {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 52px;
+    padding: 4px 8px 0 14px;
+  }
+  #stageName {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 38px;
+    font-weight: 650;
+    line-height: 1.15;
+    white-space: nowrap;
+    transform-origin: left center;
+    color: #111827;
+  }
+  #watchBtn {
+    flex: none;
+    margin-top: 2px;
+    white-space: nowrap;
+  }
+  #zoomBtn {
+    flex: none;
+    width: 44px;
+    height: 44px;
+    margin-top: 2px;
+    border: 1px solid #d7e0ec;
+    border-radius: 10px;
+    background: #fff;
+    color: #163a86;
+    font-size: 28px;
+    line-height: 1;
+  }
+  #zoomBtn[aria-pressed="true"] { background: #163a86; color: #fff; }
+  #zoomFit {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  #view {
+    position: relative;
+    flex: 1;
+    min-height: 160px;
+    touch-action: none;
+    user-select: none;
+    overflow: hidden;
+  }
+  #fig { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  #fig text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 32px; fill: #111827; }
+  .leader { fill: none; stroke: #64748b; stroke-width: 1.6; }
+  .heat-word { fill: #e11d8b; font-weight: 700; }
+  #eqBand {
+    flex: none;
+    height: calc(24px * 1.25 * 2);
+    padding: 0 14px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  #eqBand.split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    grid-auto-flow: column;
+    column-gap: 18px;
+    align-items: center;
+  }
+  #eqBand[hidden] { display: none; }
+  .eq {
+    margin: 0;
+    height: calc(24px * 1.25);
+    overflow: hidden;
+    font-size: 24px;
+    font-weight: 650;
+    line-height: 1.25;
+    white-space: nowrap;
+  }
+  .eq-inner { display: inline-block; transform-origin: left center; }
+  .answer {
+    flex: none;
+    height: 58px;
+    margin: 0;
+    display: grid;
+    place-items: center;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    color: #163a86;
+  }
+  .answer[aria-hidden="true"] { display: none; }
+  #answerInner { display: inline-block; transform-origin: center center; }
+  #desc {
+    flex: none;
+    margin: 6px 0 0;
+    padding: 0 14px 4px;
+    font-size: 38px;
+    line-height: 1.15;
+    height: calc(38px * 1.15 * 5 + 4px);
+    overflow: hidden;
+  }
+  #desc.hidden { display: none; }
+  .hl-water { color: #1d4ed8; font-weight: 700; }
+  .hl-result { color: #9a3412; font-weight: 700; }
+  .hl-lilac { color: #7e22ce; font-weight: 700; }
+  .hl-gold { color: #a16207; font-weight: 700; }
+  @media (max-width: 800px) {
+    .nav { min-width: 44px; padding: 0 8px; }
+    .metal { padding: 0 10px; }
+    #desc { height: calc(38px * 1.15 * 8 + 4px); }
+    #eqBand.split {
+      display: flex;
+      flex-direction: column;
+      height: calc(24px * 1.25 * 4);
+    }
+  }
+  .pen-canvas { position: fixed; inset: 0; z-index: 40; pointer-events: none; touch-action: none; }
+  .laser-canvas { position: fixed; inset: 0; z-index: 45; pointer-events: none; }
+  .laser-dot {
+    position: fixed; width: 22px; height: 22px; margin: -11px 0 0 -11px;
+    border-radius: 50%; pointer-events: none; z-index: 48;
+    background: radial-gradient(circle, rgba(255, 60, 60, 0.98), rgba(255, 0, 0, 0) 72%);
+  }
+  .laser-dot.hidden, .dcolors.hidden { display: none; }
+  body.pen-on { cursor: crosshair; touch-action: none; }
+  body.pen-on .pen-canvas { pointer-events: auto; }
+  body.laser-on { cursor: none; touch-action: none; }
+  body.pen-on, body.laser-on { user-select: none; }
+  .teach-dock {
+    position: fixed; right: 8px; top: 50%; transform: translateY(-50%);
+    z-index: 60; display: flex; flex-direction: column; gap: 6px;
+    padding: 8px 6px; background: rgba(255, 255, 255, 0.94);
+    border: 1px solid #d7e0ec; border-radius: 16px;
+  }
+  .dbtn {
+    width: 44px; height: 44px; border: 0; border-radius: 12px;
+    background: transparent; display: grid; place-items: center; color: #111827;
+  }
+  .dbtn svg { width: 22px; height: 22px; }
+  .dbtn.active { background: #163a86; color: #fff; }
+  #dkLaser.active { background: #e11d48; }
+  #dkPen.active { background: #0f8a62; }
+  .dcolors { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+  .dcolor { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #fff; background: var(--sc); box-shadow: 0 0 0 1px #d7e0ec; }
+  .dcolor.active { box-shadow: 0 0 0 2px #111827; }
+  .derase.active { background: #d97706; color: #3f2a00; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <h1>Metal2_Metal reaction_(notes)</h1>
+  <button type="button" class="nav" id="hideBtn" aria-pressed="false">Hide</button>
+</header>
+<nav id="metalList" aria-label="Metals">
+  <button type="button" class="metal" data-id="K" aria-pressed="true" aria-label="Potassium">K</button>
+  <button type="button" class="metal" data-id="Na" aria-label="Sodium">Na</button>
+  <button type="button" class="metal" data-id="Ca" aria-label="Calcium">Ca</button>
+  <button type="button" class="metal" data-id="Mg" aria-label="Magnesium">Mg</button>
+  <button type="button" class="metal" data-id="Al" aria-label="Aluminium">Al</button>
+  <button type="button" class="metal" data-id="Zn" aria-label="Zinc">Zn</button>
+  <button type="button" class="metal" data-id="Fe" aria-label="Iron">Fe</button>
+  <button type="button" class="metal" data-id="inert" aria-label="Lead, Copper, Mercury, Silver, Platinum, Gold">Pb–Au</button>
+</nav>
+<main>
+  <section id="stage">
+    <div class="stage-head">
+      <span id="stageName">Potassium</span>
+      <button type="button" class="nav" id="watchBtn">Watch Again</button>
+      <button type="button" id="zoomBtn" aria-label="Zoom" aria-pressed="false">+</button>
+    </div>
+    <div id="zoomFit">
+      <div id="view">
+        <svg id="fig" viewBox="0 0 1500 400" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Potassium melting and moving on cold water with a lilac flame">
+          <defs>
+            <linearGradient id="glassBody" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#ffffff"/>
+              <stop offset="0.18" stop-color="#f4fafd"/>
+              <stop offset="0.55" stop-color="#e4eef5"/>
+              <stop offset="1" stop-color="#c5d5e2"/>
+            </linearGradient>
+            <linearGradient id="waterBody" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#eef8fd"/>
+              <stop offset="0.18" stop-color="#c5e6f6"/>
+              <stop offset="1" stop-color="#7eb8d6"/>
+            </linearGradient>
+            <linearGradient id="silver" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#f8fafc"/>
+              <stop offset="0.4" stop-color="#cbd5e1"/>
+              <stop offset="0.72" stop-color="#64748b"/>
+              <stop offset="1" stop-color="#e2e8f0"/>
+            </linearGradient>
+            <linearGradient id="corkFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#edd3ae"/>
+              <stop offset="0.45" stop-color="#c4956a"/>
+              <stop offset="1" stop-color="#8a5a34"/>
+            </linearGradient>
+            <pattern id="sandPat" width="12" height="12" patternUnits="userSpaceOnUse">
+              <rect width="12" height="12" fill="#3a3126"/>
+              <circle cx="2" cy="3" r="1.5" fill="#6d5c45"/>
+              <circle cx="8" cy="7" r="1.6" fill="#1c1612"/>
+              <circle cx="5" cy="10" r="0.9" fill="#d6c7b0"/>
+              <circle cx="10" cy="2" r="0.7" fill="#8a7660"/>
+            </pattern>
+            <marker id="heatHead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+              <path d="M 0 0 L 8 4 L 0 8 Z" fill="#e11d8b"/>
+            </marker>
+            <clipPath id="tubeClip">
+              <path d="M 108 84 H 210 V 142 H 108 A 29 29 0 0 1 108 84 Z"/>
+            </clipPath>
+            <clipPath id="boilClip">
+              <path d="M 100 78 H 536 V 148 H 100 A 35 35 0 0 1 100 78 Z"/>
+            </clipPath>
+            <clipPath id="jarClip">
+              <path d="M 1134 52 Q 1134 28 1162 28 Q 1190 28 1190 52 L 1190 328 L 1134 328 Z"/>
+            </clipPath>
+            <clipPath id="coilTop">
+              <rect x="220" y="86" width="260" height="27"/>
+            </clipPath>
+          </defs>
+
+          <g id="steam" display="none">
+            <path fill="rgba(248,250,252,0.72)" d="M 912 250 L 912 360 Q 912 386 940 386 L 1310 386 Q 1338 386 1338 360 L 1338 250 Z"/>
+            <path fill="url(#waterBody)" d="M 916 300 L 916 366 Q 916 380 934 380 L 1316 380 Q 1334 380 1334 366 L 1334 300 Z"/>
+            <path fill="#f7fcfe" d="M 920 294 Q 1120 286 1330 294 L 1330 304 Q 1120 312 920 304 Z"/>
+            <path fill="none" stroke="#3d4a57" stroke-width="2.5" d="M 910 248 L 910 360 Q 910 388 938 388 L 1312 388 Q 1340 388 1340 360 L 1340 248"/>
+            <path fill="none" stroke="#ffffff" stroke-width="2" opacity="0.7" d="M 918 256 L 918 352"/>
+            <path fill="url(#glassBody)" d="M 1134 52 Q 1134 28 1162 28 Q 1190 28 1190 52 L 1190 328 L 1134 328 Z"/>
+            <g clip-path="url(#jarClip)">
+              <rect x="1134" y="168" width="56" height="170" fill="url(#waterBody)"/>
+              <ellipse cx="1162" cy="168" rx="26" ry="5" fill="#f4fbfe" stroke="#9fd0e6" stroke-width="1.2"/>
+              <path fill="none" stroke="#ffffff" stroke-width="3" opacity="0.55" d="M 1142 70 Q 1146 150 1144 250"/>
+            </g>
+            <path fill="none" stroke="#3d4a57" stroke-width="2.5" d="M 1134 328 L 1134 52 Q 1134 28 1162 28 Q 1190 28 1190 52 L 1190 328"/>
+            <g id="jarBubbles">
+              <circle cx="1148" cy="304" r="7" fill="rgba(255,255,255,0.75)" stroke="#7eb6d9" stroke-width="1.2" opacity="0"/>
+              <circle cx="1158" cy="304" r="9" fill="rgba(255,255,255,0.75)" stroke="#7eb6d9" stroke-width="1.2" opacity="0"/>
+              <circle cx="1168" cy="304" r="6" fill="rgba(255,255,255,0.75)" stroke="#7eb6d9" stroke-width="1.2" opacity="0"/>
+              <circle cx="1176" cy="304" r="8" fill="rgba(255,255,255,0.75)" stroke="#7eb6d9" stroke-width="1.2" opacity="0"/>
+              <circle cx="1152" cy="304" r="5" fill="rgba(255,255,255,0.75)" stroke="#7eb6d9" stroke-width="1.1" opacity="0"/>
+              <circle cx="1162" cy="304" r="7" fill="rgba(255,255,255,0.75)" stroke="#7eb6d9" stroke-width="1.1" opacity="0"/>
+              <circle cx="1172" cy="304" r="6" fill="rgba(255,255,255,0.75)" stroke="#7eb6d9" stroke-width="1.1" opacity="0"/>
+              <circle cx="1155" cy="304" r="8" fill="rgba(255,255,255,0.75)" stroke="#7eb6d9" stroke-width="1.2" opacity="0"/>
+              <circle cx="1166" cy="304" r="5" fill="rgba(255,255,255,0.75)" stroke="#7eb6d9" stroke-width="1.1" opacity="0"/>
+            </g>
+            <path fill="none" stroke="#c5d2de" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" d="M 548 113 L 760 150 L 1088 292 Q 1148 330 1162 286"/>
+            <path fill="none" stroke="#f8fafc" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.9" d="M 548 113 L 760 150 L 1088 292 Q 1148 330 1162 286"/>
+            <path fill="url(#glassBody)" stroke="#3d4a57" stroke-width="2.5" d="M 100 78 H 536 V 148 H 100 A 35 35 0 0 1 100 78 Z"/>
+            <g clip-path="url(#tubeClip)">
+              <path fill="url(#sandPat)" d="M 70 96 L 168 90 Q 214 108 196 128 Q 176 150 118 146 L 78 140 Q 62 118 70 96 Z"/>
+              <ellipse cx="96" cy="124" rx="14" ry="8" fill="#1c1612"/>
+              <ellipse cx="128" cy="118" rx="11" ry="7" fill="#4a3d30"/>
+              <ellipse cx="156" cy="128" rx="12" ry="7" fill="#2a241c"/>
+              <ellipse cx="112" cy="132" rx="9" ry="5" fill="#0e0c0a"/>
+              <path fill="#ffffff" opacity="0.28" d="M 86 102 Q 140 94 186 108 Q 150 112 100 114 Z"/>
+            </g>
+            <g id="coil">
+            <g id="coilMetal" fill="none" stroke="url(#silver)" stroke-width="3.2">
+              <ellipse cx="248" cy="113" rx="16" ry="22"/>
+              <ellipse cx="268" cy="113" rx="16" ry="22"/>
+              <ellipse cx="288" cy="113" rx="16" ry="22"/>
+              <ellipse cx="308" cy="113" rx="16" ry="22"/>
+              <ellipse cx="328" cy="113" rx="16" ry="22"/>
+              <ellipse cx="348" cy="113" rx="16" ry="22"/>
+              <ellipse cx="368" cy="113" rx="16" ry="22"/>
+              <ellipse cx="388" cy="113" rx="16" ry="22"/>
+              <ellipse cx="408" cy="113" rx="16" ry="22"/>
+              <ellipse cx="428" cy="113" rx="16" ry="22"/>
+              <ellipse cx="448" cy="113" rx="16" ry="22"/>
+            </g>
+            <g fill="none" stroke="#ffffff" stroke-width="1.4" clip-path="url(#coilTop)" opacity="0.95">
+              <ellipse cx="248" cy="113" rx="16" ry="22"/>
+              <ellipse cx="268" cy="113" rx="16" ry="22"/>
+              <ellipse cx="288" cy="113" rx="16" ry="22"/>
+              <ellipse cx="308" cy="113" rx="16" ry="22"/>
+              <ellipse cx="328" cy="113" rx="16" ry="22"/>
+              <ellipse cx="348" cy="113" rx="16" ry="22"/>
+              <ellipse cx="368" cy="113" rx="16" ry="22"/>
+              <ellipse cx="388" cy="113" rx="16" ry="22"/>
+              <ellipse cx="408" cy="113" rx="16" ry="22"/>
+              <ellipse cx="428" cy="113" rx="16" ry="22"/>
+              <ellipse cx="448" cy="113" rx="16" ry="22"/>
+            </g>
+            </g>
+            <g clip-path="url(#boilClip)">
+              <path d="M 120 90 Q 280 80 500 90" fill="none" stroke="#ffffff" stroke-width="4" opacity="0.9"/>
+              <path d="M 120 138 Q 300 146 500 136" fill="none" stroke="#8aa0b3" stroke-width="3" opacity="0.45"/>
+            </g>
+            <g clip-path="url(#boilClip)">
+              <g id="steamWisps">
+                <path d="M 158 110 C 200 96 248 106 310 102" fill="none" stroke="#f7fbfe" stroke-width="7" stroke-linecap="round" opacity="0"/>
+                <path d="M 146 128 C 198 136 258 116 328 122" fill="none" stroke="#e7f3fa" stroke-width="5" stroke-linecap="round" opacity="0"/>
+              </g>
+              <rect id="hotGlow" x="230" y="86" width="250" height="52" rx="18" fill="#ffffff" opacity="0"/>
+              <g id="powder" display="none" fill="#9ca3af" stroke="#64748b" stroke-width="1.5">
+                <circle cx="300" cy="124" r="13"/>
+                <circle cx="328" cy="118" r="15"/>
+                <circle cx="356" cy="126" r="14"/>
+                <circle cx="382" cy="116" r="12"/>
+                <circle cx="406" cy="124" r="13"/>
+              </g>
+              <g id="alSolid" display="none">
+                <rect id="alBody" x="292" y="102" width="128" height="28" rx="5" fill="#9ca3af" stroke="#4b5563" stroke-width="2"/>
+                <rect x="296" y="106" width="120" height="20" rx="3" fill="none" stroke="#e5e7eb" stroke-width="3"/>
+              </g>
+            </g>
+            <ellipse id="flash" cx="348" cy="113" rx="150" ry="48" fill="#ffffff" opacity="0"/>
+            <path fill="url(#corkFill)" stroke="#7a542c" stroke-width="1.5" d="M 496 90 L 552 84 L 558 140 L 496 134 Z"/>
+            <path fill="none" stroke="#a67c52" stroke-width="1.3" d="M 506 100 Q 530 96 546 100 M 504 114 Q 530 110 548 116 M 506 126 Q 528 122 546 128"/>
+            <path fill="none" stroke="#f3e0c4" stroke-width="1.5" opacity="0.8" d="M 502 96 L 548 90"/>
+            <line x1="155" y1="196" x2="155" y2="152" stroke="#e11d8b" stroke-width="3" marker-end="url(#heatHead)"/>
+            <line class="leader" x1="130" y1="46" x2="130" y2="78"/>
+            <text x="130" y="38" text-anchor="middle">wet sand</text>
+            <line class="leader" x1="352" y1="46" x2="352" y2="78"/>
+            <text id="metalInTube" x="352" y="38" text-anchor="middle">magnesium ribbon</text>
+            <text class="heat-word" x="155" y="224" text-anchor="middle">heat</text>
+            <line class="leader" x1="824" y1="136" x2="900" y2="188"/>
+            <text x="820" y="118" text-anchor="middle">delivery tube</text>
+            <line class="leader" x1="1190" y1="64" x2="1224" y2="64"/>
+            <text x="1232" y="72">hydrogen</text>
+            <line class="leader" x1="1190" y1="188" x2="1224" y2="188"/>
+            <text x="1232" y="196">water</text>
+            <line class="leader" x1="1340" y1="318" x2="1368" y2="318"/>
+            <text x="1376" y="326">trough</text>
+          </g>
+
+          <g id="water">
+            <path fill="#f8fafc" d="M 340 48 L 400 360 Q 418 392 470 392 L 1030 392 Q 1082 392 1100 360 L 1160 48 Z"/>
+            <path id="waterClear" fill="url(#waterBody)" d="M 372 196 L 424 352 Q 440 374 488 374 L 1012 374 Q 1060 374 1076 352 L 1128 196 Z"/>
+            <path id="milk" opacity="0" fill="#f7f7f5" d="M 372 196 L 424 352 Q 440 374 488 374 L 1012 374 Q 1060 374 1076 352 L 1128 196 Z"/>
+            <g id="specks" opacity="0">
+              <circle cx="560" cy="270" r="8" fill="#ffffff"/>
+              <circle cx="640" cy="310" r="6" fill="#e5e7eb"/>
+              <circle cx="730" cy="250" r="7" fill="#ffffff"/>
+              <circle cx="820" cy="300" r="5" fill="#f8fafc"/>
+              <circle cx="900" cy="270" r="8" fill="#e5e7eb"/>
+              <circle cx="680" cy="340" r="5" fill="#ffffff"/>
+              <circle cx="860" cy="330" r="6" fill="#ffffff"/>
+            </g>
+            <ellipse id="waterSurface" cx="750" cy="196" rx="378" ry="15" fill="#e7f5fc" stroke="#7eb6d9" stroke-width="2"/>
+            <g id="sinker" display="none" transform="translate(750 90)">
+              <g id="sinkBubs">
+                <circle cx="-36" cy="-8" r="14" fill="rgba(255,255,255,0.8)" stroke="#7eb6d9" stroke-width="1.5" opacity="0"/>
+                <circle cx="-18" cy="-8" r="11" fill="rgba(255,255,255,0.8)" stroke="#7eb6d9" stroke-width="1.5" opacity="0"/>
+                <circle cx="-4" cy="-8" r="13" fill="rgba(255,255,255,0.8)" stroke="#7eb6d9" stroke-width="1.5" opacity="0"/>
+                <circle cx="12" cy="-8" r="10" fill="rgba(255,255,255,0.8)" stroke="#7eb6d9" stroke-width="1.5" opacity="0"/>
+                <circle cx="28" cy="-8" r="12" fill="rgba(255,255,255,0.8)" stroke="#7eb6d9" stroke-width="1.5" opacity="0"/>
+                <circle cx="42" cy="-8" r="8" fill="rgba(255,255,255,0.8)" stroke="#7eb6d9" stroke-width="1.5" opacity="0"/>
+                <circle cx="-26" cy="-8" r="9" fill="rgba(255,255,255,0.8)" stroke="#7eb6d9" stroke-width="1.5" opacity="0"/>
+                <circle cx="20" cy="-8" r="11" fill="rgba(255,255,255,0.8)" stroke="#7eb6d9" stroke-width="1.5" opacity="0"/>
+                <circle cx="-12" cy="-8" r="7" fill="rgba(255,255,255,0.8)" stroke="#7eb6d9" stroke-width="1.5" opacity="0"/>
+                <circle cx="8" cy="-8" r="10" fill="rgba(255,255,255,0.8)" stroke="#7eb6d9" stroke-width="1.5" opacity="0"/>
+                <circle cx="36" cy="-8" r="6" fill="rgba(255,255,255,0.8)" stroke="#7eb6d9" stroke-width="1.5" opacity="0"/>
+                <circle cx="-8" cy="-8" r="8" fill="rgba(255,255,255,0.8)" stroke="#7eb6d9" stroke-width="1.5" opacity="0"/>
+              </g>
+              <ellipse id="chunk" cx="0" cy="0" rx="40" ry="24" fill="url(#silver)" stroke="#475569" stroke-width="2"/>
+            </g>
+            <g id="alkaliMove" transform="translate(520 90)">
+              <g id="ripples">
+                <ellipse cx="0" cy="22" rx="34" ry="6" fill="none" stroke="#7eb6d9" stroke-width="2" opacity="0"/>
+                <ellipse cx="0" cy="22" rx="34" ry="6" fill="none" stroke="#d7eef8" stroke-width="1.6" opacity="0"/>
+              </g>
+              <g id="alkaliBubs">
+                <circle cx="-40" cy="10" r="11" fill="rgba(255,255,255,0.8)" stroke="#7eb6d9" stroke-width="1.5" opacity="0"/>
+                <circle cx="-22" cy="10" r="8" fill="rgba(255,255,255,0.8)" stroke="#7eb6d9" stroke-width="1.5" opacity="0"/>
+                <circle cx="-6" cy="10" r="12" fill="rgba(255,255,255,0.8)" stroke="#7eb6d9" stroke-width="1.5" opacity="0"/>
+                <circle cx="12" cy="10" r="7" fill="rgba(255,255,255,0.8)" stroke="#7eb6d9" stroke-width="1.5" opacity="0"/>
+                <circle cx="26" cy="10" r="10" fill="rgba(255,255,255,0.8)" stroke="#7eb6d9" stroke-width="1.5" opacity="0"/>
+                <circle cx="40" cy="10" r="6" fill="rgba(255,255,255,0.8)" stroke="#7eb6d9" stroke-width="1.5" opacity="0"/>
+                <circle cx="-16" cy="10" r="9" fill="rgba(255,255,255,0.8)" stroke="#7eb6d9" stroke-width="1.5" opacity="0"/>
+                <circle cx="4" cy="10" r="8" fill="rgba(255,255,255,0.8)" stroke="#7eb6d9" stroke-width="1.5" opacity="0"/>
+                <circle cx="-32" cy="10" r="7" fill="rgba(255,255,255,0.8)" stroke="#7eb6d9" stroke-width="1.5" opacity="0"/>
+                <circle cx="18" cy="10" r="9" fill="rgba(255,255,255,0.8)" stroke="#7eb6d9" stroke-width="1.5" opacity="0"/>
+                <circle cx="-10" cy="10" r="6" fill="rgba(255,255,255,0.8)" stroke="#7eb6d9" stroke-width="1.5" opacity="0"/>
+                <circle cx="34" cy="10" r="8" fill="rgba(255,255,255,0.8)" stroke="#7eb6d9" stroke-width="1.5" opacity="0"/>
+              </g>
+              <g id="lump">
+                <ellipse cx="-8" cy="4" rx="34" ry="20" fill="url(#silver)"/>
+                <ellipse cx="18" cy="-2" rx="20" ry="16" fill="url(#silver)"/>
+              </g>
+              <circle id="ball" r="32" fill="url(#silver)" opacity="0"/>
+              <g id="flame" opacity="0">
+                <path id="flameOuter" fill="#c084fc" d="M -26 -8 C -44 -78 -14 -120 0 -158 C 14 -120 44 -78 26 -8 Z"/>
+                <path id="flameCore" fill="#f3e8ff" d="M -12 -16 C -20 -72 -5 -100 0 -124 C 5 -100 20 -72 12 -16 Z"/>
+              </g>
+            </g>
+            <path fill="none" stroke="#ffffff" stroke-width="5" opacity="0.65" d="M 400 78 L 446 330"/>
+            <path fill="none" stroke="#3d4a57" stroke-width="3" d="M 340 48 L 400 360 Q 418 392 470 392 L 1030 392 Q 1082 392 1100 360 L 1160 48"/>
+            <ellipse cx="750" cy="48" rx="410" ry="16" fill="none" stroke="#3d4a57" stroke-width="3"/>
+            <line class="leader" x1="1136" y1="196" x2="1244" y2="196"/>
+            <text x="1252" y="206">cold water</text>
+          </g>
+        </svg>
+      </div>
+      <div id="eqBand">
+        <p class="eq"><span class="eq-inner"></span></p>
+        <p class="eq"><span class="eq-inner"></span></p>
+        <p class="eq"><span class="eq-inner"></span></p>
+        <p class="eq"><span class="eq-inner"></span></p>
+      </div>
+      <p id="answer" class="answer" aria-hidden="true"><span id="answerInner"></span></p>
+      <p id="desc"></p>
+    </div>
+  </section>
+</main>
+
+<canvas id="penCanvas" class="pen-canvas"></canvas>
+<canvas id="laserCanvas" class="laser-canvas"></canvas>
+<div id="laserDot" class="laser-dot hidden"></div>
+<div class="teach-dock">
+  <button type="button" class="dbtn" id="dkLaser" aria-label="Laser pointer">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="currentColor"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path></svg>
+  </button>
+  <button type="button" class="dbtn" id="dkPen" aria-label="Pen">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20l4.5-1.2L19 8.3 15.7 5 5.2 15.5 4 20z"></path><path d="M13.5 7.2l3.3 3.3"></path></svg>
+  </button>
+  <div class="dcolors hidden" id="dkColors">
+    <button type="button" class="dcolor active" data-c="#e11d48" style="--sc:#e11d48" aria-label="Red"></button>
+    <button type="button" class="dcolor" data-c="#2563eb" style="--sc:#2563eb" aria-label="Blue"></button>
+    <button type="button" class="dcolor" data-c="#059669" style="--sc:#059669" aria-label="Green"></button>
+    <button type="button" class="dcolor" data-c="#111827" style="--sc:#111827" aria-label="Black"></button>
+    <button type="button" class="dbtn derase" id="dkErase" aria-label="Eraser">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="8" width="16" height="9" rx="1.5"></rect><path d="M4 13h16"></path></svg>
+    </button>
+  </div>
+  <button type="button" class="dbtn" id="dkClear" aria-label="Clear writing">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 7h14M9 7V5h6v2M8 7l1 13h6l1-13"></path></svg>
+  </button>
+</div>
+
+<script>
+(function () {
+  var METALS = [
+    {
+      id: 'K',
+      name: 'Potassium',
+      scene: 'water',
+      kind: 'alkali',
+      dur: 4800,
+      flame: '#c084fc',
+      flameCore: '#f3e8ff',
+      aria: 'Potassium melting and moving on cold water with a lilac flame',
+      desc: 'Reacts with <span class="hl-water">cold water</span>:<br>Melts to form a silvery ball<br>Moves on water surface<br>Hissing sound is heard<br>Burns with <span class="hl-lilac">lilac</span> flame',
+      eqs: [
+        'Potassium + Water → Potassium hydroxide + Hydrogen',
+        '2K(s) + 2H₂O(l) → 2KOH(aq) + H₂(g)'
+      ]
+    },
+    {
+      id: 'Na',
+      name: 'Sodium',
+      scene: 'water',
+      kind: 'alkali',
+      dur: 4800,
+      flame: '#f5c518',
+      flameCore: '#fff3bf',
+      aria: 'Sodium melting and moving on cold water with a golden yellow flame',
+      desc: 'Reacts with <span class="hl-water">cold water</span>:<br>Melts to form a silvery ball<br>Moves on water surface<br>Hissing sound is heard<br>Burns with <span class="hl-gold">golden yellow</span> flame',
+      eqs: [
+        'Sodium + Water → Sodium hydroxide + Hydrogen',
+        '2Na(s) + 2H₂O(l) → 2NaOH(aq) + H₂(g)'
+      ]
+    },
+    {
+      id: 'Ca',
+      name: 'Calcium',
+      scene: 'water',
+      kind: 'sink',
+      dur: 4200,
+      aria: 'Calcium sinking in cold water, giving a gas and a milky suspension',
+      desc: 'Reacts with <span class="hl-water">cold water</span>:<br>Sinks to the bottom<br>Reacts readily to give <span class="hl-result">colorless gas</span><br>Forms a <span class="hl-result">milky suspension</span>',
+      eqs: [
+        'Calcium + Water → Calcium hydroxide + Hydrogen',
+        'Ca(s) + 2H₂O(l) → Ca(OH)₂(aq) + H₂(g)'
+      ]
+    },
+    {
+      id: 'Mg',
+      name: 'Magnesium',
+      scene: 'steam',
+      kind: 'ribbon',
+      dur: 4400,
+      solidLabel: 'magnesium ribbon',
+      aria: 'Magnesium reacting with steam, giving a white light and a white solid',
+      desc: 'Reacts with <span class="hl-water">hot water</span> slowly.<br>Reacts with <span class="hl-water">steam</span> vigorously:<br>Give an <span class="hl-result">intense white light</span> to form a <span class="hl-result">white solid</span>',
+      eqs: [
+        'Magnesium + Water → Magnesium hydroxide + Hydrogen',
+        'Mg(s) + 2H₂O(l) → Mg(OH)₂(aq) + H₂(g)',
+        'Magnesium + Steam → Magnesium oxide + Hydrogen',
+        'Mg(s) + H₂O(g) → MgO(s) + H₂(g)'
+      ]
+    },
+    {
+      id: 'Al',
+      name: 'Aluminium',
+      scene: 'steam',
+      kind: 'oxide',
+      dur: 1600,
+      solidLabel: 'aluminium',
+      aria: 'Aluminium in steam, covered by oxide and not reacting',
+      desc: 'Aluminium usually covered by a thin layer of <span class="hl-result">aluminium oxide</span> which prevents the reaction between aluminium and <span class="hl-water">steam</span>.',
+      eqs: [
+        'Aluminium + Steam → Aluminium oxide + Hydrogen',
+        '2Al(s) + 3H₂O(g) → Al₂O₃(s) + 3H₂(g)'
+      ]
+    },
+    {
+      id: 'Zn',
+      name: 'Zinc',
+      scene: 'steam',
+      kind: 'zn',
+      dur: 4600,
+      solidLabel: 'zinc',
+      aria: 'Zinc reacting with steam, yellow while hot and white when cold',
+      desc: 'Reacts with <span class="hl-water">steam</span> to give a powder<br>(Hot: <span class="hl-gold">Yellow</span>; Cold: <span class="hl-result">White</span>)',
+      eqs: [
+        'Zinc + Steam → Zinc oxide + Hydrogen',
+        'Zn(s) + H₂O(g) → ZnO(s) + H₂(g)'
+      ]
+    },
+    {
+      id: 'Fe',
+      name: 'Iron',
+      scene: 'steam',
+      kind: 'fe',
+      dur: 4400,
+      solidLabel: 'iron',
+      aria: 'Iron reacting with steam to give a black powder',
+      desc: 'Reacts with <span class="hl-water">steam</span> to give a <span class="hl-result">black powder</span>',
+      eqs: [
+        'Iron + Steam → Iron(II, III) oxide + Hydrogen',
+        '3Fe(s) + 4H₂O(g) → Fe₃O₄(s) + 4H₂(g)'
+      ]
+    },
+    {
+      id: 'inert',
+      name: 'Lead, Copper, Mercury, Silver, Platinum, Gold',
+      scene: 'water',
+      kind: 'inert',
+      dur: 2200,
+      answer: 'No reaction with water or steam',
+      aria: 'Lead, copper, mercury, silver, platinum and gold with no reaction',
+      desc: 'No reaction with <span class="hl-water">water</span> or <span class="hl-water">steam</span>',
+      eqs: []
+    }
+  ];
+
+  var byId = {};
+  for (var mi = 0; mi < METALS.length; mi++) byId[METALS[mi].id] = METALS[mi];
+
+  var hideBtn = document.getElementById('hideBtn');
+  var stage = document.getElementById('stage');
+  var stageName = document.getElementById('stageName');
+  var zoomBtn = document.getElementById('zoomBtn');
+  var zoomFit = document.getElementById('zoomFit');
+  var fig = document.getElementById('fig');
+  var steamG = document.getElementById('steam');
+  var waterG = document.getElementById('water');
+  var metalInTube = document.getElementById('metalInTube');
+  var eqBand = document.getElementById('eqBand');
+  var eqInners = document.querySelectorAll('.eq-inner');
+  var answer = document.getElementById('answer');
+  var answerInner = document.getElementById('answerInner');
+  var desc = document.getElementById('desc');
+  var metalButtons = document.querySelectorAll('#metalList .metal');
+  var alkaliMove = document.getElementById('alkaliMove');
+  var lump = document.getElementById('lump');
+  var ball = document.getElementById('ball');
+  var flame = document.getElementById('flame');
+  var flameOuter = document.getElementById('flameOuter');
+  var flameCore = document.getElementById('flameCore');
+  var alkaliBubNodes = document.querySelectorAll('#alkaliBubs circle');
+  var sinker = document.getElementById('sinker');
+  var sinkBubNodes = document.querySelectorAll('#sinkBubs circle');
+  var milkEl = document.getElementById('milk');
+  var specks = document.getElementById('specks');
+  var waterSurface = document.getElementById('waterSurface');
+  var coil = document.getElementById('coil');
+  var coilMetal = document.getElementById('coilMetal');
+  var hotGlow = document.getElementById('hotGlow');
+  var flash = document.getElementById('flash');
+  var powder = document.getElementById('powder');
+  var powderNodes = document.querySelectorAll('#powder circle');
+  var alSolid = document.getElementById('alSolid');
+  var alBody = document.getElementById('alBody');
+  var jarBubbles = document.getElementById('jarBubbles');
+  var jarBubNodes = document.querySelectorAll('#jarBubbles circle');
+  var rippleNodes = document.querySelectorAll('#ripples ellipse');
+  var wispNodes = document.querySelectorAll('#steamWisps path');
+  var coilTurns = coilMetal.querySelectorAll('ellipse');
+  var speckNodes = document.querySelectorAll('#specks circle');
+  var penCanvas = document.getElementById('penCanvas');
+  var laserCanvas = document.getElementById('laserCanvas');
+  var laserDot = document.getElementById('laserDot');
+  var penCtx = penCanvas.getContext('2d');
+  var laserCtx = laserCanvas.getContext('2d');
+
+  var zoomed = false;
+  var descHidden = false;
+  var penOn = false;
+  var laserOn = false;
+  var erasing = false;
+  var ink = '#e11d48';
+  var drawing = false;
+  var lastPt = null;
+  var laserX = 0;
+  var laserY = 0;
+  var hasPointer = false;
+  var lastFrame = 0;
+  var laserRunning = false;
+  var inkStrokes = [];
+  var openStroke = null;
+  var playToken = 0;
+  var currentId = 'K';
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function fitLine(inner, room) {
+    inner.style.transform = 'none';
+    if (room <= 0 || !inner.scrollWidth || !inner.textContent) return;
+    var scale = Math.min(1, room / inner.scrollWidth);
+    if (scale < 0.99) inner.style.transform = 'scale(' + scale + ')';
+  }
+  function fitEqs() {
+    for (var i = 0; i < eqInners.length; i++) {
+      fitLine(eqInners[i], eqInners[i].parentElement.clientWidth);
+    }
+  }
+  function fitName() {
+    fitLine(stageName, stageName.clientWidth);
+  }
+  function fitAnswer() {
+    answerInner.style.transform = 'none';
+    var room = answer.clientWidth - 8;
+    if (room <= 0 || !answerInner.scrollWidth || !answerInner.textContent) return;
+    var scale = Math.min(1, room / answerInner.scrollWidth);
+    if (scale < 0.99) answerInner.style.transform = 'scale(' + scale + ')';
+  }
+  function clamp(t, a, b) {
+    if (t <= a) return 0;
+    if (t >= b) return 1;
+    return (t - a) / (b - a);
+  }
+  function smooth(t) {
+    return t * t * (3 - 2 * t);
+  }
+  function lerp(a, b, t) {
+    return a + (b - a) * t;
+  }
+  function mix(a, b, t) {
+    return [
+      Math.round(a[0] + (b[0] - a[0]) * t),
+      Math.round(a[1] + (b[1] - a[1]) * t),
+      Math.round(a[2] + (b[2] - a[2]) * t)
+    ];
+  }
+  function rgb(c) {
+    return 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
+  }
+  function circleBases(nodes) {
+    var xs = [];
+    var rs = [];
+    for (var i = 0; i < nodes.length; i++) {
+      xs.push(parseFloat(nodes[i].getAttribute('cx')));
+      rs.push(parseFloat(nodes[i].getAttribute('r')));
+    }
+    return { xs: xs, rs: rs };
+  }
+  var alkaliHome = circleBases(alkaliBubNodes);
+  var sinkHome = circleBases(sinkBubNodes);
+  var jarHome = circleBases(jarBubNodes);
+  var speckHome = [];
+  for (var si = 0; si < speckNodes.length; si++) {
+    speckHome.push([
+      parseFloat(speckNodes[si].getAttribute('cx')),
+      parseFloat(speckNodes[si].getAttribute('cy'))
+    ]);
+  }
+  function drawBubbles(nodes, home, t, opt) {
+    var n = nodes.length;
+    var shown = opt.on ? opt.count : 0;
+    for (var i = 0; i < n; i++) {
+      var node = nodes[i];
+      if (i >= shown || t < opt.start) {
+        node.setAttribute('opacity', '0');
+        continue;
+      }
+      var life = ((t - opt.start) * opt.rate + i / shown) % 1;
+      var fade = Math.sin(life * Math.PI);
+      var p = life * life * (3 - 2 * life);
+      node.setAttribute('cx', (home.xs[i] + Math.sin(life * 5.2 + i * 1.3) * opt.sway).toFixed(1));
+      node.setAttribute('cy', (opt.y0 - p * opt.rise).toFixed(1));
+      node.setAttribute('r', (home.rs[i] * (0.72 + 0.5 * p)).toFixed(1));
+      node.setAttribute('opacity', (fade * opt.alpha).toFixed(3));
+    }
+  }
+  function drawWisps(t, amount) {
+    for (var i = 0; i < wispNodes.length; i++) {
+      var life = (t * (0.9 + i * 0.28) + i * 0.47) % 1;
+      var fade = Math.sin(life * Math.PI) * amount;
+      var lift = Math.sin(life * Math.PI) * (i ? -3 : 3);
+      wispNodes[i].setAttribute('transform', 'translate(' + (life * 72).toFixed(1) + ' ' + lift.toFixed(1) + ')');
+      wispNodes[i].setAttribute('opacity', (fade * 0.5).toFixed(3));
+    }
+  }
+  function placeSpecks(spread) {
+    for (var i = 0; i < speckNodes.length; i++) {
+      speckNodes[i].setAttribute('cx', lerp(750, speckHome[i][0], spread).toFixed(1));
+      speckNodes[i].setAttribute('cy', lerp(318, speckHome[i][1], spread).toFixed(1));
+    }
+  }
+  function applyWaterLook(milkT) {
+    milkEl.setAttribute('opacity', milkT.toFixed(3));
+    specks.setAttribute('opacity', milkT.toFixed(3));
+    if (milkT > 0.4) {
+      waterSurface.setAttribute('fill', '#f8fafc');
+      waterSurface.setAttribute('stroke', '#cbd5e1');
+    } else {
+      waterSurface.setAttribute('fill', '#e7f5fc');
+      waterSurface.setAttribute('stroke', '#7eb6d9');
+    }
+  }
+  function drawAlkali(metal, t) {
+    var fast = metal.id === 'K';
+    var fall = smooth(clamp(t, 0, 0.16));
+    var melt = smooth(clamp(t, 0.12, 0.30));
+    var x = lerp(520, 620, fall);
+    var y = lerp(88, 174, fall);
+    if (t >= 0.28) {
+      var s = clamp(t, 0.28, 0.98);
+      var turns = fast ? 7 : 3;
+      var phase = s * Math.PI * turns;
+      var across = (1 - Math.cos(phase)) * 0.5;
+      var wobble = Math.sin(phase) * Math.sin(phase / turns);
+      x = 620 + across * (fast ? 360 : 300) + wobble * (fast ? 46 : 28);
+      y = 174 + (1 - Math.cos(phase * 2 / turns)) * (fast ? 3.2 : 2);
+    }
+    alkaliMove.setAttribute('transform', 'translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ')');
+    var shrink = 1 - (fast ? 0.22 : 0.12) * smooth(clamp(t, 0.34, 0.98));
+    lump.setAttribute('opacity', (1 - melt).toFixed(3));
+    lump.setAttribute('transform', 'scale(' + lerp(1, 0.72, melt).toFixed(3) + ')');
+    ball.setAttribute('opacity', '1');
+    ball.setAttribute('transform', 'scale(' + (melt * shrink).toFixed(3) + ')');
+    flame.setAttribute('opacity', smooth(clamp(t, fast ? 0.22 : 0.30, fast ? 0.38 : 0.48)).toFixed(3));
+    var flickY = 0.86 + 0.16 * Math.sin(t * (fast ? 43 : 29)) + 0.07 * Math.sin(t * (fast ? 71 : 51) + 0.6);
+    var flickX = 0.92 + 0.1 * Math.sin(t * (fast ? 33 : 21) + 1.1);
+    var lean = Math.sin(t * (fast ? 17 : 11) + 0.4) * (fast ? 7 : 4);
+    flame.setAttribute('transform', 'rotate(' + lean.toFixed(2) + ') scale(' + flickX.toFixed(3) + ' ' + flickY.toFixed(3) + ')');
+    drawBubbles(alkaliBubNodes, alkaliHome, t, {
+      on: true,
+      count: alkaliBubNodes.length,
+      start: 0.26,
+      rate: fast ? 3.4 : 2.2,
+      y0: 16,
+      rise: 58,
+      sway: fast ? 7 : 4,
+      alpha: 0.9
+    });
+    var rippling = t > 0.24;
+    for (var r = 0; r < rippleNodes.length; r++) {
+      var life = (t * (fast ? 2.4 : 1.5) + r * 0.48) % 1;
+      var ring = rippling ? Math.sin(life * Math.PI) : 0;
+      rippleNodes[r].setAttribute('rx', lerp(30, fast ? 86 : 70, life).toFixed(1));
+      rippleNodes[r].setAttribute('ry', lerp(5, 11, life).toFixed(1));
+      rippleNodes[r].setAttribute('opacity', (ring * 0.5).toFixed(3));
+    }
+    applyWaterLook(0);
+  }
+  function drawSink(metal, t) {
+    var sink = metal.kind === 'sink';
+    var dropEnd = sink ? 0.46 : 0.62;
+    var drop = smooth(clamp(t, 0, dropEnd));
+    var y = lerp(90, 348, drop);
+    if (t > dropEnd && t < dropEnd + 0.24) {
+      var w = (t - dropEnd) / 0.24;
+      y -= (1 - Math.cos(w * Math.PI * 2)) * 0.5 * (sink ? 16 : 10);
+    }
+    sinker.setAttribute('transform', 'translate(750 ' + y.toFixed(1) + ')');
+    var spread = sink ? smooth(clamp(t, 0.4, 1)) : 0;
+    applyWaterLook(spread * 0.96);
+    placeSpecks(spread);
+    drawBubbles(sinkBubNodes, sinkHome, t, {
+      on: sink,
+      count: sinkBubNodes.length,
+      start: 0.48,
+      rate: 2,
+      y0: 4,
+      rise: 152,
+      sway: 5,
+      alpha: 0.9
+    });
+  }
+  function drawSteam(metal, t) {
+    var kind = metal.kind;
+    var gas = kind === 'ribbon' ? jarBubNodes.length : kind === 'zn' ? 7 : kind === 'fe' ? 5 : 0;
+    jarBubbles.setAttribute('display', gas ? 'inline' : 'none');
+    drawBubbles(jarBubNodes, jarHome, t, {
+      on: gas > 0,
+      count: gas,
+      start: kind === 'ribbon' ? 0.34 : kind === 'zn' ? 0.3 : 0.42,
+      rate: kind === 'ribbon' ? 2.8 : kind === 'zn' ? 1.7 : 1.1,
+      y0: 304,
+      rise: 132,
+      sway: 3.5,
+      alpha: 0.85
+    });
+    flash.setAttribute('opacity', '0');
+    hotGlow.setAttribute('opacity', '0');
+    var steamAmt = 0;
+    if (kind === 'ribbon') {
+      for (var i = 0; i < coilTurns.length; i++) {
+        var hot = smooth(clamp(t, 0.08 + i * 0.028, 0.26 + i * 0.028));
+        coilTurns[i].setAttribute('stroke', rgb(mix([203, 213, 225], [255, 255, 255], hot)));
+        coilTurns[i].setAttribute('stroke-width', lerp(3.2, 5.4, hot).toFixed(2));
+      }
+      var glare = smooth(clamp(t, 0.3, 0.46)) * (1 - smooth(clamp(t, 0.64, 0.86)));
+      flash.setAttribute('opacity', (glare * 0.95).toFixed(3));
+      hotGlow.setAttribute('fill', '#ffffff');
+      hotGlow.setAttribute('opacity', (glare * 0.72).toFixed(3));
+      steamAmt = Math.max(smooth(clamp(t, 0.06, 0.28)) * (1 - smooth(clamp(t, 0.78, 0.96))), glare * 0.85);
+    } else if (kind === 'zn') {
+      var toYellow = smooth(clamp(t, 0.16, 0.38));
+      var toWhite = smooth(clamp(t, 0.58, 0.94));
+      var znFill = rgb(mix(mix([156, 163, 175], [250, 204, 21], toYellow), [248, 250, 252], toWhite));
+      for (var z = 0; z < powderNodes.length; z++) powderNodes[z].setAttribute('fill', znFill);
+      hotGlow.setAttribute('fill', '#fde68a');
+      hotGlow.setAttribute('opacity', (toYellow * (1 - toWhite) * 0.5).toFixed(3));
+      steamAmt = toYellow * (1 - toWhite);
+    } else if (kind === 'fe') {
+      var glowIn = smooth(clamp(t, 0.12, 0.32));
+      var glowOut = smooth(clamp(t, 0.5, 0.78));
+      var glow = glowIn * (1 - glowOut);
+      var feFill = rgb(mix([156, 163, 175], [17, 24, 39], smooth(clamp(t, 0.3, 0.9))));
+      for (var f = 0; f < powderNodes.length; f++) powderNodes[f].setAttribute('fill', feFill);
+      hotGlow.setAttribute('fill', '#c2410c');
+      hotGlow.setAttribute('opacity', (glow * 0.5).toFixed(3));
+      steamAmt = glow;
+    } else {
+      var warm = Math.sin(Math.PI * clamp(t, 0.08, 0.94));
+      alBody.setAttribute('fill', rgb(mix([156, 163, 175], [214, 170, 142], warm * 0.8)));
+      hotGlow.setAttribute('fill', '#fdba74');
+      hotGlow.setAttribute('opacity', (warm * 0.2).toFixed(3));
+      steamAmt = warm * 0.85;
+    }
+    drawWisps(t, steamAmt);
+  }
+  function draw(metal, t) {
+    if (metal.kind === 'alkali') drawAlkali(metal, t);
+    else if (metal.kind === 'sink' || metal.kind === 'inert') drawSink(metal, t);
+    else drawSteam(metal, t);
+  }
+  function play(metal) {
+    playToken += 1;
+    var token = playToken;
+    if (reduceMotion) {
+      draw(metal, 1);
+      return;
+    }
+    var t0 = performance.now();
+    function frame(now) {
+      if (token !== playToken) return;
+      var t = Math.min(1, (now - t0) / metal.dur);
+      draw(metal, t);
+      if (t < 1) requestAnimationFrame(frame);
+    }
+    draw(metal, 0);
+    requestAnimationFrame(frame);
+  }
+  function showMetal(id) {
+    var metal = byId[id];
+    if (!metal) return;
+    currentId = id;
+    for (var i = 0; i < metalButtons.length; i++) {
+      metalButtons[i].setAttribute('aria-pressed', metalButtons[i].getAttribute('data-id') === id ? 'true' : 'false');
+    }
+    stageName.textContent = metal.name;
+    desc.innerHTML = metal.desc;
+    fig.setAttribute('aria-label', metal.aria);
+    fig.setAttribute('viewBox', metal.scene === 'water' ? '300 0 1180 400' : '0 0 1500 400');
+    waterG.setAttribute('display', metal.scene === 'water' ? 'inline' : 'none');
+    steamG.setAttribute('display', metal.scene === 'steam' ? 'inline' : 'none');
+    alkaliMove.setAttribute('display', metal.kind === 'alkali' ? 'inline' : 'none');
+    sinker.setAttribute('display', (metal.kind === 'sink' || metal.kind === 'inert') ? 'inline' : 'none');
+    coil.setAttribute('display', metal.kind === 'ribbon' ? 'inline' : 'none');
+    powder.setAttribute('display', (metal.kind === 'zn' || metal.kind === 'fe') ? 'inline' : 'none');
+    alSolid.setAttribute('display', metal.kind === 'oxide' ? 'inline' : 'none');
+    if (metal.kind === 'alkali') {
+      flameOuter.setAttribute('fill', metal.flame);
+      flameCore.setAttribute('fill', metal.flameCore);
+    }
+    if (metal.solidLabel && metalInTube.textContent !== metal.solidLabel) metalInTube.textContent = metal.solidLabel;
+    var eqs = metal.eqs || [];
+    eqBand.classList.toggle('split', eqs.length > 2);
+    eqBand.hidden = eqs.length === 0;
+    for (var eqi = 0; eqi < eqInners.length; eqi++) {
+      eqInners[eqi].textContent = eqs[eqi] || '';
+      eqInners[eqi].parentElement.hidden = !eqs[eqi];
+    }
+    var showAns = !!metal.answer;
+    answer.setAttribute('aria-hidden', showAns ? 'false' : 'true');
+    answerInner.textContent = showAns ? metal.answer : '';
+    fitName();
+    fitEqs();
+    fitAnswer();
+    if (zoomed) fitZoom();
+    play(metal);
+  }
+
+  document.getElementById('metalList').addEventListener('click', function (e) {
+    var btn = e.target.closest('.metal');
+    if (!btn) return;
+    showMetal(btn.getAttribute('data-id'));
+  });
+  document.getElementById('watchBtn').addEventListener('click', function () {
+    showMetal(currentId);
+  });
+
+  function setDesc(show) {
+    descHidden = !show;
+    desc.classList.toggle('hidden', descHidden);
+    hideBtn.textContent = descHidden ? 'Show' : 'Hide';
+    hideBtn.setAttribute('aria-pressed', descHidden ? 'true' : 'false');
+  }
+  hideBtn.addEventListener('click', function () { setDesc(descHidden); });
+
+  function placeZoom() {
+    if (!zoomed) {
+      stage.style.top = '';
+      stage.style.left = '';
+      stage.style.right = '';
+      stage.style.bottom = '';
+      return;
+    }
+    var top = document.querySelector('.topbar').offsetHeight + document.getElementById('metalList').offsetHeight;
+    stage.style.top = top + 'px';
+    stage.style.left = '8px';
+    stage.style.right = '72px';
+    stage.style.bottom = '8px';
+  }
+  function fitZoom() {
+    zoomFit.style.transform = '';
+    if (!zoomed) return;
+    var haveH = zoomFit.clientHeight;
+    var needH = zoomFit.scrollHeight;
+    var haveW = zoomFit.clientWidth;
+    var needW = zoomFit.scrollWidth;
+    if (!needH || !needW) return;
+    var scale = Math.min(1, haveH / needH, haveW / needW);
+    if (scale < 0.99) {
+      zoomFit.style.transformOrigin = 'top center';
+      zoomFit.style.transform = 'scale(' + scale + ')';
+    }
+  }
+  zoomBtn.addEventListener('click', function () {
+    zoomed = !zoomed;
+    document.body.classList.toggle('zoomed', zoomed);
+    zoomBtn.setAttribute('aria-pressed', zoomed ? 'true' : 'false');
+    placeZoom();
+    requestAnimationFrame(function () {
+      fitZoom();
+      fitName();
+      fitEqs();
+      fitAnswer();
+    });
+  });
+
+  function resizeCanvas(c) {
+    var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    var cssW = window.innerWidth;
+    var cssH = window.innerHeight;
+    var w = Math.round(cssW * dpr);
+    var h = Math.round(cssH * dpr);
+    c.style.width = cssW + 'px';
+    c.style.height = cssH + 'px';
+    if (c.width === w && c.height === h) return;
+    c.width = w;
+    c.height = h;
+    c.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function wipe(c) {
+    var ctx = c.getContext('2d');
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, c.width, c.height);
+    ctx.restore();
+  }
+  function setPen(on) {
+    if (on) {
+      laserOn = false;
+      document.body.classList.remove('laser-on');
+      document.getElementById('dkLaser').classList.remove('active');
+      laserDot.classList.add('hidden');
+    }
+    penOn = on;
+    document.body.classList.toggle('pen-on', on);
+    document.getElementById('dkPen').classList.toggle('active', on);
+    document.getElementById('dkColors').classList.toggle('hidden', !on);
+    if (!on) {
+      erasing = false;
+      document.getElementById('dkErase').classList.remove('active');
+    }
+  }
+  function setLaser(on) {
+    if (on) setPen(false);
+    laserOn = on;
+    document.body.classList.toggle('laser-on', on);
+    document.getElementById('dkLaser').classList.toggle('active', on);
+    if (!on) laserDot.classList.add('hidden');
+    else if (hasPointer) laserDot.classList.remove('hidden');
+    if (on && !laserRunning) {
+      laserRunning = true;
+      lastFrame = 0;
+      requestAnimationFrame(laserFrame);
+    }
+  }
+  document.getElementById('dkPen').addEventListener('click', function () { setPen(!penOn); });
+  document.getElementById('dkLaser').addEventListener('click', function () { setLaser(!laserOn); });
+  document.getElementById('dkErase').addEventListener('click', function () {
+    erasing = !erasing;
+    document.getElementById('dkErase').classList.toggle('active', erasing);
+  });
+  document.getElementById('dkColors').addEventListener('click', function (e) {
+    var btn = e.target.closest('.dcolor');
+    if (!btn) return;
+    ink = btn.dataset.c;
+    erasing = false;
+    document.getElementById('dkErase').classList.remove('active');
+    document.querySelectorAll('.dcolor').forEach(function (el) {
+      el.classList.toggle('active', el === btn);
+    });
+  });
+  document.getElementById('dkClear').addEventListener('click', function () {
+    inkStrokes = [];
+    openStroke = null;
+    wipe(penCanvas);
+    wipe(laserCanvas);
+  });
+  function paintSeg(erase, color, a, b) {
+    penCtx.lineCap = 'round';
+    penCtx.lineJoin = 'round';
+    if (erase) {
+      penCtx.globalCompositeOperation = 'destination-out';
+      penCtx.strokeStyle = 'rgba(0,0,0,1)';
+      penCtx.lineWidth = 26;
+    } else {
+      penCtx.globalCompositeOperation = 'source-over';
+      penCtx.strokeStyle = color;
+      penCtx.lineWidth = 3.6;
+    }
+    penCtx.beginPath();
+    penCtx.moveTo(a.x, a.y);
+    penCtx.lineTo(b.x, b.y);
+    penCtx.stroke();
+  }
+  function redrawInk() {
+    var s, i;
+    wipe(penCanvas);
+    for (s = 0; s < inkStrokes.length; s++) {
+      var strokeObj = inkStrokes[s];
+      if (strokeObj.pts.length === 1) paintSeg(strokeObj.erase, strokeObj.color, strokeObj.pts[0], strokeObj.pts[0]);
+      for (i = 1; i < strokeObj.pts.length; i++) {
+        paintSeg(strokeObj.erase, strokeObj.color, strokeObj.pts[i - 1], strokeObj.pts[i]);
+      }
+    }
+  }
+  penCanvas.addEventListener('pointerdown', function (e) {
+    if (!penOn) return;
+    try { penCanvas.setPointerCapture(e.pointerId); } catch (err) {}
+    drawing = true;
+    lastPt = { x: e.clientX, y: e.clientY };
+    openStroke = { erase: erasing, color: ink, pts: [lastPt] };
+    inkStrokes.push(openStroke);
+    paintSeg(erasing, ink, lastPt, lastPt);
+  });
+  penCanvas.addEventListener('pointermove', function (e) {
+    if (!drawing) return;
+    var p = { x: e.clientX, y: e.clientY };
+    if (openStroke) openStroke.pts.push(p);
+    paintSeg(erasing, ink, lastPt, p);
+    lastPt = p;
+  });
+  function endDraw() {
+    drawing = false;
+    openStroke = null;
+  }
+  penCanvas.addEventListener('pointerup', endDraw);
+  penCanvas.addEventListener('pointercancel', endDraw);
+  document.addEventListener('pointermove', function (e) {
+    laserX = e.clientX;
+    laserY = e.clientY;
+    hasPointer = true;
+    if (!laserOn) return;
+    laserDot.style.left = laserX + 'px';
+    laserDot.style.top = laserY + 'px';
+    laserDot.classList.remove('hidden');
+  });
+  document.addEventListener('pointerleave', function () {
+    hasPointer = false;
+    laserDot.classList.add('hidden');
+  });
+  function laserFrame(now) {
+    if (!laserOn) {
+      laserRunning = false;
+      wipe(laserCanvas);
+      return;
+    }
+    var dt = lastFrame ? Math.min(40, now - lastFrame) : 16;
+    lastFrame = now;
+    laserCtx.save();
+    laserCtx.setTransform(1, 0, 0, 1, 0, 0);
+    laserCtx.globalCompositeOperation = 'destination-out';
+    laserCtx.fillStyle = 'rgba(0,0,0,' + (dt / 1600) + ')';
+    laserCtx.fillRect(0, 0, laserCanvas.width, laserCanvas.height);
+    laserCtx.restore();
+    if (hasPointer) {
+      laserCtx.globalCompositeOperation = 'source-over';
+      laserCtx.fillStyle = 'rgba(255,40,40,0.7)';
+      laserCtx.beginPath();
+      laserCtx.arc(laserX, laserY, 5, 0, Math.PI * 2);
+      laserCtx.fill();
+    }
+    requestAnimationFrame(laserFrame);
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { setPen(false); setLaser(false); }
+  });
+
+  window.addEventListener('resize', function () {
+    resizeCanvas(penCanvas);
+    resizeCanvas(laserCanvas);
+    redrawInk();
+    placeZoom();
+    fitZoom();
+    fitName();
+    fitEqs();
+    fitAnswer();
+  });
+
+  setDesc(!window.matchMedia('(max-width: 800px)').matches);
+  resizeCanvas(penCanvas);
+  resizeCanvas(laserCanvas);
+  showMetal('K');
+  requestAnimationFrame(function () {
+    fitName();
+    fitEqs();
+    fitAnswer();
+  });
+})();
+</script>
+</body>
+</html>

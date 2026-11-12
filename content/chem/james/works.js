@@ -1,6 +1,19 @@
 /* James · Chem KOC lead — submissions. */
 KOC.works('chem', 'james', [
   {
+    id: 'metal2-metal-reaction',
+    title: 'Metal2_Metal reaction_(notes)',
+    original: 'Metal reaction',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S4 Metal reaction Metal2',
+    submitted: '2026-11-12',
+    tags: ['Interactive', 'S4', 'Metal reaction'],
+    elements: ['wood'],
+    src: 'content/chem/james/metal-reaction/Metal2_Metal%20reaction_(notes).html?v=20261112b',
+    notes: 'Reactions of potassium, sodium, calcium, magnesium, aluminium, zinc, iron, and the less reactive metals. Hide, zoom, and the pen.'
+  },
+  {
     id: 'metal1-blast-furnace',
     title: 'Metal1_Metal extraction_(notes)',
     original: 'Blast furnace',
