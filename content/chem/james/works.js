@@ -1,6 +1,19 @@
 /* James · Chem KOC lead — submissions. */
 KOC.works('chem', 'james', [
   {
+    id: 'metal1-blast-furnace',
+    title: 'Metal1_Metal extraction_(notes)',
+    original: 'Blast furnace',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S4 Metal extraction Metal1',
+    submitted: '2026-11-12',
+    tags: ['Interactive', 'S4', 'Metal extraction'],
+    elements: ['wood'],
+    src: 'content/chem/james/metal-extraction/Metal1_Metal%20extraction_(notes).html?v=20261112a',
+    notes: 'Blast furnace. Five steps on one drawing. Hide, zoom, and the pen.'
+  },
+  {
     id: 'covalent-properties-sandbox',
     title: 'MWI5_Structures and properties of substances_(ex)',
     original: 'Covalent properties sandbox',

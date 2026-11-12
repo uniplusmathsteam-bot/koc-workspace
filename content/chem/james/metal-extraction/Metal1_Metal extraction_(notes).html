@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Metal1 Metal extraction — blast furnace</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; overflow: hidden; }
+  body {
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: #111827;
+    background: #eef3f8;
+    padding-left: env(safe-area-inset-left);
+    padding-right: calc(64px + env(safe-area-inset-right));
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  button { font-family: inherit; cursor: pointer; }
+  .topbar {
+    position: relative;
+    z-index: 55;
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: calc(52px + env(safe-area-inset-top));
+    padding: env(safe-area-inset-top) 12px 0;
+  }
+  .topbar h1 {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    font-size: 18px;
+    font-weight: 650;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #stepLabel { flex-shrink: 0; font-size: 16px; color: #334155; white-space: nowrap; }
+  .nav {
+    min-width: 64px;
+    min-height: 44px;
+    padding: 0 12px;
+    border: 1px solid #d7e0ec;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 16px;
+  }
+  .nav:disabled { opacity: 0.35; cursor: default; }
+  main {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 12px 8px;
+    overflow: hidden;
+  }
+  #stage {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid #d7e0ec;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  body.zoomed #stage { position: fixed; z-index: 30; margin: 0; }
+  #zoomBtn {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    z-index: 2;
+    width: 44px;
+    height: 44px;
+    border: 1px solid #d7e0ec;
+    border-radius: 10px;
+    background: #fff;
+    color: #163a86;
+    font-size: 28px;
+    line-height: 1;
+  }
+  #zoomBtn[aria-pressed="true"] { background: #163a86; color: #fff; }
+  #pairWrap {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+  }
+  #pair {
+    height: 100%;
+    min-height: 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  body.zoomed #pair { height: auto; width: 100%; }
+  #stageName {
+    flex: none;
+    min-width: 0;
+    padding: 6px 56px 0 14px;
+    font-size: 38px;
+    font-weight: 650;
+    line-height: 1.15;
+    color: #111827;
+    min-height: calc(38px * 1.15 * 2);
+  }
+  #view {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.2fr) minmax(0, 1.15fr);
+    grid-template-rows: minmax(0, 1fr);
+    gap: 8px;
+    align-items: stretch;
+    padding: 4px 8px 0;
+  }
+  body.zoomed #view { flex: none; height: auto; grid-template-rows: auto; }
+  #view > * { min-width: 0; min-height: 0; }
+  body.zoomed #view > * { min-height: auto; }
+  #furnace {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    display: block;
+  }
+  body.zoomed #furnace { height: auto; aspect-ratio: 420 / 520; }
+  .side {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    min-width: 0;
+    gap: 6px;
+  }
+  .side.left { align-items: flex-start; }
+  .side.right { align-items: flex-end; }
+  .plabel {
+    max-width: 100%;
+    padding: 2px 8px;
+    border: 1px solid #d7e0ec;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.94);
+    color: #111827;
+    font-size: 16px;
+    line-height: 1.2;
+    white-space: normal;
+    text-align: left;
+  }
+  .side.right .plabel { text-align: right; }
+  .plabel.on {
+    border-color: #163a86;
+    background: #e8eefc;
+    color: #163a86;
+    font-weight: 700;
+  }
+  .answer {
+    flex: none;
+    height: 58px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .answer[aria-hidden="true"] { visibility: hidden; }
+  #answerInner {
+    display: block;
+    font-size: 44px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    transform-origin: center center;
+  }
+  #desc {
+    flex: none;
+    min-height: calc(38px * 1.15 * 2);
+    margin: 0;
+    font-size: 38px;
+    line-height: 1.15;
+  }
+  #desc.hidden { visibility: hidden; }
+  .hl-ore { color: #9a3412; font-weight: 700; }
+  .hl-co2 { color: #163a86; font-weight: 700; }
+  .hl-co { color: #c2410c; font-weight: 700; }
+  .hl-fe { color: #9a3412; font-weight: 700; }
+  .hl-slag { color: #0f766e; font-weight: 700; }
+  sub { font-size: 0.62em; }
+  #furnace .band { opacity: 0.42; }
+  #furnace .band.on { opacity: 1; }
+  #furnace .flow { opacity: 0.35; }
+  #furnace .flow.on { opacity: 1; }
+  #furnace .drift,
+  #furnace .wisp,
+  #furnace .drip,
+  #furnace .slag-top {
+    transform-box: view-box;
+    transform-origin: 0 0;
+  }
+  #furnace .race {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  #furnace .drift.on { animation: chargeSink 9s linear infinite; }
+  #furnace .air-stream { stroke-dasharray: 11 8; }
+  #furnace .air-stream.on { animation: blastIn 2.4s linear infinite; }
+  #furnace .race.on { animation: raceGlow 3.2s ease-in-out infinite; }
+  #furnace .wisp.on { animation: gasRise 8s linear infinite; }
+  #furnace .drip.on { animation: ironDrip 7s linear infinite; }
+  #furnace .slag-top.on { animation: slagShift 9s ease-in-out infinite; }
+  #furnace .tag {
+    font-family: system-ui, sans-serif;
+    font-weight: 650;
+    text-anchor: middle;
+    paint-order: stroke fill;
+    stroke-linejoin: round;
+  }
+  #furnace .tag.light { stroke: #fff7ed; stroke-width: 4px; }
+  #furnace .tag.dark { stroke: #1c1917; stroke-width: 4px; }
+  #furnace .offtake {
+    font-family: system-ui, sans-serif;
+    font-size: 16px;
+    fill: #334155;
+  }
+  @keyframes chargeSink { to { transform: translateY(8.4615%); } }
+  @keyframes blastIn { to { stroke-dashoffset: -38; } }
+  @keyframes raceGlow { 50% { transform: scale(1.16); } }
+  @keyframes gasRise {
+    0% { transform: translateY(0); opacity: 0; }
+    16% { opacity: 1; }
+    78% { opacity: 0.85; }
+    100% { transform: translateY(-40%); opacity: 0; }
+  }
+  @keyframes ironDrip {
+    0% { transform: translateY(0); opacity: 0; }
+    14% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { transform: translateY(24%); opacity: 0; }
+  }
+  @keyframes slagShift { 50% { transform: translateX(1.6%); } }
+  @media (prefers-reduced-motion: reduce) {
+    #furnace .drift.on,
+    #furnace .air-stream.on,
+    #furnace .race.on,
+    #furnace .wisp.on,
+    #furnace .drip.on,
+    #furnace .slag-top.on { animation: none; }
+  }
+  @media (max-width: 800px) {
+    .topbar { gap: 4px; padding-left: 4px; padding-right: 4px; }
+    .topbar h1 { font-size: 15px; }
+    .nav { min-width: 44px; padding: 0 8px; font-size: 15px; }
+    #stepLabel { font-size: 14px; }
+    .plabel { font-size: 14px; }
+  }
+  .pen-canvas { position: fixed; inset: 0; z-index: 40; pointer-events: none; touch-action: none; }
+  .laser-canvas { position: fixed; inset: 0; z-index: 45; pointer-events: none; }
+  .laser-dot {
+    position: fixed; width: 22px; height: 22px; margin: -11px 0 0 -11px;
+    border-radius: 50%; pointer-events: none; z-index: 48;
+    background: radial-gradient(circle, rgba(255, 60, 60, 0.98), rgba(255, 0, 0, 0) 72%);
+  }
+  .laser-dot.hidden, .dcolors.hidden { display: none; }
+  body.pen-on { cursor: crosshair; touch-action: none; }
+  body.pen-on .pen-canvas { pointer-events: auto; }
+  body.laser-on { cursor: none; touch-action: none; }
+  body.pen-on, body.laser-on { user-select: none; }
+  .teach-dock {
+    position: fixed; right: 8px; top: 50%; transform: translateY(-50%);
+    z-index: 60; display: flex; flex-direction: column; gap: 6px;
+    padding: 8px 6px; background: rgba(255, 255, 255, 0.94);
+    border: 1px solid #d7e0ec; border-radius: 16px;
+  }
+  .dbtn {
+    width: 44px; height: 44px; border: 0; border-radius: 12px;
+    background: transparent; display: grid; place-items: center; color: #111827;
+  }
+  .dbtn svg { width: 22px; height: 22px; }
+  .dbtn.active { background: #163a86; color: #fff; }
+  #dkLaser.active { background: #e11d48; }
+  #dkPen.active { background: #0f8a62; }
+  .dcolors { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+  .dcolor { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #fff; background: var(--sc); box-shadow: 0 0 0 1px #d7e0ec; }
+  .dcolor.active { box-shadow: 0 0 0 2px #111827; }
+  .derase.active { background: #d97706; color: #3f2a00; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <button type="button" class="nav" id="backBtn">Back</button>
+  <h1>Blast furnace</h1>
+  <span id="stepLabel">1 / 5</span>
+  <button type="button" class="nav" id="hideBtn" aria-pressed="false">Hide</button>
+  <button type="button" class="nav" id="nextBtn">Next</button>
+</header>
+<main>
+  <section id="stage">
+    <button type="button" id="zoomBtn" aria-label="Zoom" aria-pressed="false">+</button>
+    <div id="pairWrap">
+      <div id="pair">
+        <div id="stageName"></div>
+        <div id="view">
+        <div class="side left" id="sideLeft">
+          <span class="plabel" data-z="charge coke">Coke</span>
+          <span class="plabel" data-z="air">Hot air</span>
+        </div>
+        <svg id="furnace" viewBox="0 0 420 520" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="furnaceTitle">
+          <title id="furnaceTitle">Blast furnace</title>
+          <defs>
+            <linearGradient id="steel" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#1e293b"/>
+              <stop offset="0.22" stop-color="#64748b"/>
+              <stop offset="0.48" stop-color="#e2e8f0"/>
+              <stop offset="0.62" stop-color="#64748b"/>
+              <stop offset="1" stop-color="#0f172a"/>
+            </linearGradient>
+            <linearGradient id="brick" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#fdba74"/>
+              <stop offset="0.45" stop-color="#ea580c"/>
+              <stop offset="1" stop-color="#7c2d12"/>
+            </linearGradient>
+            <linearGradient id="cavityHeat" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#44403c"/>
+              <stop offset="0.48" stop-color="#292524"/>
+              <stop offset="0.76" stop-color="#44403c"/>
+              <stop offset="1" stop-color="#7c2d12"/>
+            </linearGradient>
+            <linearGradient id="copper" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#fdba74"/>
+              <stop offset="0.45" stop-color="#ea580c"/>
+              <stop offset="1" stop-color="#9a3412"/>
+            </linearGradient>
+            <linearGradient id="hotMetal" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#fed7aa"/>
+              <stop offset="0.2" stop-color="#fb923c"/>
+              <stop offset="1" stop-color="#c2410c"/>
+            </linearGradient>
+            <linearGradient id="slagFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#e7e5e4"/>
+              <stop offset="0.22" stop-color="#a8a29e"/>
+              <stop offset="1" stop-color="#57534e"/>
+            </linearGradient>
+            <radialGradient id="coHaze" cx="50%" cy="42%" r="58%">
+              <stop offset="0" stop-color="#ffedd5" stop-opacity="0.95"/>
+              <stop offset="0.62" stop-color="#fdba74" stop-opacity="0.28"/>
+              <stop offset="1" stop-color="#ffedd5" stop-opacity="0"/>
+            </radialGradient>
+            <radialGradient id="raceHot" cx="50%" cy="50%" r="58%">
+              <stop offset="0" stop-color="#fffbeb"/>
+              <stop offset="0.32" stop-color="#fb923c"/>
+              <stop offset="0.7" stop-color="#ea580c" stop-opacity="0.55"/>
+              <stop offset="1" stop-color="#ea580c" stop-opacity="0"/>
+            </radialGradient>
+            <radialGradient id="wispGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0" stop-color="#fff7ed" stop-opacity="0.92"/>
+              <stop offset="1" stop-color="#ffedd5" stop-opacity="0"/>
+            </radialGradient>
+            <filter id="soft" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="2.2"/>
+            </filter>
+            <clipPath id="cavityClip">
+              <path d="M196 66 H224 L220 94 C234 128 268 176 288 226 C298 254 284 294 270 320 C260 340 254 352 250 364 L250 456 H170 L170 364 C166 352 160 340 150 320 C136 294 122 254 132 226 C152 176 186 128 200 94 Z"/>
+            </clipPath>
+            <clipPath id="stackClip">
+              <rect x="100" y="60" width="220" height="182"/>
+            </clipPath>
+            <marker id="arrowHead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+              <path d="M0 0 L8 4 L0 8 Z" fill="#2563eb"/>
+            </marker>
+            <marker id="gasHead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+              <path d="M0 0 L8 4 L0 8 Z" fill="#64748b"/>
+            </marker>
+          </defs>
+          <rect x="120" y="474" width="180" height="16" rx="2" fill="#64748b"/>
+          <rect x="100" y="490" width="220" height="14" rx="2" fill="#cbd5e1" stroke="#64748b" stroke-width="1.5"/>
+          <path d="M0 326 H118 L134 340" fill="none" stroke="#64748b" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M420 326 H302 L286 340" fill="none" stroke="#64748b" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+          <path fill="url(#steel)" stroke="none" d="M170 44 H250 L246 76 C260 114 292 170 314 222 C326 254 310 294 294 324 C282 346 274 358 272 370 L276 478 H144 L148 370 C146 358 138 346 126 324 C110 294 94 254 106 222 C128 170 160 114 174 76 Z"/>
+          <path fill="url(#brick)" d="M178 50 H242 L238 80 C250 116 284 172 306 224 C316 252 302 292 288 320 C278 340 270 352 268 364 L272 470 H148 L152 364 C150 352 142 340 132 320 C118 292 104 252 114 224 C136 172 170 116 182 80 Z"/>
+          <g clip-path="url(#cavityClip)">
+            <rect x="80" y="40" width="260" height="440" fill="url(#cavityHeat)"/>
+            <ellipse class="band" data-z="co" cx="210" cy="168" rx="86" ry="64" fill="url(#coHaze)"/>
+            <g class="band" data-z="coke">
+              <circle cx="156" cy="262" r="7" fill="#1c1917"/>
+              <circle cx="184" cy="254" r="8" fill="#292524"/>
+              <circle cx="214" cy="266" r="7" fill="#1c1917"/>
+              <circle cx="244" cy="256" r="8" fill="#292524"/>
+              <circle cx="270" cy="270" r="6" fill="#44403c"/>
+              <circle cx="168" cy="286" r="8" fill="#292524"/>
+              <circle cx="198" cy="278" r="7" fill="#1c1917"/>
+              <circle cx="230" cy="290" r="8" fill="#292524"/>
+              <circle cx="258" cy="284" r="7" fill="#1c1917"/>
+              <circle cx="150" cy="310" r="7" fill="#1c1917"/>
+              <circle cx="176" cy="304" r="8" fill="#292524"/>
+              <circle cx="206" cy="314" r="6" fill="#44403c"/>
+              <circle cx="236" cy="306" r="8" fill="#292524"/>
+              <circle cx="266" cy="316" r="6" fill="#1c1917"/>
+              <circle cx="162" cy="336" r="8" fill="#292524"/>
+              <circle cx="188" cy="328" r="7" fill="#1c1917"/>
+              <circle cx="214" cy="338" r="8" fill="#292524"/>
+              <circle cx="246" cy="330" r="7" fill="#44403c"/>
+              <circle cx="274" cy="342" r="6" fill="#1c1917"/>
+              <circle cx="170" cy="358" r="7" fill="#1c1917"/>
+              <circle cx="198" cy="352" r="8" fill="#292524"/>
+              <circle cx="228" cy="360" r="7" fill="#1c1917"/>
+              <circle cx="256" cy="354" r="8" fill="#292524"/>
+              <circle cx="180" cy="378" r="7" fill="#292524"/>
+              <circle cx="210" cy="372" r="8" fill="#1c1917"/>
+              <circle cx="240" cy="380" r="6" fill="#44403c"/>
+              <circle cx="200" cy="396" r="6" fill="#1c1917"/>
+              <circle cx="230" cy="390" r="6" fill="#292524"/>
+            </g>
+            <g clip-path="url(#stackClip)">
+              <g class="drift" id="chargeDrift" data-z="charge">
+                <g id="chargeTile">
+                  <g class="band" data-z="charge">
+                    <circle cx="132" cy="108" r="5.5" fill="#292524"/>
+                    <circle cx="156" cy="108" r="7" fill="#1c1917"/>
+                    <circle cx="182" cy="112" r="8" fill="#292524"/>
+                    <circle cx="210" cy="106" r="7" fill="#1c1917"/>
+                    <circle cx="238" cy="112" r="8" fill="#292524"/>
+                    <circle cx="264" cy="108" r="7" fill="#1c1917"/>
+                    <circle cx="288" cy="112" r="5.5" fill="#292524"/>
+                  </g>
+                  <g class="band" data-z="charge ore">
+                    <ellipse cx="146" cy="130" rx="8" ry="6.5" fill="#9a3412"/>
+                    <ellipse cx="174" cy="128" rx="9" ry="7" fill="#b45309"/>
+                    <ellipse cx="214" cy="132" rx="8" ry="7" fill="#9a3412"/>
+                    <ellipse cx="252" cy="128" rx="9" ry="7" fill="#b45309"/>
+                    <ellipse cx="280" cy="132" rx="7" ry="6" fill="#9a3412"/>
+                  </g>
+                  <g class="band" data-z="charge lime">
+                    <circle cx="194" cy="126" r="6.5" fill="#f5f5f4" stroke="#a8a29e" stroke-width="1"/>
+                    <circle cx="232" cy="134" r="5.5" fill="#e7e5e4" stroke="#a8a29e" stroke-width="1"/>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <ellipse cx="172" cy="356" rx="7" ry="5" fill="#0c0a09"/>
+            <ellipse cx="248" cy="356" rx="7" ry="5" fill="#0c0a09"/>
+            <g class="band race" data-z="coke">
+              <ellipse cx="184" cy="356" rx="22" ry="15" fill="url(#raceHot)" filter="url(#soft)"/>
+              <ellipse cx="184" cy="356" rx="8" ry="5" fill="#fffbeb"/>
+            </g>
+            <g class="band race" data-z="coke">
+              <ellipse cx="236" cy="356" rx="22" ry="15" fill="url(#raceHot)" filter="url(#soft)"/>
+              <ellipse cx="236" cy="356" rx="8" ry="5" fill="#fffbeb"/>
+            </g>
+            <circle class="band" data-z="coke" cx="168" cy="372" r="7" fill="#1c1917"/>
+            <circle class="band" data-z="coke" cx="206" cy="374" r="6.5" fill="#292524"/>
+            <circle class="band" data-z="coke" cx="228" cy="372" r="6" fill="#1c1917"/>
+            <circle class="band" data-z="coke" cx="254" cy="370" r="7" fill="#292524"/>
+            <g class="band slag-top" data-z="slag">
+              <path fill="url(#slagFill)" d="M120 400 C148 390 170 408 196 398 C222 388 246 406 272 396 C296 388 314 402 330 396 L330 432 H120 Z"/>
+            </g>
+            <g class="band" data-z="iron">
+              <path fill="url(#hotMetal)" d="M120 424 H330 V478 H120 Z"/>
+              <path fill="#fff7ed" opacity="0.4" d="M132 428 C162 420 186 434 214 426 C242 418 268 430 304 422 L304 434 C270 440 242 428 214 436 C186 442 162 430 132 436 Z"/>
+            </g>
+            <circle class="band drip" data-z="iron" cx="172" cy="334" r="6.5" fill="#fff7ed" stroke="#ea580c" stroke-width="1.5" style="animation-delay:-1.4s"/>
+            <circle class="band drip" data-z="iron" cx="188" cy="348" r="5.5" fill="#ffedd5" stroke="#ea580c" stroke-width="1.5" style="animation-delay:-3.1s"/>
+            <circle class="band drip" data-z="iron" cx="232" cy="328" r="6.5" fill="#fff7ed" stroke="#ea580c" stroke-width="1.5" style="animation-delay:-4.7s"/>
+            <circle class="band drip" data-z="iron" cx="246" cy="352" r="5" fill="#fdba74" stroke="#c2410c" stroke-width="1.5" style="animation-delay:-6s"/>
+            <ellipse class="flow wisp" data-z="co" cx="198" cy="250" rx="10" ry="18" fill="url(#wispGrad)"/>
+            <ellipse class="flow wisp" data-z="co" cx="222" cy="214" rx="8" ry="16" fill="url(#wispGrad)" style="animation-delay:-1.6s"/>
+            <ellipse class="flow wisp" data-z="co" cx="176" cy="232" rx="9" ry="17" fill="url(#wispGrad)" style="animation-delay:-3.2s"/>
+            <ellipse class="flow wisp" data-z="co" cx="236" cy="268" rx="8" ry="15" fill="url(#wispGrad)" style="animation-delay:-4.8s"/>
+            <ellipse class="flow wisp" data-z="co" cx="206" cy="196" rx="7" ry="14" fill="url(#wispGrad)" style="animation-delay:-6.4s"/>
+          </g>
+          <path fill="none" stroke="#9a3412" stroke-width="3" d="M196 66 H224 L220 94 C234 128 268 176 288 226 C298 254 284 294 270 320 C260 340 254 352 250 364 L250 456 H170 L170 364 C166 352 160 340 150 320 C136 294 122 254 132 226 C152 176 186 128 200 94 Z"/>
+          <path fill="none" stroke="#0f172a" stroke-width="3.5" stroke-linejoin="round" d="M170 44 H250 L246 76 C260 114 292 170 314 222 C326 254 310 294 294 324 C282 346 274 358 272 370 L276 478 H144 L148 370 C146 358 138 346 126 324 C110 294 94 254 106 222 C128 170 160 114 174 76 Z"/>
+          <path fill="url(#copper)" stroke="#9a3412" stroke-width="1.2" d="M134 336 L172 350 L176 362 L138 350 Z"/>
+          <path fill="url(#copper)" stroke="#9a3412" stroke-width="1.2" d="M286 336 L248 350 L244 362 L282 350 Z"/>
+          <path class="flow air-stream" data-z="air" d="M0 326 H118 L134 340" fill="none" stroke="#2563eb" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowHead)"/>
+          <path class="flow air-stream" data-z="air" d="M420 326 H302 L286 340" fill="none" stroke="#2563eb" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowHead)"/>
+          <rect x="248" y="404" width="34" height="8" rx="1.5" fill="#292524"/>
+          <rect x="246" y="444" width="36" height="10" rx="1.5" fill="#431407"/>
+          <rect x="164" y="38" width="24" height="9" rx="1.5" fill="#475569" stroke="#1e293b" stroke-width="1"/>
+          <rect x="232" y="38" width="24" height="9" rx="1.5" fill="#475569" stroke="#1e293b" stroke-width="1"/>
+          <path d="M150 10 H186 L198 36" fill="none" stroke="#1e293b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M270 10 H234 L222 36" fill="none" stroke="#1e293b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M150 10 H270" fill="none" stroke="#1e293b" stroke-width="4" stroke-linecap="round"/>
+          <line x1="210" y1="10" x2="210" y2="30" stroke="#334155" stroke-width="4"/>
+          <path d="M186 32 C196 34 204 62 210 66 C216 62 224 34 234 32 Z" fill="#64748b" stroke="#1e293b" stroke-width="2"/>
+          <path d="M258 108 C286 96 304 70 322 46" fill="none" stroke="#334155" stroke-width="10" stroke-linecap="round"/>
+          <path d="M258 108 C286 96 304 70 322 46" fill="none" stroke="#94a3b8" stroke-width="5" stroke-linecap="round" marker-end="url(#gasHead)"/>
+          <text class="offtake" x="330" y="42">waste gas</text>
+          <text class="tag light" x="210" y="176" font-size="22" fill="#9a3412">CO</text>
+          <text class="tag dark" x="210" y="300" font-size="22" fill="#f8fafc">coke</text>
+          <text class="tag light" x="210" y="418" font-size="18" fill="#1c1917">slag</text>
+          <text class="tag light" x="210" y="448" font-size="22" fill="#431407">Fe</text>
+        </svg>
+        <div class="side right" id="sideRight">
+          <span class="plabel" data-z="charge ore">Haematite (Fe<sub>2</sub>O<sub>3</sub>)</span>
+          <span class="plabel" data-z="charge lime">Limestone</span>
+          <span class="plabel" data-z="co">Carbon monoxide</span>
+          <span class="plabel" data-z="slag">Slag (CaSiO<sub>3</sub>)</span>
+          <span class="plabel" data-z="iron">Molten iron</span>
+        </div>
+        </div>
+      </div>
+    </div>
+    <p id="answer" class="answer" aria-hidden="true"><span id="answerInner"></span></p>
+  </section>
+  <p id="desc"></p>
+</main>
+
+<canvas id="penCanvas" class="pen-canvas"></canvas>
+<canvas id="laserCanvas" class="laser-canvas"></canvas>
+<div id="laserDot" class="laser-dot hidden"></div>
+<div class="teach-dock">
+  <button type="button" class="dbtn" id="dkLaser" aria-label="Laser pointer">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="currentColor"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path></svg>
+  </button>
+  <button type="button" class="dbtn" id="dkPen" aria-label="Pen">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20l4.5-1.2L19 8.3 15.7 5 5.2 15.5 4 20z"></path><path d="M13.5 7.2l3.3 3.3"></path></svg>
+  </button>
+  <div class="dcolors hidden" id="dkColors">
+    <button type="button" class="dcolor active" data-c="#e11d48" style="--sc:#e11d48" aria-label="Red"></button>
+    <button type="button" class="dcolor" data-c="#2563eb" style="--sc:#2563eb" aria-label="Blue"></button>
+    <button type="button" class="dcolor" data-c="#059669" style="--sc:#059669" aria-label="Green"></button>
+    <button type="button" class="dcolor" data-c="#111827" style="--sc:#111827" aria-label="Black"></button>
+    <button type="button" class="dbtn derase" id="dkErase" aria-label="Eraser">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="8" width="16" height="9" rx="1.5"></rect><path d="M4 13h16"></path></svg>
+    </button>
+  </div>
+  <button type="button" class="dbtn" id="dkClear" aria-label="Clear writing">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 7h14M9 7V5h6v2M8 7l1 13h6l1-13"></path></svg>
+  </button>
+</div>
+
+<script>
+(function () {
+  var STEPS = [
+    {
+      name: 'Haematite, coke, limestone, hot air',
+      desc: 'The ore is <span class="hl-ore">haematite</span> (Fe<sub>2</sub>O<sub>3</sub>).',
+      zones: ['charge', 'air']
+    },
+    {
+      name: 'C + O<sub>2</sub> → <span class="hl-co2">CO<sub>2</sub></span>',
+      desc: 'Coke reacts with oxygen to form <span class="hl-co2">carbon dioxide</span>.',
+      zones: ['coke', 'air']
+    },
+    {
+      name: 'C + CO<sub>2</sub> → <span class="hl-co">2CO</span>',
+      desc: 'Coke reacts with carbon dioxide to form <span class="hl-co">carbon monoxide</span>.',
+      zones: ['coke', 'co']
+    },
+    {
+      name: '3CO + Fe<sub>2</sub>O<sub>3</sub> → 3CO<sub>2</sub> + <span class="hl-fe">2Fe</span>',
+      desc: 'Carbon monoxide reacts with <span class="hl-ore">haematite</span>.',
+      zones: ['co', 'ore', 'iron']
+    },
+    {
+      name: 'CaCO<sub>3</sub> → CaO + CO<sub>2</sub><br>CaO + SiO<sub>2</sub> → <span class="hl-slag">CaSiO<sub>3</sub></span>',
+      desc: 'Calcium oxide removes silicon dioxide as <span class="hl-slag">slag</span>.',
+      zones: ['lime', 'slag'],
+      answer: 'Fe<sub>2</sub>O<sub>3</sub> is reduced to Fe by <span class="hl-co">carbon monoxide</span>.'
+    }
+  ];
+
+  var backBtn = document.getElementById('backBtn');
+  var nextBtn = document.getElementById('nextBtn');
+  var hideBtn = document.getElementById('hideBtn');
+  var stepLabel = document.getElementById('stepLabel');
+  var stage = document.getElementById('stage');
+  var stageName = document.getElementById('stageName');
+  var zoomBtn = document.getElementById('zoomBtn');
+  var pairWrap = document.getElementById('pairWrap');
+  var pair = document.getElementById('pair');
+  var view = document.getElementById('view');
+  var furnace = document.getElementById('furnace');
+  var sideLeft = document.getElementById('sideLeft');
+  var sideRight = document.getElementById('sideRight');
+  var answer = document.getElementById('answer');
+  var answerInner = document.getElementById('answerInner');
+  var desc = document.getElementById('desc');
+  var penCanvas = document.getElementById('penCanvas');
+  var laserCanvas = document.getElementById('laserCanvas');
+  var laserDot = document.getElementById('laserDot');
+  var chargeDrift = document.getElementById('chargeDrift');
+  var chargeTile = document.getElementById('chargeTile');
+  [-88, -44, 44, 88].forEach(function (dy) {
+    var copy = chargeTile.cloneNode(true);
+    copy.removeAttribute('id');
+    copy.setAttribute('transform', 'translate(0,' + dy + ')');
+    chargeDrift.appendChild(copy);
+  });
+  var marks = document.querySelectorAll('[data-z]');
+
+  var step = 0;
+  var zoomed = false;
+  var descHidden = false;
+  var penOn = false;
+  var laserOn = false;
+  var erasing = false;
+  var ink = '#e11d48';
+  var drawing = false;
+  var lastPt = null;
+  var laserX = 0;
+  var laserY = 0;
+  var hasPointer = false;
+  var lastFrame = 0;
+  var laserRunning = false;
+  var penCtx = penCanvas.getContext('2d');
+  var laserCtx = laserCanvas.getContext('2d');
+
+  function showStep() {
+    var item = STEPS[step];
+    stageName.innerHTML = item.name;
+    desc.innerHTML = item.desc;
+    stepLabel.textContent = (step + 1) + ' / ' + STEPS.length;
+    backBtn.disabled = step === 0;
+    nextBtn.disabled = step === STEPS.length - 1;
+    marks.forEach(function (el) {
+      var tags = (el.getAttribute('data-z') || '').split(/\s+/);
+      var on = false;
+      for (var i = 0; i < tags.length; i++) {
+        if (item.zones.indexOf(tags[i]) !== -1) on = true;
+      }
+      el.classList.toggle('on', on);
+    });
+    if (item.answer) {
+      answerInner.innerHTML = item.answer;
+      answer.setAttribute('aria-hidden', 'false');
+    } else {
+      answerInner.innerHTML = '';
+      answer.setAttribute('aria-hidden', 'true');
+    }
+    reserveTitle();
+    requestAnimationFrame(function () {
+      fitAnswer();
+      fitZoom();
+    });
+  }
+
+  function reserveTitle() {
+    var current = stageName.innerHTML;
+    stageName.style.minHeight = '0px';
+    var maxH = 0;
+    for (var i = 0; i < STEPS.length; i++) {
+      stageName.innerHTML = STEPS[i].name;
+      if (stageName.offsetHeight > maxH) maxH = stageName.offsetHeight;
+    }
+    stageName.innerHTML = current;
+    var twoLines = 6 + 38 * 1.15 * 2;
+    stageName.style.minHeight = Math.max(maxH, twoLines) + 'px';
+  }
+
+  function setDesc(show) {
+    descHidden = !show;
+    desc.classList.toggle('hidden', descHidden);
+    desc.setAttribute('aria-hidden', descHidden ? 'true' : 'false');
+    hideBtn.textContent = descHidden ? 'Show' : 'Hide';
+    hideBtn.setAttribute('aria-pressed', descHidden ? 'true' : 'false');
+  }
+
+  function placeZoom() {
+    if (!zoomed) {
+      stage.style.top = '';
+      stage.style.left = '';
+      stage.style.right = '';
+      stage.style.bottom = '';
+      return;
+    }
+    stage.style.top = document.querySelector('.topbar').offsetHeight + 'px';
+    stage.style.left = 'max(8px, env(safe-area-inset-left))';
+    stage.style.right = '72px';
+    stage.style.bottom = 'max(8px, env(safe-area-inset-bottom))';
+  }
+
+  function fitZoom() {
+    pair.style.transform = '';
+    view.style.height = '';
+    if (!zoomed) return;
+    var colW = furnace.getBoundingClientRect().width;
+    var want = Math.max(colW * (520 / 420), sideLeft.scrollHeight, sideRight.scrollHeight);
+    if (want > 0) view.style.height = want + 'px';
+    var haveH = pairWrap.clientHeight;
+    var haveW = pairWrap.clientWidth;
+    var needH = pair.offsetHeight;
+    var needW = pair.scrollWidth;
+    if (!haveH || !haveW || !needH || !needW) return;
+    var scale = Math.min(1, haveH / needH, haveW / needW);
+    if (scale < 0.995) {
+      pair.style.transformOrigin = 'top center';
+      pair.style.transform = 'scale(' + scale + ')';
+    }
+  }
+
+  function fitAnswer() {
+    answerInner.style.transform = '';
+    if (answer.getAttribute('aria-hidden') === 'true') return;
+    var max = answer.clientWidth - 8;
+    var w = answerInner.scrollWidth;
+    if (w > max && max > 0) {
+      answerInner.style.transform = 'scale(' + (max / w) + ')';
+    }
+  }
+
+  backBtn.addEventListener('click', function () {
+    if (step > 0) step -= 1;
+    showStep();
+  });
+  nextBtn.addEventListener('click', function () {
+    if (step < STEPS.length - 1) step += 1;
+    showStep();
+  });
+  hideBtn.addEventListener('click', function () { setDesc(descHidden); });
+  zoomBtn.addEventListener('click', function () {
+    zoomed = !zoomed;
+    document.body.classList.toggle('zoomed', zoomed);
+    zoomBtn.setAttribute('aria-pressed', zoomed ? 'true' : 'false');
+    placeZoom();
+    requestAnimationFrame(function () {
+      fitZoom();
+      fitAnswer();
+    });
+  });
+
+  function resizeCanvas(c) {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var cssW = window.innerWidth;
+    var cssH = window.innerHeight;
+    var w = Math.round(cssW * dpr);
+    var h = Math.round(cssH * dpr);
+    c.style.width = cssW + 'px';
+    c.style.height = cssH + 'px';
+    if (c.width === w && c.height === h) return;
+    c.width = w;
+    c.height = h;
+    c.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function wipe(c) {
+    var ctx = c.getContext('2d');
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, c.width, c.height);
+    ctx.restore();
+  }
+  function setPen(on) {
+    if (on) {
+      laserOn = false;
+      document.body.classList.remove('laser-on');
+      document.getElementById('dkLaser').classList.remove('active');
+      laserDot.classList.add('hidden');
+    }
+    penOn = on;
+    document.body.classList.toggle('pen-on', on);
+    document.getElementById('dkPen').classList.toggle('active', on);
+    document.getElementById('dkColors').classList.toggle('hidden', !on);
+    if (!on) {
+      erasing = false;
+      document.getElementById('dkErase').classList.remove('active');
+    }
+  }
+  function setLaser(on) {
+    if (on) setPen(false);
+    laserOn = on;
+    document.body.classList.toggle('laser-on', on);
+    document.getElementById('dkLaser').classList.toggle('active', on);
+    if (!on) laserDot.classList.add('hidden');
+    else if (hasPointer) laserDot.classList.remove('hidden');
+    if (on && !laserRunning) {
+      laserRunning = true;
+      lastFrame = 0;
+      requestAnimationFrame(laserFrame);
+    }
+  }
+  document.getElementById('dkPen').addEventListener('click', function () { setPen(!penOn); });
+  document.getElementById('dkLaser').addEventListener('click', function () { setLaser(!laserOn); });
+  document.getElementById('dkErase').addEventListener('click', function () {
+    erasing = !erasing;
+    document.getElementById('dkErase').classList.toggle('active', erasing);
+  });
+  document.getElementById('dkColors').addEventListener('click', function (e) {
+    var btn = e.target.closest('.dcolor');
+    if (!btn) return;
+    ink = btn.dataset.c;
+    erasing = false;
+    document.getElementById('dkErase').classList.remove('active');
+    document.querySelectorAll('.dcolor').forEach(function (el) {
+      el.classList.toggle('active', el === btn);
+    });
+  });
+  document.getElementById('dkClear').addEventListener('click', function () {
+    wipe(penCanvas);
+    wipe(laserCanvas);
+  });
+  function stroke(a, b) {
+    penCtx.lineCap = 'round';
+    penCtx.lineJoin = 'round';
+    if (erasing) {
+      penCtx.globalCompositeOperation = 'destination-out';
+      penCtx.strokeStyle = 'rgba(0,0,0,1)';
+      penCtx.lineWidth = 26;
+    } else {
+      penCtx.globalCompositeOperation = 'source-over';
+      penCtx.strokeStyle = ink;
+      penCtx.lineWidth = 3.6;
+    }
+    penCtx.beginPath();
+    penCtx.moveTo(a.x, a.y);
+    penCtx.lineTo(b.x, b.y);
+    penCtx.stroke();
+  }
+  penCanvas.addEventListener('pointerdown', function (e) {
+    if (!penOn) return;
+    try { penCanvas.setPointerCapture(e.pointerId); } catch (err) {}
+    drawing = true;
+    lastPt = { x: e.clientX, y: e.clientY };
+    stroke(lastPt, lastPt);
+  });
+  penCanvas.addEventListener('pointermove', function (e) {
+    if (!drawing) return;
+    var p = { x: e.clientX, y: e.clientY };
+    stroke(lastPt, p);
+    lastPt = p;
+  });
+  function endDraw() { drawing = false; }
+  penCanvas.addEventListener('pointerup', endDraw);
+  penCanvas.addEventListener('pointercancel', endDraw);
+  document.addEventListener('pointermove', function (e) {
+    laserX = e.clientX;
+    laserY = e.clientY;
+    hasPointer = true;
+    if (!laserOn) return;
+    laserDot.style.left = laserX + 'px';
+    laserDot.style.top = laserY + 'px';
+    laserDot.classList.remove('hidden');
+  });
+  document.addEventListener('pointerleave', function () {
+    hasPointer = false;
+    laserDot.classList.add('hidden');
+  });
+  function laserFrame(now) {
+    if (!laserOn) {
+      laserRunning = false;
+      wipe(laserCanvas);
+      return;
+    }
+    var dt = lastFrame ? Math.min(40, now - lastFrame) : 16;
+    lastFrame = now;
+    laserCtx.save();
+    laserCtx.setTransform(1, 0, 0, 1, 0, 0);
+    laserCtx.globalCompositeOperation = 'destination-out';
+    laserCtx.fillStyle = 'rgba(0,0,0,' + (dt / 1600) + ')';
+    laserCtx.fillRect(0, 0, laserCanvas.width, laserCanvas.height);
+    laserCtx.restore();
+    if (hasPointer) {
+      laserCtx.globalCompositeOperation = 'source-over';
+      laserCtx.fillStyle = 'rgba(255,40,40,0.7)';
+      laserCtx.beginPath();
+      laserCtx.arc(laserX, laserY, 5, 0, Math.PI * 2);
+      laserCtx.fill();
+    }
+    requestAnimationFrame(laserFrame);
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { setPen(false); setLaser(false); }
+  });
+  window.addEventListener('resize', function () {
+    resizeCanvas(penCanvas);
+    resizeCanvas(laserCanvas);
+    reserveTitle();
+    placeZoom();
+    fitZoom();
+    fitAnswer();
+  });
+
+  setDesc(!window.matchMedia('(max-width: 700px)').matches);
+  resizeCanvas(penCanvas);
+  resizeCanvas(laserCanvas);
+  showStep();
+})();
+</script>
+</body>
+</html>
