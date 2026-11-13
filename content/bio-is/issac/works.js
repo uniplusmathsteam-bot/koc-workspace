@@ -90,5 +90,18 @@ KOC.works('bio-is', 'issac', [
     elements: ['wood'],
     src: 'content/bio-is/issac/food-and-humans-infographic/index.html',
     notes: 'One-page Food and Humans revision, labelled Ch5 · BB02 Molecules of Life.'
+  },
+  {
+    id: 'nutrition-in-humans-infographic',
+    title: 'SB02_Nutrition in humans',
+    original: 'Nutrition in humans infographic',
+    type: 'interactive',
+    subject: 'Bio',
+    chapter: 'S3/S4 Senior Biology SB02 Digestion and absorption, transport and assimilation, liver, egestion',
+    submitted: '2026-11-13',
+    tags: ['Infographic', 'Nutrition', 'Digestion', 'Absorption'],
+    elements: ['wood'],
+    src: 'content/bio-is/issac/nutrition-in-humans-infographic/index.html',
+    notes: 'Seven-process revision: ingestion through egestion, with embedded classroom animations.'
   }
 ]);

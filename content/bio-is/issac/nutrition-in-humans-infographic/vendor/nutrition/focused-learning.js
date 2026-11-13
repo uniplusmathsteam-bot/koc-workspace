@@ -1,0 +1,145 @@
+/* Focused, compartment-based lessons. All coordinates below are shared by the
+   drawn boundaries and the material paths; quantities are teaching markers. */
+(() => {
+'use strict';
+const M=window.MechanismCore,D=window.LearningDiagrams;
+const {txt,path,circle,token,at,ramp,lerp,C}=M;
+const previousRender=window.learningSceneSVG,previousTeaching=window.processTeaching;
+const tabs={absorption:['Absorption','吸收途徑'],long:['Long intestine','長小腸'],folds:['Folds + villi','摺疊及絨毛'],microvilli:['Microvilli','微絨毛'],wall:['Thin lining','薄上皮'],blood:['Blood supply','血液供應'],lacteal:['Lacteal','乳糜管'],energy:['Mitochondria','線粒體'],mixing:['Mixing','攪拌']};
+const box=(x,y,w,h,fill='#f9eee2',stroke='#b27e6c')=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="15" fill="${fill}" stroke="${stroke}" stroke-width="3"/>`;
+const head=(en,zh)=>txt(560,35,en,zh,26);
+const wrap=(body,name)=>`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 770" role="img" aria-label="${name}"><title>${name}</title><desc>Educational schematic, not to scale. Named particles cross the explicitly drawn compartments.</desc><rect width="1120" height="770" fill="#fffdf8"/>${body}</svg>`;
+const species=[['glucose','Glucose','葡萄糖',380],['amino','Amino acids','氨基酸',480],['#298bb6','Water','水',550],['#538d55','Mineral ions / B, C','礦物離子／維生素 B、C',600]];
+function absorptionRoutes(){const result=[];
+ for(let k=0;k<4;k++)for(let i=0;i<6;i++){const y=species[k][3];result.push({id:`water-${k}-${i}`,type:species[k][0],destination:'capillary',points:[[95+i*26,y-36+i*12],[397,y],[410,y],[425,y],[460,y],[490,y-8],[520,y],[520,650-(k*6+i)*11]]});}
+ for(let i=0;i<12;i++){const y=i<8?420:545;result.push({id:`lipid-${i}`,type:i<8?'lipid':'#9a972d',destination:'lacteal',points:[[1010-(i%4)*28,y-45+(i%4)*28],[723,y],[710,y],[698,y],[560,y],[560,650-i*23]]});}
+ return result;
+}
+function absorption(s,t){let o=head('Absorption: identify the material and its destination','吸收：辨認物質及其目的地');
+ // One epithelial ribbon. Representative blood channels are left of the
+ // lacteal so the lipid route does not falsely cross a blood vessel in 2D.
+ o+='<path d="M410 650 L410 340 A150 150 0 0 1 710 340 L710 650 Z" fill="#f9e8d7" stroke="#cd977e" stroke-width="24"/>';
+ for(let y=350;y<646;y+=25){o+=path([[398,y],[422,y]],'#a77068',2)+path([[698,y],[722,y]],'#a77068',2);for(let j=0;j<4;j++)o+=path([[394,y+j*5],[382,y+j*5]],'#a77068',2)+path([[726,y+j*5],[738,y+j*5]],'#a77068',2)}
+ for(let i=0;i<26;i++){const a=Math.PI+i*Math.PI/26,x=560+150*Math.cos(a),y=340+150*Math.sin(a);o+=path([[560+138*Math.cos(a),340+138*Math.sin(a)],[560+174*Math.cos(a),340+174*Math.sin(a)]],'#a77068',2)}
+ o+=path([[460,665],[460,285],[475,260],[505,260],[520,285],[520,665]],'#e0bcc1',26)+path([[460,665],[460,285],[475,260],[505,260],[520,285],[520,665]],'#985d85',17);
+ o+=path([[460,665],[460,285]],'#b74e60',13)+path([[520,285],[520,665]],'#437da4',13);for(const y of [380,480,550,600])o+=path([[460,y],[490,y-8],[520,y]],'#985d85',17);
+ o+=path([[560,320],[560,675]],'#71985b',33)+path([[560,320],[560,675]],'#dcebc3',24)+circle(560,320,12,'#dcebc3');
+ for(const y of [380,480])o+=box(396,y-13,28,26,'#6d9f89');for(let i=0;i<10;i++){const p=at([[460,665],[460,285],[475,260],[505,260],[520,285],[520,665]],(i/10+t*.6)%1);o+=token(...p,'#bd5366','data-blood-cell="true"',6)}
+ for(let k=0;k<species.length;k++){const a=species[k];o+=token(64,a[3]-55,a[0],'',10)+txt(85,a[3]-51,a[1],a[2],20,'start')}
+ o+=txt(880,323,'Fat digestion products','脂肪消化產物',22)+txt(885,494,'Fat-soluble vitamins','脂溶性維生素 A、D、E、K',20);
+ for(const [i,r]of absorptionRoutes().entries()){if(s.absorptionGroup==='water'&&r.destination!=='capillary'||s.absorptionGroup==='lipid'&&r.destination!=='lacteal')continue;const p=ramp(t,.02+(i%6)*.045,.72+(i%6)*.035),v=at(r.points,p),packed=r.destination==='lacteal'&&v[0]<704;o+=token(...v,r.type,`data-absorption-id="${r.id}" data-destination="${r.destination}" data-packaged="${packed}"`,packed?11:9);if(packed)o+=circle(...v,15,'none','stroke="#6e8d49" stroke-width="2"')}
+ o+=txt(560,116,'Intestinal lumen','小腸腔',23)+txt(306,201,'One-cell lining','單層上皮',19)+path([[328,230],[411,350]],'#946f63',2);
+ o+=txt(400,704,'Red: arteriole · Blue: venule','紅：小動脈　藍：小靜脈 → 肝門靜脈',18)+txt(805,704,'Lacteal → lymph','乳糜管 → 淋巴',19)+path([[560,675],[738,691]],'#71985b',2);
+ o+=txt(850,615,'Ring = packaged lipid','綠圈＝上皮細胞內包裝後的脂質',18)+txt(255,135,'Food approaches from several directions','營養素由不同方向接近表面',17);
+ return o;
+}
+function lengthScene(t){let o=head('A long intestine gives more time and area for absorption','小腸長：增加吸收時間及面積');const a=[[120,245],[970,245]],b=[[120,420],[970,420],[970,535],[150,535],[150,640],[970,640]];
+ for(const [i,p]of [a,b].entries()){o+=path(p,'#c7967e',65)+path(p,'#fff0cf',47)+txt(100,i?367:170,i?'Longer path':'Shorter comparison',i?'較長路徑':'較短路徑對照',23,'start');const total=i?2825:850,distance=t*1500;for(let j=0;j<6;j++){const q=at(p,Math.min(1,(distance+j*32)/total));if(distance+j*32<total)o+=token(...q,'glucose',`data-path-length="${total}"`,10)}o+=txt(990,i?602:190,distance>total?'Exited':'In lumen',distance>total?'已離開':'仍在腸腔',18)}
+ return o+txt(560,717,'Same movement speed; extra length extends contact with the lining.','同樣移動速度；較長路徑延長與上皮接觸時間。',21);
+}
+function surfaceScene(t,micro=false){let o=head(micro?'Microvilli expand the cell’s exposed membrane':'Folds and villi increase the exposed surface',micro?'微絨毛增加細胞表面積':'摺疊及絨毛增加接觸表面積');
+ const p=[[100,480]];for(let i=0;i<10;i++){const x=100+i*90,h=lerp(0,micro?150:230,ramp(t,.05,.6));p.push([x+25,480],[x+25,480-h+15]);for(let j=0;j<=8;j++){const a=Math.PI+j*Math.PI/8;p.push([x+45+20*Math.cos(a),480-h+15+20*Math.sin(a)])}p.push([x+65,480])}p.push([1030,480]);o+=path(p,'#c8957f',24)+path([[100,625],[1030,625]],'#437ca4',30)+txt(560,660,'Surface contact is shown here; use Absorption for the complete route.','此處只展示接觸表面；完整運輸途徑見「吸收途徑」。',19);
+ for(let i=0;i<10;i++){const x=145+i*90,q=ramp(t,.6+i*.012,.9+i*.008),y=lerp(170,480-lerp(0,micro?150:230,ramp(t,.05,.6))-15,q);o+=token(x,y,'glucose',`data-expanded-surface="${micro?'microvillus':'villus'}"`,10)}
+ o+=txt(560,125,'Lumen: digested nutrients','腸腔：已消化營養素',24)+txt(560,552,micro?'Brush border of ONE epithelial cell':'Wall raised into repeated projections',micro?'同一個上皮細胞的刷狀緣':'腸壁形成多個突起',23);
+ return o;
+}
+function microScene(t){let o=head('Microvilli: more membrane on ONE epithelial cell','微絨毛：增加同一個上皮細胞的膜面積');const h=140*ramp(t,.05,.5);
+ o+=box(150,350,820,270,'#f4d7bf');let d='M150 350';for(let i=0;i<12;i++){const x=165+i*65;d+=` L${x} 350 L${x} ${350-h+15} Q${x} ${350-h} ${x+15} ${350-h} Q${x+30} ${350-h} ${x+30} ${350-h+15} L${x+30} 350`}d+=' L970 350';o+=`<path d="${d}" fill="#f4d7bf" stroke="#ae7c70" stroke-width="5"/>`+`<ellipse cx="790" cy="520" rx="65" ry="45" fill="#ad91b0"/>`+txt(790,590,'Nucleus','細胞核',20);
+ for(let i=0;i<12;i++){const x=180+i*65,q=ramp(t,.5+i*.012,.85+i*.008);o+=box(x-10,350-h-4,20,18,'#72a691');o+=token(x,lerp(125,350-h-16,q),'glucose','data-brush-contact="true"',10)}
+ o+=txt(560,100,'Digested nutrients in the intestinal lumen','小腸腔內的已消化營養素',23)+txt(430,470,'Many transport sites','提供更多運輸位置',23)+txt(430,550,'Cell cytoplasm','細胞質',22)+txt(560,700,'Finger-like membrane projections increase area without adding cell layers.','指狀細胞膜突起增加面積，而非增加細胞層數。',22);return o;
+}
+function wallScene(t){let o=head('One cell thick: a shorter diffusion distance','只有一層細胞厚：擴散距離短');
+ for(let k=0;k<2;k++){const x=70+k*550,n=k?3:1;o+=txt(x+240,140,k?'Thicker comparison':'Normal epithelium',k?'假設較厚的上皮對照':'正常單層上皮',24);for(let j=0;j<n;j++)o+=box(x+20,280+j*85,430,80);const bottom=280+n*85;o+=path([[x+20,bottom+50],[x+450,bottom+50]],'#4a80a6',32)+txt(x+240,bottom+110,'Capillary','微血管',22);for(let i=0;i<5;i++){const y=Math.min(bottom+50,200+t*365-i*10);o+=token(x+80+i*65,y,'#298bb6',`data-lining-layers="${n}"`,10)}}
+ return o+txt(560,700,'Equal travel speed: the shorter route reaches the blood sooner.','同樣移動速度：路徑較短，較快到達血液。',22);
+}
+function flowState(t,flow){let lumen=18,blood=0,carried=0;for(let i=0;i<Math.floor(t*28);i++){if(lumen>blood){lumen--;blood++}if(flow&&i%2===0&&blood){blood--;carried++}}return {lumen,blood,carried}}
+function bloodScene(t){let o=head('Blood flow removes absorbed nutrients','血流帶走已吸收營養素，維持濃度梯度');for(let k=0;k<2;k++){const x=65+k*550,a=flowState(t,!k);o+=txt(x+240,140,k?'Reduced flow':'Continuous flow',k?'血流減少對照':'持續血流',24)+box(x,190,480,190,'#fff4d7')+box(x,430,480,140,'#f5e0e6','#a65b70')+txt(x+240,610,`Lumen ${a.lumen} · Blood ${a.blood} · Carried ${a.carried}`,'腸腔　／　血液　／　已帶走',19);for(let i=0;i<a.lumen;i++)o+=token(x+35+i%9*49,230+Math.floor(i/9)*65,'glucose','',9);for(let i=0;i<a.blood;i++)o+=token(x+35+((i*43+(k?0:t*500))%410),480+i%2*35,'glucose','',9);o+=txt(x+240,405,'Epithelium 上皮','',18)}return o+txt(560,705,'More removal → less accumulation in blood → continued net uptake.','帶走更多 → 血中積聚較少 → 維持淨吸收；標記數量僅作示意。',22)}
+function lactealScene(t){let o=head('Fat is packaged inside the epithelial cell before lymph entry','脂肪先在上皮細胞內重組及包裝，再進入淋巴');o+=box(330,175,430,330)+box(850,210,125,435,'#deebca','#70965a')+txt(150,135,'Intestinal lumen','小腸腔',22)+txt(545,135,'Enterocyte','小腸上皮細胞',22)+txt(910,135,'Lacteal','乳糜管',22)+txt(545,555,'Reassembly + packaging','重組脂肪及包裝成乳糜微粒',23)+txt(900,695,'Lymph outflow','淋巴流出',22);
+ for(let i=0;i<8;i++){const q=ramp(t,.03+i*.025,.9+i*.01),p=at([[90,225+i*24],[330,300],[480,330],[650,350],[760,350],[910,350],[910,630-i*19]],q),packed=p[0]>510;o+=token(...p,'lipid',`data-lipid-packaged="${packed}"`,11);if(packed)o+=circle(...p,18,'none','stroke="#71965c" stroke-width="3"')}
+ return o+txt(150,600,'Fatty-acid components','脂肪酸等消化產物',20)+txt(560,650,'Most long-chain dietary fat follows this route; not a portal-vein shortcut.','大部分長鏈膳食脂肪循此途徑；並非直接進入肝門靜脈。',20);
+}
+function energyScene(t){let o=head('Mitochondria supply ATP that supports active absorption','線粒體供應 ATP，支持主動吸收');o+=box(260,175,610,400)+txt(560,125,'Lumen / brush border','腸腔／刷狀緣',23)+txt(720,650,'Glucose exit carrier','葡萄糖離開細胞的載體',19)+txt(560,685,'Tissue fluid → blood','組織液 → 血液',23);
+ for(let i=0;i<3;i++)o+=`<ellipse cx="${650+i*55}" cy="420" rx="25" ry="16" fill="#b97666"/>`+path([[635+i*55,420],[645+i*55,410],[655+i*55,430],[665+i*55,420]],'#f9dbbb',2);
+ o+=txt(735,478,'Mitochondria','線粒體',22)+box(400,555,100,38,'#6eab99')+txt(455,635,'Na⁺/K⁺ pump','鈉鉀泵',20)+box(530,555,60,38,'#6eab99')+box(400,155,100,38,'#6eab99')+txt(790,220,'Na⁺ + glucose cotransport','鈉與葡萄糖共同運輸',19);
+ for(let i=0;i<5;i++){const p=at([[680,420],[600,490],[450,565]],(t*2+i/5)%1);o+=token(...p,'#cbaf2d','',8)}
+ for(let i=0;i<6;i++){const q=ramp(t,.1+i*.03,.75+i*.025),p=at([[310+i*30,100],[450,175],[450,270],[450,390],[560,450],[560,575],[560,650]],q);o+=token(...p,'glucose','data-cotransport="glucose"',10);if(q<.55)o+=token(p[0]+23,p[1],'#4a91b1','',7)}
+ return o+txt(560,730,'ATP powers the sodium pump; the sodium gradient drives glucose uptake.','ATP 驅動鈉鉀泵；鈉梯度推動葡萄糖吸收。',20);
+}
+function mixingScene(t){let o=head('Mixing brings fresh digested food to the absorptive surface','攪拌使新的已消化食物接觸吸收表面');const shift=Math.sin(t*Math.PI*2)*50;o+=path([[80,540],[1040,540]],'#ca997e',30)+txt(560,650,'Absorptive lining stays in contact with renewed fluid','吸收表面接觸不斷更新的腸液',23);for(let i=0;i<24;i++){const a=i/24*Math.PI*2+t*Math.PI*2,x=560+Math.cos(a)*410,y=310+Math.sin(a)*150,entry=100+i*40;const q=ramp(t,.55+i%4*.04,.9+i%4*.02),p=at([[x+shift,y],[entry,523],[entry,540],[entry,590]],q);o+=box(entry-9,523,18,34,'#71a08c')+token(...p,'glucose','data-mixing-marker="true"',10)}return o+txt(560,130,'Particles circulate towards the lining before absorption','營養素隨腸液攪動，接近上皮後經運輸位置被吸收',24)}
+function villi(s,t){switch(s.adaptation){case 'long':return lengthScene(t);case 'folds':return surfaceScene(t);case 'microvilli':return microScene(t);case 'wall':return wallScene(t);case 'blood':return bloodScene(t);case 'lacteal':return lactealScene(t);case 'energy':return energyScene(t);case 'mixing':return mixingScene(t);default:return absorption(s,t)}}
+const FA=(x,y)=>path([[x-12,y-4],[x-4,y+4],[x+4,y-4],[x+12,y+4]],'#c67932',5);
+const TG=(x,y)=>path([[x-15,y-16],[x-15,y+16]],'#697f96',5)+[-13,0,13].map(d=>path([[x-15,y+d],[x-7,y+d]],'#c67932',3)+FA(x+5,y+d)).join('');
+const PL=(x,y)=>circle(x,y,9,'#478bb0')+path([[x-4,y+8],[x-8,y+26],[x-4,y+37]],'#c67932',5)+path([[x+4,y+8],[x+9,y+26],[x+5,y+37]],'#c67932',5);
+function lipid(s,t){const kind=M.fateKind(s),fromGlucose=s.nutrient?.startsWith('Glucose');let o=head(kind==='membrane'?'Fatty-acid building blocks → membrane phospholipids':kind==='hormone'?'Cholesterol → steroid sex hormones':fromGlucose?'Excess glucose → fat inside cells':'Fatty acids → triglycerides in adipose tissue',kind==='membrane'?'脂肪酸成分 → 細胞膜磷脂':kind==='hormone'?'膽固醇 → 類固醇性激素':fromGlucose?'細胞內將過量葡萄糖轉成脂肪':'脂肪酸 → 脂肪組織的甘油三酯');
+ o+=M.cellBody(245,300,770,340)+`<ellipse cx="930" cy="545" rx="45" ry="36" fill="#b79bb9" stroke="#8b728f" stroke-width="3"/><circle cx="938" cy="545" r="12" fill="#8e7098"/>`+path([[977,545],[995,555]],'#99769c',1.5)+txt(1030,560,'Nucleus','細胞核',17)+txt(970,680,kind==='hormone'?'Steroid-producing cell':kind==='fat'?'Liver / fat cell':'Body cell',kind==='hormone'?'製造類固醇激素的細胞':kind==='fat'?'肝／脂肪細胞':'身體細胞',20,'end');
+ if(kind==='hormone'){
+  o+=txt(560,125,'Start: cholesterol already delivered into the cell','起點：膽固醇已運送到細胞內',22)+path([[80,190],[1060,190]],'#e2bdc7',50)+txt(120,240,'Blood 血液','',20,'start');
+  for(let i=0;i<6;i++){const q=ramp(t,.05,.52),exit=ramp(t,.6+i*.018,.96),p=at([[430+i*38,450],[725,450],[725,300],[725,190],[945-i*25,190]],exit);o+=token(...p,q<1?'#b69b3b':'#dc73a2',`data-steroid-product="${q===1}"`,12)}
+  o+=txt(480,545,t<.52?'Cholesterol precursor':'Enzyme reactions form hormones',t<.52?'膽固醇前體':'酶促反應製造激素',22)+txt(850,360,'Diffusion across intact membrane','經完整細胞膜擴散',18);
+ }else{
+  const membrane=kind==='membrane',n=membrane?2:3,entry=.03,assembled=t>=.6,join=ramp(t,.6,.98),arrive=ramp(t,.36,.59),centres=Array.from({length:4},(_,i)=>[490+i%2*110,430+Math.floor(i/2)*100]);
+  o+=path([[65,185],[1060,185]],'#e5bcc7',55)+txt(100,133,'Blood capillary','微血管',22,'start')+txt(160,270,'Tissue fluid','組織液',20);
+  // A capillary-wall opening is distinct from the intact target-cell membrane.
+  o+=path([[65,216],[405,216]],'#ba7e8c',4)+path([[455,216],[1060,216]],'#ba7e8c',4);
+  o+=txt(430,245,fromGlucose?'Glucose via membrane carrier':'Fatty acids released by capillary lipase',fromGlucose?'葡萄糖經膜載體進入':'微血管脂肪酶釋出脂肪酸',20);
+  if(fromGlucose)o+=path([[417,286],[417,314],[443,314],[443,286]],'#5c9b87',5);
+  if(!fromGlucose)for(let i=0;i<3;i++){const x=125+i*180+t*90;o+=circle(x,185,30,'#f4d4a0')+TG(x,185)}
+  if(membrane){
+   // An existing bilayer patch straddles the cell's actual upper edge. Four
+   // vacancies receive the newly assembled molecules, two in each leaflet.
+   for(const x of [510,533,556,579,602,648,694,717,740,763])o+=`<g opacity=".28">${PL(x,264)}<g transform="translate(${x} 336) rotate(180)">${PL(0,0)}</g></g>`;
+  }else if(t>=.6)o+=`<ellipse cx="735" cy="480" rx="155" ry="110" fill="#fff0be" stroke="#c7a454" stroke-width="3"/>`;
+  for(let i=0;i<4;i++){
+   const centre=centres[i];
+   if(!assembled){
+    for(let j=0;j<n;j++){const index=i*n+j,q=ramp(t,entry+index*.008,.38+index*.008),p=at([[250+index*43,185],[430,210],[430,270],[430,300],[430,370],[centre[0]+(j-(n-1)/2)*25,centre[1]-18]],q),p2=at([p,[centre[0]+3,centre[1]+(j-(n-1)/2)*12]],arrive);o+=`<g data-assimilation-chain="${i}-${j}">`+(fromGlucose&&t<.42?token(...p2,'glucose','',9):FA(...p2))+'</g>';
+    }
+    const g=at([[760+i*30,470+i*12],[centre[0]-15,centre[1]]],arrive);o+=token(...g,'#697f96',`data-cell-glycerol="${i}"`,7);
+    if(membrane){const p=at([[790+i*25,410],[centre[0]-15,centre[1]-20]],arrive);o+=token(...p,'#478bb0',`data-cell-phosphate="${i}"`,7)}
+   }else{
+    const target=membrane?[625+i%2*46,i<2?264:336]:[660+i%2*115,450+Math.floor(i/2)*65],p=at([centre,target],join),angle=membrane&&i>=2?180*join:0;
+    o+=`<g data-assimilation-product="${i}" data-product-type="${membrane?'phospholipid':'triglyceride'}" data-fatty-acid-count="${n}" transform="translate(${p[0]} ${p[1]}) rotate(${angle})">`+(membrane?PL(0,0):TG(0,0))+'</g>';
+   }
+  }
+  o+=txt(620,605,t<.36?'Cell ingredients are available':t<.6?(membrane?'Fatty acids + glycerol + phosphate':'Fatty acids + glycerol components'):membrane?'New phospholipids join the membrane':'Triglycerides stored in a lipid droplet',t<.36?'細胞內備有合成成分':t<.6?(membrane?'脂肪酸＋甘油＋磷酸':'脂肪酸及甘油成分'):membrane?'新磷脂整合進細胞膜':'甘油三酯儲存在脂滴內',21);
+  o+=txt(560,724,membrane?'Heads face water on both sides; tails face inside the bilayer.':fromGlucose?'Cell reactions convert glucose carbon to fatty-acid components before fat assembly.':'Fatty acids enter; triglycerides are assembled with glycerol inside the cell.',membrane?'兩面頭部朝水；尾部相向並位於雙層內。':fromGlucose?'細胞反應先把葡萄糖的碳轉成脂肪酸成分，再合成脂肪。':'脂肪酸進入細胞後，與甘油成分合成甘油三酯。',18);
+
+ }
+ return o;
+}
+const diseaseNames={coeliac:['Coeliac disease','乳糜瀉'],lactose:['Lactose intolerance','乳糖不耐症'],pancreatic:['Pancreatic duct obstruction','胰管阻塞'],cirrhosis:['Cirrhosis','肝硬化'],anaemia:['Iron-deficiency anaemia','缺鐵性貧血'],scurvy:['Scurvy','壞血病']};
+function condition(id,affected,t,x,w){let o=`<g data-condition="${affected?'affected':'healthy'}" data-phase="${t}" transform="translate(${x} 0)">`+box(0,105,w,580,affected?'#fff2eb':'#edf6ee',affected?'#c18d72':'#6b9a7a')+txt(w/2,145,affected?'Abnormal':'Normal',affected?'異常':'正常',25);const cx=w/2;
+ if(id==='coeliac'){
+  const h=affected?lerp(170,45,ramp(t,.16,.55)):170;for(let i=0;i<3;i++){const px=70+i*(w-140)/2;o+=`<path d="M${px-24} 470 L${px-24} ${470-h+25} Q${px} ${470-h-25} ${px+24} ${470-h+25} L${px+24} 470" fill="#edb59f" stroke="#b47f70" stroke-width="9"/>`}
+  for(let i=0;i<12;i++){const absorbed=i<(affected?3:10),p=ramp(t,.5+i*.012,.9+i*.006),y=absorbed?lerp(230,535,p):230+i%2*35;o+=token(45+i%6*(w-90)/5,y,'glucose','',9)}o+=txt(cx,595,affected?'Less area → less uptake':'Large area → more uptake',affected?'面積減少 → 吸收減少':'大面積 → 較多吸收',20)+txt(cx,640,affected?'Immune damage develops over time':'Villi remain intact',affected?'免疫損傷隨時間發展':'絨毛完整',18);
+ }else if(id==='lactose'){
+  o+=path([[30,410],[w-30,410]],'#c8957e',24)+path([[30,550],[w-30,550]],'#5482a5',30)+txt(cx,365,affected?'Insufficient lactase':'Lactase splits lactose',affected?'乳糖酶不足':'乳糖酶分解乳糖',20);
+  for(let i=0;i<4;i++){const split=!affected&&t>.35,p=ramp(t,.45,.88),xx=65+i*(w-130)/3,y=split?lerp(260,550,p):260;for(const d of [-20,20])o+=box(xx+d-9,396,18,28,'#69a18a');o+=token(xx-(split?20:10),y,'glucose','',10)+token(xx+(split?20:10),y,'#9b66aa','',10);if(!split)o+=path([[xx-10,y],[xx+10,y]],'#796b55',3)}
+  if(affected)for(let i=0;i<Math.floor(t*15);i++)o+=token(40+i%7*(w-80)/6,310+Math.floor(i/7)*25,'water','',6);o+=txt(cx,475,'Epithelium → tissue → capillary','上皮 → 組織液 → 微血管',17)+txt(cx,615,affected?'Lactose stays; water retained':'Glucose + galactose enter blood',affected?'乳糖留在腸腔；水分滯留':'葡萄糖及半乳糖進入血液',19);
+ }else if(id==='pancreatic'){
+  o+=txt(85,205,'Pancreas','胰臟',17)+box(30,230,110,90,'#e3c394')+path([[140,275],[cx,275],[cx,445]],'#bda168',34)+box(30,445,w-60,110,'#fff1cf');if(affected)o+=path([[cx-24,350],[cx+24,350]],'#ac5550',17);
+  for(let i=0;i<7;i++){const end=affected?[[90,275],[cx,275],[cx,330-i*7]]:[[90,275],[cx,275],[cx,475],[w-60-i*35,485]],p=at(end,ramp(t,.03+i*.025,.65+i*.025));o+=token(...p,'#529986','',8)}
+  for(let i=0;i<3;i++){const xx=90+i*(w-180)/2;if(affected||t<.7)o+=TG(xx,510);else o+=FA(xx-14,496)+FA(xx+15,510)+FA(xx-10,528)+circle(xx+30,535,6,'#697f96')}o+=txt(cx,605,affected?'Lipase cannot reach food':'Lipase digests fat in the lumen',affected?'脂肪酶不能到達食物':'脂肪酶在腸腔消化脂肪',19)+txt(cx,650,'Duct above · intestinal lumen below','上方為胰管；下方為腸腔',18);
+ }else if(id==='cirrhosis'){
+  for(let i=0;i<20;i++){const scar=affected&&i<Math.floor(ramp(t,.12,.65)*13),xx=65+i%5*(w-130)/4,yy=250+Math.floor(i/5)*58;o+=circle(xx,yy,24,scar?'#bdafa4':'#c98975');if(scar)o+=path([[xx-15,yy-15],[xx+15,yy+15]],'#7e736a',4)}
+  o+=path([[cx,465],[cx,565]],'#929c46',25);for(let i=0;i<(affected?3:8);i++){const p=at([[cx,465],[cx,565]],(t+i/8)%1);o+=token(...p,'#a2a646','',6)}o+=txt(cx,610,affected?'Scar replaces functioning tissue':'Functioning liver cells',affected?'疤痕取代有功能的組織':'有功能的肝細胞',19)+txt(cx,652,affected?'Bile output may decrease':'Bile produced and secreted',affected?'膽汁製造可能減少':'製造及分泌膽汁',19);
+ }else if(id==='anaemia'){
+  o+=txt(cx,285,'Brown = iron · Blue = oxygen','棕色：鐵　藍色：氧',18)+txt(cx,225,'Bone marrow → newly formed RBCs','骨髓 → 新形成的紅血球',19)+path([[55,430],[w-55,430]],'#ebc9d1',85);
+  for(let i=0;i<4;i++){const xx=45+(i*(w-90)/4+t*130)%(w-90);o+=`<ellipse cx="${xx}" cy="430" rx="30" ry="20" fill="${affected?'#e4aeb9':'#b94b63'}"/>`;for(let j=0;j<(affected?1:3);j++)o+=token(xx-15+j*14,430,'#518dae','',5)}
+  for(let i=0;i<(affected?2:7);i++)o+=token(65+i*(w-130)/7,lerp(265,365,ramp(t,.1,.6)),'#786541','',8);o+=txt(cx,540,affected?'Less iron → less haemoglobin':'Iron supports haemoglobin formation',affected?'鐵不足 → 血紅蛋白減少':'鐵支持製造血紅蛋白',19)+txt(cx,610,affected?'Reduced oxygen-carrying capacity':'More oxygen carried by haemoglobin',affected?'攜氧能力降低':'血紅蛋白攜帶較多氧',19);
+ }else{
+  o+=txt(cx,225,'Vitamin C supports collagen formation','維生素 C 支持膠原蛋白形成',19);for(let i=0;i<(affected?1:5);i++){o+=token(75+i*(w-150)/5+Math.sin(t*6+i)*9,270,'#72a155','data-vitamin-helper="true"',8)}o+=txt(cx,530,'Green: vitamin C helper, not a fibre unit','綠色：維生素 C 協助形成纖維',16);for(let j=0;j<5;j++){const y=320+j*37;for(let i=0;i<8;i++){if((i+j)%3===0&&(affected&&t>.45||!affected&&t<.3))continue;o+=path([[35+i*(w-70)/8,y],[35+(i+.9)*(w-70)/8,y+10]],'#b48a76',7)}}o+=txt(cx,570,affected?'Weaker connective tissue':'Continuous collagen fibres',affected?'結締組織較脆弱':'完整的膠原蛋白纖維',20)+txt(cx,630,affected?'Poor healing / bleeding tendency':'Normal support and repair',affected?'癒合不良／容易出血':'正常支持及修復',19);
+ }
+ return o+'</g>';
+}
+function application(s,t){const a=diseaseNames[s.application];let o=head(a[0],a[1]);if(s.compareBoth)o+=condition(s.application,false,t,30,515)+condition(s.application,true,t,575,515);else o+=condition(s.application,s.diseaseComparison!=='healthy',t,255,610);return o+txt(560,727,'Same timeline; structural and deficiency changes represent progression over time.','共用進度；結構損傷及營養缺乏示意一段時間的發展。',18)}
+function render(mode,s){const t=M.clamp(s.phase||0);if(mode==='villi')return wrap(villi(s,t),'Focused villus adaptation');if(mode==='fates'&&['membrane','hormone','fat'].includes(M.fateKind(s)))return wrap(lipid(s,t),'Lipid assimilation');if(mode==='application'&&diseaseNames[s.application])return wrap(application(s,t),diseaseNames[s.application][0]);return previousRender(mode,s)}
+function teaching(mode,s){if(mode==='villi'){const a=s.adaptation||'absorption',info={absorption:['Identify materials 辨認物質','Cross lining 穿過上皮','Enter vessels 進入管道','Carry away 被帶走'],long:['Compare lengths 比較長度','Same speed 同樣速度','Contact time 接觸時間','Absorption opportunity 吸收機會'],folds:['Flat reference 平面對照','Raise folds 形成摺疊','More surface 表面增加','More contact 接觸增加'],microvilli:['Cell surface 細胞表面','Brush border 刷狀緣','More membrane 更多膜面積','Nutrient uptake 吸收'],wall:['Compare thickness 比較厚度','Equal speed 同樣速度','Cross lining 穿過上皮','Shorter distance 距離短'],blood:['Initial gradient 初始梯度','Nutrient uptake 吸收','Blood removes 血流帶走','Gradient maintained 維持梯度'],lacteal:['Fat components 脂肪成分','Enter cell 進入細胞','Package inside 細胞內包裝','Enter lymph 進入淋巴'],energy:['Glucose + sodium 糖與鈉','ATP supply ATP 供應','Pump maintains gradient 泵維持梯度','Cotransport uptake 共同運輸'],mixing:['Digested food 已消化食物','Mixing 攪拌','Renew contact 更新接觸','Absorption 吸收']};const notes={absorption:'Glucose, amino acids, water, mineral ions and vitamins B/C enter blood capillaries. Most long-chain fat is reassembled and packaged inside enterocytes, then enters lacteals; fat-soluble vitamins travel with dietary fat. 葡萄糖、氨基酸、水、礦物離子及維生素 B/C 進微血管；大部分長鏈脂肪在上皮內重組及包裝後進乳糜管，脂溶性維生素隨膳食脂肪吸收。',long:'The shorter tube is a structural comparison, not a second human organ. Equal marker speed makes the longer contact time visible. 較短管道只作結構對照；同速標記顯示較長的接觸時間。',folds:'The contour unfolds into repeated projections: exposed epithelial area increases. More absorption surface is available. 表面形成突起，增加上皮接觸面積。',microvilli:'Microvilli are projections of the epithelial cell membrane, not extra layers of cells. They increase membrane area for transport. 微絨毛是細胞膜突起，並非額外細胞層；它們增加運輸表面積。',wall:'The normal lining is one epithelial cell thick. A shorter route speeds diffusion; the thicker drawing is a comparison only. 正常上皮只有一層；擴散路徑短，擴散較快；厚上皮只作比較。',blood:'The same 18 illustrative units are conserved in each panel. With flow, absorbed solute is removed; without sufficient removal, accumulation reduces the concentration gradient. 兩邊各有同樣 18 個示意單位；血流帶走溶質，減少積聚，維持梯度。',lacteal:'The notes use fatty acids and glycerol as digestion products. More precisely, long-chain products commonly include monoglycerides: triglycerides are reassembled and packaged into chylomicrons in enterocytes before lymph entry. 原筆記以脂肪酸及甘油表述；較精確地，長鏈產物亦常包括單甘油酯；在上皮內重組甘油三酯並包裝成乳糜微粒後入淋巴。',energy:'ATP powers the basolateral sodium/potassium pump. The resulting sodium gradient supports apical sodium–glucose cotransport; glucose is not directly pumped by ATP. ATP 驅動基底側鈉鉀泵；鈉梯度支持頂端鈉糖共同運輸，並非 ATP 直接泵入葡萄糖。',mixing:'Mixing renews fluid at the epithelial surface, bringing fresh digestion products into contact with it. It does not make food particles pass through intact walls. 攪拌更新上皮表面的腸液，使新消化產物接觸上皮。'};return {where:tabs[a]?.join(' · ')||'Absorption',labels:info[a]||info.absorption,steps:Array(4).fill(notes[a]||notes.absorption),breaks:[0,.24,.48,.76,1]}}
+ const old=previousTeaching(mode,s);if(mode==='fates'&&['fat','membrane','hormone'].includes(M.fateKind(s))){const kind=M.fateKind(s);return {...old,steps:kind==='hormone'?['Start with cholesterol already inside a steroid-producing cell; its delivery is outside this focused scene. 起點為膽固醇已在製造類固醇激素的細胞內。','Enzyme reactions convert the cholesterol precursor. 酶促反應轉換膽固醇前體。','Steroid hormones form inside the cell. 類固醇激素在細胞內形成。','Lipid-soluble hormone diffuses across the intact membrane, through tissue fluid and into blood. 脂溶性激素經完整細胞膜擴散，再經組織液入血。']:kind==='membrane'?['Follow fatty-acid components; whole blood triglyceride particles do not enter this way. 追蹤脂肪酸成分。','Fatty acids enter the cell after release from circulating lipids. 脂肪酸由循環脂質釋出後進細胞。','Cell reactions combine fatty acids with glycerol and phosphate-containing components. 細胞把脂肪酸與甘油及含磷酸成分組合。','Phospholipids become part of the membrane; blue heads and orange tails identify their structure. 磷脂整合進細胞膜；藍頭及橙尾標示其結構。']:['Blood carries glucose or lipoprotein triglycerides; they are distinct materials. 血液運送葡萄糖或脂蛋白中的甘油三酯。','Glucose crosses through a carrier; lipoprotein lipase releases fatty acids for cell uptake. 葡萄糖經載體；脂蛋白脂肪酶釋出脂肪酸供細胞吸收。','Inside the cell, fatty acids and glycerol components form triglycerides. 在細胞內，脂肪酸與甘油成分組成甘油三酯。','Triglycerides accumulate in intracellular lipid droplets. The drawing compresses many reactions into stages. 甘油三酯儲存在細胞內脂滴；多個反應以階段概括。']}}
+ return old;
+}
+window.FocusedLearning={tabs,absorptionRoutes,flowState,render,condition};window.learningSceneSVG=render;window.processTeaching=teaching;
+const lesson=id=>window.LESSONS.find(a=>a.id===id);
+lesson('assimilation').text+=`<h3>Membrane transfer · 穿過細胞膜</h3><p>Oxygen is small and non-polar. It can diffuse directly through the intact phospholipid bilayer down its concentration gradient, without a carrier or ATP. Glucose and amino acids require membrane transport proteins.<br>氧氣體積小且為非極性，可沿濃度梯度直接擴散穿過完整磷脂雙層，不需載體或 ATP。葡萄糖及氨基酸則需膜運輸蛋白。</p><p class="refs">Mechanism clarification: <a href="https://openstax.org/books/biology-2e/pages/5-2-passive-transport" target="_blank" rel="noopener">OpenStax Biology 2e, Passive transport</a>.</p>`;
+lesson('villi').text+=`<h3>Reading the animation · 動畫讀法</h3><p>The main view uses separate shapes and colours for glucose, amino acids, water, mineral ions and vitamins. Red is the supplying arteriole; blue is the draining venule. The absorption view is a transverse section: capillary profiles surround the central lacteal. The blood-supply tab shows their longitudinal network.<br>主圖以形狀及顏色區分營養素；紅色為供血小動脈，藍色為引流小靜脈。吸收主圖為橫切面，微血管圍繞中央乳糜管；血液供應分頁展示縱向網絡。</p><p>Green rings identify lipid packages formed inside epithelial cells. The notes use “fatty acids and glycerol”; the long-chain pathway also commonly includes monoglycerides before triglyceride reassembly and chylomicron packaging. Fat-soluble vitamins A, D, E and K travel with dietary lipids into lymph.<br>綠圈表示在上皮內形成的脂質微粒。筆記使用「脂肪酸及甘油」；長鏈途徑亦常包括單甘油酯，之後重組及包裝。脂溶性維生素 A、D、E、K 隨脂質進淋巴。</p><p class="refs"><a href="https://openstax.org/books/anatomy-and-physiology-2e/pages/23-7-chemical-digestion-and-absorption-a-closer-look" target="_blank" rel="noopener">OpenStax: digestion and absorption</a>. These explanations supplement the unchanged original notes.</p>`;
+})();

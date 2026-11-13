@@ -1,0 +1,3238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nutrition in Humans</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+    :root {
+      --card: #fffdf8;
+      --ink: #241f1a;
+      --line: #e7dccb;
+      --moss: #2f4a3c;
+      --wash: #f6f0e4;
+      --brand-gold: #e8c96a;
+      --brand-gold-wash: #f5e6b8;
+      --media-col: 420px;
+      --media-frame-h: 420px;
+      --media-frame-h-lg: 520px;
+      --media-frame-h-sm: 320px;
+      --media-max-h: 560px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+      background:
+        radial-gradient(900px 420px at 50% -80px, #f7f1e6, transparent 70%),
+        #e5ddd0;
+    }
+    .page {
+      width: min(1280px, calc(100% - 32px));
+      margin: 32px auto 56px;
+    }
+    .mast {
+      background:
+        linear-gradient(180deg, var(--brand-gold-wash) 0, var(--card) 132px);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: 18px 28px 28px 44px;
+      margin-bottom: 18px;
+      box-shadow: 0 16px 40px rgba(55, 40, 18, 0.05);
+    }
+    .brand-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px 16px;
+      margin: 0 0 22px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(36, 31, 26, 0.08);
+    }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--moss);
+      color: #f7f3ea;
+      flex: none;
+    }
+    .brand-mark svg { display: block; }
+    .brand-series {
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--moss);
+    }
+    .brand-tag {
+      margin-left: auto;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: #6a5f52;
+    }
+    .mast-subtitle {
+      margin: -6px 0 16px;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5c5348;
+    }
+    h1 {
+      margin: 0 0 14px;
+      font-size: 68px;
+      line-height: 0.92;
+      letter-spacing: -0.03em;
+    }
+    h1::after {
+      content: "";
+      display: block;
+      width: 72px;
+      height: 4px;
+      margin-top: 16px;
+      border-radius: 4px;
+      background: var(--moss);
+    }
+    .lead {
+      margin: 0 0 10px;
+      max-width: 40em;
+      font-size: 26px;
+      line-height: 1.35;
+    }
+    .lead:last-child { margin-bottom: 0; }
+    section {
+      scroll-margin-top: 58px;
+      --chapter-accent: var(--moss);
+      --chapter-wash: var(--wash);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 22px 18px 18px 28px;
+      margin-bottom: 14px;
+      box-shadow:
+        inset 5px 0 0 var(--chapter-accent),
+        0 10px 28px rgba(55, 40, 18, 0.04);
+    }
+    section.chapter-molecule {
+      --chapter-accent: #2f4a3c;
+      --chapter-wash: #eef3ef;
+    }
+    section.chapter-nutrient {
+      --chapter-accent: #3d5a6c;
+      --chapter-wash: #eef2f5;
+    }
+    section.chapter-health {
+      --chapter-accent: #9a6b2f;
+      --chapter-wash: #f8f0e4;
+    }
+    section.chapter-lab {
+      --chapter-accent: #2f4d7a;
+      --chapter-wash: #ebf0f8;
+    }
+    section.chapter-diet {
+      --chapter-accent: #8a4a32;
+      --chapter-wash: #f7ebe4;
+    }
+    section.chapter-poster {
+      --chapter-accent: var(--brand-gold);
+      --chapter-wash: #faf3df;
+      background: linear-gradient(180deg, #fffdf8 0, var(--chapter-wash) 100%);
+    }
+    section.chapter .num { background: var(--chapter-accent); }
+    section.chapter h3 { color: var(--chapter-accent); }
+    section.chapter .key-idea { background: var(--chapter-wash); }
+    section.chapter > .copy > ul > li::before,
+    section.chapter .copy > ul > li::before { background: var(--chapter-accent); }
+    section.at-a-glance {
+      padding-top: 20px;
+    }
+    .key-idea-label {
+      display: inline-block;
+      margin: 0 0 10px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: var(--brand-gold);
+      color: var(--ink);
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .key-idea--hero {
+      border: 1px solid rgba(36, 31, 26, 0.06);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    }
+    .key-idea--hero ul {
+      margin: 0;
+      padding-left: 1.15em;
+      list-style: disc;
+    }
+    .key-idea--hero li {
+      margin: 0 0 6px;
+      font-size: 21px;
+      line-height: 1.4;
+    }
+    .key-idea--hero li:last-child { margin-bottom: 0; }
+    .glance-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+      margin: 0 0 4px;
+    }
+    .cheat-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 18px;
+      line-height: 1.35;
+    }
+    .cheat-table th,
+    .cheat-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+    .cheat-table th {
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--chapter-accent, var(--moss));
+      background: var(--chapter-wash, var(--wash));
+    }
+    .cheat-table tr:last-child td { border-bottom: 0; }
+    .cheat-table td:first-child { font-weight: 600; }
+    .page-footer {
+      margin-top: 6px;
+      padding: 22px 28px 24px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow:
+        inset 5px 0 0 var(--moss),
+        0 10px 28px rgba(55, 40, 18, 0.04);
+    }
+    .why-matters {
+      margin: 0 0 14px;
+      padding: 14px 16px;
+      background: var(--wash);
+      border-radius: 16px;
+    }
+    .why-matters ul {
+      margin: 8px 0 0;
+      padding-left: 1.15em;
+    }
+    .why-matters li {
+      margin: 0 0 6px;
+      font-size: 21px;
+      line-height: 1.45;
+    }
+    .why-matters li:last-child { margin-bottom: 0; }
+    .page-credit {
+      margin: 0;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 15px;
+      letter-spacing: 0.04em;
+      color: #7a7064;
+    }
+    .mast:has(> .gif-slot),
+    section:has(> .gif-slot) {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) var(--media-col);
+      column-gap: 22px;
+      align-items: start;
+    }
+    .gif-row.share-row:not(:has(> .gif-slot)) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .gif-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) var(--media-col);
+      column-gap: 22px;
+      align-items: start;
+      margin: 0 0 12px;
+    }
+    .gif-row > .type-card {
+      align-self: start;
+      align-content: start;
+    }
+    .gif-row:last-child { margin-bottom: 0; }
+    .gif-row.compact .gif-slot:has(> img):not(.media-stack) {
+      align-items: start;
+      padding: 6px;
+    }
+    .gif-row.compact .gif-slot > img {
+      width: auto;
+      max-width: 100%;
+      max-height: 180px;
+      margin-inline: 0;
+    }
+    .gif-row.thumb {
+      grid-template-columns: minmax(0, 1fr) 132px;
+      column-gap: 14px;
+      align-items: center;
+    }
+    .gif-row.thumb .gif-slot:has(> img):not(.media-stack) {
+      padding: 4px;
+    }
+    .gif-row.thumb .gif-slot > img {
+      width: auto;
+      max-width: 132px;
+      max-height: 108px;
+      margin-inline: 0;
+    }
+    .inline-thumb {
+      grid-column: 1;
+      grid-row: 3;
+      margin: 8px 0 0;
+    }
+    .inline-thumb img {
+      width: 100%;
+      max-width: 140px;
+      max-height: 100px;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      border-radius: 10px;
+    }
+    .inline-thumb figcaption {
+      margin: 4px 0 0;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--moss);
+    }
+    .tubes-apart {
+      --tube-img-h: clamp(140px, 22vw, 200px);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .tubes-apart .media-labeled {
+      flex: 1 1 0;
+      min-width: 0;
+      margin: 0;
+    }
+    .tubes-apart .media-labeled img {
+      width: 100%;
+      max-width: 100%;
+      height: var(--tube-img-h);
+      object-fit: contain;
+      object-position: center center;
+      display: block;
+      margin: 0 auto;
+      border-radius: 12px;
+      background: var(--wash);
+      box-sizing: border-box;
+    }
+    .tubes-apart .tube-vs {
+      flex: 0 0 auto;
+      margin: calc((var(--tube-img-h) - 1em) / 2) 0 0;
+      padding: 0 4px;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      line-height: 1;
+      color: var(--moss);
+      background: none;
+    }
+    .tubes-apart .media-labeled figcaption {
+      margin: 6px 0 0;
+      text-align: center;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--moss);
+    }
+    .pair-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 12px;
+      margin: 0 0 12px;
+    }
+    .pair-row > .gif-row {
+      margin: 0;
+      grid-template-columns: minmax(0, 1fr) minmax(96px, 42%);
+      column-gap: 12px;
+      align-items: start;
+    }
+    .pair-row .type-card {
+      grid-template-columns: 1fr;
+      row-gap: 6px;
+      padding: 12px;
+    }
+    .pair-row .type-card h4,
+    .pair-row .examples,
+    .pair-row .props,
+    .pair-row .type-card > .bullets {
+      grid-column: 1;
+      grid-row: auto;
+    }
+    .pair-row .gif-slot:has(> img):not(.media-stack) {
+      padding: 6px;
+      align-items: start;
+    }
+    .pair-row .gif-slot > img {
+      width: auto;
+      max-width: 100%;
+      max-height: 150px;
+      margin-inline: 0;
+    }
+    .copy { min-width: 0; }
+    .gif-slot {
+      margin: 0;
+      padding: 0;
+      min-width: 0;
+    }
+    .gif-slot:has(> img):not(.media-stack),
+    .gif-slot:has(> video):not(.media-stack) {
+      height: auto;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--wash);
+      border-radius: 16px;
+      overflow: visible;
+      padding: 8px;
+    }
+    .gif-slot > img,
+    .gif-slot > video {
+      width: 100%;
+      height: auto;
+      max-height: var(--media-max-h);
+      object-fit: contain;
+      object-position: center;
+      display: block;
+      border-radius: 0;
+    }
+    .gif-slot > img.portrait {
+      width: auto;
+      max-width: 240px;
+      max-height: 420px;
+      margin-inline: auto;
+    }
+    .section-nav {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      margin: 0 0 14px;
+      padding: 8px 2px;
+      background: rgba(255, 253, 248, 0.94);
+      border-bottom: 1px solid var(--line);
+    }
+    .section-nav a {
+      flex: 0 0 auto;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: var(--wash);
+      color: var(--ink);
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+    }
+    .section-nav a:hover { background: var(--brand-gold-wash); }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+    .type-grid .gif-row,
+    .type-grid .pair-row,
+    .family-cards .pair-row { margin: 0; }
+    .share-row {
+      grid-template-columns: minmax(0, 1fr) var(--media-col);
+      align-items: stretch;
+    }
+    .share-row > .gif-slot.media-stack {
+      align-self: start;
+      justify-self: stretch;
+    }
+    .media-stack .media-labeled {
+      padding: 10px 10px 12px;
+      background: #fffdf8;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      height: auto;
+      align-content: start;
+    }
+    .media-stack .media-labeled img {
+      width: 100%;
+      height: auto;
+      max-height: none;
+      background: #fffdf8;
+      border-radius: 12px;
+    }
+    .share-row > .gif-slot:has(> img:only-child):not(.media-stack),
+    .share-row > .gif-slot:has(> video:only-child):not(.media-stack) {
+      height: auto;
+      align-self: center;
+    }
+    .share-row > .gif-slot.media-top:has(> img:only-child) {
+      align-self: start;
+    }
+    .card-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+    .media-stack {
+      display: grid;
+      gap: 12px;
+      align-self: start;
+      align-content: start;
+      background: transparent;
+      height: auto;
+      overflow: visible;
+    }
+    .media-stack > img,
+    .media-stack > video {
+      width: 100%;
+      height: auto;
+      max-height: var(--media-frame-h-sm);
+      object-fit: contain;
+      object-position: center;
+      display: block;
+      background: var(--wash);
+      border-radius: 16px;
+      box-sizing: border-box;
+    }
+    .media-labeled {
+      margin: 0;
+      display: grid;
+      gap: 6px;
+    }
+    .media-label {
+      margin: 0;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--moss);
+    }
+    .media-caption {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.35;
+    }
+    .media-labeled img,
+    .media-labeled video {
+      width: 100%;
+      height: auto;
+      max-height: var(--media-frame-h-lg);
+      object-fit: contain;
+      object-position: center;
+      display: block;
+      background: var(--wash);
+      border-radius: 16px;
+      box-sizing: border-box;
+    }
+    .media-placeholder {
+      height: var(--media-frame-h-lg);
+      min-height: var(--media-frame-h-lg);
+      margin: 0;
+      padding: 12px;
+      border: 1px dashed #c9baa6;
+      border-radius: 16px;
+      background: #fffdf8;
+      display: grid;
+      place-content: center;
+      text-align: center;
+      color: #7a6f62;
+      font-size: 18px;
+      line-height: 1.35;
+    }
+    .deficiency-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) var(--media-col);
+      column-gap: 22px;
+      align-items: start;
+      margin: 0 0 18px;
+    }
+    .deficiency-row:last-child { margin-bottom: 0; }
+    .sec {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .num {
+      flex: none;
+      min-width: 42px;
+      height: 42px;
+      padding: 0 8px;
+      border-radius: 12px;
+      background: var(--moss);
+      color: #f7f3ea;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      display: grid;
+      place-items: center;
+    }
+    h2 { margin: 0; font-size: 36px; letter-spacing: -0.02em; }
+    h3 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 6px 0 10px;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--moss);
+    }
+    h3::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+    ul, ol { margin: 0 0 16px; padding-left: 1.15em; }
+    li { margin: 0 0 8px; font-size: 22px; line-height: 1.45; }
+    section > ul { list-style: none; padding-left: 0; }
+    section > ul > li {
+      position: relative;
+      padding-left: 16px;
+    }
+    section > ul > li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.62em;
+      width: 6px;
+      height: 6px;
+      border-radius: 2px;
+      background: var(--moss);
+    }
+    .group {
+      list-style: none;
+      margin: 0 0 16px;
+      padding: 12px 16px 4px 18px;
+      background: var(--wash);
+      border-radius: 16px;
+    }
+    .group > li { padding-left: 0; }
+    .group > li::before { content: none; }
+    .group ul {
+      margin: 8px 0 4px;
+      padding: 2px 0 2px 14px;
+      border-left: 2px solid #ddd2c0;
+      list-style: none;
+    }
+    .group ul li { font-size: 20px; }
+    ol {
+      list-style: none;
+      padding-left: 0;
+      counter-reset: step;
+    }
+    ol li {
+      counter-increment: step;
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 11px 0;
+      border-top: 1px solid var(--line);
+    }
+    ol li:last-child { border-bottom: 1px solid var(--line); }
+    ol li::before {
+      content: counter(step, decimal-leading-zero);
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--moss);
+      padding-top: 3px;
+    }
+    ol.steps {
+      margin: 0;
+      padding: 0;
+    }
+    ol.steps li {
+      grid-template-columns: 22px 1fr;
+      gap: 8px;
+      padding: 0 0 6px;
+      border: none;
+    }
+    ol.steps li:last-child { border: none; margin-bottom: 0; }
+    ol.steps li::before { content: counter(step) "."; }
+    .bullets {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .bullets li {
+      position: relative;
+      margin: 0 0 6px;
+      padding-left: 16px;
+    }
+    .bullets li:last-child { margin-bottom: 0; }
+    .type-card > .bullets {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      align-self: center;
+    }
+    .bullets li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.55em;
+      width: 6px;
+      height: 6px;
+      border-radius: 2px;
+      background: var(--moss);
+    }
+    .key-idea {
+      margin: 0 0 16px;
+      padding: 14px 16px;
+      background: var(--wash);
+      border-radius: 16px;
+    }
+    .key-idea p {
+      margin: 0 0 8px;
+      font-size: 22px;
+      line-height: 1.45;
+    }
+    .key-idea p:last-child { margin-bottom: 0; }
+    .type-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin: 0 0 16px;
+    }
+    .carb-family {
+      --family: #8a6420;
+      --family-wash: #f8f0dc;
+      --family-ink: #6d5018;
+      margin: 0;
+      padding: 16px 14px 14px;
+      border: 1px solid #e4d3ae;
+      border-radius: 20px;
+      background: linear-gradient(180deg, var(--family-wash) 0, #fffdf8 78px);
+      box-shadow: inset 5px 0 0 var(--family);
+    }
+    .carb-di {
+      --family: #8d4a32;
+      --family-wash: #f7ebe4;
+      --family-ink: #6e3a26;
+      border-color: #e4cfc4;
+    }
+    .carb-poly {
+      --family: #2f4a3c;
+      --family-wash: #e7efe9;
+      --family-ink: #24382e;
+      border-color: #c9d7cc;
+    }
+    .nucleic-dna {
+      --family: #2f4d7a;
+      --family-wash: #ebf0f8;
+      --family-ink: #243656;
+      border-color: #c9d4e6;
+    }
+    .nucleic-rna {
+      --family: #6d5018;
+      --family-wash: #f8f0dc;
+      --family-ink: #6d5018;
+      border-color: #e4d3ae;
+    }
+    .family-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 0 0 12px;
+      padding: 0 6px;
+    }
+    .family-thumb {
+      flex: none;
+      width: 160px;
+      height: auto;
+      margin-left: auto;
+      border-radius: 12px;
+      overflow: visible;
+      background: #fff;
+    }
+    .family-thumb img {
+      width: 100%;
+      height: auto;
+      max-height: 120px;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+    }
+    .family-head h3 {
+      margin: 0;
+      color: var(--family-ink);
+    }
+    .family-head h3::after { content: none; }
+    .family-note {
+      margin: 3px 0 0;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+      font-size: 18px;
+      font-weight: 400;
+      letter-spacing: 0;
+      text-transform: none;
+      color: var(--ink);
+      line-height: 1.35;
+    }
+    .section-note {
+      margin: -4px 0 12px;
+      font-size: 19px;
+      line-height: 1.4;
+      color: var(--ink);
+    }
+    .food-cue-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .food-cue-grid .type-card {
+      background: var(--wash);
+      grid-template-columns: 1fr;
+      row-gap: 6px;
+    }
+    .food-cue-grid .type-card h4,
+    .food-cue-grid .examples,
+    .food-cue-grid .props,
+    .food-cue-grid .type-card > .bullets {
+      grid-column: 1;
+      grid-row: auto;
+    }
+    .food-cue-grid .props {
+      align-self: start;
+    }
+    .sugar-art {
+      flex: none;
+      display: block;
+      color: var(--family);
+    }
+    .family-cards {
+      display: grid;
+      gap: 10px;
+    }
+    .carb-family .type-card {
+      background: #fffdf8;
+      border: 1px solid rgba(36, 31, 26, 0.06);
+    }
+    .carb-family .examples { color: var(--family-ink); }
+    .steroid-family {
+      --family: #5a3d5c;
+      --family-wash: #f3eaf1;
+      --family-ink: #4a324c;
+      border-color: #dccfdb;
+    }
+    .props ol.steps {
+      margin: 3px 0 0;
+    }
+    .props ol.steps li {
+      font-size: 20px;
+      line-height: 1.4;
+      margin: 0;
+    }
+    .compare-table th.kind-mono {
+      color: #6d5018;
+      box-shadow: inset 0 -3px 0 #d4a84b;
+    }
+    .compare-table th.kind-di {
+      color: #6e3a26;
+      box-shadow: inset 0 -3px 0 #c4846a;
+    }
+    .compare-table th.kind-poly {
+      color: #24382e;
+      box-shadow: inset 0 -3px 0 #6d8f7c;
+    }
+    .type-card {
+      display: grid;
+      grid-template-columns: minmax(180px, 250px) minmax(0, 1fr);
+      column-gap: 22px;
+      align-items: start;
+      margin: 0;
+      padding: 14px 16px 12px;
+      background: var(--wash);
+      border-radius: 16px;
+    }
+    .type-card h4 {
+      grid-column: 1;
+      grid-row: 1;
+      margin: 0 0 4px;
+      font-size: 26px;
+      letter-spacing: -0.02em;
+    }
+    .examples {
+      grid-column: 1;
+      grid-row: 2;
+      margin: 0;
+      font-size: 19px;
+      line-height: 1.4;
+    }
+    .props {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      align-self: center;
+      margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 28px;
+    }
+    .props div { margin-top: 0; }
+    .props dt {
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--moss);
+    }
+    .props dd {
+      margin: 3px 0 0;
+      font-size: 20px;
+      line-height: 1.4;
+    }
+    .water-grid .props {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .water-grid .props div {
+      width: 100%;
+    }
+    .water-intro .gif-slot > img,
+    .water-grid .gif-slot > img {
+      width: 100%;
+      height: auto;
+      max-height: var(--media-max-h);
+      object-fit: contain;
+      object-position: center;
+    }
+    .water-intro.thumb .gif-slot > img {
+      width: auto;
+      max-width: 132px;
+      max-height: 108px;
+    }
+    .water-grid .gif-row.compact .gif-slot > img {
+      width: auto;
+      max-width: 100%;
+      max-height: 180px;
+    }
+    .water-grid .gif-slot > img.portrait {
+      width: auto;
+      max-width: 240px;
+      max-height: 420px;
+      margin-inline: auto;
+    }
+    .scroll {
+      overflow-x: auto;
+      margin: 0 0 16px;
+    }
+    .compare-table {
+      width: 100%;
+      min-width: 640px;
+      border-collapse: collapse;
+      font-size: 19px;
+      line-height: 1.4;
+    }
+    .compare-table th,
+    .compare-table td {
+      text-align: left;
+      vertical-align: top;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .compare-table.steps-anim { min-width: 880px; }
+    .compare-table.juices-anim { min-width: 1120px; }
+    .compare-table td.anim-cell {
+      width: 236px;
+      vertical-align: middle;
+    }
+    .compare-table td.anim-cell img {
+      width: 220px;
+      height: auto;
+      display: block;
+    }
+    .compare-table th {
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--moss);
+    }
+    .compare-table td .bullets {
+      margin: 0;
+      padding: 0;
+    }
+    .compare-table td .bullets > li {
+      font-size: 19px;
+      line-height: 1.4;
+    }
+    .compare-table td .bullets > li.shot-row {
+      display: grid;
+      grid-template-columns: minmax(11rem, 1fr) 280px;
+      gap: 8px 14px;
+      align-items: center;
+      padding-left: 0;
+    }
+    .compare-table td .bullets > li.shot-row::before {
+      content: none;
+    }
+    .compare-table td .bullets > li.shot-row > span,
+    .compare-table td .bullets > li.shot-row > div {
+      grid-column: 1;
+      grid-row: 1;
+      min-width: 11rem;
+      position: relative;
+      padding-left: 16px;
+    }
+    .compare-table td .bullets > li.shot-row > span::before,
+    .compare-table td .bullets > li.shot-row > div::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.55em;
+      width: 6px;
+      height: 6px;
+      border-radius: 2px;
+      background: var(--moss);
+    }
+    .compare-table td .bullets > li.shot-row > img {
+      width: 280px;
+      height: auto;
+      max-height: 220px;
+      object-fit: contain;
+      object-position: center;
+      background: #fff;
+      border-radius: 12px;
+      grid-column: 2;
+      grid-row: 1;
+    }
+    .compare-table td .bullets > li.shot-row:has(> div > ul.bullets) {
+      padding-left: 0;
+    }
+    .compare-table td .bullets > li.shot-row:has(> div > ul.bullets)::before,
+    .compare-table td .bullets > li.shot-row:has(> div > ul.bullets) > div::before {
+      content: none;
+    }
+    .compare-table td .bullets > li.shot-row:has(> div > ul.bullets) > div {
+      padding-left: 0;
+    }
+    .compare-table td .shot-row > div > ul.bullets {
+      margin: 0;
+      padding: 0;
+      border: none;
+    }
+    .compare-table td .shot-row > div > ul.bullets > li {
+      font-size: 19px;
+      padding-left: 16px;
+    }
+    .compare-table td .shot-row > div > ul.bullets > li::before {
+      width: 6px;
+      height: 6px;
+      top: 0.55em;
+    }
+    .deficiency-row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .compare-table td .bullets ul,
+    .copy .bullets > li > ul {
+      margin: 6px 0 4px;
+      padding: 2px 0 2px 14px;
+      border-left: 2px solid #ddd2c0;
+      list-style: none;
+    }
+    .compare-table td .bullets ul li,
+    .copy .bullets > li > ul li {
+      position: relative;
+      margin: 0 0 4px;
+      padding-left: 14px;
+      font-size: 18px;
+      line-height: 1.35;
+    }
+    .compare-table td .bullets ul li::before,
+    .copy .bullets > li > ul li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.52em;
+      width: 5px;
+      height: 5px;
+      border-radius: 2px;
+      background: var(--moss);
+    }
+    .compare-table .size-media {
+      margin: 10px 0 0;
+      min-height: 140px;
+    }
+    .compare-table .size-media img,
+    .compare-table .size-media video {
+      width: 100%;
+      max-width: none;
+      height: auto;
+      max-height: none;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+      border-radius: 12px;
+      background: #fff;
+    }
+    .nutri-row { min-width: 760px; }
+    @media (max-width: 800px) {
+      .mast, section {
+        grid-template-columns: 1fr;
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+      .mast:has(> .gif-slot),
+      section:has(> .gif-slot),
+      .gif-row,
+      .gif-row.thumb,
+      .pair-row > .gif-row {
+        grid-template-columns: 1fr;
+      }
+      .pair-row {
+        grid-template-columns: 1fr;
+      }
+      .gif-slot { margin-top: 8px; }
+      :root {
+        --media-col: 100%;
+        --media-frame-h: 320px;
+        --media-frame-h-lg: 400px;
+        --media-frame-h-sm: 280px;
+        --media-max-h: 420px;
+      }
+      .compare-table td .bullets > li.shot-row {
+        grid-template-columns: minmax(11rem, 1fr);
+      }
+      .compare-table td .bullets > li.shot-row > img {
+        width: 100%;
+        max-width: 420px;
+        max-height: 320px;
+        grid-column: 1;
+        grid-row: auto;
+      }
+      .food-cue-grid { grid-template-columns: 1fr; }
+      .type-card { grid-template-columns: 1fr; row-gap: 8px; }
+      .type-card h4,
+      .examples,
+      .props,
+      .type-card > .bullets { grid-column: 1; grid-row: auto; }
+      h1 { font-size: 48px; }
+      .lead, .key-idea p, li { font-size: 20px; }
+      .type-card h4 { font-size: 22px; }
+      .family-head { align-items: flex-start; }
+      .sugar-art { margin-top: 2px; }
+      .family-thumb { width: 88px; height: 56px; }
+      .deficiency-row { grid-template-columns: 1fr; }
+      .deficiency-row .media-placeholder { margin-top: 10px; }
+      .brand-tag { margin-left: 0; width: 100%; }
+      .glance-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Notebook notes, matching the lined-paper study layout. */
+    body {
+      font-family: "Patrick Hand", "Comic Sans MS", cursive;
+      font-size: 22px;
+      line-height: 32px;
+      color: #2a2724;
+      background: #d9d3c7;
+    }
+    .page {
+      width: min(980px, calc(100% - 28px));
+      margin: 28px auto 48px;
+      padding: 36px 36px 56px 78px;
+      background-color: #fffefb;
+      background-image:
+        linear-gradient(#f3b7bc, #f3b7bc),
+        repeating-linear-gradient(to bottom, transparent 0 31px, #c5d8ee 31px 32px);
+      background-size: 2px 100%, 100% 32px;
+      background-position: 52px 0, 0 18px;
+      background-repeat: no-repeat, repeat;
+      border-radius: 4px;
+      box-shadow: 0 16px 36px rgba(50, 40, 24, 0.14);
+    }
+    .mast,
+    section,
+    .page-footer {
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      padding: 6px 0 10px;
+      margin: 0 0 8px;
+    }
+    section.chapter-poster {
+      background: transparent;
+    }
+    .brand-bar {
+      border-bottom: none;
+      margin-bottom: 4px;
+      padding-bottom: 0;
+    }
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #f0d56a;
+      color: #3a2a14;
+    }
+    .brand-series,
+    .brand-tag,
+    .mast-subtitle,
+    .key-idea-label,
+    .props dt,
+    .media-label,
+    .inline-thumb figcaption,
+    .page-credit,
+    .num,
+    .section-nav a,
+    h3,
+    .compare-table th,
+    .cheat-table th {
+      font-family: "Patrick Hand", "Comic Sans MS", cursive;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+    h1,
+    h2,
+    .type-card h4 {
+      font-family: "Caveat", "Patrick Hand", cursive;
+      font-weight: 700;
+      letter-spacing: 0;
+      color: #8a5a28;
+    }
+    h1 {
+      font-size: 78px;
+      line-height: 0.9;
+    }
+    h1::after { background: #e7c56a; }
+    h2 {
+      font-size: 58px;
+      line-height: 1;
+    }
+    .mast-subtitle,
+    .brand-tag,
+    .page-credit {
+      color: #6d645b;
+      font-size: 20px;
+      font-weight: 400;
+    }
+    .brand-series { font-size: 22px; color: #3d5c4a; }
+    .lead,
+    .key-idea p,
+    li,
+    .props dd,
+    .examples,
+    .family-note,
+    .section-note,
+    .media-caption,
+    .compare-table,
+    .cheat-table {
+      font-size: 22px;
+      line-height: 32px;
+    }
+    section.chapter .num,
+    .num {
+      width: 40px;
+      min-width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #f0d56a;
+      color: #3a2a14;
+      font-size: 22px;
+    }
+    h3 {
+      width: fit-content;
+      margin: 10px 0 8px;
+      padding: 0 14px 2px;
+      border-radius: 999px;
+      background: #d7ecc4;
+      color: #243024;
+      font-size: 26px;
+      font-weight: 400;
+      line-height: 32px;
+    }
+    h3::after { display: none; }
+    .key-idea,
+    .key-idea--hero,
+    .why-matters,
+    .group {
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      padding: 0;
+    }
+    .key-idea p,
+    .why-matters li,
+    .key-idea--hero li {
+      background-image: linear-gradient(#efe4fb, #efe4fb);
+      background-repeat: no-repeat;
+      background-size: 100% 18px;
+      background-position: 0 12px;
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+    }
+    .key-idea-label {
+      margin-bottom: 6px;
+      padding: 0 12px;
+      background: #c9b6ef;
+      color: #2a2433;
+      font-size: 20px;
+      line-height: 28px;
+    }
+    :root { --media-col: 260px; }
+    .type-card,
+    .carb-family .type-card,
+    .food-cue-grid .type-card {
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      padding: 2px 0 6px;
+      grid-template-columns: 1fr;
+      row-gap: 2px;
+    }
+    .type-card h4,
+    .examples,
+    .props,
+    .type-card > .bullets {
+      grid-column: 1;
+      grid-row: auto;
+    }
+    .props { align-self: start; }
+    .type-card h4 {
+      width: fit-content;
+      margin: 0 0 2px;
+      padding: 0 8px;
+      border-radius: 8px;
+      background: #f6e7a2;
+      font-size: 36px;
+      line-height: 1.05;
+    }
+    .examples { color: #5c5348; }
+    .props dt {
+      display: inline-block;
+      margin-top: 2px;
+      padding: 0 8px;
+      border-radius: 999px;
+      background: #f3c9df;
+      color: #4a3040;
+      font-size: 18px;
+      line-height: 24px;
+    }
+    .gif-slot:has(> img):not(.media-stack),
+    .gif-slot:has(> video):not(.media-stack),
+    .media-stack > img,
+    .media-stack > video,
+    .media-labeled img,
+    .media-labeled video,
+    .media-stack .media-labeled {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      border-radius: 12px;
+    }
+    .carb-family,
+    .family-head {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+    }
+    .section-nav {
+      position: sticky;
+      top: 0;
+      margin: 0 -36px 12px -78px;
+      padding: 8px 16px 8px 78px;
+      background: rgba(255, 254, 251, 0.94);
+      border-bottom: 1px solid #d5e3f2;
+    }
+    .section-nav a {
+      background: #f6e7a2;
+      color: #3a2a14;
+      font-size: 18px;
+      line-height: 24px;
+    }
+    .section-nav a:hover { background: #d7ecc4; }
+    .compare-table,
+    .cheat-table {
+      background: rgba(255, 254, 251, 0.88);
+      font-size: 20px;
+    }
+    .compare-table th,
+    .cheat-table th {
+      background: #f6e7a2;
+      color: #5a4630;
+      font-size: 20px;
+      font-weight: 400;
+    }
+    .glance-grid { gap: 18px; }
+    ol li {
+      border-color: transparent;
+      padding: 2px 0;
+    }
+    ol li::before {
+      font-family: "Patrick Hand", cursive;
+      color: #8a5a28;
+    }
+    @media (max-width: 800px) {
+      .page { padding: 24px 16px 40px 48px; }
+      .page {
+        background-position: 28px 0, 0 14px;
+      }
+      .section-nav {
+        margin-left: -48px;
+        margin-right: -16px;
+        padding-left: 48px;
+      }
+      h1 { font-size: 58px; }
+      h2 { font-size: 46px; }
+      .type-card h4 { font-size: 32px; }
+      .type-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Reel panels: black boxes, diagram first, pen ink, comic strip. */
+    body,
+    h1,
+    h2,
+    h3,
+    .type-card h4,
+    .lead,
+    li,
+    .props dd,
+    .examples {
+      font-family: "Patrick Hand", "Comic Sans MS", cursive;
+      color: #161616;
+    }
+    h1 { font-size: 64px; font-weight: 400; }
+    h1::after { background: #161616; height: 2px; }
+    h2 { font-size: 40px; font-weight: 400; line-height: 1.1; }
+    .page { width: min(1100px, calc(100% - 28px)); }
+    .type-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 26px 18px;
+      align-items: start;
+    }
+    .type-grid > .pair-row { display: contents; }
+    .type-grid > .share-row,
+    .type-grid > .gif-row.share-row { grid-column: 1 / -1; }
+    .type-grid > .steroid-family { grid-column: 1 / -1; }
+    .type-grid > .gif-row,
+    .type-grid > .type-card,
+    .gif-row,
+    .type-grid > .share-row {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 10px 0 0;
+      padding: 26px 14px 12px;
+      border: 3px solid #161616;
+      border-radius: 2px 10px 3px 8px;
+      box-shadow: 3px 3px 0 #161616;
+      background: transparent;
+      min-width: 0;
+    }
+    .gif-row.thumb,
+    .gif-row.compact,
+    .pair-row > .gif-row {
+      display: flex;
+      flex-direction: column;
+      grid-template-columns: none;
+    }
+    .gif-row > .gif-slot { order: -1; }
+    .gif-row.share-row:has(> .gif-slot) {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(240px, 420px);
+      align-items: start;
+      gap: 12px;
+    }
+    .gif-row.share-row:has(> .gif-slot) > .gif-slot { order: 0; }
+    .gif-slot,
+    .gif-slot:has(> img):not(.media-stack),
+    .gif-slot:has(> video):not(.media-stack) {
+      position: relative;
+      overflow: visible;
+      background: transparent;
+    }
+    .gif-slot > img,
+    .gif-slot > video,
+    .gif-row.compact .gif-slot > img,
+    .gif-row.thumb .gif-slot > img,
+    .pair-row .gif-slot > img {
+      width: 100%;
+      max-width: none;
+      max-height: 300px;
+      margin: 0 auto;
+      object-fit: contain;
+    }
+    .gif-slot > iframe.anim-frame {
+      display: block;
+      width: 100%;
+      height: 420px;
+      border: 0;
+      border-radius: 10px;
+      background: #fff;
+    }
+    iframe.anim-frame {
+      display: block;
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      background: #fff;
+    }
+    iframe.anim-frame.mid { height: 340px; }
+    iframe.anim-frame.tall { height: 560px; }
+    .compare-table td.anim-cell iframe.anim-frame {
+      width: 100%;
+      height: 230px;
+    }
+    .compare-table.juices-anim td.anim-cell iframe.anim-frame {
+      width: 220px;
+      height: 260px;
+      border-radius: 8px;
+    }
+    .compare-table.juices-anim td.anim-cell iframe.anim-frame.tall {
+      height: 340px;
+    }
+    .route-trio-duo {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .routes-villus-row .gif-slot {
+      padding: 8px;
+      border: 3px solid #161616;
+      border-radius: 2px 10px 3px 8px;
+      box-shadow: 3px 3px 0 #161616;
+      background: #fffdf8;
+      min-height: 0;
+    }
+    .digest-absorption-live {
+      display: block;
+      width: 100%;
+      min-height: 420px;
+      height: min(58vh, 520px);
+      border: 0;
+      border-radius: 8px;
+      background: #fff;
+    }
+    .compare-table.liver-jobs-anim { min-width: 980px; }
+    .compare-table.liver-jobs-anim td.anim-cell iframe.liver-job-live {
+      width: 220px;
+      height: 260px;
+      border-radius: 8px;
+    }
+    .compare-table.liver-jobs-anim td.detail-cell { min-width: 280px; }
+    .compare-table.fate-food-anim { min-width: 1020px; }
+    .compare-table.fate-food-anim td.anim-cell iframe.fate-food-live {
+      width: 220px;
+      height: 260px;
+      border-radius: 8px;
+    }
+    .compare-table td.anim-cell img.anim-frame {
+      width: 100%;
+      height: auto;
+      max-height: 240px;
+      margin-top: 0;
+      object-fit: contain;
+    }
+    iframe.arch,
+    iframe.card-anim {
+      display: block;
+      width: min(100%, 460px);
+      height: 250px;
+      border: 0;
+      border-radius: 12px;
+      background: #fff;
+    }
+    iframe.card-anim { width: 100%; height: 300px; margin-top: 8px; }
+    iframe.transport-process-live,
+    iframe.fate-food-live {
+      display: block;
+      width: 100%;
+      height: 300px;
+      margin: 0 0 10px;
+      border: 0;
+      border-radius: 12px;
+      background: #fff;
+    }
+    img.anim-frame,
+    img.card-anim,
+    img.arch {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 420px;
+      object-fit: contain;
+      border: 0;
+      border-radius: 12px;
+      background: #fffdf8;
+      margin-top: 8px;
+    }
+    .route-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .route-pair figure.route-figure {
+      margin: 0;
+      min-width: 0;
+    }
+    .route-pair .route-figure figcaption {
+      margin-top: 8px;
+      padding: 8px 10px;
+      font-size: 0.88rem;
+      line-height: 1.35;
+      background: #fff6b8;
+      border: 2px solid #161616;
+      border-radius: 6px;
+      box-shadow: 2px 2px 0 #161616;
+    }
+    .route-pair .route-figure figcaption strong {
+      display: block;
+      font-size: 0.95rem;
+      margin-bottom: 2px;
+    }
+    .route-pair iframe.route-live,
+    .route-pair iframe.card-anim { margin-top: 0; height: 300px; width: 100%; }
+    ol.steps li.shot-row {
+      grid-template-columns: 22px minmax(0, 1fr);
+      align-items: start;
+      gap: 8px 12px;
+    }
+    ol.steps li.shot-row > span { grid-column: 2; }
+    ol.steps li.shot-row > img,
+    ol.steps li.shot-row > iframe {
+      grid-column: 2;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      margin-top: 6px;
+      border: 0;
+      border-radius: 12px;
+      background: #fffdf8;
+    }
+    .type-grid > :nth-child(3n+1) { --ink-hl: #f6e27a; --dot: #e07a3d; --dot2: #f0a35e; }
+    .type-grid > :nth-child(3n+2) { --ink-hl: #c9ecc0; --dot: #2f8f5b; --dot2: #7dcea0; }
+    .type-grid > :nth-child(3n) { --ink-hl: #e4d2f6; --dot: #8d5cb8; --dot2: #c9a6e0; }
+    .type-card h4,
+    .gif-row > .type-card h4,
+    .card-stack .type-card h4 {
+      position: absolute;
+      top: -13px;
+      left: 16px;
+      z-index: 2;
+      width: auto;
+      margin: 0;
+      padding: 0 4px;
+      border-radius: 0;
+      background: linear-gradient(transparent 42%, var(--ink-hl, #f6e27a) 42% 78%, transparent 78%);
+      color: #161616;
+      font-size: 24px;
+      font-weight: 400;
+      line-height: 1.1;
+    }
+    .type-grid > .type-card { --ink-hl: #f6e27a; }
+    .card-stack .type-card {
+      position: relative;
+      border: none;
+      box-shadow: none;
+      padding: 8px 0 4px;
+    }
+    .card-stack .type-card h4 { position: static; }
+    .examples {
+      color: #161616;
+      font-size: 18px;
+      line-height: 1.35;
+    }
+    .examples::before {
+      content: "key examples";
+      display: inline-block;
+      margin-right: 8px;
+      padding: 0 7px;
+      border-radius: 999px;
+      background: #d7c4f0;
+      color: #161616;
+      font-size: 16px;
+      line-height: 22px;
+    }
+    .examples.words::before { content: "key words"; }
+    .examples.when::before { content: "time of occurrence"; }
+    .examples.stages::before { content: "stages of ingested food"; }
+    .examples.target::before { content: "target"; }
+    section.chapter h3.mode-group {
+      margin: 16px 0 8px;
+      padding: 0 4px;
+      border-radius: 0;
+      background: linear-gradient(transparent 42%, #f6e27a 42% 78%, transparent 78%);
+      color: #161616;
+      font-size: 24px;
+      line-height: 1.1;
+    }
+    .teeth-box {
+      margin: 0 0 16px;
+      padding: 0 14px 10px;
+      border: 3px solid #161616;
+      border-radius: 2px 10px 3px 8px;
+      box-shadow: 3px 3px 0 #161616;
+    }
+    .teeth-box > .gif-slot { margin: 0 0 12px; }
+    .teeth-box > .type-card:first-child { margin-top: 0; }
+    .teeth-box img.arch,
+    .type-card img.arch {
+      width: min(100%, 280px);
+      height: auto;
+      display: block;
+    }
+    .compare-table td.anim-cell img.tooth {
+      width: auto;
+      height: 120px;
+    }
+  .mastication-live,
+  .digest-mechanism-live,
+  .tooth-type-live,
+  .tooth-disease-live {
+    display: block;
+    width: 100%;
+    border: 0;
+    border-radius: 8px;
+    background: #fff;
+  }
+  .mastication-live,
+  .digest-mechanism-live {
+    width: min(100%, 440px);
+    height: 300px;
+    margin: 0 auto;
+  }
+  .fat-emulsify-row .gif-slot {
+    padding: 8px;
+    border: 3px solid #161616;
+    border-radius: 2px 10px 3px 8px;
+    box-shadow: 3px 3px 0 #161616;
+    background: #fffdf8;
+  }
+  .fat-emulsify-row .digest-mechanism-live {
+    width: 100%;
+    max-width: none;
+    height: min(52vh, 380px);
+    min-height: 280px;
+    margin: 0;
+  }
+  .compare-table td.anim-cell iframe.tooth-type-live {
+    width: 56px;
+    height: 120px;
+    margin: 0;
+    vertical-align: middle;
+  }
+  .tooth-disease-live {
+    width: min(100%, 560px);
+    height: 440px;
+    margin: 0 auto;
+  }
+  .teeth-box img.tooth-diagram-hi {
+    width: min(100%, 560px);
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+    .type-grid.one-case { grid-template-columns: 1fr; }
+    .teeth-box > .type-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 10px 0 0;
+      padding: 26px 14px 12px;
+      border: 3px solid #161616;
+      border-radius: 2px 10px 3px 8px;
+      box-shadow: 3px 3px 0 #161616;
+      background: transparent;
+    }
+    .teeth-box .tooth-structure {
+      margin: 8px 0 14px;
+    }
+    .teeth-box .tooth-structure > .type-card {
+      position: relative;
+      margin: 0;
+      padding: 26px 14px 12px;
+      border: 3px solid #161616;
+      border-radius: 2px 10px 3px 8px;
+      box-shadow: 3px 3px 0 #161616;
+      background: transparent;
+    }
+    .teeth-box .tooth-structure .gif-slot {
+      align-self: stretch;
+      padding: 8px;
+      border: 3px solid #161616;
+      border-radius: 2px 10px 3px 8px;
+      box-shadow: 3px 3px 0 #161616;
+      background: #fffdf8;
+    }
+    .teeth-box .tooth-structure .gif-slot > iframe.structure-live {
+      display: block;
+      width: 100%;
+      height: min(72vh, 560px);
+      min-height: 420px;
+      border: 0;
+      border-radius: 8px;
+      background: #fff;
+    }
+  .teeth-box .tooth-structure [data-part] {
+    border-radius: 6px;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+  }
+  .teeth-box .tooth-structure li[data-part],
+  .teeth-box .tooth-structure .props .props > div[data-part] {
+    margin: 0 0 4px;
+    padding: 4px 6px;
+  }
+  .teeth-box .tooth-structure [data-part].is-on {
+    background: #d6efff;
+    color: #0b4f86;
+    box-shadow: inset 0 0 0 2px #176eaa;
+  }
+    @media (max-width: 800px) {
+      .route-pair { grid-template-columns: 1fr; }
+      ol.steps li.shot-row { grid-template-columns: 22px minmax(0, 1fr); }
+      ol.steps li.shot-row > img,
+      ol.steps li.shot-row > iframe { grid-column: 2; height: auto; }
+    }
+    .bullets li::before,
+    .props dd { }
+    .bullets li::before,
+    section.chapter .copy > ul > li::before {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--dot, #2f8f5b);
+    }
+    .props dt {
+      background: var(--ink-hl, #f6e27a);
+      color: #161616;
+      border-radius: 2px;
+    }
+    .props dd,
+    li { font-size: 18px; line-height: 1.35; }
+    .carb-family {
+      border: 3px solid #161616;
+      border-radius: 3px 8px 2px 10px;
+      box-shadow: 3px 3px 0 #161616;
+      padding: 16px 12px 8px;
+      margin-bottom: 18px;
+    }
+    @media (max-width: 800px) {
+      .type-grid { grid-template-columns: 1fr; }
+      .type-card h4 { font-size: 22px; }
+      .gif-slot > iframe.anim-frame { height: 78vh; min-height: 520px; }
+    }
+    .tract-split {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(210px, 0.7fr);
+      gap: 16px;
+      align-items: start;
+      margin-top: 8px;
+      padding: 12px;
+      border: 3px solid #161616;
+      border-radius: 12px;
+      background: #fffdf8;
+      box-shadow: 3px 3px 0 #161616;
+    }
+    .tract-split > * { min-width: 0; }
+    .tract-frame {
+      container-type: inline-size;
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1280 / 860;
+      overflow: hidden;
+      border-radius: 8px;
+      background: #e7eef6;
+    }
+    .tract-live {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 1280px;
+      height: 860px;
+      border: 0;
+      transform: scale(calc(100cqw / 1280px));
+      transform-origin: top left;
+      background: #e7eef6;
+    }
+    .tract-key h3 {
+      margin: 14px 0 6px;
+    }
+    .tract-key h3:first-child { margin-top: 0; }
+    .tract-key p,
+    .tract-key li { margin: 0 0 6px; }
+    .tract-key ol,
+    .tract-key ul { margin: 0 0 8px; padding-left: 1.2em; }
+    @media (max-width: 800px) {
+      .tract-split { grid-template-columns: 1fr; }
+    }
+    .villus-live,
+    .route-live,
+    .step-absorb {
+      display: block;
+      width: 100%;
+      border: 0;
+      border-radius: 8px;
+      background: #fff;
+    }
+    .villus-live { height: 460px; margin: 8px 0 16px; border: 3px solid #161616; border-radius: 12px; }
+    .compare-table td.anim-cell iframe.step-absorb { height: 380px; }
+    .route-trio {
+      display: grid;
+      grid-template-columns: minmax(160px, 0.85fr) minmax(260px, 1.3fr) minmax(160px, 0.85fr);
+      gap: 12px;
+      align-items: stretch;
+      margin: 8px 0 14px;
+      padding: 12px;
+      border: 3px solid #161616;
+      border-radius: 12px;
+      background: #fffdf8;
+      box-shadow: 3px 3px 0 #161616;
+    }
+    .route-trio > .type-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      box-shadow: none;
+      background: transparent;
+    }
+    .lipase-compare-trio {
+      display: grid;
+      grid-template-columns: minmax(140px, 0.9fr) minmax(280px, 1.35fr) minmax(140px, 0.9fr);
+      gap: 12px;
+      align-items: start;
+      margin: 8px 0 14px;
+      padding: 12px;
+      border: 3px solid #161616;
+      border-radius: 12px;
+      background: #fffdf8;
+      box-shadow: 3px 3px 0 #161616;
+    }
+    .lipase-compare-trio > .type-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+      padding: 10px 12px;
+      min-height: 0;
+      box-shadow: none;
+    }
+    .lipase-compare-trio iframe.lipase-compare-live {
+      display: block;
+      width: 100%;
+      height: 420px;
+      border: 0;
+      border-radius: 8px;
+      background: #fff;
+    }
+  ol.steps li.shot-row > iframe.villus-adapt-live {
+      width: 100%;
+      max-width: 420px;
+      height: 300px;
+      margin-inline: auto;
+      display: block;
+      border: 3px solid #161616;
+      border-radius: 12px;
+      background: #fff;
+    }
+    @media (max-width: 900px) {
+      .lipase-compare-trio { grid-template-columns: 1fr; }
+      .lipase-compare-trio iframe.lipase-compare-live { height: 380px; }
+    }
+    .route-trio > .type-card h4,
+    .routes-villus-row > .type-card h4,
+    .lipase-compare-trio > .type-card h4 {
+      position: static;
+      top: auto;
+      left: auto;
+      z-index: auto;
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      margin: 0 0 8px;
+      padding: 6px 10px;
+      font-size: 20px;
+      line-height: 1.25;
+      font-weight: 700;
+      color: #161616;
+      border-radius: 6px;
+      background: #f6e27a;
+      background-image: none;
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+    }
+    .route-trio > .type-card:first-child h4 {
+      background: #e6f1f8;
+      color: #245b83;
+    }
+    .route-trio > .type-card:last-child h4 {
+      background: #edf5df;
+      color: #4b7040;
+    }
+    .routes-villus-row .props dt {
+      display: inline-block;
+      width: fit-content;
+      max-width: 100%;
+      margin: 0 0 6px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 17px;
+      line-height: 1.25;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-transform: none;
+      background-image: none;
+    }
+    .routes-villus-row .props > div:nth-child(1) dt {
+      background: #e6f1f8;
+      color: #245b83;
+    }
+    .routes-villus-row .props > div:nth-child(2) dt {
+      background: #edf5df;
+      color: #4b7040;
+    }
+    .routes-villus-row .props > div:nth-child(3) dt {
+      background: #f6e7a2;
+      color: #3a2a14;
+    }
+    .route-trio iframe.two-routes-live {
+      display: block;
+      width: 100%;
+      min-height: 320px;
+      height: min(440px, 52vh);
+      border: 0;
+      border-radius: 8px;
+      background: #fff;
+    }
+    .route-live { height: 460px; }
+    .type-grid iframe.egestion-live,
+    .type-grid iframe.application-live,
+    .type-grid iframe.liver-live,
+    .type-grid iframe.digest-stage-live {
+      display: block;
+      width: 100%;
+      height: 240px;
+      margin: 8px 0 6px;
+      border: 3px solid #161616;
+      border-radius: 12px;
+      background: #fff;
+    }
+    .gif-row .egestion-live {
+      width: 100%;
+      height: min(52vh, 320px);
+      min-height: 240px;
+      border: 0;
+      border-radius: 8px;
+    }
+    .dialysis-live {
+      display: block;
+      width: 100%;
+      height: 400px;
+      margin: 6px 0 8px;
+      border: 0;
+      border-radius: 8px;
+      background: #fff;
+    }
+    .route-model { margin-top: 4px; }
+    .route-model .type-card h4 { position: static; width: auto; margin: 0 0 4px; }
+    @media (max-width: 800px) {
+      .route-trio { grid-template-columns: 1fr; }
+      .villus-live, .route-live { height: 420px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Edit the words under each heading. -->
+  <div class="page">
+    <header class="mast">
+      <div class="copy">
+        <div class="brand-bar">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 36 40" width="22" height="24" focusable="false">
+              <polygon points="18,3 32,11.5 32,28.5 18,37 4,28.5 4,11.5" fill="currentColor" fill-opacity="0.22" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="brand-series">SB02 · Nutrition in humans</span>
+          <span class="brand-tag">Seven processes · Ch7</span>
+        </div>
+        <h1>Nutrition in Humans</h1>
+        <p class="mast-subtitle">Ch7 · The seven processes</p>
+        <p class="lead">Nutrition is one of the seven characteristics of life. Humans use holozoic nutrition: they take in solid food, break it down, absorb the useful molecules, and use them in cells.</p>
+        <p class="lead">These notes follow the seven processes in order: the nutrition process, the human digestive tract and glands, teeth and swallowing, then peristalsis, digestion, absorption, transport and the liver, then the large intestine and egestion.</p>
+        <div class="scroll">
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>Process</th>
+                <th>Focus</th>
+                <th>Hold this line</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>01 Nutrition process</td>
+                <td>Five holozoic steps and four modes</td>
+                <td>Egestion is not excretion</td>
+              </tr>
+              <tr>
+                <td>02 Human Digestive Tract & Glands</td>
+                <td>Names in order, 1 to 9</td>
+                <td>Ileum is the long coiled part</td>
+              </tr>
+              <tr>
+                <td>03 Teeth, swallowing, and peristalsis</td>
+                <td>Chewing, bolus into oesophagus, then muscle wave</td>
+                <td>Food moves one way only</td>
+              </tr>
+              <tr>
+                <td>04 Digestion</td>
+                <td>Physical first, then enzymes</td>
+                <td>Bile has no enzyme</td>
+              </tr>
+              <tr>
+                <td>05 Absorption</td>
+                <td>Villi, two routes, dialysis model</td>
+                <td>Lipids rejoin the blood before the heart</td>
+              </tr>
+              <tr>
+                <td>06 Transport and liver</td>
+                <td>Routes, use, and storage</td>
+                <td>Deamination happens only after absorption</td>
+              </tr>
+              <tr>
+                <td>07 Large intestine</td>
+                <td>Final water uptake and faeces</td>
+                <td>No digestion after the ileum</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </header>
+
+    <nav class="section-nav" aria-label="Sections">
+      <a href="#at-a-glance">Glance</a>
+      <a href="#s01">01 Process</a>
+      <a href="#s02">02 Tract</a>
+      <a href="#s03">03 Mouth</a>
+      <a href="#s04">04 Digestion</a>
+      <a href="#s05">05 Absorption</a>
+      <a href="#s06">06 Liver</a>
+      <a href="#s07">07 Egestion</a>
+    </nav>
+
+    <section class="chapter chapter-poster at-a-glance" id="at-a-glance">
+      <div class="copy">
+        <p class="key-idea-label">Key idea</p>
+        <div class="key-idea key-idea--hero">
+          <ul>
+            <li>Holozoic nutrition has five steps: ingestion, digestion, absorption, assimilation, and egestion.</li>
+            <li>Physical digestion makes smaller pieces and a larger surface. Enzymes then split molecules. Bile only emulsifies fat.</li>
+            <li>Digestion finishes in the small intestine. Water-soluble food goes to the liver in the blood. Lipids travel in lymph.</li>
+            <li>The large intestine absorbs the last of the water and egests undigested material as faeces. That is not excretion.</li>
+          </ul>
+        </div>
+        <div class="glance-grid">
+          <div>
+            <h3>Five steps</h3>
+            <table class="cheat-table">
+              <thead>
+                <tr>
+                  <th scope="col">Step</th>
+                  <th scope="col">One word</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Ingestion</td><td>Mouth</td></tr>
+                <tr><td>Digestion</td><td>Breakdown</td></tr>
+                <tr><td>Absorption</td><td>Enter</td></tr>
+                <tr><td>Assimilation</td><td>Use</td></tr>
+                <tr><td>Egestion</td><td>Faeces</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <h3>Where food changes</h3>
+            <table class="cheat-table">
+              <thead>
+                <tr>
+                  <th scope="col">Food</th>
+                  <th scope="col">Starts</th>
+                  <th scope="col">Finished before</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Starch</td><td>Mouth</td><td>Large intestine</td></tr>
+                <tr><td>Protein</td><td>Stomach</td><td>Large intestine</td></tr>
+                <tr><td>Lipid</td><td>Duodenum</td><td>Large intestine</td></tr>
+                <tr><td>Dietary fibre</td><td>Never digested</td><td>Leaves in faeces</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter chapter-molecule" id="s01">
+      <div class="copy">
+        <div class="sec"><span class="num">01</span><h2>The nutrition process</h2></div>
+        <div class="key-idea">
+          <p>Humans cannot make their own food. They ingest it, digest it into small soluble molecules, absorb those molecules, and cells use them for metabolism.</p>
+        </div>
+        <h3>Five steps</h3>
+        <div class="scroll">
+          <table class="compare-table steps-anim">
+            <thead>
+              <tr>
+                <th>Process</th>
+                <th>Definition</th>
+                <th>Words to use</th>
+                <th>Animation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Ingestion</td>
+                <td>Food is taken in through the mouth cavity.</td>
+                <td>Mouth, taken in, intake</td>
+                <td class="anim-cell"><img src="assets/dig-mouth.gif" alt="Ingestion: mouth cavity" class="anim-frame"></td>
+              </tr>
+              <tr>
+                <td>Digestion</td>
+                <td>Breakdown into small, simple, soluble molecules, ready for absorption.</td>
+                <td>Breakdown, hydrolyse, enzyme, grind, cut</td>
+                <td class="anim-cell"><img src="assets/dig-stomach-duodenum.gif" alt="Digestion: stomach, then duodenum" class="anim-frame"></td>
+              </tr>
+              <tr>
+                <td>Absorption</td>
+                <td>Entry of molecules into the circulatory transport system.</td>
+                <td>Enter, diffuse, active transport, blood, lymph</td>
+                <td class="anim-cell"><iframe class="step-absorb" src="vendor/nutrition/index.html?embed=1&amp;topic=villi&amp;view=guided&amp;adaptation=absorption&amp;group=both&amp;animate=1&amp;legend=1" title="Absorption: molecules enter capillaries or the lacteal."></iframe></td>
+              </tr>
+              <tr>
+                <td>Assimilation</td>
+                <td>Cells take up molecules for metabolism, both building up and breaking down.</td>
+                <td>Use, build, make, anabolism, growth and repair</td>
+                <td class="anim-cell"><img class="anim-frame" src="assets/fate-of-food.gif" alt="Assimilation"></td>
+              </tr>
+              <tr>
+                <td>Egestion</td>
+                <td>Removal of undigested and unabsorbed material as faeces.</td>
+                <td>Faeces, undigested. Not urine, urea, or carbon dioxide</td>
+                <td class="anim-cell"><img class="anim-frame" src="assets/colon-normal.gif" alt="Egestion"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Modes</h3>
+        <div class="type-grid">
+          <article class="type-card">
+            <h4>Autotrophic</h4>
+            <img src="assets/mode-autotrophic.png" alt="Photosynthesis in a green plant" class="arch">
+            <p class="examples">Green plant</p>
+            <ul class="bullets">
+              <li>Makes its own food by photosynthesis.</li>
+            </ul>
+          </article>
+        </div>
+        <h3 class="mode-group">Heterotrophic nutrition</h3>
+        <p class="family-note">Holozoic, saprophytic, and parasitic nutrition all use ready-made organic food. Saprophytes and parasites both absorb soluble food.</p>
+        <div class="type-grid">
+          <article class="type-card">
+            <h4>Holozoic</h4>
+            <img src="assets/mode-holozoic.png" alt="Holozoic steps: ingestion to egestion" class="arch">
+            <p class="examples">Human, dog</p>
+            <ul class="bullets">
+              <li>Cannot photosynthesise. Ingests solid organic food and digests it inside the body.</li>
+            </ul>
+          </article>
+          <article class="type-card">
+            <h4>Parasitic</h4>
+            <img src="assets/mode-parasitic.png" alt="Tapeworm in the intestine" class="arch">
+            <p class="examples">Tapeworm</p>
+            <ul class="bullets">
+              <li>Absorbs food from a living host. The host is harmed.</li>
+              <li>It is specific to its host, and it does not directly kill the host.</li>
+            </ul>
+          </article>
+          <article class="type-card">
+            <h4>Saprophytic</h4>
+            <img src="assets/mode-saprophytic.jpg" alt="Bracket fungi on decaying wood" class="arch">
+            <p class="examples">Mushroom, bread mould</p>
+            <ul class="bullets">
+              <li>Feeds on dead or decaying organic matter.</li>
+              <li>Can use a variety of food sources.</li>
+              <li>A mycelium is a mass of branching hyphae. The thin wall and large surface area let it secrete enzymes and absorb the digested food. Digestion is outside the body.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter chapter-nutrient" id="s02">
+      <div class="copy">
+        <div class="sec"><span class="num">02</span><h2>Human Digestive Tract & Glands</h2></div>
+        <div class="key-idea">
+          <p>Learn each name and its place in the sequence. The alimentary canal is one tube. What each gland pours in is in the juices table.</p>
+        </div>
+        <div class="tract-split">
+          <div class="tract-frame">
+            <iframe class="tract-live" src="vendor/digestion/index.html?map=1&amp;v=2" title="Digestive tract map, playing through the organs."></iframe>
+          </div>
+          <article class="tract-key">
+            <h3>Alimentary canal</h3>
+            <p>Food passes through this one tube, in this order.</p>
+            <ol class="steps">
+              <li>Mouth cavity</li>
+              <li>Pharynx</li>
+              <li>Oesophagus</li>
+              <li>Stomach</li>
+              <li>Duodenum</li>
+              <li>Ileum</li>
+              <li>Colon</li>
+              <li>Rectum</li>
+              <li>Anus</li>
+            </ol>
+            <p>The appendix: ✅ canal ❌ a gland</p>
+            <h3>Digestive glands</h3>
+            <p>These pour juice or bile into the tube. Food does not enter them.</p>
+            <ul class="bullets">
+              <li>Salivary glands</li>
+              <li>Liver</li>
+              <li>Pancreas</li>
+            </ul>
+            <p>gall bladder: ❌ a gland ❌ food enter</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter chapter-health" id="s03">
+      <div class="copy">
+        <div class="sec"><span class="num">03</span><h2>Teeth, swallowing, and peristalsis</h2></div>
+        <div class="key-idea">
+          <p>Physical digestion starts in the mouth. Swallowing sends the bolus into the oesophagus. Peristalsis then pushes food along the rest of the tube. The gut wall has circular muscle on the inside and longitudinal muscle on the outside.</p>
+        </div>
+        <div class="teeth-box">
+          <article class="type-card">
+            <h4>Mastication</h4>
+            <iframe class="mastication-live" src="vendor/digestion/index.html?embed=1&amp;stages=0&amp;v=3" title="Mastication: teeth grind food into smaller pieces." loading="lazy"></iframe>
+            <ul class="bullets">
+              <li>Chewing</li>
+              <li>Physical digestion: cutting food into smaller pieces to increase surface area</li>
+            </ul>
+          </article>
+          <h3>Teeth type</h3>
+          <div class="scroll">
+          <table class="compare-table steps-anim">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Shape</th>
+                <th>Job</th>
+                <th>Roots</th>
+                <th>Animation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Incisor</td>
+                <td>Chisel-shaped, flat sharp edge</td>
+                <td>Biting and cutting</td>
+                <td>One</td>
+                <td class="anim-cell"><iframe class="tooth-type-live" src="vendor/teeth/index.html?embed=1&amp;topic=types&amp;item=incisor&amp;model=1&amp;isolate=1&amp;spin=1&amp;v=7" title="Incisor, one tooth rotating." loading="lazy"></iframe></td>
+              </tr>
+              <tr>
+                <td>Canine</td>
+                <td>Pointed and curved</td>
+                <td>Tearing flesh</td>
+                <td>One</td>
+                <td class="anim-cell"><img src="assets/tooth-canine.gif" alt="Canine" class="anim-frame tooth"></td>
+              </tr>
+              <tr>
+                <td>Premolar</td>
+                <td>Broad top with cusps</td>
+                <td>Crushing and grinding</td>
+                <td>One or two</td>
+                <td class="anim-cell"><iframe class="tooth-type-live" src="vendor/teeth/index.html?embed=1&amp;topic=types&amp;item=premolar&amp;model=1&amp;isolate=1&amp;spin=1&amp;v=7" title="Premolar, one tooth rotating." loading="lazy"></iframe></td>
+              </tr>
+              <tr>
+                <td>Molar</td>
+                <td>Like a premolar, but larger</td>
+                <td>Crushing and grinding</td>
+                <td>Two or three</td>
+                <td class="anim-cell"><img src="assets/tooth-molar.gif" alt="Molar" class="anim-frame tooth"></td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="section-note">A dental formula consists of 4 tooth types: incisors, canines, premolars, and molars, in that order.</p>
+        </div>
+        <div class="type-grid">
+          <article class="type-card">
+            <h4>Milk teeth</h4>
+            <img src="assets/tooth-milk.gif" alt="Milk teeth" class="arch">
+            <ul class="bullets">
+              <li>2102/2102</li>
+              <li>Total number: 20</li>
+              <li>No premolar</li>
+            </ul>
+          </article>
+          <article class="type-card">
+            <h4>Permanent teeth</h4>
+            <img src="assets/tooth-permanent.gif" alt="Permanent teeth" class="arch">
+            <ul class="bullets">
+              <li>2123/2123</li>
+              <li>Total number: 32</li>
+            </ul>
+          </article>
+        </div>
+        <h3>Tooth structure</h3>
+        <div class="gif-row share-row tooth-structure" id="tooth-structure-panel">
+          <article class="type-card">
+            <h4>One tooth</h4>
+            <dl class="props">
+              <div>
+                <dt>Regions</dt>
+                <dd>
+                  <ul class="bullets">
+                    <li data-part="crown">Crown: the part you see and use for biting.</li>
+                    <li data-part="neck">Neck: joins the crown and the root.</li>
+                    <li data-part="root">Root: anchors the tooth and is hidden.</li>
+                  </ul>
+                </dd>
+              </div>
+              <div>
+                <dt>Layers</dt>
+                <dd>
+                  <ul class="bullets">
+                    <li data-part="enamel">Enamel is the hardest part, non-living, and mainly calcium salts plus phosphate. It needs calcium and vitamin D so those salts can be absorbed. It protects the tooth from wear.</li>
+                    <li data-part="dentine">Dentine is bone-like but softer, and it contains living cytoplasm strands.</li>
+                    <li data-part="pulp">The pulp cavity has living cells, blood vessels, and nerves. They supply oxygen and nutrients, remove carbon dioxide and waste, and detect temperature and pressure. Decay here causes pain.</li>
+                  </ul>
+                </dd>
+              </div>
+              <div>
+                <dt>Attachment</dt>
+                <dd>
+                  <dl class="props">
+                    <div data-part="gum">
+                      <dt>Gum</dt>
+                      <dd>Protects the tooth root and the bone.</dd>
+                    </div>
+                    <div data-part="jawbone">
+                      <dt>Jawbone</dt>
+                      <dd>Houses the roots.</dd>
+                    </div>
+                    <div data-part="membrane">
+                      <dt>Periodontal membrane</dt>
+                      <dd>Connects the tooth to the jaw. Acts as a shock absorber and allows slight movement.</dd>
+                    </div>
+                    <div data-part="cement">
+                      <dt>Cement</dt>
+                      <dd>On the root. Helps attach the periodontal membrane. Thinner than enamel.</dd>
+                    </div>
+                  </dl>
+                </dd>
+              </div>
+            </dl>
+          </article>
+          <aside class="gif-slot" aria-label="Tooth structure model">
+            <iframe class="structure-live" src="vendor/teeth/index.html?embed=1&amp;topic=structure&amp;item=crown&amp;model=1&amp;zoom=1&amp;cycle=crown,neck,root,enamel,dentine,pulp,gum,jawbone,membrane,cement,nerve,blood&amp;dwell=3000&amp;v=4" title="Tooth structure, from crown to blood vessel." loading="lazy"></iframe>
+          </aside>
+        </div>
+        <div class="type-grid">
+          <article class="type-card">
+            <h4>Herbivore</h4>
+            <img src="assets/diet-herbivore.png" alt="Sheep skull: grinding molars and incisors for plants" class="arch">
+            <p class="examples">Sheep, cow</p>
+            <ul class="bullets">
+              <li>Well-developed molars. Cusps grind plants. No canines, so a gap is left. The jaw moves sideways.</li>
+            </ul>
+          </article>
+          <article class="type-card">
+            <h4>Carnivore</h4>
+            <img src="assets/diet-carnivore.jpg" alt="Dog skull: canines and slicing teeth for meat" class="arch">
+            <p class="examples">Dog, cat</p>
+            <ul class="bullets">
+              <li>Well-developed canines, pointed and curved, for tearing flesh.</li>
+            </ul>
+          </article>
+          <article class="type-card">
+            <h4>Omnivore</h4>
+            <img src="assets/diet-omnivore.jpg" alt="Baboon skull: mixed dentition" class="arch">
+            <p class="examples">Human, baboon</p>
+            <ul class="bullets">
+              <li>Incisors, canines, premolars, and molars. Humans eat both plants and meat.</li>
+            </ul>
+          </article>
+        </div>
+        <h3>Tooth disease</h3>
+        <div class="type-grid">
+          <article class="type-card">
+            <h4>Decay</h4>
+            <iframe class="tooth-disease-live" src="vendor/teeth/index.html?embed=1&amp;topic=decay&amp;item=decay&amp;model=1&amp;zoom=1&amp;loop=3200&amp;v=3" title="Tooth decay animation." loading="lazy"></iframe>
+            <ul class="bullets">
+              <li>Bacteria in plaque plus food produce acid. Acid dissolves the calcium salts and the tooth decays.</li>
+              <li>Toothpaste is alkaline, so it neutralises that acid. Fluoride strengthens enamel. It does not kill the bacteria.</li>
+              <li>Alcohol mouthwash dissolves the bacterial cell membrane and kills bacteria. It can harm mouth cells as well.</li>
+            </ul>
+          </article>
+          <article class="type-card">
+            <h4>Loose tooth</h4>
+            <img src="assets/tooth-periodontal-diagram.png" alt="Periodontal membrane between cement and jaw bone; attachment fibres damaged" class="tooth-diagram-hi">
+            <ul class="bullets">
+              <li>Bacteria can damage the periodontal membrane.</li>
+              <li>The gum becomes inflamed.</li>
+              <li>The tooth may fall out because it is no longer held to the jawbone.</li>
+            </ul>
+          </article>
+        </div>
+        </div>
+        <h3>Swallowing</h3>
+        <div class="gif-row share-row">
+          <article class="type-card">
+            <h4>Bolus to oesophagus</h4>
+            <p class="examples when">After chewing</p>
+            <ol class="steps">
+              <li>The tongue rolls food into a bolus, then rises and pushes it towards the pharynx.</li>
+              <li>The soft palate moves up so the bolus cannot enter the nasal cavity.</li>
+              <li>The larynx rises. The epiglottis covers the trachea so the bolus cannot enter the airway.</li>
+              <li>The bolus enters the oesophagus.</li>
+            </ol>
+            <dl class="props">
+              <div>
+                <dt>Tell the tubes apart</dt>
+                <dd>The trachea has C-shaped cartilage and a ciliated lining. The oesophagus does not. The bolus must take the oesophagus.</dd>
+              </div>
+            </dl>
+            <div class="tubes-apart" aria-label="Trachea and oesophagus compared">
+              <figure class="media-labeled">
+                <img src="assets/tube-trachea.png" alt="Trachea: C-shaped cartilage rings and bronchi">
+                <figcaption>Trachea</figcaption>
+              </figure>
+              <p class="tube-vs" aria-hidden="true">VS</p>
+              <figure class="media-labeled">
+                <img src="assets/tube-oesophagus.png" alt="Oesophagus: muscular wall layers in cross-section">
+                <figcaption>Oesophagus</figcaption>
+              </figure>
+            </div>
+          </article>
+          <aside class="gif-slot" aria-label="Swallowing animation">
+            <iframe class="digest-mechanism-live" src="vendor/digestion/index.html?embed=1&amp;stages=1&amp;v=3" title="Swallowing: bolus moves through the pharynx into the oesophagus." loading="lazy"></iframe>
+          </aside>
+        </div>
+        <h3>Peristalsis</h3>
+        <div class="gif-row share-row">
+          <article class="type-card">
+            <h4>One-way wave</h4>
+            <p class="examples stages">Bolus, then chyme, then faeces</p>
+            <ol class="steps">
+              <li>Behind the bolus, circular muscle contracts. The lumen gets smaller and food is squeezed forward.</li>
+              <li>In front of the bolus, longitudinal muscle relaxes. The tube is wider and food slides through.</li>
+              <li>The wave pushes food in one direction only. It does not depend on gravity.</li>
+            </ol>
+          </article>
+          <aside class="gif-slot" aria-label="Peristalsis animation">
+            <iframe class="digest-mechanism-live" src="vendor/digestion/index.html?embed=1&amp;stages=2&amp;v=3" title="Peristalsis: muscular waves push the bolus along the oesophagus." loading="lazy"></iframe>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter chapter-lab" id="s04">
+      <div class="copy">
+        <div class="sec"><span class="num">04</span><h2>Physical and chemical digestion</h2></div>
+        <div class="key-idea">
+          <p>Physical digestion prepares food for chemical digestion. It breaks food into smaller pieces and increases the surface area for juice to act on. Enzymes then break molecules into simpler ones.</p>
+        </div>
+        <h3>Juices</h3>
+        <div class="scroll">
+          <table class="compare-table juices-anim">
+            <thead>
+              <tr>
+                <th>Juice</th>
+                <th>Made by</th>
+                <th>What is in it</th>
+                <th>Medium</th>
+                <th>What it digests</th>
+                <th>Animation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Saliva</td>
+                <td>Salivary glands</td>
+                <td>
+                  <ol class="steps">
+                    <li>Amylase: splits starch to maltose</li>
+                    <li>Water: moistens food</li>
+                    <li>Mucus: lubricates swallowing</li>
+                  </ol>
+                </td>
+                <td>Neutral</td>
+                <td>Starch, chemical</td>
+                <td class="anim-cell"><iframe class="anim-frame" src="vendor/digestion/index.html?embed=1&amp;stages=0&amp;v=3" title="Saliva: mastication and salivary amylase on starch in the mouth." loading="lazy"></iframe></td>
+              </tr>
+              <tr>
+                <td>Gastric juice</td>
+                <td>Gastric glands in the stomach wall</td>
+                <td>
+                  <ol class="steps">
+                    <li>Pepsin: splits proteins into peptides and needs acid</li>
+                    <li>Hydrochloric acid: makes the medium about pH 2, kills microorganisms, and denatures proteins</li>
+                    <li>Mucus: protects the wall from pepsin and acid</li>
+                  </ol>
+                </td>
+                <td>Acidic</td>
+                <td>Proteins, chemical</td>
+                <td class="anim-cell"><iframe class="anim-frame" src="vendor/digestion/index.html?embed=1&amp;stages=3&amp;v=3" title="Gastric juice: stomach churning and pepsin in acid." loading="lazy"></iframe></td>
+              </tr>
+              <tr>
+                <td>Intestinal juice</td>
+                <td>Cells on the small intestine wall</td>
+                <td>
+                  <ol class="steps">
+                    <li>Enzymes: none</li>
+                    <li>Mucus: protects the wall</li>
+                    <li>Water</li>
+                    <li>Sodium hydrogencarbonate: neutralises acidic chyme</li>
+                  </ol>
+                </td>
+                <td>Alkaline</td>
+                <td>None by itself</td>
+                <td class="anim-cell"><img class="anim-frame" src="assets/villus-thin.gif" alt="One-cell-thick epithelium and mucus lining the small intestine wall." width="220" height="180" loading="lazy"></td>
+              </tr>
+              <tr>
+                <td>Pancreatic juice</td>
+                <td>Pancreas, to the duodenum by the pancreatic duct</td>
+                <td>
+                  <ol class="steps">
+                    <li>Protease</li>
+                    <li>Amylase</li>
+                    <li>Lipase</li>
+                    <li>Sodium hydrogencarbonate: neutralises acidic chyme</li>
+                  </ol>
+                </td>
+                <td>Alkaline</td>
+                <td>Proteins, starch, lipids, chemical</td>
+                <td class="anim-cell"><iframe class="anim-frame" src="vendor/nutrition/index.html?embed=1&amp;topic=applications&amp;view=guided&amp;application=pancreatic&amp;diseaseComparison=healthy&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=10" title="Pancreatic enzymes travelling through the duct to the duodenum (normal)." loading="lazy"></iframe></td>
+              </tr>
+              <tr>
+                <td>Bile</td>
+                <td>Liver. Stored in the gall bladder. To the duodenum by the bile duct</td>
+                <td>
+                  <ol class="steps">
+                    <li>Bile salts: emulsify lipids into small droplets</li>
+                    <li>Bile pigment: comes from broken red blood cells</li>
+                    <li>Sodium hydrogencarbonate: neutralises acid</li>
+                    <li>Enzymes: none</li>
+                  </ol>
+                </td>
+                <td>Alkaline</td>
+                <td>Lipids, physical only</td>
+                <td class="anim-cell"><iframe class="anim-frame" src="vendor/digestion/index.html?embed=1&amp;stages=4&amp;animate=1&amp;v=5" title="Bile salts emulsify lipids into smaller droplets in the duodenum." loading="lazy"></iframe></td>
+              </tr>
+              <tr>
+                <td>Enzymes on ileum cells</td>
+                <td>Epithelium of the small intestine</td>
+                <td>
+                  <ol class="steps">
+                    <li>Protease: on the cell membrane</li>
+                    <li>Carbohydrases: on the cell membrane</li>
+                    <li>Lipase: none</li>
+                  </ol>
+                </td>
+                <td>Alkaline</td>
+                <td>Proteins and carbohydrates, chemical</td>
+                <td class="anim-cell"><iframe class="anim-frame tall" src="vendor/digestion/index.html?embed=1&amp;stages=5&amp;animate=1&amp;labels=0&amp;v=5" title="Ileum: villus cross-section with absorption into capillaries and the lacteal." loading="lazy"></iframe></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Along the tube</h3>
+        <div class="scroll">
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>Place</th>
+                <th>Physical</th>
+                <th>Chemical</th>
+                <th>Food is called</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Mouth</td>
+                <td>Mastication</td>
+                <td>Salivary amylase on starch</td>
+                <td>Bolus</td>
+              </tr>
+              <tr>
+                <td>Oesophagus</td>
+                <td>Peristalsis</td>
+                <td>Salivary amylase still works</td>
+                <td>Bolus</td>
+              </tr>
+              <tr>
+                <td>Stomach</td>
+                <td>Churning</td>
+                <td>Gastric juice, pepsin on protein. Salivary amylase is denatured</td>
+                <td>Chyme</td>
+              </tr>
+              <tr>
+                <td>Duodenum</td>
+                <td>Bile emulsifies lipids</td>
+                <td>Pancreatic amylase, lipase, and protease</td>
+                <td>Chyme</td>
+              </tr>
+              <tr>
+                <td>Ileum</td>
+                <td>Peristalsis</td>
+                <td>Carbohydrases and peptidase on the wall. Digestion finishes here</td>
+                <td>Chyme</td>
+              </tr>
+              <tr>
+                <td>Colon</td>
+                <td>Peristalsis and compaction</td>
+                <td>No digestion</td>
+                <td>Faeces</td>
+              </tr>
+              <tr>
+                <td>Rectum</td>
+                <td>Stores faeces</td>
+                <td>No digestion</td>
+                <td>Faeces</td>
+              </tr>
+              <tr>
+                <td>Anus</td>
+                <td>Egestion</td>
+                <td>No digestion</td>
+                <td>Faeces</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Fat</h3>
+        <div class="gif-row share-row fat-emulsify-row">
+          <article class="type-card">
+            <h4>Emulsification</h4>
+            <p class="examples words">Bile salts, lipase</p>
+            <dl class="props">
+              <div>
+                <dt>Location</dt>
+                <dd>Small intestine: yes</dd>
+                <dd>Liver and the gall bladder: no</dd>
+              </div>
+              <div>
+                <dt>Process</dt>
+                <dd>Emulsify lipids into small droplets: increase surface area for digestive juices and enzymes to work on</dd>
+              </div>
+              <div>
+                <dt>Experiment-related concept</dt>
+                <dd>Lipase catalyses the breakdown of triglycerides into glycerol and three fatty acids. Fatty acids lower the pH, so the indicator changes sooner when digestion is faster.</dd>
+              </div>
+            </dl>
+          </article>
+          <aside class="gif-slot" aria-label="Emulsification then lipase in the duodenum">
+            <iframe class="digest-mechanism-live" src="vendor/digestion/index.html?embed=1&amp;stages=4&amp;animate=1&amp;v=4" title="Emulsification then lipase: physical emulsification, then chemical digestion." loading="lazy"></iframe>
+          </aside>
+        </div>
+        <div class="lipase-compare-trio" aria-label="Lipase with and without bile salts">
+          <article class="type-card">
+            <h4>Lipase alone</h4>
+            <ul class="bullets">
+              <li>Oil, lipase, and water: chemical digestion still happens, but the rate is lower because the surface area is smaller.</li>
+            </ul>
+          </article>
+          <iframe class="lipase-compare-live" src="vendor/nutrition/index.html?embed=1&amp;topic=applications&amp;view=guided&amp;application=experiments&amp;experiment=lipase&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=5" title="Compare lipase alone with lipase and bile salts." loading="lazy"></iframe>
+          <article class="type-card">
+            <h4>Lipase with bile</h4>
+            <ul class="bullets">
+              <li>Oil, lipase, and bile salts: enzyme active, fat emulsified, fastest fall in pH.</li>
+            </ul>
+          </article>
+        </div>
+        <article class="type-card">
+          <h4>Boiled lipase</h4>
+          <ul class="bullets">
+            <li>Boiled lipase is denatured. Bile salts cannot digest fat by themselves. pH stays the same.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter chapter-nutrient" id="s05">
+      <div class="copy">
+        <div class="sec"><span class="num">05</span><h2>Absorption</h2></div>
+        <div class="key-idea">
+          <p>Absorption is molecules entering the blood or the lymph. The small intestine is built to give time, surface, a short distance, and a steep concentration gradient.</p>
+        </div>
+        <h3>Villus</h3>
+        <div class="gif-row share-row">
+          <article class="type-card">
+            <h4>Adaptations</h4>
+            <p class="examples">At least seven features</p>
+            <img src="assets/villus-anatomy.gif" alt="Villus anatomy" class="card-anim">
+            <ol class="steps">
+              <li class="shot-row"><span>The intestine is very long, so there is more time for absorption.</span><img src="assets/villus-long.gif" alt="Long intestine"></li>
+              <li class="shot-row"><span>The inner wall is highly folded, so the surface area is larger.</span><img src="assets/villus-fold.gif" alt="Circular folds"></li>
+              <li class="shot-row"><span>The wall has many villi, so the surface area is larger again.</span><img src="assets/villus-many.gif" alt="Many villi"></li>
+              <li class="shot-row"><span>Epithelial cells have many microvilli, so the surface area is larger still.</span><iframe class="villus-adapt-live" src="vendor/nutrition/index.html?embed=1&amp;topic=villi&amp;view=guided&amp;adaptation=microvilli&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=8" title="Microvilli on one cell: more membrane surface for absorption." loading="lazy"></iframe></li>
+              <li class="shot-row"><span>The epithelium is one cell thick, so the diffusion distance is short.</span><img src="assets/villus-thin.gif" alt="Thin lining"></li>
+              <li class="shot-row"><span>Epithelial cells have many mitochondria. Aerobic respiration supplies ATP for active transport.</span><img src="assets/villus-mito.gif" alt="Mitochondria"></li>
+              <li class="shot-row"><span>A capillary network carries water-soluble food away, and a lacteal carries lipids away, so the concentration gradient stays steep. Villi move with peristalsis and keep meeting fresh food.</span><img src="assets/villus-blood.gif" alt="Blood supply"></li>
+            </ol>
+          </article>
+        </div>
+        <h3>How molecules cross</h3>
+        <div class="type-grid">
+          <article class="type-card">
+            <h4>Diffusion</h4>
+            <iframe class="transport-process-live" src="vendor/nutrition/index.html?embed=1&amp;topic=applications&amp;view=guided&amp;application=processes&amp;process=diffusion&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=4" title="Diffusion: net movement from high to low concentration, no energy." loading="lazy"></iframe>
+            <p class="examples target">Food molecules</p>
+            <ul class="bullets">
+              <li>No energy</li>
+              <li>From high concentration to low concentration until equilibrium</li>
+            </ul>
+          </article>
+          <article class="type-card">
+            <h4>Osmosis</h4>
+            <iframe class="transport-process-live" src="vendor/nutrition/index.html?embed=1&amp;topic=applications&amp;view=guided&amp;application=processes&amp;process=osmosis&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=4" title="Osmosis: water through a partially permeable membrane." loading="lazy"></iframe>
+            <p class="examples target">Water only</p>
+            <ul class="bullets">
+              <li>No energy</li>
+              <li>Needs a partially permeable membrane</li>
+              <li>Water moves from a higher water potential to a lower one, following solute</li>
+            </ul>
+          </article>
+          <article class="type-card">
+            <h4>Active transport</h4>
+            <iframe class="transport-process-live" src="vendor/nutrition/index.html?embed=1&amp;topic=applications&amp;view=guided&amp;application=processes&amp;process=active&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=4" title="Active transport: carriers use ATP from mitochondria." loading="lazy"></iframe>
+            <p class="examples target">Food molecules</p>
+            <ul class="bullets">
+              <li>Needs energy from mitochondria</li>
+              <li>Only living cells do it</li>
+              <li>Moves molecules from low concentration to high concentration, or speeds up a downhill move</li>
+            </ul>
+          </article>
+        </div>
+        <h3>Case: flattened villi</h3>
+        <div class="type-grid one-case">
+          <article class="type-card">
+            <h4>Flattened villi</h4>
+            <p class="examples">Coeliac disease</p>
+            <img src="assets/coeliac.gif" alt="Coeliac disease" class="card-anim">
+            <ul class="bullets">
+              <li>Less surface, so fewer food molecules are absorbed and more stay in the lumen.</li>
+              <li>The lumen then has a lower water potential, so less water is absorbed by osmosis. More water in the faeces means diarrhoea.</li>
+              <li>Damaged microvilli also mean less amino acid uptake, so the blood amino acid level stays low even if protein is digested.</li>
+            </ul>
+          </article>
+        </div>
+        <h3>Two routes</h3>
+        <div class="route-trio">
+          <article class="type-card">
+            <h4>Water-soluble, into the blood capillary</h4>
+            <ol class="steps">
+              <li>Monosaccharides</li>
+              <li>Amino acids</li>
+              <li>Minerals</li>
+              <li>Vitamins B and C</li>
+              <li>Water</li>
+            </ol>
+          </article>
+          <iframe class="two-routes-live" src="vendor/nutrition/index.html?embed=1&amp;topic=villi&amp;view=guided&amp;adaptation=absorption&amp;group=both&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=10" title="Absorption: water-soluble into capillaries; lipids into the lacteal." loading="lazy"></iframe>
+          <article class="type-card">
+            <h4>Lipid-soluble, into the lacteal</h4>
+            <ol class="steps">
+              <li>Lipids: glycerol and fatty acids recombine into triglyceride in the epithelial cells before they enter the lacteal</li>
+              <li>Vitamin A</li>
+              <li>Vitamin D</li>
+              <li>Vitamin E</li>
+              <li>Vitamin K</li>
+            </ol>
+          </article>
+        </div>
+        <div class="type-grid one-case route-model">
+          <article class="type-card">
+            <h4>Model</h4>
+            <iframe class="dialysis-live" src="vendor/nutrition/index.html?embed=1&amp;topic=applications&amp;view=guided&amp;application=experiments&amp;experiment=dialysis&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=3" title="Dialysis tubing model: small molecules cross, starch stays inside."></iframe>
+            <ul class="bullets">
+              <li>A dialysis-tubing model uses the tubing as the intestine wall, the outside water as blood, and a 37°C bath as body temperature. Starch stays inside. Sugars can cross.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter chapter-diet" id="s06">
+      <div class="copy">
+        <div class="sec"><span class="num">06</span><h2>Transport, assimilation, and liver</h2></div>
+        <div class="key-idea">
+          <p>Water-soluble food reaches the liver in the blood first, then the body. Lipids travel in lymph and join the blood before the heart, so they meet the liver later.</p>
+        </div>
+        <h3>Routes</h3>
+        <div class="gif-row share-row routes-villus-row">
+          <article class="type-card">
+            <h4>After the villus</h4>
+            <p class="examples">Portal vein or lymph</p>
+            <dl class="props">
+              <div>
+                <dt>Water-soluble order</dt>
+                <dd>
+                  <ol class="steps">
+                    <li>Capillaries in the villus.</li>
+                    <li>Hepatic portal vein.</li>
+                    <li>Liver.</li>
+                    <li>Hepatic vein.</li>
+                    <li>Vena cava.</li>
+                    <li>Heart.</li>
+                    <li>Aorta.</li>
+                    <li>Body cells.</li>
+                  </ol>
+                </dd>
+              </div>
+              <div>
+                <dt>Lipid-soluble order</dt>
+                <dd>
+                  <ol class="steps">
+                    <li>Lacteal.</li>
+                    <li>Lymph.</li>
+                    <li>Subclavian vein.</li>
+                    <li>Vena cava.</li>
+                    <li>Heart.</li>
+                    <li>The body.</li>
+                  </ol>
+                </dd>
+              </div>
+              <div>
+                <dt>Arteries and veins</dt>
+                <dd>Arteries leave the heart and carry more oxygen. Veins return to the heart and carry less oxygen and more carbon dioxide. Red and blue in the diagrams are blood vessels; the numbered labels match the water-soluble and lipid-soluble orders above.</dd>
+              </div>
+            </dl>
+            <div class="route-pair" aria-label="Water-soluble and lipid-soluble transport on the circulation diagram">
+              <figure class="route-figure">
+                <iframe class="route-live card-anim" src="vendor/nutrition/index.html?embed=1&amp;topic=transport&amp;view=notes&amp;route=water&amp;animate=1&amp;loop=1&amp;v=8" title="Water-soluble nutrients: villus capillaries, hepatic portal vein, liver, then heart." loading="lazy"></iframe>
+                <figcaption><strong>Water-soluble order</strong> Intestinal capillaries → hepatic portal vein → liver → hepatic vein → vena cava → heart → aorta → body.</figcaption>
+              </figure>
+              <figure class="route-figure">
+                <iframe class="route-live card-anim" src="vendor/nutrition/index.html?embed=1&amp;topic=transport&amp;view=notes&amp;route=lipid&amp;animate=1&amp;loop=1&amp;v=8" title="Lipid-soluble nutrients: lacteal, lymph vessels, then blood before the heart." loading="lazy"></iframe>
+                <figcaption><strong>Lipid-soluble order</strong> Lacteal → lymph → subclavian (left venous) junction → vena cava → heart. The liver is reached later in the circulation.</figcaption>
+              </figure>
+            </div>
+          </article>
+          <aside class="gif-slot" aria-label="Villus: water-soluble vs lipid-soluble absorption">
+            <iframe class="digest-absorption-live" src="vendor/digestion/index.html?embed=1&amp;stages=5&amp;animate=1&amp;v=5" title="Ileum villi: capillaries and lacteals with water-soluble and lipid-soluble examples." loading="lazy"></iframe>
+          </aside>
+        </div>
+        <div class="scroll">
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>Vessel</th>
+                <th>Carries</th>
+                <th>Direction</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Hepatic portal vein</td>
+                <td>After a meal: most water-soluble nutrients, including monosaccharides, amino acids, minerals, vitamins B and C, and water</td>
+                <td>Small intestine to liver</td>
+              </tr>
+              <tr>
+                <td>Hepatic vein</td>
+                <td>Processed nutrients. Urea after a protein meal. The most glucose during starvation, from glycogen</td>
+                <td>Liver to heart</td>
+              </tr>
+              <tr>
+                <td>Vena cava</td>
+                <td>Blood returning to the heart</td>
+                <td>Towards the heart</td>
+              </tr>
+              <tr>
+                <td>Aorta</td>
+                <td>Blood for the whole body</td>
+                <td>Heart to the body</td>
+              </tr>
+              <tr>
+                <td>Lymph vessel</td>
+                <td>Lipids and fat-soluble vitamins. It rejoins blood at the subclavian vein</td>
+                <td>Towards the heart</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Fate of food</h3>
+        <div class="scroll">
+          <table class="compare-table fate-food-anim">
+            <thead>
+              <tr>
+                <th>Nutrient</th>
+                <th>Used for</th>
+                <th>If there is extra</th>
+                <th>Animation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Glucose</td>
+                <td>Releasing energy</td>
+                <td>Glycogen in the liver and muscles, or lipid in the liver</td>
+                <td class="anim-cell"><iframe class="fate-food-live" src="vendor/nutrition/index.html?embed=1&amp;topic=assimilation&amp;view=guided&amp;nutrient=glucose&amp;fate=use&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=5" title="Glucose: used for releasing energy in body cells." loading="lazy"></iframe></td>
+              </tr>
+              <tr>
+                <td>Amino acids</td>
+                <td>Proteins for growth and repair, plus enzymes, antibodies, and hormones</td>
+                <td>Deamination. The amino group becomes urea and is excreted in urine. The remaining part can become glucose, glycogen, or lipid</td>
+                <td class="anim-cell"><iframe class="fate-food-live" src="vendor/nutrition/index.html?embed=1&amp;topic=assimilation&amp;view=guided&amp;nutrient=amino&amp;fate=use&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=5" title="Amino acids: built into proteins for growth and repair." loading="lazy"></iframe></td>
+              </tr>
+              <tr>
+                <td>Lipids</td>
+                <td>Energy store, cell membranes, and sex hormones</td>
+                <td>Deposited around organs and built into adipose tissue, including fat under the skin</td>
+                <td class="anim-cell"><iframe class="fate-food-live" src="vendor/nutrition/index.html?embed=1&amp;topic=assimilation&amp;view=guided&amp;nutrient=lipid&amp;fate=use&amp;lipidUse=membrane&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=5" title="Lipids: cell membranes, energy store, and hormones." loading="lazy"></iframe></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="type-grid">
+          <article class="type-card">
+            <h4>Which vessel</h4>
+            <img class="card-anim" src="assets/glucose-vessel.gif" alt="Blood glucose after a meal and during starvation">
+            <ul class="bullets">
+              <li>After a meal rich in carbohydrate, the hepatic portal vein has the highest glucose. Insulin rises. Glucagon does not.</li>
+              <li>During starvation, the hepatic vein has the highest glucose, because the liver turns glycogen back into glucose.</li>
+            </ul>
+          </article>
+        </div>
+        <h3>Liver jobs</h3>
+        <div class="scroll">
+          <table class="compare-table liver-jobs-anim">
+            <thead>
+              <tr>
+                <th>Job</th>
+                <th>Detail</th>
+                <th>Animation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Regulating</td>
+                <td class="detail-cell">Insulin rises: glucose becomes glycogen, so blood glucose falls. Glucagon rises: glycogen becomes glucose, so blood glucose rises. Insulin does not work if it is swallowed. It is a protein, so proteases in the gut digest it before it can reach the blood. It has to be injected.</td>
+                <td class="anim-cell"><iframe class="liver-job-live" src="vendor/nutrition/index.html?embed=1&amp;topic=liver&amp;view=guided&amp;fn=0&amp;situation=meal&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=6" title="Regulating blood glucose: insulin and glycogen storage." loading="lazy"></iframe></td>
+              </tr>
+              <tr>
+                <td>Storing</td>
+                <td class="detail-cell">Glycogen, iron from broken red blood cells, and vitamins A, D, E, and K.</td>
+                <td class="anim-cell"><iframe class="liver-job-live" src="vendor/nutrition/index.html?embed=1&amp;topic=liver&amp;view=guided&amp;fn=1&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=6" title="Liver storage: glycogen, iron, and fat-soluble vitamins." loading="lazy"></iframe></td>
+              </tr>
+              <tr>
+                <td>Producing</td>
+                <td class="detail-cell">Bile, and vitamin A made from carotene.</td>
+                <td class="anim-cell"><iframe class="liver-job-live" src="vendor/nutrition/index.html?embed=1&amp;topic=liver&amp;view=guided&amp;fn=2&amp;production=bile&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=6" title="Liver production: bile from hepatocytes." loading="lazy"></iframe></td>
+              </tr>
+              <tr>
+                <td>Deaminating</td>
+                <td class="detail-cell">
+                  <ol class="steps">
+                    <li>Making body proteins is assimilation. The nitrogenous part is not stored.</li>
+                    <li>Deamination can happen only after the amino acids have been absorbed.</li>
+                    <li>The amino group is removed and converted to urea. Urea leaves in urine.</li>
+                  </ol>
+                </td>
+                <td class="anim-cell"><iframe class="liver-job-live" src="vendor/nutrition/index.html?embed=1&amp;topic=liver&amp;view=guided&amp;fn=3&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=6" title="Deamination: amino group to urea." loading="lazy"></iframe></td>
+              </tr>
+              <tr>
+                <td>Detoxifying</td>
+                <td class="detail-cell">Mild toxic substances are processed. Catalase breaks down hydrogen peroxide.</td>
+                <td class="anim-cell"><iframe class="liver-job-live" src="vendor/nutrition/index.html?embed=1&amp;topic=liver&amp;view=guided&amp;fn=4&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=6" title="Detoxification: catalase breaks down hydrogen peroxide." loading="lazy"></iframe></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter chapter-health" id="s07">
+      <div class="copy">
+        <div class="sec"><span class="num">07</span><h2>Large intestine and egestion</h2></div>
+        <div class="key-idea">
+          <p>There is no digestion in the large intestine. Most food, and most water, has already been absorbed in the small intestine. What leaves through the anus is faeces only.</p>
+        </div>
+        <h3>Jobs</h3>
+        <div class="gif-row share-row">
+          <article class="type-card">
+            <h4>Colon, rectum, anus</h4>
+            <dl class="props">
+              <div>
+                <dt>Structure</dt>
+                <dd>Colon, rectum, and anus.</dd>
+              </div>
+              <div>
+                <dt>Process</dt>
+                <dd>The colon does the final absorption of water, and also some minerals and vitamins, then compacts the faeces.</dd>
+                <dd>The rectum stores faeces for a short time.</dd>
+                <dd>Egestion is the removal of undigested and unabsorbed material. It is not the removal of metabolic waste.</dd>
+              </div>
+              <div>
+                <dt>Fate of bile pigment</dt>
+                <dd>Liver, gall bladder, bile duct, duodenum, ileum, colon, rectum, anus. It leaves with the faeces and makes them brown.</dd>
+              </div>
+            </dl>
+          </article>
+          <aside class="gif-slot" aria-label="Egestion animation">
+            <iframe class="egestion-live" src="vendor/nutrition/index.html?embed=1&amp;topic=egestion&amp;view=notes&amp;transit=normal&amp;animate=1&amp;loop=1&amp;v=8" title="Colon and rectum: water absorption and faeces compaction." loading="lazy"></iframe>
+          </aside>
+        </div>
+        <h3>Faeces</h3>
+        <div class="type-grid">
+          <article class="type-card">
+            <h4>Normal faeces</h4>
+            <iframe class="egestion-live" src="vendor/nutrition/index.html?embed=1&amp;topic=egestion&amp;view=notes&amp;transit=normal&amp;animate=1&amp;loop=1&amp;v=8" title="Normal large intestine: water absorbed, faeces compacted." loading="lazy"></iframe>
+            <ul class="bullets">
+              <li>Dietary fibre, bile pigment, bacteria, dead cells, mucus, and a little water.</li>
+              <li>Bacteria make the smell. Bile pigment makes the brown colour.</li>
+              <li>Red blood cells and a large volume of water are not normal in the faeces of a healthy person. Bacteria are.</li>
+            </ul>
+          </article>
+        </div>
+        <div class="type-grid faeces-figures">
+          <article class="type-card">
+            <h4>Sphincters</h4>
+            <img class="card-anim" src="assets/sphincters-stomach.png" alt="Stomach cross-section with cardiac and pyloric sphincters labelled." width="640" height="480" loading="lazy">
+            <ul class="bullets">
+              <li>Cardiac sphincter: between oesophagus and stomach.</li>
+              <li>Pyloric sphincter: between stomach and duodenum.</li>
+              <li>Anal sphincter: at the anus, opened for egestion.</li>
+            </ul>
+          </article>
+          <article class="type-card">
+            <h4>Diarrhoea</h4>
+            <img class="card-anim" src="assets/diarrhoea-colon.png" alt="Normal versus diarrhoea: water and electrolyte loss in the colon." width="640" height="480" loading="lazy">
+            <ul class="bullets">
+              <li>Diarrhoea: peristalsis is too fast, so there is not enough time to absorb water. Or too little solute is absorbed, so water stays in the lumen by osmosis.</li>
+            </ul>
+          </article>
+          <article class="type-card">
+            <h4>Constipation</h4>
+            <img class="card-anim" src="assets/constipation.jpg" alt="Packed colon and hardened faeces in constipation." width="640" height="480" loading="lazy">
+            <ul class="bullets">
+              <li>Not enough dietary fibre and water.</li>
+              <li>Low fibre slows peristalsis, so there is more time to absorb water and the faeces become dry.</li>
+            </ul>
+          </article>
+          <article class="type-card">
+            <h4>Oily or bloody</h4>
+            <img class="card-anim" src="assets/bloody-stool.jpg" alt="Causes of blood in stool, including damage along the alimentary canal." width="640" height="480" loading="lazy">
+            <ul class="bullets">
+              <li>Oily faeces: the pancreas is not supplying enough lipase, so fat is not digested.</li>
+              <li>Blood: the alimentary canal is damaged. Blood from further along the tube is less bright red.</li>
+            </ul>
+          </article>
+        </div>
+        <h3>If a part is removed</h3>
+        <div class="type-grid">
+          <article class="type-card">
+            <h4>Less small intestine</h4>
+            <ul class="bullets">
+              <li>Less digested food is absorbed, so less energy is assimilated. That can cause weight loss.</li>
+            </ul>
+          </article>
+          <article class="type-card">
+            <h4>Less large intestine</h4>
+            <ul class="bullets">
+              <li>Less water is absorbed, so faeces are more watery and the body can lose water.</li>
+              <li>A low-fibre diet slows peristalsis. The remaining large intestine then has more time to absorb water.</li>
+            </ul>
+          </article>
+          <article class="type-card">
+            <h4>No gall bladder</h4>
+            <ul class="bullets">
+              <li>Bile is not stored, so a large fatty meal is harder to emulsify. Very fatty food is the food to cut down.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <p class="key-idea-label">Why it matters</p>
+      <div class="why-matters">
+        <ul>
+          <li>Use the five words in order, and keep egestion for faeces. Urine, urea, and carbon dioxide are excretion.</li>
+          <li>If a graph is flat in the stomach, that food is not being digested there. Starch pauses because acid denatures amylase. Fat waits for bile and lipase. Fibre never drops.</li>
+          <li>Name the vessel with its direction. After a meal, glucose peaks in the hepatic portal vein. In starvation, it peaks in the hepatic vein.</li>
+        </ul>
+      </div>
+      <p class="page-credit">Ch7 · SB02 Nutrition in humans · seven processes</p>
+    </footer>
+  </div>
+  <script>
+    (function () {
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      document.querySelectorAll("img[src*='.gif']").forEach(function (img) {
+        function freeze() {
+          if (!img.naturalWidth) return;
+          var canvas = document.createElement("canvas");
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          canvas.getContext("2d").drawImage(img, 0, 0);
+          img.src = canvas.toDataURL("image/png");
+        }
+        if (img.complete && img.naturalWidth) freeze();
+        else img.addEventListener("load", freeze, { once: true });
+      });
+    })();
+    (function () {
+      const panel = document.getElementById("tooth-structure-panel");
+      if (!panel) return;
+      const marks = panel.querySelectorAll("[data-part]");
+      const alias = { nerve: "pulp", blood: "pulp" };
+      function highlight(part) {
+        const key = alias[part] || part;
+        marks.forEach(function (node) {
+          node.classList.toggle("is-on", node.getAttribute("data-part") === key);
+        });
+      }
+      highlight("crown");
+      window.addEventListener("message", function (event) {
+        const data = event.data;
+        if (!data || data.source !== "teeth-structure" || !data.item) return;
+        highlight(data.item);
+      });
+    })();
+  </script>
+</body>
+</html>
