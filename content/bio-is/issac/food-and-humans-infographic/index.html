@@ -416,6 +416,71 @@
       grid-template-columns: minmax(0, 1fr) var(--media-col);
       align-items: stretch;
     }
+    /* Sparse copy beside tall media — entire infographic (opt out with .copy-dense) */
+    .gif-row.share-row {
+      display: grid;
+    }
+    .gif-row.share-row:not(.copy-dense) .card-stack {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 100%;
+    }
+    .gif-row.share-row:not(.copy-dense) .type-card .props dd,
+    .gif-row.share-row:not(.copy-dense) .type-card ol.steps li,
+    .gif-row.share-row:not(.copy-dense) .type-card .bullets li {
+      font-size: 21px;
+      line-height: 1.45;
+    }
+    .type-grid > .gif-row.share-row {
+      display: grid;
+      flex-direction: unset;
+      grid-template-columns: minmax(0, 1fr) var(--media-col);
+      align-items: stretch;
+    }
+    .type-grid > .gif-row.share-row > .gif-slot {
+      order: 0;
+      align-self: stretch;
+    }
+    .type-grid > .gif-row:not(.share-row):not(.thumb):not(.compact):not(.copy-dense) {
+      display: grid;
+      flex-direction: unset;
+      grid-template-columns: minmax(0, 1fr) var(--media-col);
+      align-items: stretch;
+    }
+    .type-grid > .gif-row:not(.share-row):not(.thumb):not(.compact):not(.copy-dense) > .gif-slot {
+      order: 0;
+      align-self: stretch;
+    }
+    .type-grid > .gif-row:not(.share-row):not(.thumb):not(.compact):not(.copy-dense) > .type-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-self: stretch;
+      min-height: 100%;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      box-shadow: none;
+    }
+    .type-grid > .gif-row:not(.share-row):not(.thumb):not(.compact):not(.copy-dense) .props dd,
+    .type-grid > .gif-row:not(.share-row):not(.thumb):not(.compact):not(.copy-dense) .bullets li,
+    .type-grid > .gif-row:not(.share-row):not(.thumb):not(.compact):not(.copy-dense) ol.steps li {
+      font-size: 21px;
+      line-height: 1.45;
+    }
+    #s02 .carb-mono .family-cards > .gif-row:not(.copy-dense) .props dd,
+    #s02 .carb-di .family-cards > .gif-row:not(.copy-dense) .props dd {
+      font-size: 21px;
+      line-height: 1.45;
+    }
+    #s02 .carb-mono .family-cards > .gif-row:not(.copy-dense) > .type-card,
+    #s02 .carb-di .family-cards > .gif-row:not(.copy-dense) > .type-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 100%;
+    }
     .share-row > .gif-slot.media-stack {
       align-self: start;
       justify-self: stretch;
@@ -1475,6 +1540,18 @@
       padding: 8px 0 4px;
     }
     .card-stack .type-card h4 { position: static; }
+    .card-stack .fatty-acid-diagram {
+      margin: 10px 0 0;
+      padding: 0;
+    }
+    .card-stack .fatty-acid-diagram img {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+      background: #fff;
+    }
     .examples {
       color: #161616;
       font-size: 18px;
@@ -1513,6 +1590,57 @@
       box-shadow: 3px 3px 0 #161616;
       padding: 16px 12px 8px;
       margin-bottom: 18px;
+    }
+    /* §02 Carbohydrate: mono/disac bottom-align; poly full width */
+    #s02 .carb-sugar-grid {
+      align-items: stretch;
+    }
+    #s02 .carb-sugar-grid > .carb-mono,
+    #s02 .carb-sugar-grid > .carb-di {
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      margin-bottom: 0;
+    }
+    #s02 .carb-mono .family-cards {
+      flex: 1;
+    }
+    #s02 .carb-sugar-grid > .carb-poly {
+      grid-column: 1 / -1;
+      margin-bottom: 0;
+    }
+    #s02 .carb-poly .family-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 26px 18px;
+      align-items: stretch;
+    }
+    #s02 .carb-poly .family-cards > .gif-row:nth-child(1),
+    #s02 .carb-poly .family-cards > .gif-row:nth-child(2) {
+      min-height: 0;
+    }
+    #s02 .carb-poly .family-cards > .gif-row:last-child {
+      grid-column: 1 / -1;
+      display: grid;
+      flex-direction: unset;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 44%);
+      column-gap: 22px;
+      align-items: start;
+    }
+    #s02 .carb-poly .family-cards > .gif-row:last-child > .gif-slot {
+      order: 0;
+    }
+    #s02 .carb-poly .family-cards > .gif-row:last-child .gif-slot > img {
+      max-height: min(380px, 48vh);
+    }
+    @media (max-width: 800px) {
+      #s02 .carb-poly .family-cards {
+        grid-template-columns: 1fr;
+      }
+      #s02 .carb-poly .family-cards > .gif-row:last-child {
+        grid-column: auto;
+        grid-template-columns: minmax(0, 1fr);
+      }
     }
     @media (prefers-reduced-motion: reduce) {
       .gif-slot::before,
@@ -1755,7 +1883,7 @@
         </table>
       </div>
       <h3>Types</h3>
-      <div class="type-grid">
+      <div class="type-grid carb-sugar-grid">
         <div class="carb-family carb-mono">
           <header class="family-head">
             <svg class="sugar-art" viewBox="0 0 36 40" width="36" height="40" aria-hidden="true">
@@ -2117,7 +2245,7 @@
             </div>
           </div>
         </div>
-        <div class="gif-row share-row">
+        <div class="gif-row share-row copy-dense">
           <div class="card-stack">
         <article class="type-card">
           <h4>Saturated fatty acid</h4>
@@ -2131,6 +2259,9 @@
               <dd>Raises the risk of cardiovascular disease.</dd>
             </div>
           </dl>
+          <figure class="fatty-acid-diagram">
+            <img loading="lazy" decoding="async" src="images/saturated-fatty-acid.png" alt="Saturated fatty acid: straight hydrocarbon chain with no double bonds.">
+          </figure>
         </article>
         <article class="type-card">
           <h4>Unsaturated fatty acid</h4>
@@ -2153,6 +2284,9 @@
               <dd>The body’s enzymes are not suited to hydrolyse it.</dd>
             </div>
           </dl>
+          <figure class="fatty-acid-diagram">
+            <img loading="lazy" decoding="async" src="images/trans-fatty-acid.png" alt="Cis and trans fatty acids: trans has hydrogens on opposite sides of the double bond.">
+          </figure>
         </article>
           </div>
         <aside class="gif-slot photo-slot" aria-label="Fatty acid foods">
@@ -2173,7 +2307,7 @@
       </div>
       <h3>Types</h3>
       <div class="type-grid">
-        <div class="gif-row share-row">
+        <div class="gif-row share-row copy-dense">
           <div class="card-stack">
             <article class="type-card">
               <h4>Amino acid</h4>
@@ -2333,7 +2467,7 @@
           <img loading="lazy" decoding="async" src="images/nucleotide.png" alt="A nucleotide: phosphate, pentose sugar and a nitrogenous base.">
         </aside>
         </div>
-        <div class="gif-row share-row">
+        <div class="gif-row share-row copy-dense">
           <div class="card-stack">
             <div class="carb-family nucleic-dna">
               <header class="family-head">

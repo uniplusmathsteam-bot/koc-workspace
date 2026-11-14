@@ -650,9 +650,11 @@
     ol {
       list-style: none;
       padding-left: 0;
+    }
+    ol:not(.steps) {
       counter-reset: step;
     }
-    ol li {
+    ol:not(.steps) > li {
       counter-increment: step;
       display: grid;
       grid-template-columns: 32px 1fr;
@@ -661,8 +663,8 @@
       padding: 11px 0;
       border-top: 1px solid var(--line);
     }
-    ol li:last-child { border-bottom: 1px solid var(--line); }
-    ol li::before {
+    ol:not(.steps) > li:last-child { border-bottom: 1px solid var(--line); }
+    ol:not(.steps) > li::before {
       content: counter(step, decimal-leading-zero);
       font-family: "Avenir Next", "Segoe UI", sans-serif;
       font-size: 16px;
@@ -674,15 +676,24 @@
     ol.steps {
       margin: 0;
       padding: 0;
+      counter-reset: step;
     }
     ol.steps li {
-      grid-template-columns: 22px 1fr;
-      gap: 8px;
-      padding: 0 0 6px;
+      display: block;
+      position: relative;
+      padding: 0 0 6px 1.65em;
       border: none;
+      counter-increment: step;
     }
     ol.steps li:last-child { border: none; margin-bottom: 0; }
-    ol.steps li::before { content: counter(step) "."; }
+    ol.steps li::before {
+      content: counter(step) ".";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1.4em;
+      text-align: left;
+    }
     .bullets {
       list-style: none;
       margin: 0;
@@ -963,7 +974,197 @@
       border-bottom: 1px solid var(--line);
     }
     .compare-table.steps-anim { min-width: 880px; }
-    .compare-table.juices-anim { min-width: 1120px; }
+    .juices-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      margin: 0 0 16px;
+    }
+    .juice-card {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 40%);
+      grid-template-areas:
+        "copy anim";
+      gap: 12px 18px;
+      align-items: stretch;
+      padding: 26px 14px 14px;
+      border: 3px solid #161616;
+      border-radius: 2px 10px 3px 8px;
+      box-shadow: 3px 3px 0 #161616;
+      background: transparent;
+    }
+    .juice-card > h4 {
+      position: absolute;
+      top: -13px;
+      left: 16px;
+      z-index: 2;
+      margin: 0;
+      padding: 0 4px;
+      background: linear-gradient(transparent 42%, #f6e27a 42% 78%, transparent 78%);
+      font-size: 24px;
+      line-height: 1.1;
+    }
+    .juice-copy {
+      grid-area: copy;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 100%;
+    }
+    .juice-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+      gap: 6px 14px;
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.35;
+    }
+    .juice-meta div { margin: 0; }
+    .juice-meta dt {
+      display: inline-block;
+      margin: 0 0 2px;
+      padding: 0 8px;
+      border-radius: 2px;
+      background: #f6e27a;
+      font-size: 16px;
+      line-height: 22px;
+    }
+    .juice-meta dd {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.35;
+    }
+    .juice-contents-label {
+      margin: 8px 0 4px;
+      padding: 0 8px;
+      width: fit-content;
+      border-radius: 999px;
+      background: #d7c4f0;
+      font-size: 16px;
+      line-height: 22px;
+    }
+    .juice-card .juice-contents ol.steps li {
+      font-size: 17px;
+      line-height: 1.35;
+    }
+    /* Sparse copy beside tall media — entire infographic (opt out with .copy-dense) */
+    .juice-card:not(.copy-dense) > h4 {
+      font-size: 26px;
+    }
+    .juice-card:not(.copy-dense) .juice-meta {
+      font-size: 19px;
+      line-height: 1.42;
+    }
+    .juice-card:not(.copy-dense) .juice-meta dt {
+      font-size: 18px;
+      line-height: 24px;
+    }
+    .juice-card:not(.copy-dense) .juice-meta dd {
+      font-size: 19px;
+    }
+    .juice-card:not(.copy-dense) .juice-contents-label {
+      font-size: 18px;
+      line-height: 24px;
+      margin-top: 14px;
+    }
+    .juice-card:not(.copy-dense) .juice-contents ol.steps li {
+      font-size: 21px;
+      line-height: 1.45;
+      padding-bottom: 12px;
+    }
+    .gif-row.share-row:has(> .gif-slot) {
+      align-items: stretch;
+    }
+    .gif-row.share-row:has(> .gif-slot) > .type-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 100%;
+    }
+    .gif-row.share-row:not(.copy-dense) > .type-card .examples,
+    .gif-row.share-row:not(.copy-dense) > .type-card .props dd,
+    .gif-row.share-row:not(.copy-dense) > .type-card ol.steps li,
+    .gif-row.share-row:not(.copy-dense) > .type-card .bullets li,
+    .gif-row.share-row:not(.copy-dense) > .type-card > p {
+      font-size: 21px;
+      line-height: 1.45;
+    }
+    .gif-row.share-row:not(.copy-dense) > .type-card .props dt {
+      font-size: 18px;
+    }
+    .tract-split {
+      align-items: stretch;
+    }
+    .tract-split .tract-key {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 100%;
+    }
+    .tract-split:not(.copy-dense) .tract-key p,
+    .tract-split:not(.copy-dense) .tract-key li,
+    .tract-split:not(.copy-dense) .tract-key dd {
+      font-size: 21px;
+      line-height: 1.45;
+    }
+    .teeth-box > .type-card:not(.copy-dense) .bullets li,
+    .type-grid > .type-card:not(.copy-dense) .bullets li {
+      font-size: 21px;
+      line-height: 1.45;
+    }
+    .route-trio:not(.copy-dense) ol.steps li,
+    .lipase-compare-trio:not(.copy-dense) .bullets li {
+      font-size: 21px;
+      line-height: 1.45;
+    }
+    .lipase-compare-trio {
+      align-items: stretch;
+    }
+    .lipase-compare-trio > .type-card {
+      justify-content: space-between;
+      min-height: 100%;
+    }
+    .route-trio > .type-card {
+      justify-content: space-between;
+    }
+    .juice-anim {
+      grid-area: anim;
+      align-self: start;
+      min-width: 0;
+    }
+    .juice-anim iframe,
+    .juice-anim img {
+      display: block;
+      width: 100%;
+      border: 0;
+      border-radius: 8px;
+      background: #fff;
+    }
+    .juice-anim iframe {
+      height: min(380px, 44vh);
+      min-height: 300px;
+    }
+    .juice-card.juice-tall .juice-anim iframe {
+      height: min(440px, 50vh);
+      min-height: 340px;
+    }
+    .juice-anim img {
+      height: auto;
+      max-height: min(380px, 44vh);
+      object-fit: contain;
+    }
+    @media (max-width: 860px) {
+      .juice-card {
+        grid-template-columns: 1fr;
+      }
+      .juice-anim {
+        grid-column: 1;
+        grid-row: auto;
+        order: -1;
+      }
+    }
     .compare-table td.anim-cell {
       width: 236px;
       vertical-align: middle;
@@ -1468,7 +1669,6 @@
     .gif-row.share-row:has(> .gif-slot) {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(240px, 420px);
-      align-items: start;
       gap: 12px;
     }
     .gif-row.share-row:has(> .gif-slot) > .gif-slot { order: 0; }
@@ -1510,14 +1710,6 @@
     .compare-table td.anim-cell iframe.anim-frame {
       width: 100%;
       height: 230px;
-    }
-    .compare-table.juices-anim td.anim-cell iframe.anim-frame {
-      width: 220px;
-      height: 260px;
-      border-radius: 8px;
-    }
-    .compare-table.juices-anim td.anim-cell iframe.anim-frame.tall {
-      height: 340px;
     }
     .route-trio-duo {
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1620,11 +1812,22 @@
     .route-pair iframe.route-live,
     .route-pair iframe.card-anim { margin-top: 0; height: 300px; width: 100%; }
     ol.steps li.shot-row {
-      grid-template-columns: 22px minmax(0, 1fr);
+      display: grid;
+      grid-template-columns: 1.65em minmax(0, 1fr);
       align-items: start;
       gap: 8px 12px;
+      padding-left: 0;
     }
-    ol.steps li.shot-row > span { grid-column: 2; }
+    ol.steps li.shot-row::before {
+      position: static;
+      width: auto;
+      grid-column: 1;
+      grid-row: 1;
+    }
+    ol.steps li.shot-row > span {
+      grid-column: 2;
+      min-width: 0;
+    }
     ol.steps li.shot-row > img,
     ol.steps li.shot-row > iframe {
       grid-column: 2;
@@ -1853,7 +2056,6 @@
       display: grid;
       grid-template-columns: minmax(0, 1.45fr) minmax(210px, 0.7fr);
       gap: 16px;
-      align-items: start;
       margin-top: 8px;
       padding: 12px;
       border: 3px solid #161616;
@@ -1931,7 +2133,7 @@
       display: grid;
       grid-template-columns: minmax(140px, 0.9fr) minmax(280px, 1.35fr) minmax(140px, 0.9fr);
       gap: 12px;
-      align-items: start;
+      align-items: stretch;
       margin: 8px 0 14px;
       padding: 12px;
       border: 3px solid #161616;
@@ -2070,6 +2272,45 @@
       .route-trio { grid-template-columns: 1fr; }
       .villus-live, .route-live { height: 420px; }
     }
+
+    /* PDF note highlights (Michael Y SB02) — inline words only */
+    mark.hl-y, mark.hl-g, mark.hl-b, mark.hl-p, mark.hl-o {
+      display: inline;
+      width: auto;
+      max-width: none;
+      padding: 0 0.12em;
+      color: inherit;
+      border-radius: 2px;
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+    }
+    h4 mark {
+      display: inline;
+      padding: 0 0.12em;
+    }
+    .key-idea p mark,
+    .key-idea--hero li mark,
+    .why-matters li mark,
+    li mark,
+    dd mark,
+    td mark,
+    .props dd mark,
+    .compare-table mark {
+      background-image: none;
+    }
+    .compare-table td,
+    .compare-table th,
+    .juice-copy,
+    .props dd,
+    .bullets li {
+      overflow-wrap: break-word;
+      word-break: normal;
+    }
+    mark.hl-y { background: #fff156; }
+    mark.hl-g { background: #b8f0a8; }
+    mark.hl-b { background: #a8e4ff; }
+    mark.hl-p { background: #ffc8e8; }
+    mark.hl-o { background: #ffd4a8; }
   </style>
 </head>
 <body>
@@ -2087,9 +2328,9 @@
           <span class="brand-tag">Seven processes · Ch7</span>
         </div>
         <h1>Nutrition in Humans</h1>
-        <p class="mast-subtitle">Ch7 · The seven processes</p>
-        <p class="lead">Nutrition is one of the seven characteristics of life. Humans use holozoic nutrition: they take in solid food, break it down, absorb the useful molecules, and use them in cells.</p>
-        <p class="lead">These notes follow the seven processes in order: the nutrition process, the human digestive tract and glands, teeth and swallowing, then peristalsis, digestion, absorption, transport and the liver, then the large intestine and egestion.</p>
+        <p class="mast-subtitle">Ch7 · Process of nutrition <mark class="hl-y">(one of 7 characteristics of life)</mark></p>
+        <p class="lead">Humans have <mark class="hl-y">heterotrophic</mark> <mark class="hl-y">holozoic</mark> nutrition: <mark class="hl-y">ingestion</mark>, <mark class="hl-y">digestion</mark>, <mark class="hl-y">absorption</mark>, <mark class="hl-y">assimilation</mark>, and <mark class="hl-y">egestion</mark>.</p>
+        <p class="lead">Follow the notes in order: the nutrition process, human digestive tract and glands, teeth and swallowing, peristalsis, digestion, absorption, transport and liver, then large intestine and egestion.</p>
         <div class="scroll">
           <table class="compare-table">
             <thead>
@@ -2157,10 +2398,10 @@
         <p class="key-idea-label">Key idea</p>
         <div class="key-idea key-idea--hero">
           <ul>
-            <li>Holozoic nutrition has five steps: ingestion, digestion, absorption, assimilation, and egestion.</li>
-            <li>Physical digestion makes smaller pieces and a larger surface. Enzymes then split molecules. Bile only emulsifies fat.</li>
-            <li>Digestion finishes in the small intestine. Water-soluble food goes to the liver in the blood. Lipids travel in lymph.</li>
-            <li>The large intestine absorbs the last of the water and egests undigested material as faeces. That is not excretion.</li>
+            <li>Holozoic nutrition: <mark class="hl-y">ingestion</mark>, <mark class="hl-y">digestion</mark>, <mark class="hl-y">absorption</mark>, <mark class="hl-y">assimilation</mark>, <mark class="hl-y">egestion</mark>.</li>
+            <li><mark class="hl-g">Physical digestion</mark>: mechanical breakdown into <mark class="hl-y">smaller</mark> pieces, <mark class="hl-o">increase surface area</mark> for digestive juice. <mark class="hl-g">Chemical digestion</mark>: breakdown by <mark class="hl-y">enzymes</mark> to <mark class="hl-y">simpler</mark> molecules. Bile <mark class="hl-g">emulsifies</mark> lipids only (no enzyme).</li>
+            <li><mark class="hl-y">Small intestine</mark> finishes all digestion! Water-soluble: capillaries → hepatic portal vein → liver. Lipids: lacteals → lymph → <mark class="hl-y">rejoin blood</mark> before the heart.</li>
+            <li>Large intestine: <mark class="hl-g">final</mark> water absorption; <mark class="hl-y">egestion</mark> of <mark class="hl-y">undigested and unabsorbed</mark> material as <mark class="hl-y">faeces</mark>. Different from <mark class="hl-y">excretion</mark> (metabolic waste, e.g. urine, urea, CO<sub>2</sub>).</li>
           </ul>
         </div>
         <div class="glance-grid">
@@ -2174,11 +2415,11 @@
                 </tr>
               </thead>
               <tbody>
-                <tr><td>Ingestion</td><td>Mouth</td></tr>
-                <tr><td>Digestion</td><td>Breakdown</td></tr>
-                <tr><td>Absorption</td><td>Enter</td></tr>
-                <tr><td>Assimilation</td><td>Use</td></tr>
-                <tr><td>Egestion</td><td>Faeces</td></tr>
+                <tr><td><mark class="hl-y">Ingestion</mark></td><td><mark class="hl-y">mouth</mark></td></tr>
+                <tr><td><mark class="hl-y">Digestion</mark></td><td><mark class="hl-y">breakdown</mark></td></tr>
+                <tr><td><mark class="hl-g">Absorption</mark></td><td><mark class="hl-g">enter…</mark></td></tr>
+                <tr><td><mark class="hl-b">Assimilation</mark></td><td><mark class="hl-b">use</mark></td></tr>
+                <tr><td><mark class="hl-o">Egestion</mark></td><td><mark class="hl-o">faeces</mark></td></tr>
               </tbody>
             </table>
           </div>
@@ -2193,10 +2434,10 @@
                 </tr>
               </thead>
               <tbody>
-                <tr><td>Starch</td><td>Mouth</td><td>Large intestine</td></tr>
-                <tr><td>Protein</td><td>Stomach</td><td>Large intestine</td></tr>
-                <tr><td>Lipid</td><td>Duodenum</td><td>Large intestine</td></tr>
-                <tr><td>Dietary fibre</td><td>Never digested</td><td>Leaves in faeces</td></tr>
+                <tr><td>Starch</td><td><mark class="hl-y">Mouth cavity</mark></td><td>Before large intestine</td></tr>
+                <tr><td>Protein</td><td><mark class="hl-y">Stomach</mark></td><td>Before large intestine</td></tr>
+                <tr><td>Lipid</td><td><mark class="hl-y">Small intestine</mark></td><td>Before large intestine</td></tr>
+                <tr><td><mark class="hl-o">Dietary fibre</mark></td><td><mark class="hl-o">Never digested</mark></td><td><mark class="hl-y">Undigested unabsorbed</mark> in faeces</td></tr>
               </tbody>
             </table>
           </div>
@@ -2208,7 +2449,7 @@
       <div class="copy">
         <div class="sec"><span class="num">01</span><h2>The nutrition process</h2></div>
         <div class="key-idea">
-          <p>Humans cannot make their own food. They ingest it, digest it into small soluble molecules, absorb those molecules, and cells use them for metabolism.</p>
+          <p>= <mark class="hl-y">cannot make own food</mark> (no photosynthesis). Food is ingested, digested into <mark class="hl-g">small, simple, soluble molecules</mark> (<mark class="hl-g">prepare for absorption!</mark>), absorbed, then used for <mark class="hl-b">metabolism</mark>.</p>
         </div>
         <h3>Five steps</h3>
         <div class="scroll">
@@ -2223,33 +2464,33 @@
             </thead>
             <tbody>
               <tr>
-                <td>Ingestion</td>
-                <td>Food is taken in through the mouth cavity.</td>
-                <td>Mouth, taken in, intake</td>
+                <td><mark class="hl-y">Ingestion</mark></td>
+                <td>Food taken in through the <mark class="hl-y">mouth cavity</mark>.</td>
+                <td><mark class="hl-y">mouth</mark></td>
                 <td class="anim-cell"><img src="assets/dig-mouth.gif" alt="Ingestion: mouth cavity" class="anim-frame"></td>
               </tr>
               <tr>
-                <td>Digestion</td>
-                <td>Breakdown into small, simple, soluble molecules, ready for absorption.</td>
-                <td>Breakdown, hydrolyse, enzyme, grind, cut</td>
+                <td><mark class="hl-y">Digestion</mark></td>
+                <td>Breakdown into <mark class="hl-g">small, simple, soluble molecules</mark> (<mark class="hl-g">prepare for absorption!</mark>).</td>
+                <td><mark class="hl-y">breakdown</mark></td>
                 <td class="anim-cell"><img src="assets/dig-stomach-duodenum.gif" alt="Digestion: stomach, then duodenum" class="anim-frame"></td>
               </tr>
               <tr>
-                <td>Absorption</td>
-                <td>Entry of molecules into the circulatory transport system.</td>
-                <td>Enter, diffuse, active transport, blood, lymph</td>
+                <td><mark class="hl-g">Absorption</mark></td>
+                <td><mark class="hl-g">Entry</mark> of molecules into circulatory / transport system.</td>
+                <td><mark class="hl-g">enter…</mark></td>
                 <td class="anim-cell"><iframe class="step-absorb" src="vendor/nutrition/index.html?embed=1&amp;topic=villi&amp;view=guided&amp;adaptation=absorption&amp;group=both&amp;animate=1&amp;legend=1" title="Absorption: molecules enter capillaries or the lacteal."></iframe></td>
               </tr>
               <tr>
-                <td>Assimilation</td>
-                <td>Cells take up molecules for metabolism, both building up and breaking down.</td>
-                <td>Use, build, make, anabolism, growth and repair</td>
+                <td><mark class="hl-b">Assimilation</mark></td>
+                <td>Absorbed food molecules taken up by body cells for <mark class="hl-b">metabolism</mark>.</td>
+                <td><mark class="hl-b">use</mark></td>
                 <td class="anim-cell"><img class="anim-frame" src="assets/fate-of-food.gif" alt="Assimilation"></td>
               </tr>
               <tr>
-                <td>Egestion</td>
-                <td>Removal of undigested and unabsorbed material as faeces.</td>
-                <td>Faeces, undigested. Not urine, urea, or carbon dioxide</td>
+                <td><mark class="hl-o">Egestion</mark></td>
+                <td>Removal of <mark class="hl-o">undigested / unabsorbed</mark> materials as <mark class="hl-o">faeces</mark>.</td>
+                <td><mark class="hl-o">faeces</mark> — different from excretion!</td>
                 <td class="anim-cell"><img class="anim-frame" src="assets/colon-normal.gif" alt="Egestion"></td>
               </tr>
             </tbody>
@@ -2262,19 +2503,19 @@
             <img src="assets/mode-autotrophic.png" alt="Photosynthesis in a green plant" class="arch">
             <p class="examples">Green plant</p>
             <ul class="bullets">
-              <li>Makes its own food by photosynthesis.</li>
+              <li>= <mark class="hl-y">make own food</mark> (photosynthesis).</li>
             </ul>
           </article>
         </div>
         <h3 class="mode-group">Heterotrophic nutrition</h3>
-        <p class="family-note">Holozoic, saprophytic, and parasitic nutrition all use ready-made organic food. Saprophytes and parasites both absorb soluble food.</p>
+        <p class="family-note"><mark class="hl-y">Heterotrophic</mark> nutrition: holozoic, saprophytic, parasitic. S: <mark class="hl-y">heterotrophic</mark> / <mark class="hl-g">absorb soluble food</mark>. D: saprophytic — from <mark class="hl-y">dead</mark> organism; parasitic — from <mark class="hl-y">living</mark> organism.</p>
         <div class="type-grid">
           <article class="type-card">
             <h4>Holozoic</h4>
             <img src="assets/mode-holozoic.png" alt="Holozoic steps: ingestion to egestion" class="arch">
             <p class="examples">Human, dog</p>
             <ul class="bullets">
-              <li>Cannot photosynthesise. Ingests solid organic food and digests it inside the body.</li>
+              <li>= <mark class="hl-y">eat</mark> others (kill).</li>
             </ul>
           </article>
           <article class="type-card">
@@ -2282,8 +2523,8 @@
             <img src="assets/mode-parasitic.png" alt="Tapeworm in the intestine" class="arch">
             <p class="examples">Tapeworm</p>
             <ul class="bullets">
-              <li>Absorbs food from a living host. The host is harmed.</li>
-              <li>It is specific to its host, and it does not directly kill the host.</li>
+              <li>= <mark class="hl-y">absorb from host</mark> 宿主.</li>
+              <li>Specific to host; <mark class="hl-y">doesn&apos;t directly kill</mark> the host.</li>
             </ul>
           </article>
           <article class="type-card">
@@ -2291,9 +2532,9 @@
             <img src="assets/mode-saprophytic.jpg" alt="Bracket fungi on decaying wood" class="arch">
             <p class="examples">Mushroom, bread mould</p>
             <ul class="bullets">
-              <li>Feeds on dead or decaying organic matter.</li>
-              <li>Can use a variety of food sources.</li>
-              <li>A mycelium is a mass of branching hyphae. The thin wall and large surface area let it secrete enzymes and absorb the digested food. Digestion is outside the body.</li>
+              <li>= eat &quot;<mark class="hl-y">rubbish</mark>&quot; (dead organic matter).</li>
+              <li>Can use a <mark class="hl-y">variety of food source</mark>.</li>
+              <li>Mycelium: mass of <mark class="hl-o">delicate branching</mark> hyphae → <mark class="hl-o">large surface area to volume ratio</mark>; thin wall → <mark class="hl-g">secretion</mark> of enzymes and <mark class="hl-g">absorption</mark> of digested food (external digestion).</li>
             </ul>
           </article>
         </div>
@@ -2304,9 +2545,9 @@
       <div class="copy">
         <div class="sec"><span class="num">02</span><h2>Human Digestive Tract & Glands</h2></div>
         <div class="key-idea">
-          <p>Learn each name and its place in the sequence. The alimentary canal is one tube. What each gland pours in is in the juices table.</p>
+          <p><mark class="hl-y">Human Digestive Tract &amp; Glands</mark> (digestive tract / gastro-intestinal tract / <mark class="hl-y">alimentary canal</mark>). Learn names and order (1–9). Structures with * are digestive glands.</p>
         </div>
-        <div class="tract-split">
+        <div class="tract-split copy-dense">
           <div class="tract-frame">
             <iframe class="tract-live" src="vendor/digestion/index.html?map=1&amp;v=2" title="Digestive tract map, playing through the organs."></iframe>
           </div>
@@ -2314,25 +2555,25 @@
             <h3>Alimentary canal</h3>
             <p>Food passes through this one tube, in this order.</p>
             <ol class="steps">
-              <li>Mouth cavity</li>
-              <li>Pharynx</li>
-              <li>Oesophagus</li>
-              <li>Stomach</li>
-              <li>Duodenum</li>
-              <li>Ileum</li>
-              <li>Colon</li>
-              <li>Rectum</li>
-              <li>Anus</li>
+              <li><mark class="hl-y">mouth cavity</mark></li>
+              <li><mark class="hl-y">pharynx</mark></li>
+              <li><mark class="hl-y">oesophagus</mark></li>
+              <li><mark class="hl-y">stomach</mark></li>
+              <li><mark class="hl-y">duodenum</mark> (part of small intestine)</li>
+              <li><mark class="hl-y">ileum</mark> (part of small intestine)</li>
+              <li><mark class="hl-y">colon</mark> (part of large intestine)</li>
+              <li><mark class="hl-y">rectum</mark></li>
+              <li><mark class="hl-y">anus</mark></li>
             </ol>
-            <p>The appendix: ✅ canal ❌ a gland</p>
+            <p><mark class="hl-b">appendix</mark>: part of alimentary canal — not a gland.</p>
             <h3>Digestive glands</h3>
             <p>These pour juice or bile into the tube. Food does not enter them.</p>
             <ul class="bullets">
-              <li>Salivary glands</li>
-              <li>Liver</li>
-              <li>Pancreas</li>
+              <li><mark class="hl-g">salivary glands</mark>*</li>
+              <li><mark class="hl-g">liver</mark>* (make bile)</li>
+              <li><mark class="hl-g">pancreas</mark>*</li>
             </ul>
-            <p>gall bladder: ❌ a gland ❌ food enter</p>
+            <p><mark class="hl-y">gall bladder</mark>: store bile — not a gland; food does not enter.</p>
           </article>
         </div>
       </div>
@@ -2342,15 +2583,15 @@
       <div class="copy">
         <div class="sec"><span class="num">03</span><h2>Teeth, swallowing, and peristalsis</h2></div>
         <div class="key-idea">
-          <p>Physical digestion starts in the mouth. Swallowing sends the bolus into the oesophagus. Peristalsis then pushes food along the rest of the tube. The gut wall has circular muscle on the inside and longitudinal muscle on the outside.</p>
+          <p><mark class="hl-g">Mastication</mark> and swallowing in the mouth; <mark class="hl-y">peristalsis</mark> 蠕動 (<mark class="hl-y">move = have muscles!</mark>) along the alimentary canal.</p>
         </div>
         <div class="teeth-box">
           <article class="type-card">
             <h4>Mastication</h4>
             <iframe class="mastication-live" src="vendor/digestion/index.html?embed=1&amp;stages=0&amp;v=3" title="Mastication: teeth grind food into smaller pieces." loading="lazy"></iframe>
             <ul class="bullets">
-              <li>Chewing</li>
-              <li>Physical digestion: cutting food into smaller pieces to increase surface area</li>
+              <li>Process of <mark class="hl-y">chewing</mark> food</li>
+              <li><mark class="hl-g">Physical digestion</mark>: into <mark class="hl-y">smaller</mark> pieces → <mark class="hl-o">increase surface area</mark></li>
             </ul>
           </article>
           <h3>Teeth type</h3>
@@ -2367,29 +2608,29 @@
             </thead>
             <tbody>
               <tr>
-                <td>Incisor</td>
-                <td>Chisel-shaped, flat sharp edge</td>
-                <td>Biting and cutting</td>
+                <td><mark class="hl-y">Incisor</mark></td>
+                <td><mark class="hl-y">Chisel-shaped</mark>, flat sharp edges</td>
+                <td><mark class="hl-y">Biting and cutting</mark> food</td>
                 <td>One</td>
                 <td class="anim-cell"><iframe class="tooth-type-live" src="vendor/teeth/index.html?embed=1&amp;topic=types&amp;item=incisor&amp;model=1&amp;isolate=1&amp;spin=1&amp;v=7" title="Incisor, one tooth rotating." loading="lazy"></iframe></td>
               </tr>
               <tr>
-                <td>Canine</td>
-                <td>Pointed and curved</td>
-                <td>Tearing flesh</td>
+                <td><mark class="hl-y">Canine</mark></td>
+                <td><mark class="hl-y">Pointed</mark> and curved</td>
+                <td><mark class="hl-y">Tearing flesh</mark></td>
                 <td>One</td>
                 <td class="anim-cell"><img src="assets/tooth-canine.gif" alt="Canine" class="anim-frame tooth"></td>
               </tr>
               <tr>
-                <td>Premolar</td>
-                <td>Broad top with cusps</td>
-                <td>Crushing and grinding</td>
+                <td><mark class="hl-y">Premolar</mark></td>
+                <td>Broad top with <mark class="hl-y">cusps</mark></td>
+                <td><mark class="hl-y">Crushing</mark> and <mark class="hl-y">grinding</mark></td>
                 <td>One or two</td>
                 <td class="anim-cell"><iframe class="tooth-type-live" src="vendor/teeth/index.html?embed=1&amp;topic=types&amp;item=premolar&amp;model=1&amp;isolate=1&amp;spin=1&amp;v=7" title="Premolar, one tooth rotating." loading="lazy"></iframe></td>
               </tr>
               <tr>
-                <td>Molar</td>
-                <td>Like a premolar, but larger</td>
+                <td><mark class="hl-y">Molar</mark></td>
+                <td><mark class="hl-y">Similar to premolars</mark> but larger</td>
                 <td>Crushing and grinding</td>
                 <td>Two or three</td>
                 <td class="anim-cell"><img src="assets/tooth-molar.gif" alt="Molar" class="anim-frame tooth"></td>
@@ -2403,7 +2644,7 @@
             <h4>Milk teeth</h4>
             <img src="assets/tooth-milk.gif" alt="Milk teeth" class="arch">
             <ul class="bullets">
-              <li>2102/2102</li>
+              <li><mark class="hl-y">2102/2102</mark></li>
               <li>Total number: 20</li>
               <li>No premolar</li>
             </ul>
@@ -2412,13 +2653,13 @@
             <h4>Permanent teeth</h4>
             <img src="assets/tooth-permanent.gif" alt="Permanent teeth" class="arch">
             <ul class="bullets">
-              <li>2123/2123</li>
+              <li><mark class="hl-y">2123/2123</mark></li>
               <li>Total number: 32</li>
             </ul>
           </article>
         </div>
         <h3>Tooth structure</h3>
-        <div class="gif-row share-row tooth-structure" id="tooth-structure-panel">
+        <div class="gif-row share-row copy-dense tooth-structure" id="tooth-structure-panel">
           <article class="type-card">
             <h4>One tooth</h4>
             <dl class="props">
@@ -2436,9 +2677,9 @@
                 <dt>Layers</dt>
                 <dd>
                   <ul class="bullets">
-                    <li data-part="enamel">Enamel is the hardest part, non-living, and mainly calcium salts plus phosphate. It needs calcium and vitamin D so those salts can be absorbed. It protects the tooth from wear.</li>
-                    <li data-part="dentine">Dentine is bone-like but softer, and it contains living cytoplasm strands.</li>
-                    <li data-part="pulp">The pulp cavity has living cells, blood vessels, and nerves. They supply oxygen and nutrients, remove carbon dioxide and waste, and detect temperature and pressure. Decay here causes pain.</li>
+                    <li data-part="enamel"><mark class="hl-y">Enamel</mark>: <mark class="hl-y">hardest part</mark>, <mark class="hl-y">non-living</mark>; calcium salt + phosphate — need calcium + <mark class="hl-g">vitamin D</mark> (help absorb).</li>
+                    <li data-part="dentine"><mark class="hl-y">Dentine</mark>: contains <mark class="hl-y">living cytoplasm strands</mark>.</li>
+                    <li data-part="pulp"><mark class="hl-g">Pulp cavity</mark>: <mark class="hl-y">living cells</mark>, <mark class="hl-b">blood vessels</mark>, <mark class="hl-p">nerves</mark>. <mark class="hl-g">Supplies</mark> oxygen/nutrient; <mark class="hl-b">remove</mark> CO<sub>2</sub>/waste; <mark class="hl-p">detects</mark> temperature/pressure → <mark class="hl-p">pain</mark>.</li>
                   </ul>
                 </dd>
               </div>
@@ -2452,7 +2693,7 @@
                     </div>
                     <div data-part="jawbone">
                       <dt>Jawbone</dt>
-                      <dd>Houses the roots.</dd>
+                      <dd><mark class="hl-y">Houses tooth roots</mark>.</dd>
                     </div>
                     <div data-part="membrane">
                       <dt>Periodontal membrane</dt>
@@ -2460,7 +2701,7 @@
                     </div>
                     <div data-part="cement">
                       <dt>Cement</dt>
-                      <dd>On the root. Helps attach the periodontal membrane. Thinner than enamel.</dd>
+                      <dd>Helps <mark class="hl-y">attach periodontal membrane</mark>.</dd>
                     </div>
                   </dl>
                 </dd>
@@ -2477,7 +2718,7 @@
             <img src="assets/diet-herbivore.png" alt="Sheep skull: grinding molars and incisors for plants" class="arch">
             <p class="examples">Sheep, cow</p>
             <ul class="bullets">
-              <li>Well-developed molars. Cusps grind plants. No canines, so a gap is left. The jaw moves sideways.</li>
+              <li>Well-developed <mark class="hl-y">molars</mark>; cusps <mark class="hl-y">grind</mark> plant material.</li>
             </ul>
           </article>
           <article class="type-card">
@@ -2485,7 +2726,7 @@
             <img src="assets/diet-carnivore.jpg" alt="Dog skull: canines and slicing teeth for meat" class="arch">
             <p class="examples">Dog, cat</p>
             <ul class="bullets">
-              <li>Well-developed canines, pointed and curved, for tearing flesh.</li>
+              <li>Well-developed <mark class="hl-y">canine</mark>; pointed and curved → <mark class="hl-y">tear flesh</mark>.</li>
             </ul>
           </article>
           <article class="type-card">
@@ -2493,47 +2734,45 @@
             <img src="assets/diet-omnivore.jpg" alt="Baboon skull: mixed dentition" class="arch">
             <p class="examples">Human, baboon</p>
             <ul class="bullets">
-              <li>Incisors, canines, premolars, and molars. Humans eat both plants and meat.</li>
+              <li>Eat <mark class="hl-y">both</mark> plant and meat.</li>
             </ul>
           </article>
         </div>
         <h3>Tooth disease</h3>
         <div class="type-grid">
-          <article class="type-card">
+          <article class="type-card copy-dense">
             <h4>Decay</h4>
             <iframe class="tooth-disease-live" src="vendor/teeth/index.html?embed=1&amp;topic=decay&amp;item=decay&amp;model=1&amp;zoom=1&amp;loop=3200&amp;v=3" title="Tooth decay animation." loading="lazy"></iframe>
             <ul class="bullets">
-              <li>Bacteria in plaque plus food produce acid. Acid dissolves the calcium salts and the tooth decays.</li>
-              <li>Toothpaste is alkaline, so it neutralises that acid. Fluoride strengthens enamel. It does not kill the bacteria.</li>
-              <li>Alcohol mouthwash dissolves the bacterial cell membrane and kills bacteria. It can harm mouth cells as well.</li>
+              <li>Bacteria (in <mark class="hl-y">plaque</mark>) + food → produce <mark class="hl-g">acid</mark> → <mark class="hl-y">tooth decay</mark> (<mark class="hl-g">dissolve calcium salt</mark>).</li>
+              <li>Toothpaste: <mark class="hl-g">alkaline</mark> → <mark class="hl-g">neutralize</mark> bacteria acid; <mark class="hl-b">fluoride</mark> → <mark class="hl-b">prevent</mark> tooth decay (<mark class="hl-b">strengthening enamel</mark>, not by killing bacteria!).</li>
+              <li>Alcohol mouth wash: dissolve cell membrane → <mark class="hl-y">kill bacteria</mark> (but harm mouth cells as well!).</li>
             </ul>
           </article>
           <article class="type-card">
             <h4>Loose tooth</h4>
             <img src="assets/tooth-periodontal-diagram.png" alt="Periodontal membrane between cement and jaw bone; attachment fibres damaged" class="tooth-diagram-hi">
             <ul class="bullets">
-              <li>Bacteria can damage the periodontal membrane.</li>
-              <li>The gum becomes inflamed.</li>
-              <li>The tooth may fall out because it is no longer held to the jawbone.</li>
+              <li>Bacteria damage periodontal membrane → <mark class="hl-y">inflammation</mark> → tooth may fall out.</li>
             </ul>
           </article>
         </div>
         </div>
         <h3>Swallowing</h3>
-        <div class="gif-row share-row">
+        <div class="gif-row share-row copy-dense">
           <article class="type-card">
             <h4>Bolus to oesophagus</h4>
             <p class="examples when">After chewing</p>
             <ol class="steps">
-              <li>The tongue rolls food into a bolus, then rises and pushes it towards the pharynx.</li>
-              <li>The soft palate moves up so the bolus cannot enter the nasal cavity.</li>
-              <li>The larynx rises. The epiglottis covers the trachea so the bolus cannot enter the airway.</li>
-              <li>The bolus enters the oesophagus.</li>
+              <li>After chewing, tongue rolls food into a <mark class="hl-y">bolus</mark>, then the <mark class="hl-y">tongue rises</mark> to push the bolus towards the <mark class="hl-y">pharynx</mark>.</li>
+              <li>The <mark class="hl-y">soft palate</mark> <mark class="hl-g">moves up</mark> to <mark class="hl-g">prevent</mark> the bolus from <mark class="hl-g">entering</mark> the <mark class="hl-g">nasal cavity</mark>.</li>
+              <li>The <mark class="hl-y">larynx rises</mark> so that the <mark class="hl-y">epiglottis</mark> covers the opening to the <mark class="hl-y">trachea</mark>. This <mark class="hl-g">prevents</mark> the bolus from <mark class="hl-g">entering the trachea</mark>.</li>
+              <li>The bolus enters the <mark class="hl-y">oesophagus</mark>.</li>
             </ol>
             <dl class="props">
               <div>
                 <dt>Tell the tubes apart</dt>
-                <dd>The trachea has C-shaped cartilage and a ciliated lining. The oesophagus does not. The bolus must take the oesophagus.</dd>
+                <dd>Hint: oesophagus vs trachea — <mark class="hl-y">C-shaped cartilage</mark>; trachea has <mark class="hl-g">ciliated epithelial cells</mark>.</dd>
               </div>
             </dl>
             <div class="tubes-apart" aria-label="Trachea and oesophagus compared">
@@ -2558,9 +2797,9 @@
             <h4>One-way wave</h4>
             <p class="examples stages">Bolus, then chyme, then faeces</p>
             <ol class="steps">
-              <li>Behind the bolus, circular muscle contracts. The lumen gets smaller and food is squeezed forward.</li>
-              <li>In front of the bolus, longitudinal muscle relaxes. The tube is wider and food slides through.</li>
-              <li>The wave pushes food in one direction only. It does not depend on gravity.</li>
+              <li>Behind the bolus: <mark class="hl-y">circular</mark> muscles <mark class="hl-g">contract</mark>; <mark class="hl-y">longitudinal</mark> muscles <mark class="hl-g">relax</mark>.</li>
+              <li>In front of the bolus: <mark class="hl-y">circular</mark> muscles <mark class="hl-g">relax</mark>; <mark class="hl-y">longitudinal</mark> muscles <mark class="hl-g">contract</mark>.</li>
+              <li><mark class="hl-y">Wave-like motion</mark> pushes food <mark class="hl-y">in one direction</mark> (exact wordings!).</li>
             </ol>
           </article>
           <aside class="gif-slot" aria-label="Peristalsis animation">
@@ -2574,111 +2813,136 @@
       <div class="copy">
         <div class="sec"><span class="num">04</span><h2>Physical and chemical digestion</h2></div>
         <div class="key-idea">
-          <p>Physical digestion prepares food for chemical digestion. It breaks food into smaller pieces and increases the surface area for juice to act on. Enzymes then break molecules into simpler ones.</p>
+          <p><mark class="hl-g">Physical digestion</mark>: mechanical breakdown into <mark class="hl-y">smaller</mark> pieces, <mark class="hl-o">increase surface area</mark> of food for digestive juice. <mark class="hl-g">Chemical digestion</mark>: breakdown of food molecules by <mark class="hl-y">enzymes</mark> to <mark class="hl-y">simpler</mark> molecules.</p>
         </div>
         <h3>Juices</h3>
-        <div class="scroll">
-          <table class="compare-table juices-anim">
-            <thead>
-              <tr>
-                <th>Juice</th>
-                <th>Made by</th>
-                <th>What is in it</th>
-                <th>Medium</th>
-                <th>What it digests</th>
-                <th>Animation</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Saliva</td>
-                <td>Salivary glands</td>
-                <td>
-                  <ol class="steps">
-                    <li>Amylase: splits starch to maltose</li>
-                    <li>Water: moistens food</li>
-                    <li>Mucus: lubricates swallowing</li>
-                  </ol>
-                </td>
-                <td>Neutral</td>
-                <td>Starch, chemical</td>
-                <td class="anim-cell"><iframe class="anim-frame" src="vendor/digestion/index.html?embed=1&amp;stages=0&amp;v=3" title="Saliva: mastication and salivary amylase on starch in the mouth." loading="lazy"></iframe></td>
-              </tr>
-              <tr>
-                <td>Gastric juice</td>
-                <td>Gastric glands in the stomach wall</td>
-                <td>
-                  <ol class="steps">
-                    <li>Pepsin: splits proteins into peptides and needs acid</li>
-                    <li>Hydrochloric acid: makes the medium about pH 2, kills microorganisms, and denatures proteins</li>
-                    <li>Mucus: protects the wall from pepsin and acid</li>
-                  </ol>
-                </td>
-                <td>Acidic</td>
-                <td>Proteins, chemical</td>
-                <td class="anim-cell"><iframe class="anim-frame" src="vendor/digestion/index.html?embed=1&amp;stages=3&amp;v=3" title="Gastric juice: stomach churning and pepsin in acid." loading="lazy"></iframe></td>
-              </tr>
-              <tr>
-                <td>Intestinal juice</td>
-                <td>Cells on the small intestine wall</td>
-                <td>
-                  <ol class="steps">
-                    <li>Enzymes: none</li>
-                    <li>Mucus: protects the wall</li>
-                    <li>Water</li>
-                    <li>Sodium hydrogencarbonate: neutralises acidic chyme</li>
-                  </ol>
-                </td>
-                <td>Alkaline</td>
-                <td>None by itself</td>
-                <td class="anim-cell"><img class="anim-frame" src="assets/villus-thin.gif" alt="One-cell-thick epithelium and mucus lining the small intestine wall." width="220" height="180" loading="lazy"></td>
-              </tr>
-              <tr>
-                <td>Pancreatic juice</td>
-                <td>Pancreas, to the duodenum by the pancreatic duct</td>
-                <td>
-                  <ol class="steps">
-                    <li>Protease</li>
-                    <li>Amylase</li>
-                    <li>Lipase</li>
-                    <li>Sodium hydrogencarbonate: neutralises acidic chyme</li>
-                  </ol>
-                </td>
-                <td>Alkaline</td>
-                <td>Proteins, starch, lipids, chemical</td>
-                <td class="anim-cell"><iframe class="anim-frame" src="vendor/nutrition/index.html?embed=1&amp;topic=applications&amp;view=guided&amp;application=pancreatic&amp;diseaseComparison=healthy&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=10" title="Pancreatic enzymes travelling through the duct to the duodenum (normal)." loading="lazy"></iframe></td>
-              </tr>
-              <tr>
-                <td>Bile</td>
-                <td>Liver. Stored in the gall bladder. To the duodenum by the bile duct</td>
-                <td>
-                  <ol class="steps">
-                    <li>Bile salts: emulsify lipids into small droplets</li>
-                    <li>Bile pigment: comes from broken red blood cells</li>
-                    <li>Sodium hydrogencarbonate: neutralises acid</li>
-                    <li>Enzymes: none</li>
-                  </ol>
-                </td>
-                <td>Alkaline</td>
-                <td>Lipids, physical only</td>
-                <td class="anim-cell"><iframe class="anim-frame" src="vendor/digestion/index.html?embed=1&amp;stages=4&amp;animate=1&amp;v=5" title="Bile salts emulsify lipids into smaller droplets in the duodenum." loading="lazy"></iframe></td>
-              </tr>
-              <tr>
-                <td>Enzymes on ileum cells</td>
-                <td>Epithelium of the small intestine</td>
-                <td>
-                  <ol class="steps">
-                    <li>Protease: on the cell membrane</li>
-                    <li>Carbohydrases: on the cell membrane</li>
-                    <li>Lipase: none</li>
-                  </ol>
-                </td>
-                <td>Alkaline</td>
-                <td>Proteins and carbohydrates, chemical</td>
-                <td class="anim-cell"><iframe class="anim-frame tall" src="vendor/digestion/index.html?embed=1&amp;stages=5&amp;animate=1&amp;labels=0&amp;v=5" title="Ileum: villus cross-section with absorption into capillaries and the lacteal." loading="lazy"></iframe></td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="juices-stack">
+          <article class="juice-card">
+            <h4><mark class="hl-y">Saliva</mark></h4>
+            <div class="juice-copy">
+            <dl class="juice-meta">
+              <div><dt>Made by</dt><dd><mark class="hl-g">Salivary glands</mark></dd></div>
+              <div><dt>Medium</dt><dd>Neutral</dd></div>
+              <div><dt>What it digests</dt><dd>Starch, chemical</dd></div>
+            </dl>
+            <div class="juice-contents">
+              <p class="juice-contents-label">What is in it</p>
+              <ol class="steps">
+                <li><mark class="hl-y">Amylase</mark>: breaks down starch to maltose</li>
+                <li>Water: moistens food</li>
+                <li>Mucus: lubricates food</li>
+              </ol>
+            </div>
+            </div>
+            <aside class="juice-anim" aria-label="Saliva animation">
+              <iframe class="anim-frame" src="vendor/digestion/index.html?embed=1&amp;stages=0&amp;v=3" title="Saliva: mastication and salivary amylase on starch in the mouth." loading="lazy"></iframe>
+            </aside>
+          </article>
+          <article class="juice-card copy-dense">
+            <h4><mark class="hl-b">Gastric juice</mark></h4>
+            <div class="juice-copy">
+            <dl class="juice-meta">
+              <div><dt>Made by</dt><dd>Gastric glands in stomach wall</dd></div>
+              <div><dt>Medium</dt><dd>Acidic</dd></div>
+              <div><dt>What it digests</dt><dd>Proteins, chemical</dd></div>
+            </dl>
+            <div class="juice-contents">
+              <p class="juice-contents-label">What is in it</p>
+              <ol class="steps">
+                <li><mark class="hl-p">Pepsin</mark>: breaks down proteins into peptides (need acidic pH)</li>
+                <li><mark class="hl-y">Hydrochloric acid</mark>: acidic environment (~pH 2); <mark class="hl-g">kills microorganisms</mark>; denatures proteins</li>
+                <li>Mucus: protects stomach wall</li>
+              </ol>
+            </div>
+            </div>
+            <aside class="juice-anim" aria-label="Gastric juice animation">
+              <iframe class="anim-frame" src="vendor/digestion/index.html?embed=1&amp;stages=3&amp;v=3" title="Gastric juice: stomach churning and pepsin in acid." loading="lazy"></iframe>
+            </aside>
+          </article>
+          <article class="juice-card copy-dense">
+            <h4>Intestinal juice</h4>
+            <div class="juice-copy">
+            <dl class="juice-meta">
+              <div><dt>Made by</dt><dd>Cells on the small intestine wall</dd></div>
+              <div><dt>Medium</dt><dd>Alkaline</dd></div>
+              <div><dt>What it digests</dt><dd>None by itself</dd></div>
+            </dl>
+            <div class="juice-contents">
+              <p class="juice-contents-label">What is in it</p>
+              <ol class="steps">
+                <li>Enzymes: none</li>
+                <li>Mucus: protects the wall</li>
+                <li>Water</li>
+                <li><mark class="hl-g">Sodium hydrogencarbonate</mark>: neutralize acidic chyme; <mark class="hl-g">alkaline</mark> environment (no enzymes)</li>
+              </ol>
+            </div>
+            </div>
+            <aside class="juice-anim" aria-label="Intestinal juice">
+              <img class="anim-frame" src="assets/villus-thin.gif" alt="One-cell-thick epithelium and mucus lining the small intestine wall." loading="lazy">
+            </aside>
+          </article>
+          <article class="juice-card">
+            <h4>Pancreatic juice</h4>
+            <div class="juice-copy">
+            <dl class="juice-meta">
+              <div><dt>Made by</dt><dd>Pancreas, to the duodenum by the pancreatic duct</dd></div>
+              <div><dt>Medium</dt><dd>Alkaline</dd></div>
+              <div><dt>What it digests</dt><dd>Proteins, starch, lipids, chemical</dd></div>
+            </dl>
+            <div class="juice-contents">
+              <p class="juice-contents-label">What is in it</p>
+              <ol class="steps">
+                <li>Protease, carbohydrates e.g. amylase, + <mark class="hl-y">Lipase</mark></li>
+                <li><mark class="hl-g">Sodium hydrogencarbonate</mark>: neutralize acidic chyme (<mark class="hl-g">alkaline</mark>)</li>
+              </ol>
+            </div>
+            </div>
+            <aside class="juice-anim" aria-label="Pancreatic juice animation">
+              <iframe class="anim-frame" src="vendor/nutrition/index.html?embed=1&amp;topic=applications&amp;view=guided&amp;application=pancreatic&amp;diseaseComparison=healthy&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=10" title="Pancreatic enzymes travelling through the duct to the duodenum (normal)." loading="lazy"></iframe>
+            </aside>
+          </article>
+          <article class="juice-card copy-dense">
+            <h4>Bile</h4>
+            <div class="juice-copy">
+            <dl class="juice-meta">
+              <div><dt>Made by</dt><dd>Liver. Stored in the gall bladder. To the duodenum by the bile duct</dd></div>
+              <div><dt>Medium</dt><dd>Alkaline</dd></div>
+              <div><dt>What it digests</dt><dd><mark class="hl-y">Lipids</mark>, physical only</dd></div>
+            </dl>
+            <div class="juice-contents">
+              <p class="juice-contents-label">What is in it</p>
+              <ol class="steps">
+                <li><mark class="hl-g">Bile salt</mark>: <mark class="hl-g">emulsify</mark> lipids into small droplets; <mark class="hl-o">increase surface area</mark> for digestive juice and enzymes</li>
+                <li>Bile pigment: comes from broken red blood cells</li>
+                <li>Sodium hydrogencarbonate: neutralises acid</li>
+                <li>Enzymes: none</li>
+              </ol>
+            </div>
+            </div>
+            <aside class="juice-anim" aria-label="Bile animation">
+              <iframe class="anim-frame" src="vendor/digestion/index.html?embed=1&amp;stages=4&amp;animate=1&amp;v=5" title="Bile salts emulsify lipids into smaller droplets in the duodenum." loading="lazy"></iframe>
+            </aside>
+          </article>
+          <article class="juice-card juice-tall">
+            <h4>Epithelial cells of small intestine</h4>
+            <div class="juice-copy">
+            <dl class="juice-meta">
+              <div><dt>Made by</dt><dd>Cells on small intestine wall</dd></div>
+              <div><dt>Medium</dt><dd>Alkaline</dd></div>
+              <div><dt>What it digests</dt><dd>Proteins and carbohydrates, chemical</dd></div>
+            </dl>
+            <div class="juice-contents">
+              <p class="juice-contents-label">What is in it</p>
+              <ol class="steps">
+                <li>Various enzymes on <mark class="hl-p">cell membrane</mark></li>
+                <li><mark class="hl-y">Protease</mark> + <mark class="hl-y">carbohydrases</mark> (no lipase!)</li>
+              </ol>
+            </div>
+            </div>
+            <aside class="juice-anim" aria-label="Ileum cell enzymes animation">
+              <iframe class="anim-frame tall" src="vendor/digestion/index.html?embed=1&amp;stages=5&amp;animate=1&amp;labels=0&amp;v=5" title="Ileum: villus cross-section with absorption into capillaries and the lacteal." loading="lazy"></iframe>
+            </aside>
+          </article>
         </div>
         <h3>Along the tube</h3>
         <div class="scroll">
@@ -2693,58 +2957,58 @@
             </thead>
             <tbody>
               <tr>
-                <td>Mouth</td>
-                <td>Mastication</td>
-                <td>Salivary amylase on starch</td>
-                <td>Bolus</td>
+                <td><mark class="hl-y">Mouth cavity</mark></td>
+                <td><mark class="hl-y">Mastication (chewing)</mark></td>
+                <td><mark class="hl-y">Salivary amylase</mark></td>
+                <td><mark class="hl-y">Bolus</mark></td>
               </tr>
               <tr>
-                <td>Oesophagus</td>
-                <td>Peristalsis</td>
-                <td>Salivary amylase still works</td>
-                <td>Bolus</td>
+                <td><mark class="hl-y">Oesophagus</mark></td>
+                <td><mark class="hl-y">Peristalsis</mark></td>
+                <td><mark class="hl-y">Salivary amylase</mark></td>
+                <td><mark class="hl-y">Bolus</mark></td>
               </tr>
               <tr>
-                <td>Stomach</td>
+                <td><mark class="hl-y">Stomach</mark></td>
                 <td>Churning</td>
-                <td>Gastric juice, pepsin on protein. Salivary amylase is denatured</td>
-                <td>Chyme</td>
+                <td><mark class="hl-b">Gastric juice</mark>, <mark class="hl-p">pepsin</mark>; salivary amylase <mark class="hl-g">denatured</mark></td>
+                <td><mark class="hl-b">Chyme</mark></td>
               </tr>
               <tr>
-                <td>Duodenum</td>
-                <td>Bile emulsifies lipids</td>
-                <td>Pancreatic amylase, lipase, and protease</td>
-                <td>Chyme</td>
+                <td><mark class="hl-y">Duodenum</mark></td>
+                <td><mark class="hl-g">Bile emulsify</mark> lipids</td>
+                <td><mark class="hl-y">Pancreatic amylase</mark>, <mark class="hl-y">pancreatic lipase</mark>, <mark class="hl-y">pancreatic protease</mark></td>
+                <td><mark class="hl-b">Chyme</mark></td>
               </tr>
               <tr>
-                <td>Ileum</td>
-                <td>Peristalsis</td>
-                <td>Carbohydrases and peptidase on the wall. Digestion finishes here</td>
-                <td>Chyme</td>
+                <td><mark class="hl-y">Ileum</mark></td>
+                <td><mark class="hl-y">Peristalsis</mark></td>
+                <td>Intestinal wall cells: <mark class="hl-y">carbohydrases</mark>, <mark class="hl-y">peptidase</mark> — <mark class="hl-g">digestion finish</mark></td>
+                <td><mark class="hl-b">Chyme</mark></td>
               </tr>
               <tr>
-                <td>Colon</td>
+                <td><mark class="hl-y">Colon</mark></td>
                 <td>Peristalsis and compaction</td>
-                <td>No digestion</td>
-                <td>Faeces</td>
+                <td><mark class="hl-g">No digestion</mark></td>
+                <td><mark class="hl-o">Faeces</mark></td>
               </tr>
               <tr>
-                <td>Rectum</td>
-                <td>Stores faeces</td>
-                <td>No digestion</td>
-                <td>Faeces</td>
+                <td><mark class="hl-y">Rectum</mark></td>
+                <td>Storage of faeces</td>
+                <td><mark class="hl-g">No digestion</mark></td>
+                <td><mark class="hl-o">Faeces</mark></td>
               </tr>
               <tr>
-                <td>Anus</td>
-                <td>Egestion</td>
-                <td>No digestion</td>
-                <td>Faeces</td>
+                <td><mark class="hl-y">Anus</mark></td>
+                <td><mark class="hl-o">Egestion</mark></td>
+                <td><mark class="hl-g">No digestion</mark></td>
+                <td><mark class="hl-o">Faeces</mark></td>
               </tr>
             </tbody>
           </table>
         </div>
         <h3>Fat</h3>
-        <div class="gif-row share-row fat-emulsify-row">
+        <div class="gif-row share-row copy-dense fat-emulsify-row">
           <article class="type-card">
             <h4>Emulsification</h4>
             <p class="examples words">Bile salts, lipase</p>
@@ -2756,7 +3020,7 @@
               </div>
               <div>
                 <dt>Process</dt>
-                <dd>Emulsify lipids into small droplets: increase surface area for digestive juices and enzymes to work on</dd>
+                <dd><mark class="hl-g">Bile salt</mark> in bile <mark class="hl-g">emulsify</mark> lipids into <mark class="hl-y">small droplets</mark> → <mark class="hl-o">larger surface area</mark> for digestive juice and lipase = faster digestion!</dd>
               </div>
               <div>
                 <dt>Experiment-related concept</dt>
@@ -2772,21 +3036,21 @@
           <article class="type-card">
             <h4>Lipase alone</h4>
             <ul class="bullets">
-              <li>Oil, lipase, and water: chemical digestion still happens, but the rate is lower because the surface area is smaller.</li>
+              <li>Tube B: oil + <mark class="hl-y">lipase</mark> + distilled water — chemical digestion <mark class="hl-g">yes</mark>, rate <mark class="hl-g">lower</mark> (no emulsification).</li>
             </ul>
           </article>
           <iframe class="lipase-compare-live" src="vendor/nutrition/index.html?embed=1&amp;topic=applications&amp;view=guided&amp;application=experiments&amp;experiment=lipase&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=5" title="Compare lipase alone with lipase and bile salts." loading="lazy"></iframe>
           <article class="type-card">
             <h4>Lipase with bile</h4>
             <ul class="bullets">
-              <li>Oil, lipase, and bile salts: enzyme active, fat emulsified, fastest fall in pH.</li>
+              <li>Tube A: oil + lipase + <mark class="hl-y">bile salts</mark> — emulsification <mark class="hl-g">yes</mark>; digestion rate <mark class="hl-g">higher</mark>; pH <mark class="hl-g">decrease</mark> (fatty acids).</li>
             </ul>
           </article>
         </div>
         <article class="type-card">
           <h4>Boiled lipase</h4>
           <ul class="bullets">
-            <li>Boiled lipase is denatured. Bile salts cannot digest fat by themselves. pH stays the same.</li>
+            <li>Tube C: oil + <mark class="hl-b">boiled</mark> lipase + bile salts — lipase <mark class="hl-y">denatured</mark>; pH <mark class="hl-g">no change</mark>.</li>
           </ul>
         </article>
       </div>
@@ -2796,22 +3060,22 @@
       <div class="copy">
         <div class="sec"><span class="num">05</span><h2>Absorption</h2></div>
         <div class="key-idea">
-          <p>Absorption is molecules entering the blood or the lymph. The small intestine is built to give time, surface, a short distance, and a steep concentration gradient.</p>
+          <p><mark class="hl-g">Absorption in small intestine</mark> 小腸吸收: digested molecules enter <mark class="hl-p">blood</mark> (capillaries) or <mark class="hl-b">lymph</mark> (lacteals).</p>
         </div>
         <h3>Villus</h3>
-        <div class="gif-row share-row">
+        <div class="gif-row share-row copy-dense">
           <article class="type-card">
             <h4>Adaptations</h4>
             <p class="examples">At least seven features</p>
             <img src="assets/villus-anatomy.gif" alt="Villus anatomy" class="card-anim">
             <ol class="steps">
-              <li class="shot-row"><span>The intestine is very long, so there is more time for absorption.</span><img src="assets/villus-long.gif" alt="Long intestine"></li>
-              <li class="shot-row"><span>The inner wall is highly folded, so the surface area is larger.</span><img src="assets/villus-fold.gif" alt="Circular folds"></li>
-              <li class="shot-row"><span>The wall has many villi, so the surface area is larger again.</span><img src="assets/villus-many.gif" alt="Many villi"></li>
-              <li class="shot-row"><span>Epithelial cells have many microvilli, so the surface area is larger still.</span><iframe class="villus-adapt-live" src="vendor/nutrition/index.html?embed=1&amp;topic=villi&amp;view=guided&amp;adaptation=microvilli&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=8" title="Microvilli on one cell: more membrane surface for absorption." loading="lazy"></iframe></li>
-              <li class="shot-row"><span>The epithelium is one cell thick, so the diffusion distance is short.</span><img src="assets/villus-thin.gif" alt="Thin lining"></li>
-              <li class="shot-row"><span>Epithelial cells have many mitochondria. Aerobic respiration supplies ATP for active transport.</span><img src="assets/villus-mito.gif" alt="Mitochondria"></li>
-              <li class="shot-row"><span>A capillary network carries water-soluble food away, and a lacteal carries lipids away, so the concentration gradient stays steep. Villi move with peristalsis and keep meeting fresh food.</span><img src="assets/villus-blood.gif" alt="Blood supply"></li>
+              <li class="shot-row"><span>Being very <mark class="hl-y">long</mark> → more <mark class="hl-y">time</mark> for absorption.</span><img src="assets/villus-long.gif" alt="Long intestine"></li>
+              <li class="shot-row"><span>Inner wall <mark class="hl-y">highly-folded</mark> and numerous <mark class="hl-y">villi</mark> → increase <mark class="hl-y">surface area</mark> for absorption.</span><img src="assets/villus-fold.gif" alt="Circular folds"></li>
+              <li class="shot-row"><span>The wall has many <mark class="hl-y">villi</mark> → increase <mark class="hl-y">surface area</mark> again.</span><img src="assets/villus-many.gif" alt="Many villi"></li>
+              <li class="shot-row"><span>Numerous <mark class="hl-o">microvilli</mark> on epithelial cells → <mark class="hl-o">surface area</mark> still.</span><iframe class="villus-adapt-live" src="vendor/nutrition/index.html?embed=1&amp;topic=villi&amp;view=guided&amp;adaptation=microvilli&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=8" title="Microvilli on one cell: more membrane surface for absorption." loading="lazy"></iframe></li>
+              <li class="shot-row"><span>Thin epithelium (<mark class="hl-y">one-cell-thick</mark>) → <mark class="hl-y">reduces the distance</mark> for <mark class="hl-y">diffusion</mark>.</span><img src="assets/villus-thin.gif" alt="Thin lining"></li>
+              <li class="shot-row"><span><mark class="hl-y">Abundant mitochondria</mark> → efficient aerobic respiration for <mark class="hl-g">ATP</mark>, aiding <mark class="hl-y">active transport</mark>.</span><img src="assets/villus-mito.gif" alt="Mitochondria"></li>
+              <li class="shot-row"><span><mark class="hl-y">Lacteals</mark> and <mark class="hl-y">capillaries</mark> carry absorbed food away rapidly → steep <mark class="hl-y">concentration gradient</mark>; <mark class="hl-y">movement</mark> of villi with peristalsis contacts freshly digested food.</span><img src="assets/villus-blood.gif" alt="Blood supply"></li>
             </ol>
           </article>
         </div>
@@ -2820,63 +3084,62 @@
           <article class="type-card">
             <h4>Diffusion</h4>
             <iframe class="transport-process-live" src="vendor/nutrition/index.html?embed=1&amp;topic=applications&amp;view=guided&amp;application=processes&amp;process=diffusion&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=4" title="Diffusion: net movement from high to low concentration, no energy." loading="lazy"></iframe>
-            <p class="examples target">Food molecules</p>
+            <p class="examples target"><mark class="hl-y">Food molecules</mark></p>
             <ul class="bullets">
-              <li>No energy</li>
-              <li>From high concentration to low concentration until equilibrium</li>
+              <li><mark class="hl-p">No need energy</mark></li>
+              <li>High to low concentration until <mark class="hl-b">equilibrium</mark></li>
             </ul>
           </article>
           <article class="type-card">
             <h4>Osmosis</h4>
             <iframe class="transport-process-live" src="vendor/nutrition/index.html?embed=1&amp;topic=applications&amp;view=guided&amp;application=processes&amp;process=osmosis&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=4" title="Osmosis: water through a partially permeable membrane." loading="lazy"></iframe>
-            <p class="examples target">Water only</p>
+            <p class="examples target"><mark class="hl-y">Water only</mark></p>
             <ul class="bullets">
-              <li>No energy</li>
-              <li>Needs a partially permeable membrane</li>
-              <li>Water moves from a higher water potential to a lower one, following solute</li>
+              <li><mark class="hl-p">No need energy</mark></li>
+              <li><mark class="hl-p">WATER FOLLOW SOLUTE!</mark> need cell membrane / dialysis tubing</li>
+              <li>Water: <mark class="hl-b">higher water potential</mark> → <mark class="hl-b">lower water potential</mark></li>
             </ul>
           </article>
           <article class="type-card">
             <h4>Active transport</h4>
             <iframe class="transport-process-live" src="vendor/nutrition/index.html?embed=1&amp;topic=applications&amp;view=guided&amp;application=processes&amp;process=active&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=4" title="Active transport: carriers use ATP from mitochondria." loading="lazy"></iframe>
-            <p class="examples target">Food molecules</p>
+            <p class="examples target"><mark class="hl-y">Food molecules</mark></p>
             <ul class="bullets">
-              <li>Needs energy from mitochondria</li>
-              <li>Only living cells do it</li>
-              <li>Moves molecules from low concentration to high concentration, or speeds up a downhill move</li>
+              <li><mark class="hl-p">Need energy</mark>, <mark class="hl-p">mitochondria</mark>, only in living cells</li>
+              <li><mark class="hl-b">Low to high</mark> concentration, or high to low but faster</li>
             </ul>
           </article>
         </div>
         <h3>Case: flattened villi</h3>
         <div class="type-grid one-case">
-          <article class="type-card">
+          <article class="type-card copy-dense">
             <h4>Flattened villi</h4>
             <p class="examples">Coeliac disease</p>
             <img src="assets/coeliac.gif" alt="Coeliac disease" class="card-anim">
             <ul class="bullets">
-              <li>Less surface, so fewer food molecules are absorbed and more stay in the lumen.</li>
-              <li>The lumen then has a lower water potential, so less water is absorbed by osmosis. More water in the faeces means diarrhoea.</li>
-              <li>Damaged microvilli also mean less amino acid uptake, so the blood amino acid level stays low even if protein is digested.</li>
+              <li>Total <mark class="hl-o">surface area</mark> for absorption decreased → less food absorbed, more in lumen.</li>
+              <li><mark class="hl-y">Lower water potential</mark> → less water absorbed by osmosis → more water in faeces = <mark class="hl-y">diarrhoea</mark>.</li>
+              <li>Damaged microvilli → less amino acid uptake → low blood amino acid even if protein digested.</li>
             </ul>
           </article>
         </div>
         <h3>Two routes</h3>
         <div class="route-trio">
           <article class="type-card">
-            <h4>Water-soluble, into the blood capillary</h4>
+            <h4>Water-soluble 水溶先入血 → capillaries</h4>
             <ol class="steps">
-              <li>Monosaccharides</li>
-              <li>Amino acids</li>
-              <li>Minerals</li>
-              <li>Vitamins B and C</li>
-              <li>Water</li>
+              <li><mark class="hl-y">Monosaccharides</mark> / simple sugars</li>
+              <li><mark class="hl-y">Amino acids</mark></li>
+              <li><mark class="hl-y">Minerals</mark></li>
+              <li>Vitamin <mark class="hl-y">B, C</mark></li>
+              <li><mark class="hl-y">Water</mark></li>
             </ol>
           </article>
           <iframe class="two-routes-live" src="vendor/nutrition/index.html?embed=1&amp;topic=villi&amp;view=guided&amp;adaptation=absorption&amp;group=both&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=10" title="Absorption: water-soluble into capillaries; lipids into the lacteal." loading="lazy"></iframe>
           <article class="type-card">
-            <h4>Lipid-soluble, into the lacteal</h4>
+            <h4>Lipid-soluble 油溶先入淋巴 → lacteals</h4>
             <ol class="steps">
-              <li>Lipids: glycerol and fatty acids recombine into triglyceride in the epithelial cells before they enter the lacteal</li>
+              <li><mark class="hl-y">Lipids</mark>: glycerol + fatty acids recombine to <mark class="hl-b">triglyceride</mark> at epithelial cells → lacteal</li>
               <li>Vitamin A</li>
               <li>Vitamin D</li>
               <li>Vitamin E</li>
@@ -2900,10 +3163,10 @@
       <div class="copy">
         <div class="sec"><span class="num">06</span><h2>Transport, assimilation, and liver</h2></div>
         <div class="key-idea">
-          <p>Water-soluble food reaches the liver in the blood first, then the body. Lipids travel in lymph and join the blood before the heart, so they meet the liver later.</p>
+          <p><mark class="hl-y">Transport</mark> 運輸 and <mark class="hl-b">assimilation</mark> 同化. Arteries: <mark class="hl-y">Away from heart</mark>; veins: <mark class="hl-y">Back to heart</mark>. Lipids <mark class="hl-y">rejoin blood before heart</mark>!</p>
         </div>
         <h3>Routes</h3>
-        <div class="gif-row share-row routes-villus-row">
+        <div class="gif-row share-row copy-dense routes-villus-row">
           <article class="type-card">
             <h4>After the villus</h4>
             <p class="examples">Portal vein or lymph</p>
@@ -2967,14 +3230,14 @@
             </thead>
             <tbody>
               <tr>
-                <td>Hepatic portal vein</td>
-                <td>After a meal: most water-soluble nutrients, including monosaccharides, amino acids, minerals, vitamins B and C, and water</td>
-                <td>Small intestine to liver</td>
+                <td><mark class="hl-y">Hepatic portal vein</mark></td>
+                <td><mark class="hl-y">Most water-soluble nutrients</mark> just absorbed: monosaccharides, amino acids, minerals, vitamins B, C, water</td>
+                <td>Small intestine → liver</td>
               </tr>
               <tr>
-                <td>Hepatic vein</td>
-                <td>Processed nutrients. Urea after a protein meal. The most glucose during starvation, from glycogen</td>
-                <td>Liver to heart</td>
+                <td><mark class="hl-y">Hepatic vein</mark></td>
+                <td>Processed nutrients; protein diet → <mark class="hl-g">most urea</mark>; starvation → <mark class="hl-g">glycogen → glucose</mark></td>
+                <td>Liver → heart</td>
               </tr>
               <tr>
                 <td>Vena cava</td>
@@ -2987,8 +3250,8 @@
                 <td>Heart to the body</td>
               </tr>
               <tr>
-                <td>Lymph vessel</td>
-                <td>Lipids and fat-soluble vitamins. It rejoins blood at the subclavian vein</td>
+                <td>Lymphatic vessel</td>
+                <td><mark class="hl-y">Lipids</mark>, fat-soluble vitamins (ADEK); <mark class="hl-y">rejoin</mark> blood at <mark class="hl-y">subclavian veins</mark></td>
                 <td>Towards the heart</td>
               </tr>
             </tbody>
@@ -3007,21 +3270,21 @@
             </thead>
             <tbody>
               <tr>
-                <td>Glucose</td>
-                <td>Releasing energy</td>
-                <td>Glycogen in the liver and muscles, or lipid in the liver</td>
+                <td><mark class="hl-y">Glucose</mark></td>
+                <td>Used for <mark class="hl-g">releasing energy</mark></td>
+                <td>→ <mark class="hl-y">Glycogen</mark> in liver/muscles; lipids in liver</td>
                 <td class="anim-cell"><iframe class="fate-food-live" src="vendor/nutrition/index.html?embed=1&amp;topic=assimilation&amp;view=guided&amp;nutrient=glucose&amp;fate=use&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=5" title="Glucose: used for releasing energy in body cells." loading="lazy"></iframe></td>
               </tr>
               <tr>
-                <td>Amino acids</td>
-                <td>Proteins for growth and repair, plus enzymes, antibodies, and hormones</td>
-                <td>Deamination. The amino group becomes urea and is excreted in urine. The remaining part can become glucose, glycogen, or lipid</td>
+                <td><mark class="hl-y">Amino acids</mark></td>
+                <td><mark class="hl-g">Make proteins for growth/repair</mark>; enzymes, antibodies, hormones</td>
+                <td><mark class="hl-y">Deamination</mark>: amine group → <mark class="hl-o">urea</mark> → urine; remaining → glucose/glycogen/lipids</td>
                 <td class="anim-cell"><iframe class="fate-food-live" src="vendor/nutrition/index.html?embed=1&amp;topic=assimilation&amp;view=guided&amp;nutrient=amino&amp;fate=use&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=5" title="Amino acids: built into proteins for growth and repair." loading="lazy"></iframe></td>
               </tr>
               <tr>
-                <td>Lipids</td>
-                <td>Energy store, cell membranes, and sex hormones</td>
-                <td>Deposited around organs and built into adipose tissue, including fat under the skin</td>
+                <td><mark class="hl-y">Lipids</mark></td>
+                <td><mark class="hl-g">Energy storage</mark>; cell membranes; sex hormones</td>
+                <td>Deposited around organs; <mark class="hl-g">adipose tissue</mark> (e.g. subcutaneous fat)</td>
                 <td class="anim-cell"><iframe class="fate-food-live" src="vendor/nutrition/index.html?embed=1&amp;topic=assimilation&amp;view=guided&amp;nutrient=lipid&amp;fate=use&amp;lipidUse=membrane&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=5" title="Lipids: cell membranes, energy store, and hormones." loading="lazy"></iframe></td>
               </tr>
             </tbody>
@@ -3049,34 +3312,34 @@
             </thead>
             <tbody>
               <tr>
-                <td>Regulating</td>
-                <td class="detail-cell">Insulin rises: glucose becomes glycogen, so blood glucose falls. Glucagon rises: glycogen becomes glucose, so blood glucose rises. Insulin does not work if it is swallowed. It is a protein, so proteases in the gut digest it before it can reach the blood. It has to be injected.</td>
+                <td><mark class="hl-g">Regulating</mark></td>
+                <td class="detail-cell">↓ blood glucose: <mark class="hl-y">Glucose → Glycogen</mark> (insulin). ↑ blood glucose: <mark class="hl-y">Glycogen → Glucose</mark> (glucagon). Why insulin does not work when taken orally: protein → digested in gut → must inject.</td>
                 <td class="anim-cell"><iframe class="liver-job-live" src="vendor/nutrition/index.html?embed=1&amp;topic=liver&amp;view=guided&amp;fn=0&amp;situation=meal&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=6" title="Regulating blood glucose: insulin and glycogen storage." loading="lazy"></iframe></td>
               </tr>
               <tr>
-                <td>Storing</td>
-                <td class="detail-cell">Glycogen, iron from broken red blood cells, and vitamins A, D, E, and K.</td>
+                <td><mark class="hl-g">Storing</mark></td>
+                <td class="detail-cell"><mark class="hl-y">Glycogen</mark>, iron (from RBC breakdown), lipid-soluble vitamins A, D, E, K.</td>
                 <td class="anim-cell"><iframe class="liver-job-live" src="vendor/nutrition/index.html?embed=1&amp;topic=liver&amp;view=guided&amp;fn=1&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=6" title="Liver storage: glycogen, iron, and fat-soluble vitamins." loading="lazy"></iframe></td>
               </tr>
               <tr>
-                <td>Producing</td>
-                <td class="detail-cell">Bile, and vitamin A made from carotene.</td>
+                <td><mark class="hl-g">Producing</mark></td>
+                <td class="detail-cell"><mark class="hl-y">Bile</mark>; vitamin A from carotene.</td>
                 <td class="anim-cell"><iframe class="liver-job-live" src="vendor/nutrition/index.html?embed=1&amp;topic=liver&amp;view=guided&amp;fn=2&amp;production=bile&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=6" title="Liver production: bile from hepatocytes." loading="lazy"></iframe></td>
               </tr>
               <tr>
-                <td>Deaminating</td>
+                <td><mark class="hl-y">Deaminating</mark></td>
                 <td class="detail-cell">
                   <ol class="steps">
-                    <li>Making body proteins is assimilation. The nitrogenous part is not stored.</li>
-                    <li>Deamination can happen only after the amino acids have been absorbed.</li>
-                    <li>The amino group is removed and converted to urea. Urea leaves in urine.</li>
+                    <li>Making proteins = <mark class="hl-b">assimilation</mark>; nitrogenous waste not stored in body.</li>
+                    <li><mark class="hl-y">Deamination</mark> only <mark class="hl-g">after absorption</mark>!</li>
+                    <li>Amino group → <mark class="hl-o">urea</mark> → excreted in urine.</li>
                   </ol>
                 </td>
                 <td class="anim-cell"><iframe class="liver-job-live" src="vendor/nutrition/index.html?embed=1&amp;topic=liver&amp;view=guided&amp;fn=3&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=6" title="Deamination: amino group to urea." loading="lazy"></iframe></td>
               </tr>
               <tr>
-                <td>Detoxifying</td>
-                <td class="detail-cell">Mild toxic substances are processed. Catalase breaks down hydrogen peroxide.</td>
+                <td><mark class="hl-g">Detoxifying</mark></td>
+                <td class="detail-cell"><mark class="hl-g">Mild toxic substances</mark>, e.g. <mark class="hl-g">catalase</mark> (hydrogen peroxide).</td>
                 <td class="anim-cell"><iframe class="liver-job-live" src="vendor/nutrition/index.html?embed=1&amp;topic=liver&amp;view=guided&amp;fn=4&amp;animate=1&amp;loop=1&amp;legend=1&amp;v=6" title="Detoxification: catalase breaks down hydrogen peroxide." loading="lazy"></iframe></td>
               </tr>
             </tbody>
@@ -3089,7 +3352,7 @@
       <div class="copy">
         <div class="sec"><span class="num">07</span><h2>Large intestine and egestion</h2></div>
         <div class="key-idea">
-          <p>There is no digestion in the large intestine. Most food, and most water, has already been absorbed in the small intestine. What leaves through the anus is faeces only.</p>
+          <p>Large intestine: <mark class="hl-g">no digestion</mark>; most food and water absorbed in small intestine. <mark class="hl-y">Egestion</mark>: removal of <mark class="hl-y">undigested material</mark> only (faeces — not urine/urea).</p>
         </div>
         <h3>Jobs</h3>
         <div class="gif-row share-row">
@@ -3102,9 +3365,9 @@
               </div>
               <div>
                 <dt>Process</dt>
-                <dd>The colon does the final absorption of water, and also some minerals and vitamins, then compacts the faeces.</dd>
+                <dd>Colon: <mark class="hl-g">final</mark> water absorption (+ mineral, vitamin); compact <mark class="hl-y">faeces</mark>.</dd>
                 <dd>The rectum stores faeces for a short time.</dd>
-                <dd>Egestion is the removal of undigested and unabsorbed material. It is not the removal of metabolic waste.</dd>
+                <dd><mark class="hl-y">Egestion</mark>: removal of <mark class="hl-y">undigested and unabsorbed material</mark> — not excretion.</dd>
               </div>
               <div>
                 <dt>Fate of bile pigment</dt>
@@ -3122,7 +3385,7 @@
             <h4>Normal faeces</h4>
             <iframe class="egestion-live" src="vendor/nutrition/index.html?embed=1&amp;topic=egestion&amp;view=notes&amp;transit=normal&amp;animate=1&amp;loop=1&amp;v=8" title="Normal large intestine: water absorbed, faeces compacted." loading="lazy"></iframe>
             <ul class="bullets">
-              <li>Dietary fibre, bile pigment, bacteria, dead cells, mucus, and a little water.</li>
+              <li><mark class="hl-y">Undigested</mark> and <mark class="hl-y">unabsorbed</mark> material: dietary fibre, bile pigment (brown), bacteria (smelly), dead cells, mucus, little water.</li>
               <li>Bacteria make the smell. Bile pigment makes the brown colour.</li>
               <li>Red blood cells and a large volume of water are not normal in the faeces of a healthy person. Bacteria are.</li>
             </ul>
@@ -3142,14 +3405,14 @@
             <h4>Diarrhoea</h4>
             <img class="card-anim" src="assets/diarrhoea-colon.png" alt="Normal versus diarrhoea: water and electrolyte loss in the colon." width="640" height="480" loading="lazy">
             <ul class="bullets">
-              <li>Diarrhoea: peristalsis is too fast, so there is not enough time to absorb water. Or too little solute is absorbed, so water stays in the lumen by osmosis.</li>
+              <li><mark class="hl-y">Diarrhoea</mark>: <mark class="hl-y">Peristalsis</mark> too fast (not enough time to absorb water) / osmosis.</li>
             </ul>
           </article>
           <article class="type-card">
             <h4>Constipation</h4>
             <img class="card-anim" src="assets/constipation.jpg" alt="Packed colon and hardened faeces in constipation." width="640" height="480" loading="lazy">
             <ul class="bullets">
-              <li>Not enough dietary fibre and water.</li>
+              <li><mark class="hl-y">Constipation</mark>: not enough dietary <mark class="hl-y">fibre</mark> &amp; <mark class="hl-y">water</mark>.</li>
               <li>Low fibre slows peristalsis, so there is more time to absorb water and the faeces become dry.</li>
             </ul>
           </article>
@@ -3157,8 +3420,8 @@
             <h4>Oily or bloody</h4>
             <img class="card-anim" src="assets/bloody-stool.jpg" alt="Causes of blood in stool, including damage along the alimentary canal." width="640" height="480" loading="lazy">
             <ul class="bullets">
-              <li>Oily faeces: the pancreas is not supplying enough lipase, so fat is not digested.</li>
-              <li>Blood: the alimentary canal is damaged. Blood from further along the tube is less bright red.</li>
+              <li><mark class="hl-y">Oily</mark>: pancreas problem (pancreatic <mark class="hl-y">lipase</mark>).</li>
+              <li><mark class="hl-y">Blood</mark>: damaged <mark class="hl-y">alimentary canal</mark> (further along → less bright red).</li>
             </ul>
           </article>
         </div>
@@ -3191,9 +3454,9 @@
       <p class="key-idea-label">Why it matters</p>
       <div class="why-matters">
         <ul>
-          <li>Use the five words in order, and keep egestion for faeces. Urine, urea, and carbon dioxide are excretion.</li>
-          <li>If a graph is flat in the stomach, that food is not being digested there. Starch pauses because acid denatures amylase. Fat waits for bile and lipase. Fibre never drops.</li>
-          <li>Name the vessel with its direction. After a meal, glucose peaks in the hepatic portal vein. In starvation, it peaks in the hepatic vein.</li>
+          <li>Five processes in order; <mark class="hl-y">egestion</mark> = faeces only. <mark class="hl-y">Excretion</mark>: urine, urea, CO<sub>2</sub>.</li>
+          <li>Graph: Z = carbohydrates (salivary amylase); Y = proteins (pepsin); X = lipids (pancreatic lipase). Large intestine: 100% undigested → no digestion.</li>
+          <li>After meal: glucose peak in <mark class="hl-y">hepatic portal vein</mark>. Starving: peak in <mark class="hl-y">hepatic vein</mark> (glycogen → glucose).</li>
         </ul>
       </div>
       <p class="page-credit">Ch7 · SB02 Nutrition in humans · seven processes</p>
