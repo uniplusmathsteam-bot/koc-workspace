@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>JM33 Coordinates of Lines — Concept</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +13,7 @@
       margin: 0;
       color: #1e293b;
       font-family: "Hanken Grotesk", system-ui, sans-serif;
-      background: linear-gradient(180deg, #f8fafc, #f1f5f9);
+      background: linear-gradient(180deg, #f8fafc, #eef2ff);
     }
     .jm-page {
       height: 100%;
@@ -61,18 +60,18 @@
 </head>
 <body>
   <main class="jm-page">
-    <p class="jm-eyebrow">JM33 · Lesson 33</p>
+    <p class="jm-eyebrow">JM33 · Coordinates of straight lines</p>
     <h1>Coordinates of Lines — Concept</h1>
-    <div class="subnav" aria-label="Concept decks">
-      <button class="chip active" type="button" data-deck="slides/intro/index.html?v=20261106-coord14">Distance and slope</button>
-      <button class="chip" type="button" data-deck="slides/further/index.html?v=20261106-coord14">Parallel, midpoint, area</button>
+    <div class="subnav" aria-label="Concept animations">
+      <button class="chip active" type="button" data-deck="slides/distance/index.html?v=20261114-ops17">Distance, slope, and the line</button>
+      <button class="chip" type="button" data-deck="slides/centres/index.html?v=20261114-ops17">Parallel, section, and centres</button>
     </div>
     <div class="deck-slideshow">
       <div class="deck-wrap">
-        <iframe id="deck-frame" src="slides/intro/index.html?v=20261106-coord14" title="Distance and slope"></iframe>
+        <iframe id="deck-frame" src="slides/distance/index.html?v=20261114-ops17" title="Distance, slope, and the line"></iframe>
       </div>
     </div>
-    <p class="hint">Space pauses or resumes. Click, Enter, or the right arrow advances one step. Left arrow goes back.</p>
+    <p class="hint">Click or the right arrow finishes the step you are watching. Press it again for the next step. Left arrow goes back. Space pauses, and once the step has finished, Space also moves on.</p>
   </main>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -86,6 +85,13 @@
             frame.title = b.textContent.trim();
           }
         });
+      });
+      document.addEventListener("keydown", function (e) {
+        var api = frame.contentWindow && frame.contentWindow.KOC && frame.contentWindow.KOC.api;
+        if (!api) return;
+        if (e.key === "ArrowRight" || e.key === "Enter") { e.preventDefault(); api.advance(); }
+        else if (e.key === "ArrowLeft") { e.preventDefault(); api.back(); }
+        else if (e.key === " ") { e.preventDefault(); api.toggle(); }
       });
     });
   </script>

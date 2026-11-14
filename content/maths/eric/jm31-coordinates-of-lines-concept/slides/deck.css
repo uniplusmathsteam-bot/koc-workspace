@@ -1,0 +1,114 @@
+html, body {
+  margin: 0;
+  height: 100%;
+  background: #0f172a;
+  overflow: hidden;
+}
+#app { height: 100%; }
+#board {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1280px;
+  height: 720px;
+  background: #0f172a;
+  transform-origin: center center;
+  overflow: hidden;
+}
+.title {
+  position: absolute;
+  top: 26px;
+  left: 40px;
+  right: 40px;
+  text-align: center;
+  color: #f8fafc;
+}
+.title .katex { font-size: 40px; }
+.rule {
+  position: absolute;
+  top: 86px;
+  left: 50%;
+  height: 2px;
+  background: #e6c260;
+  transform: translateX(-50%);
+}
+.fig {
+  position: absolute;
+  left: 24px;
+  top: 112px;
+  width: 610px;
+  height: 570px;
+}
+.fig svg { width: 610px; height: 570px; display: block; }
+.labs { position: absolute; inset: 0; pointer-events: none; }
+.tag {
+  position: absolute;
+  white-space: nowrap;
+  font-size: 22px;
+  line-height: 1;
+}
+.tag .katex { font-size: 22px; }
+.side {
+  position: absolute;
+  left: 650px;
+  top: 128px;
+  width: 590px;
+  height: 540px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 16px;
+}
+.desc { color: #e6c260; min-height: 42px; }
+.desc .katex { font-size: 30px; }
+.eq { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
+.row-wrap { position: relative; }
+.row {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  font-size: 32px;
+}
+.row .katex { font-size: 32px; }
+.part { display: inline-flex; align-items: center; }
+.eqsign { margin: 0 0.05em; }
+.note { display: none; }
+.frac {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 4px;
+}
+.frac-side { display: inline-flex; align-items: center; white-space: nowrap; }
+.fbar {
+  display: block;
+  height: 2px;
+  background: #f8fafc;
+  align-self: stretch;
+  min-width: 16px;
+  margin: 12px 0;
+}
+.note {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 22px;
+  line-height: 1.35;
+  color: #e2e8f0;
+  max-width: 580px;
+  min-height: 30px;
+}
+.count {
+  position: absolute;
+  right: 22px;
+  bottom: 12px;
+  color: #64748b;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 16px;
+}
+.fly {
+  position: fixed;
+  z-index: 40;
+  pointer-events: none;
+  line-height: 1;
+  font-size: 32px;
+}
+.fly .katex { font-size: 32px; }
