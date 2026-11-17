@@ -405,6 +405,31 @@
                 <circle cx="382" cy="116" r="12"/>
                 <circle cx="406" cy="124" r="13"/>
               </g>
+              <g id="ironBits" display="none" fill="#9ca3af" stroke="#4b5563" stroke-width="1.6">
+                <circle cx="322" cy="120" r="17"/>
+                <circle cx="358" cy="118" r="19"/>
+                <circle cx="396" cy="122" r="16"/>
+              </g>
+              <g id="ironDust" display="none" fill="#9ca3af">
+                <circle cx="308" cy="128" r="3.1" opacity="0"/>
+                <circle cx="316" cy="122" r="2.6" opacity="0"/>
+                <circle cx="324" cy="130" r="3.4" opacity="0"/>
+                <circle cx="332" cy="124" r="2.4" opacity="0"/>
+                <circle cx="312" cy="116" r="2.2" opacity="0"/>
+                <circle cx="328" cy="114" r="2.8" opacity="0"/>
+                <circle cx="344" cy="128" r="3.2" opacity="0"/>
+                <circle cx="352" cy="122" r="2.5" opacity="0"/>
+                <circle cx="360" cy="130" r="3.5" opacity="0"/>
+                <circle cx="368" cy="124" r="2.7" opacity="0"/>
+                <circle cx="348" cy="114" r="2.3" opacity="0"/>
+                <circle cx="364" cy="112" r="2.9" opacity="0"/>
+                <circle cx="382" cy="128" r="3.0" opacity="0"/>
+                <circle cx="390" cy="122" r="2.4" opacity="0"/>
+                <circle cx="398" cy="130" r="3.3" opacity="0"/>
+                <circle cx="406" cy="124" r="2.6" opacity="0"/>
+                <circle cx="386" cy="114" r="2.2" opacity="0"/>
+                <circle cx="404" cy="116" r="2.8" opacity="0"/>
+              </g>
               <g id="alSolid" display="none">
                 <rect id="alBody" x="292" y="102" width="128" height="28" rx="5" fill="#9ca3af" stroke="#4b5563" stroke-width="2"/>
                 <rect x="296" y="106" width="120" height="20" rx="3" fill="none" stroke="#e5e7eb" stroke-width="3"/>
@@ -422,8 +447,10 @@
             <text class="heat-word" x="155" y="224" text-anchor="middle">heat</text>
             <line class="leader" x1="824" y1="136" x2="900" y2="188"/>
             <text x="820" y="118" text-anchor="middle">delivery tube</text>
-            <line class="leader" x1="1190" y1="64" x2="1224" y2="64"/>
-            <text x="1232" y="72">hydrogen</text>
+            <g id="h2Label">
+              <line class="leader" x1="1190" y1="64" x2="1224" y2="64"/>
+              <text x="1232" y="72">hydrogen</text>
+            </g>
             <line class="leader" x1="1190" y1="188" x2="1224" y2="188"/>
             <text x="1232" y="196">water</text>
             <line class="leader" x1="1340" y1="318" x2="1368" y2="318"/>
@@ -574,7 +601,7 @@
       kind: 'sink',
       dur: 4200,
       aria: 'Calcium sinking in cold water, giving a gas and a milky suspension',
-      desc: 'Reacts with <span class="hl-water">cold water</span>:<br>Sinks to the bottom<br>Reacts readily to give <span class="hl-result">colorless gas</span><br>Forms a <span class="hl-result">milky suspension</span>',
+      desc: 'Reacts with <span class="hl-water">cold water</span>:<br>Sinks to the bottom<br>Reacts readily to give <span class="hl-result">colorless gas</span><br>Slightly soluble, so a <span class="hl-result">milky suspension</span> forms',
       eqs: [
         'Calcium + Water → Calcium hydroxide + Hydrogen',
         'Ca(s) + 2H₂O(l) → Ca(OH)₂(aq) + H₂(g)'
@@ -588,9 +615,9 @@
       dur: 4400,
       solidLabel: 'magnesium ribbon',
       aria: 'Magnesium reacting with steam, giving a white light and a white solid',
-      desc: 'Reacts with <span class="hl-water">hot water</span> slowly.<br>Reacts with <span class="hl-water">steam</span> vigorously:<br>Give an <span class="hl-result">intense white light</span> to form a <span class="hl-result">white solid</span>',
+      desc: 'Reacts with <span class="hl-water">hot water</span> slowly.<br>Reacts with <span class="hl-water">steam</span> vigorously:<br>Gives an <span class="hl-result">intense white light</span> to form a <span class="hl-result">white solid</span>',
       eqs: [
-        'Magnesium + Water → Magnesium hydroxide + Hydrogen',
+        'Magnesium + Hot water → Magnesium hydroxide + Hydrogen',
         'Mg(s) + 2H₂O(l) → Mg(OH)₂(aq) + H₂(g)',
         'Magnesium + Steam → Magnesium oxide + Hydrogen',
         'Mg(s) + H₂O(g) → MgO(s) + H₂(g)'
@@ -604,7 +631,7 @@
       dur: 1600,
       solidLabel: 'aluminium',
       aria: 'Aluminium in steam, covered by oxide and not reacting',
-      desc: 'Aluminium usually covered by a thin layer of <span class="hl-result">aluminium oxide</span> which prevents the reaction between aluminium and <span class="hl-water">steam</span>.',
+      desc: 'A thin layer of <span class="hl-result">aluminium oxide</span> prevents reaction with <span class="hl-water">steam</span>.<br>No hydrogen is given off.',
       eqs: [
         'Aluminium + Steam → Aluminium oxide + Hydrogen',
         '2Al(s) + 3H₂O(g) → Al₂O₃(s) + 3H₂(g)'
@@ -632,7 +659,7 @@
       dur: 4400,
       solidLabel: 'iron',
       aria: 'Iron reacting with steam to give a black powder',
-      desc: 'Reacts with <span class="hl-water">steam</span> to give a <span class="hl-result">black powder</span>',
+      desc: 'Reacts with <span class="hl-water">steam</span> on strong heating to give a <span class="hl-result">black powder</span>',
       eqs: [
         'Iron + Steam → Iron(II, III) oxide + Hydrogen',
         '3Fe(s) + 4H₂O(g) → Fe₃O₄(s) + 4H₂(g)'
@@ -663,6 +690,7 @@
   var steamG = document.getElementById('steam');
   var waterG = document.getElementById('water');
   var metalInTube = document.getElementById('metalInTube');
+  var h2Label = document.getElementById('h2Label');
   var eqBand = document.getElementById('eqBand');
   var eqInners = document.querySelectorAll('.eq-inner');
   var answer = document.getElementById('answer');
@@ -687,6 +715,14 @@
   var flash = document.getElementById('flash');
   var powder = document.getElementById('powder');
   var powderNodes = document.querySelectorAll('#powder circle');
+  var ironBits = document.getElementById('ironBits');
+  var ironDust = document.getElementById('ironDust');
+  var ironBallNodes = document.querySelectorAll('#ironBits circle');
+  var ironDustNodes = document.querySelectorAll('#ironDust circle');
+  var ironBallR = [];
+  var ironDustR = [];
+  for (var ib = 0; ib < ironBallNodes.length; ib++) ironBallR.push(parseFloat(ironBallNodes[ib].getAttribute('r')));
+  for (var idu = 0; idu < ironDustNodes.length; idu++) ironDustR.push(parseFloat(ironDustNodes[idu].getAttribute('r')));
   var alSolid = document.getElementById('alSolid');
   var alBody = document.getElementById('alBody');
   var jarBubbles = document.getElementById('jarBubbles');
@@ -895,9 +931,13 @@
       alpha: 0.9
     });
   }
+  function setTube(text) {
+    if (metalInTube.textContent !== text) metalInTube.textContent = text;
+  }
   function drawSteam(metal, t) {
     var kind = metal.kind;
     var gas = kind === 'ribbon' ? jarBubNodes.length : kind === 'zn' ? 7 : kind === 'fe' ? 5 : 0;
+    h2Label.setAttribute('display', gas ? 'inline' : 'none');
     jarBubbles.setAttribute('display', gas ? 'inline' : 'none');
     drawBubbles(jarBubNodes, jarHome, t, {
       on: gas > 0,
@@ -923,6 +963,7 @@
       hotGlow.setAttribute('fill', '#ffffff');
       hotGlow.setAttribute('opacity', (glare * 0.72).toFixed(3));
       steamAmt = Math.max(smooth(clamp(t, 0.06, 0.28)) * (1 - smooth(clamp(t, 0.78, 0.96))), glare * 0.85);
+      setTube(t > 0.5 ? 'magnesium oxide' : 'magnesium ribbon');
     } else if (kind === 'zn') {
       var toYellow = smooth(clamp(t, 0.16, 0.38));
       var toWhite = smooth(clamp(t, 0.58, 0.94));
@@ -931,21 +972,36 @@
       hotGlow.setAttribute('fill', '#fde68a');
       hotGlow.setAttribute('opacity', (toYellow * (1 - toWhite) * 0.5).toFixed(3));
       steamAmt = toYellow * (1 - toWhite);
+      setTube(toYellow > 0.5 ? 'zinc oxide' : 'zinc');
     } else if (kind === 'fe') {
       var glowIn = smooth(clamp(t, 0.12, 0.32));
       var glowOut = smooth(clamp(t, 0.5, 0.78));
       var glow = glowIn * (1 - glowOut);
-      var feFill = rgb(mix([156, 163, 175], [17, 24, 39], smooth(clamp(t, 0.3, 0.9))));
-      for (var f = 0; f < powderNodes.length; f++) powderNodes[f].setAttribute('fill', feFill);
+      var crack = smooth(clamp(t, 0.26, 0.8));
+      var feFill = rgb(mix([156, 163, 175], [17, 24, 39], smooth(clamp(t, 0.24, 0.88))));
+      for (var f = 0; f < ironBallNodes.length; f++) {
+        var left = 1 - crack;
+        ironBallNodes[f].setAttribute('fill', feFill);
+        ironBallNodes[f].setAttribute('r', (ironBallR[f] * left).toFixed(2));
+        ironBallNodes[f].setAttribute('opacity', left > 0.05 ? '1' : '0');
+      }
+      for (var d = 0; d < ironDustNodes.length; d++) {
+        var grow = smooth(clamp(t, 0.22 + (d % 5) * 0.02, 0.62));
+        ironDustNodes[d].setAttribute('fill', feFill);
+        ironDustNodes[d].setAttribute('r', (ironDustR[d] * (0.35 + 0.65 * grow)).toFixed(2));
+        ironDustNodes[d].setAttribute('opacity', grow.toFixed(3));
+      }
       hotGlow.setAttribute('fill', '#c2410c');
       hotGlow.setAttribute('opacity', (glow * 0.5).toFixed(3));
       steamAmt = glow;
+      setTube(crack > 0.55 ? 'Fe₃O₄' : 'iron');
     } else {
       var warm = Math.sin(Math.PI * clamp(t, 0.08, 0.94));
       alBody.setAttribute('fill', rgb(mix([156, 163, 175], [214, 170, 142], warm * 0.8)));
       hotGlow.setAttribute('fill', '#fdba74');
       hotGlow.setAttribute('opacity', (warm * 0.2).toFixed(3));
       steamAmt = warm * 0.85;
+      setTube('aluminium');
     }
     drawWisps(t, steamAmt);
   }
@@ -987,7 +1043,9 @@
     alkaliMove.setAttribute('display', metal.kind === 'alkali' ? 'inline' : 'none');
     sinker.setAttribute('display', (metal.kind === 'sink' || metal.kind === 'inert') ? 'inline' : 'none');
     coil.setAttribute('display', metal.kind === 'ribbon' ? 'inline' : 'none');
-    powder.setAttribute('display', (metal.kind === 'zn' || metal.kind === 'fe') ? 'inline' : 'none');
+    powder.setAttribute('display', metal.kind === 'zn' ? 'inline' : 'none');
+    ironBits.setAttribute('display', metal.kind === 'fe' ? 'inline' : 'none');
+    ironDust.setAttribute('display', metal.kind === 'fe' ? 'inline' : 'none');
     alSolid.setAttribute('display', metal.kind === 'oxide' ? 'inline' : 'none');
     if (metal.kind === 'alkali') {
       flameOuter.setAttribute('fill', metal.flame);
