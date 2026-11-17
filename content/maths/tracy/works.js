@@ -209,6 +209,19 @@ KOC.works('maths', 'tracy', [
     notes: 'Areas and Volumes survival kit: pyramids, cones, spheres, frustums, and similar solids.'
   },
   {
+    id: 'jm33-coordinates-summary',
+    title: 'JM33 · Summary',
+    type: 'interactive',
+    chapter: 'S3 JM33',
+    submitted: '2026-11-17',
+    status: 'pending',
+    tags: ['Interactive', 'Coordinates', 'Summary', 'S3'],
+    elements: ['gold'],
+    cover: 'content/maths/tracy/s3-cover.svg',
+    src: 'https://unikoc5.github.io/s3-maths/topics/coordinates/summary-only.html',
+    notes: 'Coordinates of straight lines survival kit.'
+  },
+  {
     id: 'jm34-trigonometry-concept',
     title: 'JM34 · Trigonometry Concept',
     type: 'interactive',
@@ -233,6 +246,58 @@ KOC.works('maths', 'tracy', [
     cover: 'content/maths/tracy/s3-cover.svg',
     src: 'https://unikoc5.github.io/s3-maths/topics/trigonometry/tools-only.html',
     notes: 'Special triangles, the identity, and co-functions.'
+  },
+  {
+    id: 'jm34-trigonometry-games',
+    title: 'JM34 · Games',
+    type: 'interactive',
+    chapter: 'S3 JM34',
+    submitted: '2026-11-17',
+    status: 'pending',
+    tags: ['Interactive', 'Trigonometry', 'Game', 'S3'],
+    elements: ['fire'],
+    cover: 'content/maths/tracy/s3-cover.svg',
+    src: 'https://unikoc5.github.io/s3-maths/topics/trigonometry/games-only.html',
+    notes: 'Blackout Voyage, Aim Sight, and Rhythm Lock.'
+  },
+  {
+    id: 'jm34-trigonometry-summary',
+    title: 'JM34 · Summary',
+    type: 'interactive',
+    chapter: 'S3 JM34',
+    submitted: '2026-11-17',
+    status: 'pending',
+    tags: ['Interactive', 'Trigonometry', 'Summary', 'S3'],
+    elements: ['gold'],
+    cover: 'content/maths/tracy/s3-cover.svg',
+    src: 'https://unikoc5.github.io/s3-maths/topics/trigonometry/summary-only.html',
+    notes: 'Trigonometric relations survival kit.'
+  },
+  {
+    id: 'jm35-trig-applications-games',
+    title: 'JM35 · Games',
+    type: 'interactive',
+    chapter: 'S3 JM35',
+    submitted: '2026-11-17',
+    status: 'pending',
+    tags: ['Interactive', 'Trigonometry', 'Game', 'S3'],
+    elements: ['fire'],
+    cover: 'content/maths/tracy/s3-cover.svg',
+    src: 'https://unikoc5.github.io/s3-maths/topics/trigonometry_applications/games-only.html',
+    notes: 'Laser Vault — The Midnight Vector.'
+  },
+  {
+    id: 'jm35-trig-applications-summary',
+    title: 'JM35 · Summary',
+    type: 'interactive',
+    chapter: 'S3 JM35',
+    submitted: '2026-11-17',
+    status: 'pending',
+    tags: ['Interactive', 'Trigonometry', 'Summary', 'S3'],
+    elements: ['gold'],
+    cover: 'content/maths/tracy/s3-cover.svg',
+    src: 'https://unikoc5.github.io/s3-maths/topics/trigonometry_applications/summary-only.html',
+    notes: 'Application of trigonometry survival kit.'
   },
   {
     id: 's3-mathematics-gallery',
