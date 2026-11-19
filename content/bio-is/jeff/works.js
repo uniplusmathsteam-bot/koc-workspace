@@ -27,6 +27,19 @@ KOC.works('bio-is', 'jeff', [
     notes: 'Interactive lab of factors that damage the cell membrane: organic solvents, detergents, extreme pH, high temperature, and mechanical stress.'
   },
   {
+    id: 'osmosis',
+    title: 'Ch2 Osmosis',
+    original: 'Dialysis tubing, beetroot, egg, and red blood cells',
+    type: 'interactive',
+    subject: 'Bio',
+    chapter: 'S3 Basic Biology Ch2 Cells — osmosis',
+    submitted: '2026-11-19',
+    tags: ['Interactive', 'Osmosis', 'Cell membrane'],
+    elements: ['wood'],
+    src: 'content/bio-is/jeff/osmosis/index.html',
+    notes: 'Osmosis lab: dialysis tubing, beetroot temperature, egg in salt and water, and red blood cells.'
+  },
+  {
     id: 'migration-of-coloured-ions',
     title: 'MWI2_Ion migration_(Migration of Ions)',
     original: 'Migration of coloured ions',

@@ -21,7 +21,7 @@ KOC.manifest([
   'content/phy/winnie/works.js',
   'content/phy/jerry/works.js',
 
-  'content/bio-is/jeff/works.js?v=20261024-damage',
+  'content/bio-is/jeff/works.js?v=20261119-osmosis',
   'content/bio-is/issac/works.js?v=20261113-nutrition',
   'content/bio-is/javin/works.js?v=20261012a'
 ]);
