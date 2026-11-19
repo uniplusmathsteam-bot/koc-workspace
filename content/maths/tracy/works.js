@@ -18,13 +18,13 @@ KOC.works('maths', 'tracy', [
     title: 'JM24 · Games',
     type: 'interactive',
     chapter: 'S3 JM24',
-    submitted: '2026-10-14',
+    submitted: '2026-11-19',
     status: 'pending',
     tags: ['Interactive', 'Indices', 'Game', 'S3'],
     elements: ['fire'],
     cover: 'content/maths/tracy/s3-cover.svg',
-    src: 'https://unikoc5.github.io/s3-maths/topics/law_of_indices/index.html#games',
-    notes: 'Index cards, Magnitude Express, and Signal Room.'
+    src: 'https://unikoc5.github.io/s3-maths/topics/law_of_indices/games-only.html',
+    notes: 'Index cards, Magnitude Express, and Signal Room. (volume update 2026-11-19)'
   },
   {
     id: 'jm24-law-of-indices-summary',
@@ -44,13 +44,26 @@ KOC.works('maths', 'tracy', [
     title: 'JM25 · Games',
     type: 'interactive',
     chapter: 'S3 JM25',
-    submitted: '2026-10-31',
+    submitted: '2026-11-19',
     status: 'pending',
     tags: ['Interactive', 'Factorization', 'Game', 'S3'],
     elements: ['fire'],
     cover: 'content/maths/tracy/s3-cover.svg',
     src: 'https://unikoc5.github.io/s3-maths/topics/factorization_polynomials/games-only.html',
-    notes: 'Factor Blaster and Cross Method Snake.'
+    notes: 'Factor Blaster and Cross Method Snake. (volume update 2026-11-19)'
+  },
+  {
+    id: 'jm27-percentage-games',
+    title: 'JM27 · Games',
+    type: 'interactive',
+    chapter: 'S3 JM27',
+    submitted: '2026-11-19',
+    status: 'pending',
+    tags: ['Interactive', 'Percentage', 'Game', 'S3'],
+    elements: ['fire'],
+    cover: 'content/maths/tracy/s3-cover.svg',
+    src: 'https://unikoc5.github.io/s3-maths/topics/percentage/games-only.html',
+    notes: 'Super Mart and City Bank. (volume update 2026-11-19)'
   },
   {
     id: 'jm28-triangle-centres-concept',
@@ -96,13 +109,13 @@ KOC.works('maths', 'tracy', [
     title: 'JM29 · Games',
     type: 'interactive',
     chapter: 'S3 JM29',
-    submitted: '2026-11-05',
+    submitted: '2026-11-19',
     status: 'pending',
     tags: ['Interactive', 'Quadrilaterals', 'Game', 'S3'],
     elements: ['fire'],
     cover: 'content/maths/tracy/s3-cover.svg',
     src: 'https://unikoc5.github.io/s3-maths/topics/quadrilaterals/games-only.html',
-    notes: 'The Search for the True Princesses and Proof Pipes.'
+    notes: 'The Search for the True Princesses and Proof Pipes. (volume update 2026-11-19)'
   },
   {
     id: 'jm29-quadrilaterals-comics',
@@ -174,13 +187,13 @@ KOC.works('maths', 'tracy', [
     title: 'JM31 · Games',
     type: 'interactive',
     chapter: 'S3 JM31',
-    submitted: '2026-10-31',
+    submitted: '2026-11-19',
     status: 'pending',
     tags: ['Interactive', 'Statistics', 'Game', 'S3'],
     elements: ['fire'],
     cover: 'content/maths/tracy/s3-cover.svg',
     src: 'https://unikoc5.github.io/s3-maths/topics/central_tendency/games-only.html',
-    notes: 'Objection! The Average Trial.'
+    notes: 'Objection! The Average Trial. (volume update 2026-11-19)'
   },
   {
     id: 'jm31-central-tendency-summary',
@@ -213,13 +226,13 @@ KOC.works('maths', 'tracy', [
     title: 'JM32 · Games',
     type: 'interactive',
     chapter: 'S3 JM32',
-    submitted: '2026-11-05',
+    submitted: '2026-11-19',
     status: 'pending',
     tags: ['Interactive', 'Volume', 'Game', 'S3'],
     elements: ['fire'],
     cover: 'content/maths/tracy/s3-cover.svg',
     src: 'https://unikoc5.github.io/s3-maths/topics/area_volume/games-only.html',
-    notes: 'Hot Drop and Ratio Solitaire.'
+    notes: 'Hot Drop and Ratio Solitaire. (volume update 2026-11-19)'
   },
   {
     id: 'jm32-area-volume-summary',
