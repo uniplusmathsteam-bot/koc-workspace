@@ -144,6 +144,19 @@ KOC.works('maths', 'tracy', [
     notes: 'Probability survival kit: formula, tree diagrams, and expected value.'
   },
   {
+    id: 'jm30-probability-comics',
+    title: 'JM30 · Comics',
+    type: 'interactive',
+    chapter: 'S3 JM30',
+    submitted: '2026-11-19',
+    status: 'pending',
+    tags: ['Interactive', 'Probability', 'Comics', 'S3'],
+    elements: ['water'],
+    cover: 'content/maths/tracy/s3-cover.svg',
+    src: 'https://unikoc5.github.io/s3-maths/topics/probability/comics-only.html',
+    notes: 'Fair-games probability comics with chapter checks.'
+  },
+  {
     id: 'jm31-central-tendency-concept',
     title: 'JM31 · Concept & Formula',
     type: 'interactive',
@@ -183,6 +196,19 @@ KOC.works('maths', 'tracy', [
     notes: 'Averages survival kit: mean, median, mode, and choosing an average.'
   },
   {
+    id: 'jm31-central-tendency-comics',
+    title: 'JM31 · Comics',
+    type: 'interactive',
+    chapter: 'S3 JM31',
+    submitted: '2026-11-19',
+    status: 'pending',
+    tags: ['Interactive', 'Statistics', 'Comics', 'S3'],
+    elements: ['water'],
+    cover: 'content/maths/tracy/s3-cover.svg',
+    src: 'https://unikoc5.github.io/s3-maths/topics/central_tendency/comics-only.html',
+    notes: 'Mean, weighted mean, median and mode comics with follow-up checks.'
+  },
+  {
     id: 'jm32-area-volume-games',
     title: 'JM32 · Games',
     type: 'interactive',
@@ -207,6 +233,19 @@ KOC.works('maths', 'tracy', [
     cover: 'content/maths/tracy/s3-cover.svg',
     src: 'https://unikoc5.github.io/s3-maths/topics/area_volume/summary-only.html',
     notes: 'Areas and Volumes survival kit: pyramids, cones, spheres, frustums, and similar solids.'
+  },
+  {
+    id: 'jm33-coordinates-games',
+    title: 'JM33 · Games',
+    type: 'interactive',
+    chapter: 'S3 JM33',
+    submitted: '2026-11-19',
+    status: 'pending',
+    tags: ['Interactive', 'Coordinates', 'Game', 'S3'],
+    elements: ['fire'],
+    cover: 'content/maths/tracy/s3-cover.svg',
+    src: 'https://unikoc5.github.io/s3-maths/topics/coordinates/games-only.html',
+    notes: 'Harbour Grid: Bo\'s Way Home.'
   },
   {
     id: 'jm33-coordinates-summary',
@@ -252,13 +291,13 @@ KOC.works('maths', 'tracy', [
     title: 'JM34 · Games',
     type: 'interactive',
     chapter: 'S3 JM34',
-    submitted: '2026-11-17',
+    submitted: '2026-11-19',
     status: 'pending',
     tags: ['Interactive', 'Trigonometry', 'Game', 'S3'],
     elements: ['fire'],
     cover: 'content/maths/tracy/s3-cover.svg',
     src: 'https://unikoc5.github.io/s3-maths/topics/trigonometry/games-only.html',
-    notes: 'Blackout Voyage, Aim Sight, and Rhythm Lock.'
+    notes: 'Blackout Voyage, Aim Sight, and Rhythm Lock. (re-push 2026-11-19)'
   },
   {
     id: 'jm34-trigonometry-summary',
@@ -274,17 +313,30 @@ KOC.works('maths', 'tracy', [
     notes: 'Trigonometric relations survival kit.'
   },
   {
+    id: 'jm35-trig-applications-concept',
+    title: 'JM35 · Concept & Formula',
+    type: 'interactive',
+    chapter: 'S3 JM35',
+    submitted: '2026-11-19',
+    status: 'pending',
+    tags: ['Interactive', 'Trigonometry', 'Concept', 'S3'],
+    elements: ['wood'],
+    cover: 'content/maths/tracy/s3-cover.svg',
+    src: 'https://unikoc5.github.io/s3-maths/topics/trigonometry_applications/concept-only.html',
+    notes: 'Gradient, elevation & depression, and bearings concept decks.'
+  },
+  {
     id: 'jm35-trig-applications-games',
     title: 'JM35 · Games',
     type: 'interactive',
     chapter: 'S3 JM35',
-    submitted: '2026-11-17',
+    submitted: '2026-11-19',
     status: 'pending',
     tags: ['Interactive', 'Trigonometry', 'Game', 'S3'],
     elements: ['fire'],
     cover: 'content/maths/tracy/s3-cover.svg',
     src: 'https://unikoc5.github.io/s3-maths/topics/trigonometry_applications/games-only.html',
-    notes: 'Laser Vault — The Midnight Vector.'
+    notes: 'Laser Vault — The Midnight Vector. (re-push 2026-11-19)'
   },
   {
     id: 'jm35-trig-applications-summary',
