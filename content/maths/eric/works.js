@@ -148,12 +148,12 @@ KOC.works('maths', 'eric', [
     title: 'JM33 Coordinates of Lines — Concept',
     type: 'interactive',
     chapter: 'S3 JM33',
-    submitted: '2026-11-14',
+    submitted: '2026-11-20',
     status: 'pending',
     tags: ['Interactive', 'Coordinates', 'Concept', 'S3'],
     elements: ['wood'],
     cover: 'content/maths/eric/covers/jm31.svg',
-    src: 'content/maths/eric/jm31-coordinates-of-lines-concept/index.html?v=20261114-ops17',
+    src: 'content/maths/eric/jm31-coordinates-of-lines-concept/index.html?v=20261120-ops50',
     notes: 'Two concept decks: distance, slope and the line, then parallel lines, ratios and centres.'
   }
 ]);

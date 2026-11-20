@@ -12,6 +12,7 @@
   var INK = "#F8FAFC";
   var MUTED = "#94A3B8";
   var RED = "#E57373";
+  var GOLD = "#FF8A80";
 
   function ease(t) { return 1 - Math.pow(1 - clamp(t), 3); }
   function clamp(t) { return Math.max(0, Math.min(1, t)); }
@@ -43,21 +44,26 @@
       while (j >= 0 && s.charAt(j) === " ") j--;
       prev = j >= 0 ? s.charAt(j) : "";
       if (ch === "+") {
-        out += "({^".indexOf(prev) >= 0 ? "+" : "\\mkern10mu\\mathord{+}\\mkern10mu";
+        out += (prev && "({^".indexOf(prev) >= 0) ? "+" : "\\mkern10mu\\mathord{+}\\mkern10mu";
         continue;
       }
-      unary = !prev || "=<>,+({^".indexOf(prev) >= 0;
+      rest = s.slice(i + 1);
+      if (!prev && (rest.charAt(0) === "(" || rest === "")) {
+        out += "\\mkern10mu\\mathord{-}\\mkern10mu";
+        continue;
+      }
+      unary = !prev || "=<>+,({^;,".indexOf(prev) >= 0;
       if (!unary) {
         out += "\\mkern10mu\\mathord{-}\\mkern10mu";
         continue;
       }
-      rest = s.slice(i + 1);
-      out += (rest.charAt(0) === "\\" || rest === "") ? "-\\mkern3mu" : "-";
+      out += rest.charAt(0) === "\\" ? "-\\mkern3mu" : "-";
     }
     s = out;
     s = s.replace(/[=<>]/g, function (op) {
       return "\\mkern10mu\\mathord{" + op + "}\\mkern10mu";
     });
+    s = s.replace(/:/g, "\\mkern10mu\\mathord{:}\\mkern10mu");
     s = s.replace(/\u0000(\d+);/g, function (_, i) {
       return "\\mkern10mu\\mathord{" + stash[+i] + "}\\mkern10mu";
     });
@@ -131,10 +137,12 @@
       var beats = [];
       var group = null;
       var registry = {};
+      var formulaCount = 0;
       svg.setAttribute("viewBox", "0 0 610 570");
       svg.innerHTML = "";
       labs.innerHTML = "";
       eqEl.innerHTML = "";
+      eqEl.style.gap = "";
       descEl.innerHTML = "";
       descEl.style.opacity = "0";
       noteEl.textContent = "";
@@ -195,7 +203,9 @@
           });
         },
         desc: function (tex) {
-          descEl.innerHTML = kx(tex);
+          descEl.innerHTML = String(tex).split("\\\\").map(function (line) {
+            return kx(line);
+          }).join("");
           add({
             dur: 420,
             run: function (t) { descEl.style.opacity = String(ease(t)); },
@@ -413,6 +423,7 @@
           });
         },
         formula: function (parts) {
+          formulaCount++;
           var wrap = document.createElement("div");
           wrap.className = "row-wrap";
           var row = document.createElement("div");
@@ -447,7 +458,7 @@
           parts.forEach(function (p) {
             if (p.frac) {
               var box = document.createElement("span");
-              box.className = "frac";
+              box.className = p.frac.tight ? "frac tight" : "frac";
               var bar = document.createElement("span");
               bar.className = "fbar";
               bar.style.opacity = "0";
@@ -476,28 +487,7 @@
               slots.push(one);
             }
           });
-          var opened = 0;
-          var gap = 0.42;
-          row.querySelectorAll(".mfrac").forEach(function (mf) {
-            if (mf.querySelector(".mfrac")) return;
-            var v = mf.querySelector(":scope > .vlist, .vlist");
-            if (!v || v.children.length < 3) return;
-            var den = v.children[0];
-            var num = v.children[v.children.length - 1];
-            var dt = parseFloat(den.style.top);
-            var nt = parseFloat(num.style.top);
-            if (!isNaN(dt)) den.style.top = (dt + gap) + "em";
-            if (!isNaN(nt)) num.style.top = (nt - gap) + "em";
-            var h = parseFloat(v.style.height);
-            if (!isNaN(h)) v.style.height = (h + gap * 2) + "em";
-            opened++;
-          });
-          if (opened) {
-            var pad = Math.ceil(gap * 32);
-            row.style.paddingTop = pad + "px";
-            row.style.paddingBottom = (pad + 10) + "px";
-          }
-          var naturalH = Math.max(row.querySelector(".frac") ? 92 : 48, row.offsetHeight || 48);
+          var naturalH = Math.max(48, row.offsetHeight || 48);
           var naturalW = row.scrollWidth || 1;
           if (naturalW > 570) {
             var sc = 570 / naturalW;
@@ -597,6 +587,7 @@
       }
 
       slideFn(api);
+      if (formulaCount >= 7) eqEl.style.gap = "6px";
 
       function tagBox(div) {
         var left = parseFloat(div.style.left) || 0;
@@ -924,7 +915,7 @@
 
   window.JM33 = {
     BLUE: BLUE, AMBER: AMBER, GREEN: GREEN, PINK: PINK, VIOLET: VIOLET,
-    INK: INK, MUTED: MUTED, RED: RED,
+    INK: INK, MUTED: MUTED, RED: RED, GOLD: GOLD,
     start: function (deck) { mount(document.getElementById("app"), deck); }
   };
 })();
