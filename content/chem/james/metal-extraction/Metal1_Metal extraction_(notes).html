@@ -127,6 +127,8 @@
   #view > * { min-width: 0; min-height: 0; }
   body.zoomed #view > * { min-height: auto; }
   #furnace {
+    position: relative;
+    z-index: 2;
     width: 100%;
     height: 100%;
     min-height: 0;
@@ -134,6 +136,8 @@
   }
   body.zoomed #furnace { height: auto; aspect-ratio: 420 / 520; }
   .side {
+    position: relative;
+    z-index: 2;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
@@ -160,6 +164,32 @@
     background: #e8eefc;
     color: #163a86;
     font-weight: 700;
+  }
+  .pitem {
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+    gap: 2px;
+  }
+  .side.left .pitem { align-items: flex-start; }
+  .side.right .pitem { align-items: flex-end; }
+  .role {
+    display: none;
+    max-width: 100%;
+    font-size: 14px;
+    line-height: 1.2;
+    color: #334155;
+  }
+  .plabel.on + .role { display: block; }
+  .side.right .role { text-align: right; }
+  #leaders {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 1;
   }
   .answer {
     flex: none;
@@ -194,27 +224,37 @@
   .hl-slag { color: #0f766e; font-weight: 700; }
   sub { font-size: 0.62em; }
   #furnace .band { opacity: 0.42; }
-  #furnace .band.on { opacity: 1; }
   #furnace .flow { opacity: 0.35; }
-  #furnace .flow.on { opacity: 1; }
-  #furnace .drift,
-  #furnace .wisp,
-  #furnace .drip,
-  #furnace .slag-top {
-    transform-box: view-box;
-    transform-origin: 0 0;
+  #furnace .ptr { opacity: 0; }
+  #furnace .ptr.on { opacity: 1; }
+  #furnace .air-stream.live.on { opacity: 1; }
+  #furnace .call {
+    font-family: system-ui, sans-serif;
+    font-size: 15px;
+    font-weight: 650;
+    paint-order: stroke fill;
+    stroke: #fff7ed;
+    stroke-width: 4px;
+    stroke-linejoin: round;
   }
-  #furnace .race {
+  #furnace .piece {
     transform-box: fill-box;
     transform-origin: center;
   }
-  #furnace .drift.on { animation: chargeSink 9s linear infinite; }
-  #furnace .air-stream { stroke-dasharray: 11 8; }
-  #furnace .air-stream.on { animation: blastIn 2.4s linear infinite; }
-  #furnace .race.on { animation: raceGlow 3.2s ease-in-out infinite; }
-  #furnace .wisp.on { animation: gasRise 8s linear infinite; }
-  #furnace .drip.on { animation: ironDrip 7s linear infinite; }
-  #furnace .slag-top.on { animation: slagShift 9s ease-in-out infinite; }
+  #furnace .ptr .ping { fill: none; stroke: #fff7ed; stroke-width: 2; opacity: 0; transform-box: fill-box; transform-origin: center; }
+  #furnace .ptr.on circle:not(.ping) { filter: drop-shadow(0 0 4px rgba(255, 247, 237, 0.95)); }
+  #furnace .ptr.on .ping { animation: ping 1.6s ease-out infinite; }
+  #furnace .ptr.on.lump .piece { animation: pieceSink 2.8s ease-in-out infinite; }
+  #furnace .ptr.on.gas .piece { animation: pieceRise 2.6s ease-in-out infinite; }
+  #furnace .ptr.on.bed .piece { animation: piecePulse 1.8s ease-in-out infinite; }
+  #furnace .ptr.on.liquid .piece { animation: pieceShift 2.4s ease-in-out infinite; }
+  #furnace .air-stream.live { stroke-dasharray: 10 9; }
+  #furnace .air-stream.live.on {
+    opacity: 1;
+    stroke-width: 7;
+    filter: drop-shadow(0 0 6px #60a5fa);
+    animation: blastIn 0.9s linear infinite;
+  }
   #furnace .tag {
     font-family: system-ui, sans-serif;
     font-weight: 650;
@@ -229,29 +269,34 @@
     font-size: 16px;
     fill: #334155;
   }
-  @keyframes chargeSink { to { transform: translateY(8.4615%); } }
-  @keyframes blastIn { to { stroke-dashoffset: -38; } }
-  @keyframes raceGlow { 50% { transform: scale(1.16); } }
-  @keyframes gasRise {
-    0% { transform: translateY(0); opacity: 0; }
-    16% { opacity: 1; }
-    78% { opacity: 0.85; }
-    100% { transform: translateY(-40%); opacity: 0; }
+  @keyframes pieceSink {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.28); }
   }
-  @keyframes ironDrip {
-    0% { transform: translateY(0); opacity: 0; }
-    14% { opacity: 1; }
-    80% { opacity: 1; }
-    100% { transform: translateY(24%); opacity: 0; }
+  @keyframes pieceRise {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.34); }
   }
-  @keyframes slagShift { 50% { transform: translateX(1.6%); } }
+  @keyframes piecePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.4); }
+  }
+  @keyframes pieceShift {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+  }
+  @keyframes blastIn { to { stroke-dashoffset: -57; } }
+  @keyframes ping {
+    0% { opacity: 0.7; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.7); }
+  }
   @media (prefers-reduced-motion: reduce) {
-    #furnace .drift.on,
-    #furnace .air-stream.on,
-    #furnace .race.on,
-    #furnace .wisp.on,
-    #furnace .drip.on,
-    #furnace .slag-top.on { animation: none; }
+    #furnace .ptr.on.lump .piece,
+    #furnace .ptr.on.gas .piece,
+    #furnace .ptr.on.bed .piece,
+    #furnace .ptr.on.liquid .piece,
+    #furnace .ptr.on .ping,
+    #furnace .air-stream.live.on { animation: none; }
   }
   @media (max-width: 800px) {
     .topbar { gap: 4px; padding-left: 4px; padding-right: 4px; }
@@ -294,10 +339,9 @@
 </head>
 <body>
 <header class="topbar">
-  <button type="button" class="nav" id="backBtn">Back</button>
   <h1>Blast furnace</h1>
   <span id="stepLabel">1 / 5</span>
-  <button type="button" class="nav" id="hideBtn" aria-pressed="false">Hide</button>
+  <button type="button" class="nav" id="backBtn">Back</button>
   <button type="button" class="nav" id="nextBtn">Next</button>
 </header>
 <main>
@@ -308,8 +352,14 @@
         <div id="stageName"></div>
         <div id="view">
         <div class="side left" id="sideLeft">
-          <span class="plabel" data-z="charge coke">Coke</span>
-          <span class="plabel" data-z="air">Hot air</span>
+          <div class="pitem">
+            <span class="plabel" data-z="charge coke" data-role="coke">Coke</span>
+            <span class="role"></span>
+          </div>
+          <div class="pitem">
+            <span class="plabel" data-z="air" data-role="air">Hot air</span>
+            <span class="role"></span>
+          </div>
         </div>
         <svg id="furnace" viewBox="0 0 420 520" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="furnaceTitle">
           <title id="furnaceTitle">Blast furnace</title>
@@ -478,8 +528,8 @@
           <path fill="none" stroke="#0f172a" stroke-width="3.5" stroke-linejoin="round" d="M170 44 H250 L246 76 C260 114 292 170 314 222 C326 254 310 294 294 324 C282 346 274 358 272 370 L276 478 H144 L148 370 C146 358 138 346 126 324 C110 294 94 254 106 222 C128 170 160 114 174 76 Z"/>
           <path fill="url(#copper)" stroke="#9a3412" stroke-width="1.2" d="M134 336 L172 350 L176 362 L138 350 Z"/>
           <path fill="url(#copper)" stroke="#9a3412" stroke-width="1.2" d="M286 336 L248 350 L244 362 L282 350 Z"/>
-          <path class="flow air-stream" data-z="air" d="M0 326 H118 L134 340" fill="none" stroke="#2563eb" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowHead)"/>
-          <path class="flow air-stream" data-z="air" d="M420 326 H302 L286 340" fill="none" stroke="#2563eb" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowHead)"/>
+          <path class="flow air-stream live" data-z="air" d="M0 326 H118 L134 340" fill="none" stroke="#2563eb" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowHead)"/>
+          <path class="flow air-stream" d="M420 326 H302 L286 340" fill="none" stroke="#2563eb" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowHead)"/>
           <rect x="248" y="404" width="34" height="8" rx="1.5" fill="#292524"/>
           <rect x="246" y="444" width="36" height="10" rx="1.5" fill="#431407"/>
           <rect x="164" y="38" width="24" height="9" rx="1.5" fill="#475569" stroke="#1e293b" stroke-width="1"/>
@@ -492,18 +542,70 @@
           <path d="M258 108 C286 96 304 70 322 46" fill="none" stroke="#334155" stroke-width="10" stroke-linecap="round"/>
           <path d="M258 108 C286 96 304 70 322 46" fill="none" stroke="#94a3b8" stroke-width="5" stroke-linecap="round" marker-end="url(#gasHead)"/>
           <text class="offtake" x="330" y="42">waste gas</text>
-          <text class="tag light" x="210" y="176" font-size="22" fill="#9a3412">CO</text>
-          <text class="tag dark" x="210" y="300" font-size="22" fill="#f8fafc">coke</text>
-          <text class="tag light" x="210" y="418" font-size="18" fill="#1c1917">slag</text>
-          <text class="tag light" x="210" y="448" font-size="22" fill="#431407">Fe</text>
+          <g class="ptr lump" data-z="charge" data-role="coke">
+            <line x1="78" y1="142" x2="158" y2="142" stroke="#1c1917" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="166" cy="142" r="7" fill="#1c1917" stroke="#fff7ed" stroke-width="2"/>
+            <text class="call" x="74" y="146" text-anchor="end" fill="#1c1917">coke</text>
+          </g>
+          <g class="ptr lump" data-z="charge ore" data-role="ore">
+            <line x1="276" y1="148" x2="330" y2="148" stroke="#9a3412" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="268" cy="148" r="7" fill="#9a3412" stroke="#fff7ed" stroke-width="2"/>
+            <text class="call" x="334" y="152" text-anchor="start" fill="#9a3412">haematite</text>
+          </g>
+          <g class="ptr lump" data-z="charge lime" data-role="lime">
+            <line x1="278" y1="206" x2="330" y2="206" stroke="#57534e" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="270" cy="206" r="7" fill="#f5f5f4" stroke="#57534e" stroke-width="2"/>
+            <text class="call" x="334" y="210" text-anchor="start" fill="#44403c">limestone</text>
+          </g>
+          <g class="ptr" data-z="air" data-role="air">
+            <line x1="48" y1="310" x2="86" y2="322" stroke="#2563eb" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="92" cy="326" r="5" fill="#2563eb" stroke="#fff7ed" stroke-width="2"/>
+            <text class="call" x="44" y="306" text-anchor="end" fill="#2563eb">hot air</text>
+          </g>
+          <g class="ptr gas" data-z="co" data-role="co">
+            <line x1="262" y1="236" x2="330" y2="236" stroke="#9a3412" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="254" cy="236" r="5.5" fill="#9a3412" stroke="#fff7ed" stroke-width="2"/>
+            <text class="tag light" x="228" y="240" font-size="22" fill="#9a3412">CO</text>
+          </g>
+          <g class="ptr bed" data-z="coke" data-role="coke">
+            <line x1="78" y1="292" x2="158" y2="292" stroke="#f8fafc" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="166" cy="292" r="5.5" fill="#f8fafc" stroke="#1c1917" stroke-width="2"/>
+            <text class="tag dark" x="200" y="296" font-size="22" fill="#f8fafc">coke</text>
+          </g>
+          <g class="ptr liquid" data-z="slag" data-role="slag">
+            <line x1="258" y1="406" x2="330" y2="406" stroke="#44403c" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="250" cy="406" r="5.5" fill="#a8a29e" stroke="#fff7ed" stroke-width="2"/>
+            <text class="tag light" x="220" y="410" font-size="18" fill="#1c1917">slag</text>
+          </g>
+          <g class="ptr liquid" data-z="iron" data-role="iron">
+            <line x1="258" y1="448" x2="330" y2="448" stroke="#c2410c" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="250" cy="448" r="5.5" fill="#ea580c" stroke="#fff7ed" stroke-width="2"/>
+            <text class="tag light" x="220" y="452" font-size="22" fill="#431407">Fe</text>
+          </g>
         </svg>
         <div class="side right" id="sideRight">
-          <span class="plabel" data-z="charge ore">Haematite (Fe<sub>2</sub>O<sub>3</sub>)</span>
-          <span class="plabel" data-z="charge lime">Limestone</span>
-          <span class="plabel" data-z="co">Carbon monoxide</span>
-          <span class="plabel" data-z="slag">Slag (CaSiO<sub>3</sub>)</span>
-          <span class="plabel" data-z="iron">Molten iron</span>
+          <div class="pitem">
+            <span class="plabel" data-z="charge ore" data-role="ore">Haematite (Fe<sub>2</sub>O<sub>3</sub>)</span>
+            <span class="role"></span>
+          </div>
+          <div class="pitem">
+            <span class="plabel" data-z="charge lime" data-role="lime">Limestone</span>
+            <span class="role"></span>
+          </div>
+          <div class="pitem">
+            <span class="plabel" data-z="co" data-role="co">Carbon monoxide</span>
+            <span class="role"></span>
+          </div>
+          <div class="pitem">
+            <span class="plabel" data-z="slag" data-role="slag">Slag (CaSiO<sub>3</sub>)</span>
+            <span class="role"></span>
+          </div>
+          <div class="pitem">
+            <span class="plabel" data-z="iron" data-role="iron">Molten iron</span>
+            <span class="role"></span>
+          </div>
         </div>
+        <svg id="leaders" aria-hidden="true"></svg>
         </div>
       </div>
     </div>
@@ -541,35 +643,57 @@
   var STEPS = [
     {
       name: 'Haematite, coke, limestone, hot air',
-      desc: 'The ore is <span class="hl-ore">haematite</span> (Fe<sub>2</sub>O<sub>3</sub>).',
-      zones: ['charge', 'air']
+      desc: 'These four are the raw materials.',
+      zones: ['charge', 'air'],
+      roles: {
+        coke: 'a raw material',
+        air: 'a raw material',
+        ore: 'the iron ore',
+        lime: 'a raw material'
+      }
     },
     {
       name: 'C + O<sub>2</sub> → <span class="hl-co2">CO<sub>2</sub></span>',
       desc: 'Coke reacts with oxygen to form <span class="hl-co2">carbon dioxide</span>.',
-      zones: ['coke', 'air']
+      zones: ['coke', 'air'],
+      roles: {
+        coke: 'forms carbon dioxide',
+        air: 'supplies oxygen'
+      }
     },
     {
       name: 'C + CO<sub>2</sub> → <span class="hl-co">2CO</span>',
       desc: 'Coke reacts with carbon dioxide to form <span class="hl-co">carbon monoxide</span>.',
-      zones: ['coke', 'co']
+      zones: ['coke', 'co'],
+      roles: {
+        coke: 'forms carbon monoxide',
+        co: 'made from coke'
+      }
     },
     {
       name: '3CO + Fe<sub>2</sub>O<sub>3</sub> → 3CO<sub>2</sub> + <span class="hl-fe">2Fe</span>',
-      desc: 'Carbon monoxide reacts with <span class="hl-ore">haematite</span>.',
-      zones: ['co', 'ore', 'iron']
+      desc: '<span class="hl-co">Carbon monoxide</span> reduces <span class="hl-ore">haematite</span> to <span class="hl-fe">iron</span>.',
+      zones: ['co', 'ore', 'iron'],
+      roles: {
+        co: 'reduces haematite',
+        ore: 'reduced to iron',
+        iron: 'the metal formed'
+      }
     },
     {
       name: 'CaCO<sub>3</sub> → CaO + CO<sub>2</sub><br>CaO + SiO<sub>2</sub> → <span class="hl-slag">CaSiO<sub>3</sub></span>',
-      desc: 'Calcium oxide removes silicon dioxide as <span class="hl-slag">slag</span>.',
+      desc: 'Limestone removes silicon dioxide as <span class="hl-slag">slag</span>.',
       zones: ['lime', 'slag'],
+      roles: {
+        lime: 'removes silicon dioxide',
+        slag: 'floats on the iron'
+      },
       answer: 'Fe<sub>2</sub>O<sub>3</sub> is reduced to Fe by <span class="hl-co">carbon monoxide</span>.'
     }
   ];
 
   var backBtn = document.getElementById('backBtn');
   var nextBtn = document.getElementById('nextBtn');
-  var hideBtn = document.getElementById('hideBtn');
   var stepLabel = document.getElementById('stepLabel');
   var stage = document.getElementById('stage');
   var stageName = document.getElementById('stageName');
@@ -578,6 +702,7 @@
   var pair = document.getElementById('pair');
   var view = document.getElementById('view');
   var furnace = document.getElementById('furnace');
+  var leaders = document.getElementById('leaders');
   var sideLeft = document.getElementById('sideLeft');
   var sideRight = document.getElementById('sideRight');
   var answer = document.getElementById('answer');
@@ -594,11 +719,23 @@
     copy.setAttribute('transform', 'translate(0,' + dy + ')');
     chargeDrift.appendChild(copy);
   });
+  document.querySelectorAll('#furnace .ptr > circle').forEach(function (dot) {
+    var piece = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    piece.setAttribute('class', 'piece');
+    dot.parentNode.insertBefore(piece, dot);
+    piece.appendChild(dot);
+    var ping = dot.cloneNode(false);
+    ping.setAttribute('class', 'ping');
+    ping.removeAttribute('fill');
+    ping.removeAttribute('stroke');
+    ping.removeAttribute('stroke-width');
+    piece.insertBefore(ping, dot);
+  });
   var marks = document.querySelectorAll('[data-z]');
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var step = 0;
   var zoomed = false;
-  var descHidden = false;
   var penOn = false;
   var laserOn = false;
   var erasing = false;
@@ -628,6 +765,13 @@
       }
       el.classList.toggle('on', on);
     });
+    document.querySelectorAll('.plabel').forEach(function (el) {
+      var roleEl = el.parentNode.querySelector('.role');
+      var key = el.getAttribute('data-role');
+      var text = '';
+      if (el.classList.contains('on') && item.roles && item.roles[key]) text = item.roles[key];
+      if (roleEl) roleEl.textContent = text;
+    });
     if (item.answer) {
       answerInner.innerHTML = item.answer;
       answer.setAttribute('aria-hidden', 'false');
@@ -639,6 +783,77 @@
     requestAnimationFrame(function () {
       fitAnswer();
       fitZoom();
+      drawLeaders();
+    });
+  }
+
+  function leaderLine(x1, y1, x2, y2, color, width, dash) {
+    var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', x1);
+    line.setAttribute('y1', y1);
+    line.setAttribute('x2', x2);
+    line.setAttribute('y2', y2);
+    line.setAttribute('stroke', color);
+    line.setAttribute('stroke-width', width);
+    line.setAttribute('stroke-linecap', 'round');
+    line.setAttribute('vector-effect', 'non-scaling-stroke');
+    if (dash) {
+      line.setAttribute('stroke-dasharray', '16 11');
+      line.setAttribute('stroke-dashoffset', dash);
+    }
+    leaders.appendChild(line);
+  }
+
+  function leaderArrow(x, y, ux, uy) {
+    var back = 18;
+    var wing = 8;
+    var bx = x - ux * back;
+    var by = y - uy * back;
+    var arrow = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    arrow.setAttribute('points', [
+      x + ',' + y,
+      (bx - uy * wing) + ',' + (by + ux * wing),
+      (bx + uy * wing) + ',' + (by - ux * wing)
+    ].join(' '));
+    arrow.setAttribute('fill', '#1e3a8a');
+    arrow.setAttribute('stroke', '#eff6ff');
+    arrow.setAttribute('stroke-width', '1.5');
+    arrow.setAttribute('stroke-linejoin', 'round');
+    leaders.appendChild(arrow);
+  }
+
+  function drawLeaders() {
+    var box = leaders.getBoundingClientRect();
+    var w = leaders.clientWidth;
+    var h = leaders.clientHeight;
+    leaders.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+    while (leaders.firstChild) leaders.removeChild(leaders.firstChild);
+    if (!w || !h || !box.width || !box.height) return;
+    var dash = reduceMotion ? '' : String(-((performance.now() / 12) % 27));
+    document.querySelectorAll('.plabel.on').forEach(function (pill) {
+      var role = pill.getAttribute('data-role');
+      var dot = document.querySelector('#furnace .ptr.on[data-role="' + role + '"] circle:not(.ping)');
+      if (!dot) return;
+      var a = pill.getBoundingClientRect();
+      var b = dot.getBoundingClientRect();
+      var onLeft = pill.closest('#sideLeft');
+      var x1 = ((onLeft ? a.right : a.left) - box.left) / box.width * w;
+      var y1 = (a.top + a.height / 2 - box.top) / box.height * h;
+      var x2 = (b.left + b.width / 2 - box.left) / box.width * w;
+      var y2 = (b.top + b.height / 2 - box.top) / box.height * h;
+      var dx = x2 - x1;
+      var dy = y2 - y1;
+      var len = Math.sqrt(dx * dx + dy * dy) || 1;
+      var ux = dx / len;
+      var uy = dy / len;
+      var rad = (b.width / box.width) * w / 2 + 6;
+      var tipX = x2 - ux * rad;
+      var tipY = y2 - uy * rad;
+      var endX = tipX - ux * 12;
+      var endY = tipY - uy * 12;
+      leaderLine(x1, y1, endX, endY, '#bfdbfe', '9', '');
+      leaderLine(x1, y1, endX, endY, '#1d4ed8', '2.75', dash);
+      if (len > 36) leaderArrow(tipX, tipY, ux, uy);
     });
   }
 
@@ -653,14 +868,6 @@
     stageName.innerHTML = current;
     var twoLines = 6 + 38 * 1.15 * 2;
     stageName.style.minHeight = Math.max(maxH, twoLines) + 'px';
-  }
-
-  function setDesc(show) {
-    descHidden = !show;
-    desc.classList.toggle('hidden', descHidden);
-    desc.setAttribute('aria-hidden', descHidden ? 'true' : 'false');
-    hideBtn.textContent = descHidden ? 'Show' : 'Hide';
-    hideBtn.setAttribute('aria-pressed', descHidden ? 'true' : 'false');
   }
 
   function placeZoom() {
@@ -714,7 +921,6 @@
     if (step < STEPS.length - 1) step += 1;
     showStep();
   });
-  hideBtn.addEventListener('click', function () { setDesc(descHidden); });
   zoomBtn.addEventListener('click', function () {
     zoomed = !zoomed;
     document.body.classList.toggle('zoomed', zoomed);
@@ -723,6 +929,7 @@
     requestAnimationFrame(function () {
       fitZoom();
       fitAnswer();
+      drawLeaders();
     });
   });
 
@@ -874,12 +1081,17 @@
     placeZoom();
     fitZoom();
     fitAnswer();
+    drawLeaders();
   });
 
-  setDesc(!window.matchMedia('(max-width: 700px)').matches);
   resizeCanvas(penCanvas);
   resizeCanvas(laserCanvas);
   showStep();
+  function followLeaders() {
+    drawLeaders();
+    requestAnimationFrame(followLeaders);
+  }
+  followLeaders();
 })();
 </script>
 </body>

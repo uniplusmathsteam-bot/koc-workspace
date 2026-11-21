@@ -23,8 +23,8 @@ KOC.works('chem', 'james', [
     submitted: '2026-11-12',
     tags: ['Interactive', 'S4', 'Metal extraction'],
     elements: ['wood'],
-    src: 'content/chem/james/metal-extraction/Metal1_Metal%20extraction_(notes).html?v=20261112a',
-    notes: 'Blast furnace. Five steps on one drawing. Hide, zoom, and the pen.'
+    src: 'content/chem/james/metal-extraction/Metal1_Metal%20extraction_(notes).html?v=20261121a',
+    notes: 'Blast furnace. Five steps on one drawing. Zoom and the pen.'
   },
   {
     id: 'covalent-properties-sandbox',
