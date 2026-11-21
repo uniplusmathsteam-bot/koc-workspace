@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Metal with oxygen</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; overflow: hidden; max-width: 100%; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: #111827;
+    background: #eef3f8;
+    overscroll-behavior: none;
+    padding-left: env(safe-area-inset-left);
+    padding-right: calc(64px + env(safe-area-inset-right));
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  button { font-family: inherit; cursor: pointer; }
+  .topbar {
+    position: relative;
+    z-index: 55;
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: calc(52px + env(safe-area-inset-top));
+    padding: env(safe-area-inset-top) 12px 0;
+  }
+  .topbar h1 {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    font-size: 18px;
+    font-weight: 650;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #stepLabel {
+    flex-shrink: 0;
+    font-size: 16px;
+    color: #334155;
+    white-space: nowrap;
+  }
+  .nav {
+    min-width: 64px;
+    min-height: 44px;
+    padding: 0 12px;
+    border: 1px solid #d7e0ec;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 16px;
+    color: #111827;
+  }
+  .nav:disabled { opacity: 0.35; cursor: default; }
+  main {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 12px 8px;
+    overflow: hidden;
+  }
+  #stage {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid #d7e0ec;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  #pairWrap {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+  }
+  #pair {
+    height: 100%;
+    min-height: 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  #flame {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    min-width: 0;
+    display: block;
+  }
+  #equation {
+    flex: none;
+    min-width: 0;
+    margin: 0;
+    padding: 0 8px 4px;
+    overflow: hidden;
+    font-size: 38px;
+    line-height: 1.15;
+    font-weight: 650;
+    text-align: center;
+    min-height: calc(38px * 1.15);
+  }
+  #choices {
+    flex: none;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    padding: 0 8px 8px;
+  }
+  .choice {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    height: 100%;
+    min-height: 44px;
+    border: 2px solid #d7e0ec;
+    border-radius: 12px;
+    background: #fff;
+    color: #111827;
+    font-size: 38px;
+    line-height: 1.1;
+    font-weight: 650;
+    padding: 4px 6px;
+    text-align: center;
+    touch-action: manipulation;
+  }
+  .choice-label { min-width: 0; max-width: 100%; }
+  .choice.wrong {
+    border-color: #e11d48;
+    background: #fff1f2;
+    color: #9f1239;
+  }
+  .choice.right,
+  .choice.right:disabled {
+    border-color: #059669;
+    background: #ecfdf5;
+    color: #111827;
+    opacity: 1;
+  }
+  .choice:disabled { cursor: default; }
+  .choice.wrong:disabled { opacity: 0.72; }
+  .answer {
+    flex: none;
+    height: 64px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .answer[aria-hidden="true"] { visibility: hidden; }
+  #answerInner {
+    display: block;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    transform-origin: center center;
+  }
+  #desc {
+    flex: none;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    font-size: 38px;
+    line-height: 1.15;
+    min-height: calc(38px * 1.15 * 2);
+  }
+  #guide {
+    flex: none;
+    height: 32px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    overflow: hidden;
+  }
+  #guide[aria-hidden="true"] { visibility: hidden; }
+  #guide span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 16px;
+    line-height: 1.2;
+    font-weight: 650;
+    color: #163a86;
+    background: #e8eefc;
+    border: 1px solid #c7d2fe;
+    border-radius: 999px;
+    padding: 4px 12px;
+  }
+  .hl {
+    font-size: inherit;
+    font-weight: 700;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  .hl-lilac { color: #6d28d9; }
+  .hl-gold, .hl-hot {
+    background: #fde68a;
+    color: #111827;
+    padding: 0 0.12em;
+    border-radius: 0.12em;
+  }
+  .hl-brick { color: #9f1239; }
+  .hl-white {
+    background: #f8fafc;
+    color: #111827;
+    padding: 0 0.12em;
+    border-radius: 0.12em;
+    box-shadow: inset 0 0 0 2px #64748b;
+  }
+  .hl-solid { color: #9a3412; }
+  .hl-orange { color: #c2410c; }
+  .hl-black {
+    background: #111827;
+    color: #fff;
+    padding: 0 0.12em;
+    border-radius: 0.12em;
+  }
+  .hl-red { color: #dc2626; }
+  sub { font-size: 0.62em; }
+  @property --edge { syntax: '<color>'; inherits: true; initial-value: #7dd3fc; }
+  @property --mid { syntax: '<color>'; inherits: true; initial-value: #2563eb; }
+  @property --core { syntax: '<color>'; inherits: true; initial-value: #e0f2fe; }
+  @property --glow { syntax: '<color>'; inherits: true; initial-value: #93c5fd; }
+  @property --powder { syntax: '<color>'; inherits: true; initial-value: #94a3b8; }
+  @property --powder-deep { syntax: '<color>'; inherits: true; initial-value: #475569; }
+  @property --crust { syntax: '<color>'; inherits: true; initial-value: #64748b; }
+  #stage {
+    background:
+      radial-gradient(ellipse at 50% 38%, #ffffff 0%, #f8fafc 46%, #e8eef5 100%);
+  }
+  #flame {
+    --edge: #7dd3fc;
+    --mid: #2563eb;
+    --core: #e0f2fe;
+    --glow: #93c5fd;
+    --powder: #94a3b8;
+    --powder-deep: #475569;
+    --crust: #64748b;
+    transition:
+      --edge 0.45s ease, --mid 0.45s ease, --core 0.45s ease, --glow 0.45s ease,
+      --powder 0.4s ease, --powder-deep 0.4s ease, --crust 0.4s ease;
+  }
+  #flame.lilac { --edge: #ddd6fe; --mid: #7c3aed; --core: #f5f3ff; --glow: #c4b5fd; }
+  #flame.gold { --edge: #fde68a; --mid: #f59e0b; --core: #fffbeb; --glow: #fbbf24; }
+  #flame.brick { --edge: #fdba74; --mid: #c2410c; --core: #ffedd5; --glow: #fb923c; }
+  #flame.white { --edge: #bfdbfe; --mid: #e0f2fe; --core: #ffffff; --glow: #dbeafe; }
+  #flame.blue { --edge: #7dd3fc; --mid: #2563eb; --core: #e0f2fe; --glow: #93c5fd; }
+  #flame.powder-white { --powder: #f8fafc; --powder-deep: #94a3b8; --crust: #64748b; }
+  #flame.powder-yellow { --powder: #facc15; --powder-deep: #a16207; --crust: #78350f; }
+  #flame.powder-orange { --powder: #fb923c; --powder-deep: #9a3412; --crust: #7c2d12; }
+  #flame.powder-black { --powder: #1f2937; --powder-deep: #030712; --crust: #e5e7eb; }
+  #flame.powder-red { --powder: #ef4444; --powder-deep: #991b1b; --crust: #fecaca; }
+  #flame.powder-none { --powder: #b6c2d2; --powder-deep: #64748b; --crust: transparent; }
+  #flame .flame-body {
+    transform-box: fill-box;
+    transform-origin: center bottom;
+    animation: flicker 0.42s ease-in-out infinite alternate;
+  }
+  #flame .tongue {
+    transform-box: fill-box;
+    transform-origin: center bottom;
+    animation: tongue 0.33s ease-in-out infinite alternate;
+  }
+  #flame .glow { fill: var(--glow); opacity: 0.55; }
+  #flame .sheen { fill: #fff; opacity: 0.62; }
+  #flame.powder-black .sheen { opacity: 0.22; }
+  #flame .crust { fill: var(--crust); opacity: 0.8; }
+  #flame.powder-none .crust { opacity: 0; }
+  #flame .gloss { fill: #fff; opacity: 0; }
+  #flame.melt .gloss { opacity: 0.85; }
+  #flame .ring { fill: none; stroke: var(--mid); stroke-width: 3; opacity: 0; }
+  #flame .sparks circle {
+    fill: #facc15;
+    stroke: #a16207;
+    stroke-width: 1.2;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  #flame.sparks-on .sparks circle { animation: rise 0.85s ease-out infinite; }
+  #flame.burst .flame-body { animation: flare 0.7s ease; }
+  #flame.burst .ring { animation: ring 0.7s ease-out; }
+  #flame .lump {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  #flame.mood-wait .lump { animation: bob 1.25s ease-in-out infinite; }
+  #flame .face { fill: none; stroke: #1e293b; stroke-width: 2.6; stroke-linecap: round; }
+  #flame .pupil { fill: #1e293b; }
+  #flame.powder-black .face, #flame.powder-red .face { stroke: #f8fafc; }
+  #flame.powder-black .pupil, #flame.powder-red .pupil { fill: #f8fafc; }
+  #flame .mouth-happy, #flame .mouth-oh { opacity: 0; }
+  #flame.mood-good .mouth-flat { opacity: 0; }
+  #flame.mood-good .mouth-happy { opacity: 1; }
+  #flame.mood-bad .mouth-flat { opacity: 0; }
+  #flame.mood-bad .mouth-oh { opacity: 1; fill: #1e293b; }
+  #flame.powder-black.mood-bad .mouth-oh, #flame.powder-red.mood-bad .mouth-oh { fill: #f8fafc; }
+  #flame .party, #flame .smoke { opacity: 0; }
+  #flame .smoke { transform-box: fill-box; transform-origin: center; }
+  #flame .bit { transform-box: fill-box; transform-origin: center; }
+  #flame.burst .lump { animation: ignite 0.55s ease; }
+  #flame.burst .party { opacity: 1; }
+  #flame.burst .bit { animation: popbit 0.85s ease-out forwards; }
+  #flame.sputter .smoke { animation: puff 0.55s ease-out; }
+  #pips {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    z-index: 2;
+    display: flex;
+    gap: 5px;
+  }
+  .pip {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    border: 2px solid #cbd5e1;
+  }
+  .pip.on {
+    background: #059669;
+    border-color: #047857;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+  }
+  .choice:not(:disabled):hover { transform: translateY(-3px); }
+  .choice:not(:disabled):active { transform: translateY(1px) scale(0.97); }
+  #flame.sputter .flame-body { animation: sputter 0.48s ease; }
+  #stage.good { animation: goodFlash 0.7s ease; }
+  #stage.bad { animation: badFlash 0.48s ease; }
+  .choice.pop { animation: pop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1); }
+  .choice.shake { animation: shake 0.46s ease; }
+  #equation.reveal { animation: revealIn 0.4s ease; }
+  @keyframes flicker {
+    from { transform: scale(0.97, 0.98); }
+    to { transform: scale(1.03, 1.06) translateY(-4px); }
+  }
+  @keyframes tongue {
+    from { transform: scale(0.94, 1); }
+    to { transform: scale(1.06, 1.08) translateY(-6px); }
+  }
+  @keyframes flare {
+    0% { transform: scale(1); }
+    35% { transform: scale(1.14, 1.38) translateY(-10px); }
+    100% { transform: scale(1); }
+  }
+  @keyframes ring {
+    0% { opacity: 0.85; transform: scale(0.55); }
+    100% { opacity: 0; transform: scale(1.9); }
+  }
+  @keyframes ignite {
+    0% { transform: scale(1) rotate(0deg); }
+    30% { transform: scale(1.22) rotate(-8deg); }
+    60% { transform: scale(1.08) rotate(6deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  @keyframes popbit {
+    0% { opacity: 1; transform: translate(0, 0) scale(0.4) rotate(0deg); }
+    100% { opacity: 0; transform: translate(var(--sx), var(--sy)) scale(1) rotate(var(--rot)); }
+  }
+  @keyframes puff {
+    0% { opacity: 0; transform: translateY(6px) scale(0.6); }
+    30% { opacity: 0.85; }
+    100% { opacity: 0; transform: translateY(-18px) scale(1.3); }
+  }
+  @keyframes sputter {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    28% { transform: scale(0.72, 0.55) translateY(8px); opacity: 0.45; }
+    62% { transform: scale(1.06, 0.86); opacity: 0.8; }
+  }
+  @keyframes rise {
+    0% { opacity: 1; transform: translate(0, 6px) scale(1); }
+    100% { opacity: 0; transform: translate(var(--sx), var(--sy)) scale(0.35); }
+  }
+  @keyframes goodFlash {
+    0% { box-shadow: inset 0 0 0 0 rgba(5, 150, 105, 0); }
+    35% { box-shadow: inset 0 0 90px 16px rgba(16, 185, 129, 0.45); }
+    100% { box-shadow: inset 0 0 0 0 rgba(5, 150, 105, 0); }
+  }
+  @keyframes badFlash {
+    0%, 100% { box-shadow: inset 0 0 0 0 rgba(225, 29, 72, 0); }
+    40% { box-shadow: inset 0 0 80px 12px rgba(225, 29, 72, 0.42); }
+  }
+  @keyframes pop {
+    0% { transform: scale(0.9); }
+    55% { transform: scale(1.07); }
+    100% { transform: scale(1); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    15% { transform: translateX(-10px); }
+    35% { transform: translateX(9px); }
+    55% { transform: translateX(-6px); }
+    75% { transform: translateX(4px); }
+  }
+  @keyframes revealIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #flame, #flame .flame-body, #flame .tongue, #flame .sparks circle,
+    #flame.burst .flame-body, #flame.burst .ring, #flame.burst .lump, #flame.burst .bit,
+    #flame.sputter .flame-body, #flame.sputter .smoke, #flame.mood-wait .lump,
+    #stage.good, #stage.bad,
+    .choice.pop, .choice.shake, #equation.reveal { animation: none; transition: none; }
+  }
+  @media (max-width: 800px) {
+    .topbar { gap: 4px; padding-left: 4px; padding-right: 4px; }
+    .topbar h1 { font-size: 15px; }
+    .nav { min-width: 44px; padding: 0 8px; font-size: 15px; }
+    #stepLabel { font-size: 14px; }
+    .choice { font-size: 22px; }
+  }
+  .pen-canvas { position: fixed; inset: 0; z-index: 40; pointer-events: none; touch-action: none; }
+  .laser-canvas { position: fixed; inset: 0; z-index: 45; pointer-events: none; }
+  .laser-dot {
+    position: fixed; width: 22px; height: 22px; margin: -11px 0 0 -11px;
+    border-radius: 50%; pointer-events: none; z-index: 48;
+    background: radial-gradient(circle, rgba(255, 60, 60, 0.98), rgba(255, 0, 0, 0) 72%);
+  }
+  .laser-dot.hidden, .dcolors.hidden { display: none; }
+  body.pen-on { cursor: crosshair; touch-action: none; }
+  body.pen-on .pen-canvas { pointer-events: auto; }
+  body.laser-on { cursor: none; touch-action: none; }
+  body.pen-on, body.laser-on { user-select: none; }
+  .teach-dock {
+    position: fixed;
+    right: calc(8px + env(safe-area-inset-right));
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 6px;
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid #d7e0ec;
+    border-radius: 16px;
+  }
+  .dbtn {
+    width: 44px; height: 44px; border: 0; border-radius: 12px;
+    background: transparent; display: grid; place-items: center; color: #111827;
+  }
+  .dbtn svg { width: 22px; height: 22px; }
+  .dbtn.active { background: #163a86; color: #fff; }
+  #dkLaser.active { background: #e11d48; }
+  #dkPen.active { background: #0f8a62; }
+  .dcolors { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+  .dcolor {
+    width: 26px; height: 26px; border-radius: 50%; border: 2px solid #fff;
+    background: var(--sc); box-shadow: 0 0 0 1px #d7e0ec; padding: 0;
+  }
+  .dcolor.active { box-shadow: 0 0 0 2px #111827; }
+  .derase.active { background: #d97706; color: #3f2a00; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <button type="button" class="nav" id="backBtn" disabled>Back</button>
+  <h1>Metal with oxygen</h1>
+  <span id="stepLabel">1 / 11</span>
+  <button type="button" class="nav" id="nextBtn">Next</button>
+</header>
+<main>
+  <section id="stage">
+    <div id="pips" aria-hidden="true">
+      <span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span>
+    </div>
+    <div id="pairWrap">
+      <div id="pair">
+        <svg id="flame" class="blue powder-none" viewBox="0 0 420 500" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="flameTitle">
+          <title id="flameTitle">Metal sample heated in a flame</title>
+          <defs>
+            <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
+              <feGaussianBlur stdDeviation="14"/>
+            </filter>
+            <linearGradient id="gOuter" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0%" stop-color="var(--mid)"/>
+              <stop offset="48%" stop-color="var(--edge)"/>
+              <stop offset="100%" stop-color="var(--edge)" stop-opacity="0.15"/>
+            </linearGradient>
+            <linearGradient id="gMid" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0%" stop-color="var(--core)"/>
+              <stop offset="42%" stop-color="var(--mid)"/>
+              <stop offset="100%" stop-color="var(--edge)" stop-opacity="0.05"/>
+            </linearGradient>
+            <radialGradient id="gCore" cx="50%" cy="78%" r="65%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+              <stop offset="38%" stop-color="var(--core)"/>
+              <stop offset="100%" stop-color="var(--mid)" stop-opacity="0.15"/>
+            </radialGradient>
+            <linearGradient id="steel" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#64748b"/>
+              <stop offset="35%" stop-color="#e2e8f0"/>
+              <stop offset="70%" stop-color="#94a3b8"/>
+              <stop offset="100%" stop-color="#475569"/>
+            </linearGradient>
+            <linearGradient id="barrel" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#475569"/>
+              <stop offset="28%" stop-color="#f8fafc"/>
+              <stop offset="62%" stop-color="#cbd5e1"/>
+              <stop offset="100%" stop-color="#334155"/>
+            </linearGradient>
+            <radialGradient id="ball" cx="34%" cy="30%" r="75%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+              <stop offset="28%" stop-color="var(--powder)"/>
+              <stop offset="100%" stop-color="var(--powder-deep)"/>
+            </radialGradient>
+          </defs>
+          <ellipse cx="230" cy="486" rx="118" ry="8" fill="#94a3b8" opacity="0.35"/>
+          <g class="flame-body">
+            <ellipse class="glow" cx="230" cy="230" rx="108" ry="128" filter="url(#softGlow)"/>
+            <path fill="url(#gOuter)" d="M230 48 C278 108 332 168 304 236 C286 282 312 308 286 328 L174 328 C148 308 174 282 156 236 C128 168 182 108 230 48 Z"/>
+            <path class="tongue" fill="url(#gMid)" d="M230 102 C262 150 286 196 270 246 C260 284 278 312 256 328 L204 328 C182 312 200 284 190 246 C174 196 198 150 230 102 Z"/>
+            <path fill="url(#gCore)" d="M230 168 C248 206 256 248 246 328 L214 328 C204 248 212 206 230 168 Z"/>
+          </g>
+          <ellipse class="ring" cx="214" cy="198" r="36"/>
+          <rect x="138" y="462" width="184" height="18" rx="8" fill="url(#steel)" stroke="#334155" stroke-width="2"/>
+          <rect x="204" y="322" width="52" height="146" rx="8" fill="url(#barrel)" stroke="#334155" stroke-width="2"/>
+          <rect x="216" y="334" width="9" height="118" rx="4" fill="#ffffff" opacity="0.45"/>
+          <rect x="190" y="308" width="80" height="20" rx="6" fill="#334155" stroke="#0f172a" stroke-width="2"/>
+          <circle cx="230" cy="386" r="9" fill="#0f172a"/>
+          <circle cx="230" cy="386" r="4.5" fill="#334155"/>
+          <rect x="6" y="222" width="156" height="11" rx="5" fill="url(#steel)" stroke="#334155" stroke-width="1.5"/>
+          <ellipse cx="214" cy="234" rx="58" ry="16" fill="url(#steel)" stroke="#334155" stroke-width="2"/>
+          <g class="smoke">
+            <circle cx="214" cy="168" r="10" fill="#94a3b8"/>
+            <circle cx="230" cy="160" r="8" fill="#cbd5e1"/>
+            <circle cx="198" cy="162" r="7" fill="#e2e8f0"/>
+          </g>
+          <g class="party">
+            <rect class="bit" x="206" y="188" width="8" height="8" rx="1" fill="#e11d48" style="--sx:-70px; --sy:-80px; --rot:180deg"/>
+            <rect class="bit" x="220" y="184" width="7" height="7" rx="1" fill="#2563eb" style="--sx:74px; --sy:-70px; --rot:-160deg"/>
+            <rect class="bit" x="210" y="198" width="8" height="8" rx="1" fill="#059669" style="--sx:-40px; --sy:-100px; --rot:120deg"/>
+            <rect class="bit" x="226" y="196" width="7" height="7" rx="1" fill="#f59e0b" style="--sx:48px; --sy:-96px; --rot:-90deg"/>
+            <circle class="bit" cx="214" cy="186" r="5" fill="#7c3aed" style="--sx:-10px; --sy:-110px; --rot:40deg"/>
+            <circle class="bit" cx="232" cy="192" r="4" fill="#db2777" style="--sx:86px; --sy:-36px; --rot:70deg"/>
+            <circle class="bit" cx="196" cy="194" r="4" fill="#0ea5e9" style="--sx:-88px; --sy:-28px; --rot:-40deg"/>
+          </g>
+          <g class="lump">
+            <ellipse class="sample" cx="214" cy="200" rx="34" ry="24" fill="url(#ball)" stroke="var(--powder-deep)" stroke-width="2"/>
+            <g class="crust">
+              <circle cx="198" cy="196" r="2.2"/>
+              <circle cx="214" cy="190" r="1.8"/>
+              <circle cx="228" cy="198" r="2.4"/>
+              <circle cx="206" cy="208" r="1.6"/>
+              <circle cx="222" cy="210" r="2"/>
+            </g>
+            <ellipse class="sheen" cx="202" cy="190" rx="11" ry="6"/>
+            <ellipse class="gloss" cx="200" cy="188" rx="14" ry="8"/>
+            <g class="face">
+              <circle class="pupil" cx="203" cy="196" r="3.2"/>
+              <circle class="pupil" cx="226" cy="196" r="3.2"/>
+              <path class="mouth-flat" d="M204 208 H224"/>
+              <path class="mouth-happy" d="M202 206 Q214 220 226 206"/>
+              <circle class="mouth-oh" cx="214" cy="208" r="4.5"/>
+            </g>
+          </g>
+          <g class="sparks">
+            <circle cx="168" cy="168" r="3.4" style="--sx:-16px; --sy:-46px; animation-delay: 0s"/>
+            <circle cx="188" cy="132" r="2.8" style="--sx:-8px; --sy:-52px; animation-delay: 0.15s"/>
+            <circle cx="246" cy="124" r="3.2" style="--sx:10px; --sy:-48px; animation-delay: 0.28s"/>
+            <circle cx="278" cy="156" r="2.6" style="--sx:18px; --sy:-40px; animation-delay: 0.42s"/>
+            <circle cx="156" cy="196" r="2.4" style="--sx:-20px; --sy:-28px; animation-delay: 0.55s"/>
+            <circle cx="286" cy="188" r="3" style="--sx:16px; --sy:-34px; animation-delay: 0.7s"/>
+          </g>
+        </svg>
+        <p id="equation">Potassium. Flame colour?</p>
+        <div id="choices" role="group" aria-label="Choose the observation">
+          <button type="button" class="choice" data-i="0"><span class="choice-label"><span class="hl hl-lilac">Lilac</span></span></button>
+          <button type="button" class="choice" data-i="1"><span class="choice-label"><span class="hl hl-gold">Golden yellow</span></span></button>
+          <button type="button" class="choice" data-i="2"><span class="choice-label"><span class="hl hl-brick">Brick-red</span></span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+  <p id="answer" class="answer" aria-hidden="true"><span id="answerInner"></span></p>
+  <p id="guide" aria-hidden="true"><span id="guideText">Next changes the question.</span></p>
+  <p id="desc">Tap an answer. The correct tap heats the metal.</p>
+</main>
+
+<canvas id="penCanvas" class="pen-canvas"></canvas>
+<canvas id="laserCanvas" class="laser-canvas"></canvas>
+<div id="laserDot" class="laser-dot hidden"></div>
+<div class="teach-dock">
+  <button type="button" class="dbtn" id="dkLaser" aria-label="Laser pointer">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="currentColor"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path></svg>
+  </button>
+  <button type="button" class="dbtn" id="dkPen" aria-label="Pen">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20l4.5-1.2L19 8.3 15.7 5 5.2 15.5 4 20z"></path><path d="M13.5 7.2l3.3 3.3"></path></svg>
+  </button>
+  <div class="dcolors hidden" id="dkColors">
+    <button type="button" class="dcolor active" data-c="#e11d48" style="--sc:#e11d48" aria-label="Red"></button>
+    <button type="button" class="dcolor" data-c="#2563eb" style="--sc:#2563eb" aria-label="Blue"></button>
+    <button type="button" class="dcolor" data-c="#059669" style="--sc:#059669" aria-label="Green"></button>
+    <button type="button" class="dcolor" data-c="#111827" style="--sc:#111827" aria-label="Black"></button>
+    <button type="button" class="dbtn derase" id="dkErase" aria-label="Eraser">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="8" width="16" height="9" rx="1.5"></rect><path d="M4 13h16"></path></svg>
+    </button>
+  </div>
+  <button type="button" class="dbtn" id="dkClear" aria-label="Clear writing">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 7h14M9 7V5h6v2M8 7l1 13h6l1-13"></path></svg>
+  </button>
+</div>
+
+<script>
+(function () {
+  var PROMPT = 'Tap an answer. The correct tap heats the metal.';
+  var STEPS = [
+    {
+      ask: 'Potassium. Flame colour?',
+      options: [
+        '<span class="hl hl-lilac">Lilac</span>',
+        '<span class="hl hl-gold">Golden yellow</span>',
+        '<span class="hl hl-brick">Brick-red</span>'
+      ],
+      correct: 0,
+      eq: '4K + O<sub>2</sub> → 2K<sub>2</sub>O',
+      desc: 'Store potassium under paraffin oil; gentle heating gives a <span class="hl hl-lilac">lilac</span> flame and a white powder.',
+      flame: 'lilac',
+      powder: 'white'
+    },
+    {
+      ask: 'Sodium. Flame colour?',
+      options: [
+        '<span class="hl hl-lilac">Lilac</span>',
+        '<span class="hl hl-gold">Golden yellow</span>',
+        '<span class="hl hl-white">Bright white</span>'
+      ],
+      correct: 1,
+      eq: '4Na + O<sub>2</sub> → 2Na<sub>2</sub>O',
+      desc: 'Gentle heating gives a <span class="hl hl-gold">golden yellow</span> flame and a white powder.',
+      flame: 'gold',
+      powder: 'white'
+    },
+    {
+      ask: 'Calcium. Flame colour?',
+      options: [
+        '<span class="hl hl-gold">Golden yellow</span>',
+        '<span class="hl hl-brick">Brick-red</span>',
+        '<span class="hl hl-white">Bright white</span>'
+      ],
+      correct: 1,
+      eq: '2Ca + O<sub>2</sub> → 2CaO',
+      desc: 'Strong heating gives a <span class="hl hl-brick">brick-red</span> flame and a white powder.',
+      flame: 'brick',
+      powder: 'white'
+    },
+    {
+      ask: 'Magnesium. Flame colour?',
+      options: [
+        '<span class="hl hl-brick">Brick-red</span>',
+        '<span class="hl hl-lilac">Lilac</span>',
+        '<span class="hl hl-white">Bright white</span>'
+      ],
+      correct: 2,
+      eq: '2Mg + O<sub>2</sub> → 2MgO',
+      desc: 'Strong heating gives a <span class="hl hl-white">bright white</span> flame and a white powder.',
+      flame: 'white',
+      powder: 'white'
+    },
+    {
+      ask: 'Aluminium. The oxide is…',
+      options: [
+        'Al<sub>2</sub>O<sub>3</sub>(g)',
+        'No oxide',
+        'Al<sub>2</sub>O<sub>3</sub>(s)'
+      ],
+      correct: 2,
+      eq: '4Al + 3O<sub>2</sub> → 2<span class="hl hl-solid">Al<sub>2</sub>O<sub>3</sub>(s)</span>',
+      desc: 'The oxide is a solid, not a gas.',
+      flame: 'blue',
+      powder: 'white'
+    },
+    {
+      ask: 'Zinc. The hot powder is…',
+      options: [
+        '<span class="hl hl-black">Black</span>',
+        '<span class="hl hl-hot">Yellow when hot</span>',
+        '<span class="hl hl-orange">Orange when hot</span>'
+      ],
+      correct: 1,
+      coldText: '<span class="hl hl-white">White when cold</span>',
+      coldPowder: 'white',
+      eq: '2Zn + O<sub>2</sub> → 2ZnO',
+      desc: 'The powder is <span class="hl hl-hot">yellow when hot</span> and white when cold.',
+      flame: 'blue',
+      powder: 'yellow'
+    },
+    {
+      ask: 'Lead. The hot powder is…',
+      options: [
+        '<span class="hl hl-hot">Yellow when hot</span>',
+        '<span class="hl hl-black">Black</span>',
+        '<span class="hl hl-orange">Orange when hot</span>'
+      ],
+      correct: 2,
+      coldText: '<span class="hl hl-gold">Yellow when cold</span>',
+      coldPowder: 'yellow',
+      eq: '2Pb + O<sub>2</sub> → 2PbO',
+      desc: 'Lead melts, and the powder is <span class="hl hl-orange">orange when hot</span> and yellow when cold.',
+      flame: 'blue',
+      powder: 'orange',
+      melt: true
+    },
+    {
+      ask: 'Copper. The powder is…',
+      options: [
+        '<span class="hl hl-red">Red</span>',
+        'White',
+        '<span class="hl hl-black">Black</span>'
+      ],
+      correct: 2,
+      eq: '2Cu + O<sub>2</sub> → 2CuO',
+      desc: 'Very strong heating gives a <span class="hl hl-black">black</span> powder.',
+      flame: 'blue',
+      powder: 'black'
+    },
+    {
+      ask: 'Mercury. The powder is…',
+      options: [
+        '<span class="hl hl-black">Black</span>',
+        '<span class="hl hl-red">Red</span>',
+        'White'
+      ],
+      correct: 1,
+      eq: '2Hg(l) + O<sub>2</sub> → 2HgO',
+      desc: 'Very strong heating gives a <span class="hl hl-red">red</span> powder.',
+      flame: 'blue',
+      powder: 'red'
+    },
+    {
+      ask: 'Silver, platinum and gold?',
+      options: [
+        '<span class="hl hl-black">Black powder</span>',
+        'White powder',
+        'No reaction'
+      ],
+      correct: 2,
+      eq: '',
+      desc: 'Silver, platinum and gold do not react with oxygen.',
+      flame: 'blue',
+      powder: 'none'
+    },
+    {
+      ask: 'Iron. The black powder is…',
+      options: [
+        'Fe<sub>2</sub>O<sub>3</sub>',
+        'FeO',
+        'Fe<sub>3</sub>O<sub>4</sub>'
+      ],
+      correct: 2,
+      eq: '3Fe + 2O<sub>2</sub> → <span class="hl hl-solid">Fe<sub>3</sub>O<sub>4</sub></span>',
+      desc: 'Strong heating gives yellow sparks and a black powder.',
+      flame: 'blue',
+      powder: 'black',
+      sparks: true,
+      answer: 'The black powder is Fe<sub>3</sub>O<sub>4</sub>, not brown Fe<sub>2</sub>O<sub>3</sub>.'
+    }
+  ];
+
+  var FLAMES = ['lilac', 'gold', 'brick', 'white', 'blue'];
+  var POWDERS = ['white', 'yellow', 'orange', 'black', 'red', 'none'];
+
+  var backBtn = document.getElementById('backBtn');
+  var nextBtn = document.getElementById('nextBtn');
+  var stepLabel = document.getElementById('stepLabel');
+  var flame = document.getElementById('flame');
+  var equation = document.getElementById('equation');
+  var choiceBtns = document.querySelectorAll('#choices .choice');
+  var answer = document.getElementById('answer');
+  var answerInner = document.getElementById('answerInner');
+  var desc = document.getElementById('desc');
+  var guide = document.getElementById('guide');
+  var guideText = document.getElementById('guideText');
+  var penCanvas = document.getElementById('penCanvas');
+  var laserCanvas = document.getElementById('laserCanvas');
+  var laserDot = document.getElementById('laserDot');
+
+  var step = 0;
+  var solved = [];
+  var missed = [];
+  var coldOn = [];
+  for (var s = 0; s < STEPS.length; s++) {
+    solved.push(false);
+    missed.push({});
+    coldOn.push(false);
+  }
+  var penOn = false;
+  var laserOn = false;
+  var erasing = false;
+  var ink = '#e11d48';
+  var drawing = false;
+  var lastPt = null;
+  var laserX = 0;
+  var laserY = 0;
+  var hasPointer = false;
+  var lastFrame = 0;
+  var laserRunning = false;
+  var penCtx = penCanvas.getContext('2d');
+  var laserCtx = laserCanvas.getContext('2d');
+
+  function choiceLabel(html) {
+    return '<span class="choice-label">' + html + '</span>';
+  }
+
+  function appearance(item, done, cold) {
+    if (!done) return { flame: 'blue', powder: 'none', melt: false, sparks: false };
+    if (cold && item.coldPowder) {
+      return { flame: item.flame, powder: item.coldPowder, melt: false, sparks: false };
+    }
+    return {
+      flame: item.flame,
+      powder: item.powder,
+      melt: !!item.melt,
+      sparks: !!item.sparks
+    };
+  }
+
+  function paint() {
+    var item = STEPS[step];
+    var done = !!solved[step];
+    var look = appearance(item, done, !!coldOn[step]);
+    FLAMES.forEach(function (name) {
+      flame.classList.toggle(name, look.flame === name);
+    });
+    POWDERS.forEach(function (name) {
+      flame.classList.toggle('powder-' + name, look.powder === name);
+    });
+    flame.classList.toggle('melt', look.melt);
+    flame.classList.toggle('sparks-on', look.sparks);
+    var anyMiss = false;
+    for (var m = 0; m < 3; m++) if (missed[step][m]) anyMiss = true;
+    flame.classList.toggle('mood-good', done);
+    flame.classList.toggle('mood-bad', !done && anyMiss);
+    flame.classList.toggle('mood-wait', !done && !anyMiss);
+    var pips = document.querySelectorAll('#pips .pip');
+    for (var p = 0; p < pips.length; p++) pips[p].classList.toggle('on', !!solved[p]);
+    equation.innerHTML = done ? item.eq : item.ask;
+    desc.innerHTML = done ? item.desc : PROMPT;
+    for (var i = 0; i < choiceBtns.length; i++) {
+      var toggle = done && item.coldText && i === item.correct;
+      var label = (toggle && coldOn[step]) ? item.coldText : item.options[i];
+      choiceBtns[i].innerHTML = choiceLabel(label);
+      choiceBtns[i].classList.toggle('wrong', !!missed[step][i]);
+      choiceBtns[i].classList.toggle('right', done && i === item.correct);
+      choiceBtns[i].disabled = done && !toggle;
+      choiceBtns[i].setAttribute('aria-pressed', (done && i === item.correct) ? 'true' : 'false');
+    }
+    if (done && item.answer) {
+      answerInner.innerHTML = item.answer;
+      answer.setAttribute('aria-hidden', 'false');
+    } else {
+      answerInner.innerHTML = '';
+      answer.setAttribute('aria-hidden', 'true');
+    }
+    if (done && step === 0) guideText.textContent = 'Next changes the question.';
+    else if (done && step === STEPS.length - 1) guideText.textContent = 'Back changes the question.';
+    else if (done) guideText.textContent = 'Next or Back changes the question.';
+    guide.setAttribute('aria-hidden', done ? 'false' : 'true');
+    requestAnimationFrame(fitAnswer);
+  }
+
+  function showStep() {
+    stepLabel.textContent = (step + 1) + ' / ' + STEPS.length;
+    backBtn.disabled = step === 0;
+    nextBtn.disabled = step === STEPS.length - 1;
+    paint();
+  }
+
+  function reserveBoxes() {
+    var choices = document.getElementById('choices');
+    equation.style.height = 'auto';
+    desc.style.height = 'auto';
+    choices.style.height = 'auto';
+    var maxEq = 0;
+    var maxDesc = 0;
+    var maxChoice = 0;
+    desc.innerHTML = PROMPT;
+    if (desc.offsetHeight > maxDesc) maxDesc = desc.offsetHeight;
+    for (var i = 0; i < STEPS.length; i++) {
+      equation.innerHTML = STEPS[i].ask;
+      if (equation.offsetHeight > maxEq) maxEq = equation.offsetHeight;
+      equation.innerHTML = STEPS[i].eq || '\u00a0';
+      if (equation.offsetHeight > maxEq) maxEq = equation.offsetHeight;
+      desc.innerHTML = STEPS[i].desc;
+      if (desc.offsetHeight > maxDesc) maxDesc = desc.offsetHeight;
+      for (var b = 0; b < choiceBtns.length; b++) {
+        choiceBtns[b].innerHTML = choiceLabel(STEPS[i].options[b]);
+      }
+      if (choices.offsetHeight > maxChoice) maxChoice = choices.offsetHeight;
+      if (STEPS[i].coldText) {
+        choiceBtns[STEPS[i].correct].innerHTML = choiceLabel(STEPS[i].coldText);
+        if (choices.offsetHeight > maxChoice) maxChoice = choices.offsetHeight;
+      }
+    }
+    equation.style.height = Math.max(maxEq, 38 * 1.15) + 'px';
+    desc.style.height = Math.max(maxDesc, 38 * 1.15 * 2) + 'px';
+    choices.style.height = Math.max(maxChoice, 44) + 'px';
+    paint();
+  }
+
+  function fitAnswer() {
+    answerInner.style.transform = '';
+    if (answer.getAttribute('aria-hidden') === 'true') return;
+    var max = answer.clientWidth - 8;
+    var w = answerInner.scrollWidth;
+    if (w > max && max > 0) {
+      answerInner.style.transform = 'scale(' + (max / w) + ')';
+    }
+  }
+
+  backBtn.addEventListener('click', function () {
+    if (step > 0) step -= 1;
+    showStep();
+  });
+  nextBtn.addEventListener('click', function () {
+    if (step < STEPS.length - 1) step += 1;
+    showStep();
+  });
+  var effectTimer = 0;
+  function playEffect(kind, btn) {
+    var stage = document.getElementById('stage');
+    window.clearTimeout(effectTimer);
+    stage.classList.remove('good', 'bad');
+    flame.classList.remove('burst', 'sputter');
+    equation.classList.remove('reveal');
+    for (var n = 0; n < choiceBtns.length; n++) {
+      choiceBtns[n].classList.remove('pop', 'shake');
+    }
+    void stage.offsetWidth;
+    if (kind === 'good') {
+      stage.classList.add('good');
+      flame.classList.add('burst');
+      equation.classList.add('reveal');
+      btn.classList.add('pop');
+    } else {
+      stage.classList.add('bad');
+      flame.classList.add('sputter');
+      btn.classList.add('shake');
+    }
+    effectTimer = window.setTimeout(function () {
+      stage.classList.remove('good', 'bad');
+      flame.classList.remove('burst', 'sputter');
+      equation.classList.remove('reveal');
+      btn.classList.remove('pop', 'shake');
+    }, 760);
+  }
+  document.getElementById('choices').addEventListener('click', function (e) {
+    var btn = e.target.closest('.choice');
+    if (!btn || btn.disabled) return;
+    var i = Number(btn.getAttribute('data-i'));
+    var item = STEPS[step];
+    if (solved[step]) {
+      if (item.coldText && i === item.correct) {
+        coldOn[step] = !coldOn[step];
+        paint();
+      }
+      return;
+    }
+    if (i === item.correct) solved[step] = true;
+    else missed[step][i] = true;
+    paint();
+    playEffect(i === item.correct ? 'good' : 'bad', btn);
+  });
+
+  function resizeCanvas(c) {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var cssW = window.innerWidth;
+    var cssH = window.innerHeight;
+    var w = Math.round(cssW * dpr);
+    var h = Math.round(cssH * dpr);
+    c.style.width = cssW + 'px';
+    c.style.height = cssH + 'px';
+    if (c.width === w && c.height === h) return;
+    c.width = w;
+    c.height = h;
+    c.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function wipe(c) {
+    var ctx = c.getContext('2d');
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, c.width, c.height);
+    ctx.restore();
+  }
+  function setPen(on) {
+    if (on) {
+      laserOn = false;
+      document.body.classList.remove('laser-on');
+      document.getElementById('dkLaser').classList.remove('active');
+      laserDot.classList.add('hidden');
+    }
+    penOn = on;
+    document.body.classList.toggle('pen-on', on);
+    document.getElementById('dkPen').classList.toggle('active', on);
+    document.getElementById('dkColors').classList.toggle('hidden', !on);
+    if (!on) {
+      erasing = false;
+      document.getElementById('dkErase').classList.remove('active');
+    }
+  }
+  function setLaser(on) {
+    if (on) setPen(false);
+    laserOn = on;
+    document.body.classList.toggle('laser-on', on);
+    document.getElementById('dkLaser').classList.toggle('active', on);
+    if (!on) laserDot.classList.add('hidden');
+    else if (hasPointer) laserDot.classList.remove('hidden');
+    if (on && !laserRunning) {
+      laserRunning = true;
+      lastFrame = 0;
+      requestAnimationFrame(laserFrame);
+    }
+  }
+  document.getElementById('dkPen').addEventListener('click', function () { setPen(!penOn); });
+  document.getElementById('dkLaser').addEventListener('click', function () { setLaser(!laserOn); });
+  document.getElementById('dkErase').addEventListener('click', function () {
+    erasing = !erasing;
+    document.getElementById('dkErase').classList.toggle('active', erasing);
+  });
+  document.getElementById('dkColors').addEventListener('click', function (e) {
+    var btn = e.target.closest('.dcolor');
+    if (!btn) return;
+    ink = btn.dataset.c;
+    erasing = false;
+    document.getElementById('dkErase').classList.remove('active');
+    document.querySelectorAll('.dcolor').forEach(function (el) {
+      el.classList.toggle('active', el === btn);
+    });
+  });
+  document.getElementById('dkClear').addEventListener('click', function () {
+    wipe(penCanvas);
+    wipe(laserCanvas);
+  });
+  function stroke(a, b) {
+    penCtx.lineCap = 'round';
+    penCtx.lineJoin = 'round';
+    if (erasing) {
+      penCtx.globalCompositeOperation = 'destination-out';
+      penCtx.strokeStyle = 'rgba(0,0,0,1)';
+      penCtx.lineWidth = 26;
+    } else {
+      penCtx.globalCompositeOperation = 'source-over';
+      penCtx.strokeStyle = ink;
+      penCtx.lineWidth = 3.6;
+    }
+    penCtx.beginPath();
+    penCtx.moveTo(a.x, a.y);
+    penCtx.lineTo(b.x, b.y);
+    penCtx.stroke();
+  }
+  penCanvas.addEventListener('pointerdown', function (e) {
+    if (!penOn) return;
+    try { penCanvas.setPointerCapture(e.pointerId); } catch (err) {}
+    drawing = true;
+    lastPt = { x: e.clientX, y: e.clientY };
+    stroke(lastPt, lastPt);
+  });
+  penCanvas.addEventListener('pointermove', function (e) {
+    if (!drawing) return;
+    var p = { x: e.clientX, y: e.clientY };
+    stroke(lastPt, p);
+    lastPt = p;
+  });
+  function endDraw() { drawing = false; }
+  penCanvas.addEventListener('pointerup', endDraw);
+  penCanvas.addEventListener('pointercancel', endDraw);
+  document.addEventListener('pointermove', function (e) {
+    laserX = e.clientX;
+    laserY = e.clientY;
+    hasPointer = true;
+    if (!laserOn) return;
+    laserDot.style.left = laserX + 'px';
+    laserDot.style.top = laserY + 'px';
+    laserDot.classList.remove('hidden');
+  });
+  document.addEventListener('pointerleave', function () {
+    hasPointer = false;
+    laserDot.classList.add('hidden');
+  });
+  function laserFrame(now) {
+    if (!laserOn) {
+      laserRunning = false;
+      wipe(laserCanvas);
+      return;
+    }
+    var dt = lastFrame ? Math.min(40, now - lastFrame) : 16;
+    lastFrame = now;
+    laserCtx.save();
+    laserCtx.setTransform(1, 0, 0, 1, 0, 0);
+    laserCtx.globalCompositeOperation = 'destination-out';
+    laserCtx.fillStyle = 'rgba(0,0,0,' + (dt / 1600) + ')';
+    laserCtx.fillRect(0, 0, laserCanvas.width, laserCanvas.height);
+    laserCtx.restore();
+    if (hasPointer) {
+      laserCtx.globalCompositeOperation = 'source-over';
+      laserCtx.fillStyle = 'rgba(255,40,40,0.7)';
+      laserCtx.beginPath();
+      laserCtx.arc(laserX, laserY, 5, 0, Math.PI * 2);
+      laserCtx.fill();
+    }
+    requestAnimationFrame(laserFrame);
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { setPen(false); setLaser(false); }
+  });
+  window.addEventListener('resize', function () {
+    resizeCanvas(penCanvas);
+    resizeCanvas(laserCanvas);
+    reserveBoxes();
+    fitAnswer();
+  });
+
+  resizeCanvas(penCanvas);
+  resizeCanvas(laserCanvas);
+  showStep();
+  reserveBoxes();
+})();
+</script>
+</body>
+</html>

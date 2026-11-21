@@ -1,6 +1,19 @@
 /* James · Chem KOC lead — submissions. */
 KOC.works('chem', 'james', [
   {
+    id: 'metal2-reaction-with-oxygen',
+    title: 'Metal2_Reaction with oxygen_(notes)',
+    original: 'Reaction with oxygen',
+    type: 'interactive',
+    subject: 'Chem',
+    chapter: 'S4 Metal reaction Metal2',
+    submitted: '2026-11-21',
+    tags: ['Interactive', 'S4', 'Metal reaction'],
+    elements: ['wood'],
+    src: 'content/chem/james/reaction-with-oxygen/Metal2_Reaction%20with%20oxygen_(notes).html?v=20261121a',
+    notes: 'Flame colours and oxides of potassium, sodium, calcium, magnesium, aluminium, zinc, lead, copper, mercury, iron, and the unreactive metals. Pen and laser.'
+  },
+  {
     id: 'metal2-metal-reaction',
     title: 'Metal2_Metal reaction_(notes)',
     original: 'Metal reaction',
